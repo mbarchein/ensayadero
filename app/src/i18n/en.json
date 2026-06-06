@@ -24,6 +24,13 @@
     "notifications": "Alerts",
     "profile": "Profile"
   },
+  "join": {
+    "title": "Join a group",
+    "hint": "Enter the 6-character code your director gave you.",
+    "joinBtn": "Join",
+    "joining": "Joining…",
+    "invalid": "Invalid or disabled code."
+  },
   "upcoming": {
     "title": "Upcoming rehearsals",
     "empty": "You have no upcoming rehearsals.",
@@ -46,6 +53,7 @@
     "pendingTitle_other": "You have {{count}} rehearsals to confirm",
     "myGroups": "My groups",
     "newGroup": "Create group",
+    "joinByCode": "Join with code",
     "newGroupTitle": "New group",
     "newGroupHint": "You'll be the director of this group and can invite the others.",
     "signOut": "Sign out",

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
@@ -14,6 +14,7 @@ import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib
 export default function HomePage() {
   const { t } = useTranslation()
   const { profile, signOut } = useAuth()
+  const navigate = useNavigate()
   const qc = useQueryClient()
   const [newGroupOpen, setNewGroupOpen] = useState(false)
   const [groupName, setGroupName] = useState('')
@@ -109,7 +110,12 @@ export default function HomePage() {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{t('home.myGroups')}</h2>
-          <Button onClick={openNewGroup}>{t('home.newGroup')}</Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => navigate('/join')}>
+              {t('home.joinByCode')}
+            </Button>
+            <Button onClick={openNewGroup}>{t('home.newGroup')}</Button>
+          </div>
         </div>
         {memberships?.length === 0 ? (
           <EmptyState message={t('home.noGroups')} />

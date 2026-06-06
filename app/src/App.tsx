@@ -5,6 +5,7 @@ import AuthCallback from './auth/AuthCallback'
 import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
 import MembersPage from './features/groups/MembersPage'
+import JoinPage from './features/groups/JoinPage'
 import AvailabilityPage from './features/availability/AvailabilityPage'
 import UpcomingPage from './features/agenda/UpcomingPage'
 import SessionsPage from './features/sessions/SessionsPage'
@@ -20,8 +21,11 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        {/* /join/:code gestiona su propio login (enlace compartible) */}
+        <Route path="/join/:code" element={<JoinPage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/join" element={<JoinPage />} />
           <Route path="/availability" element={<AvailabilityPage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />

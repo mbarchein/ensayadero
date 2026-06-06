@@ -24,6 +24,13 @@
     "notifications": "Avisos",
     "profile": "Perfil"
   },
+  "join": {
+    "title": "Unirse a un grupo",
+    "hint": "Introduce el código de 6 caracteres que te ha dado tu director.",
+    "joinBtn": "Unirse",
+    "joining": "Uniéndote…",
+    "invalid": "Código no válido o desactivado."
+  },
   "upcoming": {
     "title": "Próximos ensayos",
     "empty": "No tienes ensayos próximos.",
@@ -46,6 +53,7 @@
     "pendingTitle_other": "Tienes {{count}} ensayos por confirmar",
     "myGroups": "Mis grupos",
     "newGroup": "Crear grupo",
+    "joinByCode": "Unirse con código",
     "newGroupTitle": "Nuevo grupo",
     "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
     "signOut": "Salir",

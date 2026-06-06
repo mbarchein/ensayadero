@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { PENDING_JOIN_KEY } from '../features/groups/JoinPage'
 
 export default function AuthCallback() {
   const { t } = useTranslation()
@@ -21,6 +22,13 @@ export default function AuthCallback() {
             : desc ?? null,
         )
         if (!desc) navigate('/login', { replace: true })
+        return
+      }
+      // retomar unión por código si se inició desde un enlace /join/:code
+      const pending = localStorage.getItem(PENDING_JOIN_KEY)
+      if (pending) {
+        localStorage.removeItem(PENDING_JOIN_KEY)
+        navigate(`/join/${pending}`, { replace: true })
         return
       }
       navigate('/', { replace: true })
