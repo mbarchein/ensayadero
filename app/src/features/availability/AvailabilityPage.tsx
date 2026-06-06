@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Check, X, Clock } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -269,8 +269,14 @@ export default function AvailabilityPage() {
         weekMonday={monday}
         cellClass={({ day, slot }) => {
           const ses = sessionCells.get(`${day}:${slot}`)
-          const overlay = ses ? 'ring-2 ring-inset ring-indigo-500' : ''
-          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${overlay}`
+          const ring = ses
+            ? ses.response === 'ACCEPTED'
+              ? 'ring-2 ring-inset ring-green-500'
+              : ses.response === 'DECLINED'
+                ? 'ring-2 ring-inset ring-red-500'
+                : 'ring-2 ring-inset ring-amber-500'
+            : ''
+          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring}`
         }}
         renderCell={({ day, slot }) => {
           const p = sessionCells.get(`${day}:${slot}`)
@@ -280,21 +286,29 @@ export default function AvailabilityPage() {
             const secondSlot =
               !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
             if (firstSlot) {
-              // primer slot: estado de mi respuesta + grupo
-              const icon = p.response === 'ACCEPTED' ? '✓' : p.response === 'DECLINED' ? '✗' : '•'
+              // primer slot: icono de mi respuesta + grupo
+              const RespIcon =
+                p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
+              const color =
+                p.response === 'ACCEPTED'
+                  ? 'text-green-700'
+                  : p.response === 'DECLINED'
+                    ? 'text-red-600'
+                    : 'text-amber-600'
               return (
                 <span
-                  className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-indigo-800"
+                  className={`flex items-center gap-0.5 truncate px-0.5 text-[8px] font-semibold leading-6 ${color}`}
                   title={title}
                 >
-                  {icon} {p.sessions.groups.name}
+                  <RespIcon size={9} className="shrink-0" />
+                  <span className="truncate">{p.sessions.groups.name}</span>
                 </span>
               )
             }
             if (secondSlot) {
               // segundo slot: nombre del ensayo
               return (
-                <span className="block truncate px-0.5 text-[8px] leading-6 text-indigo-500" title={title}>
+                <span className="block truncate px-0.5 text-[8px] leading-6 text-gray-500" title={title}>
                   {p.sessions.title}
                 </span>
               )
