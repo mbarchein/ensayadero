@@ -12,7 +12,7 @@ import { useGroup } from '../groups/useGroup'
 import { supabase } from '../../lib/supabase'
 import { parseRange, type TimeRange } from '../../lib/ranges'
 import { heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
-import WeekGrid, { type CellPos } from '../availability/WeekGrid'
+import WeekGrid from '../availability/WeekGrid'
 import CreateSessionModal from './CreateSessionModal'
 import { Spinner } from '../../components/ui'
 import { Button } from '../../components/ui'
@@ -25,8 +25,11 @@ export default function PlannerPage() {
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const weekEnd = useMemo(() => addDays(monday, 7), [monday])
   const [selected, setSelected] = useState<Set<string> | null>(null) // null = todos
-  const [createAt, setCreateAt] = useState<CellPos | null>(null)
-  const [inspect, setInspect] = useState<CellPos | null>(null)
+  // selección de franja: día + slot ancla + slot final (arrastrar). a/b sin ordenar.
+  const [sel, setSel] = useState<{ day: number; a: number; b: number } | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const selRange = sel ? { lo: Math.min(sel.a, sel.b), hi: Math.max(sel.a, sel.b) } : null
 
   const memberIds = members.map((m) => m.user_id)
   const activeIds = selected ? memberIds.filter((id) => selected.has(id)) : memberIds
@@ -145,7 +148,13 @@ export default function PlannerPage() {
       ) : (
         <WeekGrid
           weekMonday={monday}
-          cellClass={({ day, slot }) => `${heatClass(grid[day][slot], total)} cursor-pointer`}
+          cellClass={({ day, slot }) => {
+            const selected =
+              selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
+            return `${heatClass(grid[day][slot], total)} cursor-pointer ${
+              selected ? 'ring-2 ring-inset ring-violet-600' : ''
+            }`
+          }}
           renderCell={({ day, slot }) => {
             const c = grid[day][slot]
             return c.available.length > 0 ? (
@@ -154,41 +163,57 @@ export default function PlannerPage() {
               </span>
             ) : null
           }}
-          onCellTap={(pos) => setInspect(pos)}
+          onPaintStart={(pos) => {
+            setDragging(true)
+            setSel({ day: pos.day, a: pos.slot, b: pos.slot })
+          }}
+          onPaintMove={(pos) =>
+            // extender solo dentro del mismo día del ancla
+            setSel((prev) => (prev && pos.day === prev.day ? { ...prev, b: pos.slot } : prev))
+          }
+          onPaintEnd={() => setDragging(false)}
         />
       )}
 
-      <p className="text-xs text-gray-500">{t('planner.legend')}</p>
+      <p className="text-xs text-gray-500">{t('planner.legendDrag')}</p>
 
-      {/* detalle de celda */}
-      {inspect && grid && (
+      {/* detalle de la franja seleccionada (agregado del rango) */}
+      {sel && selRange && grid && !dragging && (
         <div className="rounded-xl border bg-white p-4 shadow">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-semibold">
-              {format(slotRange(monday, inspect.day, inspect.slot).start, "EEE d · HH:mm", { locale: dateLocale() })}
+              {format(slotRange(monday, sel.day, selRange.lo).start, "EEE d · HH:mm", { locale: dateLocale() })}
+              –{format(slotRange(monday, sel.day, selRange.hi).end, 'HH:mm')}
             </p>
-            <button onClick={() => setInspect(null)} className="text-gray-400" aria-label={t('common.close')}>
+            <button onClick={() => setSel(null)} className="text-gray-400" aria-label={t('common.close')}>
               ✕
             </button>
           </div>
-          <CellDetail cell={grid[inspect.day][inspect.slot]} activeIds={activeIds} nameOf={nameOf} />
-          <Button className="mt-3 w-full" onClick={() => setCreateAt(inspect)}>
+          <CellDetail
+            cell={mergeCells(grid[sel.day], selRange.lo, selRange.hi)}
+            activeIds={activeIds}
+            nameOf={nameOf}
+          />
+          <Button className="mt-3 w-full" onClick={() => setCreateOpen(true)}>
             {t('planner.createHere')}
           </Button>
         </div>
       )}
 
-      {createAt && grid && (
+      {createOpen && sel && selRange && grid && (
         <CreateSessionModal
           groupId={groupId}
           members={members}
           preselectedIds={activeIds}
-          initialRange={slotRange(monday, createAt.day, createAt.slot)}
+          initialRange={{
+            start: slotRange(monday, sel.day, selRange.lo).start,
+            end: slotRange(monday, sel.day, selRange.hi).end,
+          }}
           grid={grid}
           weekMonday={monday}
           onClose={() => {
-            setCreateAt(null)
-            setInspect(null)
+            setCreateOpen(false)
+            setSel(null)
           }}
         />
       )}
@@ -200,6 +225,20 @@ const chip = (active: boolean) =>
   `rounded-full px-3 py-1 text-xs font-medium transition ${
     active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500 line-through'
   }`
+
+/** Agrega los slots lo..hi de un día en una celda: disponible = quien lo está
+ *  en TODOS los slots (puede hacer la sesión entera); ocupado = unión. */
+function mergeCells(day: HeatCell[], lo: number, hi: number): HeatCell {
+  let available = day[lo].available
+  const busy = new Set<string>()
+  const preferred = new Set(day[lo].preferred)
+  for (let s = lo; s <= hi; s++) {
+    available = available.filter((id) => day[s].available.includes(id))
+    day[s].busy.forEach((id) => busy.add(id))
+    for (const id of [...preferred]) if (!day[s].preferred.includes(id)) preferred.delete(id)
+  }
+  return { available, preferred: [...preferred], busy: [...busy].filter((id) => !available.includes(id)) }
+}
 
 function heatClass(cell: HeatCell, total: number): string {
   if (total === 0) return 'bg-white'

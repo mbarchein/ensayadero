@@ -49,7 +49,10 @@ export default function CreateSessionModal({
   const [scene, setScene] = useState('')
   const [location, setLocation] = useState('')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
-  const [durationMin, setDurationMin] = useState(120)
+  // duración inicial = longitud de la franja arrastrada (mín. 30 min)
+  const [durationMin, setDurationMin] = useState(() =>
+    Math.max(30, Math.round((initialRange.end.getTime() - initialRange.start.getTime()) / 60_000)),
+  )
   const [participants, setParticipants] = useState<ParticipantDraft[]>(
     members.map((m) => ({
       userId: m.user_id,
@@ -212,11 +215,13 @@ export default function CreateSessionModal({
               onChange={(e) => setDurationMin(Number(e.target.value))}
               className="mt-1 w-full rounded-lg border px-3 py-2"
             >
-              {[60, 90, 120, 150, 180, 240].map((m) => (
-                <option key={m} value={m}>
-                  {m / 60} h{m % 60 ? ` ${m % 60} min` : ''}
-                </option>
-              ))}
+              {[...new Set([durationMin, 30, 60, 90, 120, 150, 180, 240])]
+                .sort((a, b) => a - b)
+                .map((m) => (
+                  <option key={m} value={m}>
+                    {m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`}
+                  </option>
+                ))}
             </select>
           </label>
         </div>

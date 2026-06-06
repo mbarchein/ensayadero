@@ -1,7 +1,7 @@
 // Rejilla semanal genérica: pintado (modo edición) o visualización (heatmap).
 // Pointer events → funciona con ratón y táctil (touch-action: none).
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -33,8 +33,11 @@ export default function WeekGrid({
 }: Props) {
   const { t } = useTranslation()
   const gridRef = useRef<HTMLDivElement>(null)
-  const [painting, setPainting] = useState(false)
+  // ref, no state: el handler de pointermove se ejecuta síncronamente tras
+  // pointerdown y un setState no estaría aplicado todavía (closure obsoleta).
+  const paintingRef = useRef(false)
   const movedRef = useRef(false)
+  const lastPos = useRef<CellPos | null>(null)
 
   const posFromEvent = (e: React.PointerEvent): CellPos | null => {
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
@@ -70,20 +73,30 @@ export default function WeekGrid({
             if (!pos) return
             movedRef.current = false
             if (onPaintStart) {
-              setPainting(true)
-              gridRef.current?.setPointerCapture(e.pointerId)
+              paintingRef.current = true
+              lastPos.current = pos
+              try {
+                gridRef.current?.setPointerCapture(e.pointerId)
+              } catch {
+                /* puntero no capturable (algunos entornos); moves caen vía elementFromPoint */
+              }
               onPaintStart(pos)
             }
           }}
           onPointerMove={(e) => {
-            if (!painting) return
-            movedRef.current = true
+            if (!paintingRef.current) return
             const pos = posFromEvent(e)
-            if (pos) onPaintMove?.(pos)
+            if (!pos) return
+            // ignorar moves dentro de la misma celda (evita falsos "moved" en taps)
+            if (lastPos.current && pos.day === lastPos.current.day && pos.slot === lastPos.current.slot)
+              return
+            movedRef.current = true
+            lastPos.current = pos
+            onPaintMove?.(pos)
           }}
           onPointerUp={(e) => {
-            if (painting) {
-              setPainting(false)
+            if (paintingRef.current) {
+              paintingRef.current = false
               onPaintEnd?.()
             }
             if (!movedRef.current && onCellTap) {
@@ -92,7 +105,7 @@ export default function WeekGrid({
             }
           }}
           onPointerCancel={() => {
-            setPainting(false)
+            paintingRef.current = false
             onPaintEnd?.()
           }}
         >

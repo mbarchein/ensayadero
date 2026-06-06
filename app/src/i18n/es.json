@@ -97,6 +97,7 @@
     "directorsOnly": "Solo los directores pueden planificar.",
     "all": "Todos ({{count}})",
     "legend": "El número indica cuántas personas seleccionadas están disponibles. Verde intenso = todas. Toca una franja para ver detalle y crear el ensayo.",
+    "legendDrag": "El número indica cuántas personas seleccionadas están disponibles. Arrastra para seleccionar varias franjas consecutivas y crear el ensayo con esa duración.",
     "availableLabel": "Disponibles:",
     "busyLabel": "Ocupados (otro ensayo):",
     "unavailableLabel": "Sin disponibilidad:",
