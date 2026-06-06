@@ -116,7 +116,7 @@
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos.",
     "tabs": {
       "sessions": "Ensayos",
-      "planner": "Planificar",
+      "planner": "Programar",
       "members": "Miembros"
     }
   },
@@ -143,7 +143,7 @@
   },
   "sessions": {
     "empty": "No hay ensayos programados.",
-    "planOne": "Planificar un ensayo",
+    "planOne": "Programar un ensayo",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
     "archive": "Archivar",
     "status": {
@@ -179,7 +179,7 @@
     "editBtn": "Editar ensayo"
   },
   "planner": {
-    "title": "Planificar ensayo",
+    "title": "Programar ensayo",
     "directorsOnly": "Solo los directores pueden planificar.",
     "membersOnly": "Debes ser miembro del grupo para planificar.",
     "all": "Todos ({{count}})",
