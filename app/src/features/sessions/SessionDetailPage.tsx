@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { MapPin } from 'lucide-react'
+import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
@@ -14,7 +15,7 @@ import type { ParticipantResponse, SessionWithParticipants } from '../../lib/typ
 export default function SessionDetailPage() {
   const { t } = useTranslation()
   const { sessionId } = useParams<{ sessionId: string }>()
-  const { groupId, isInstructor } = useGroup()
+  const { groupId, group, isInstructor } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -82,6 +83,10 @@ export default function SessionDetailPage() {
       </Link>
 
       <header className="space-y-1">
+        <div className="flex items-center gap-2">
+          <GroupAvatar seed={group?.avatar_seed || groupId} size={28} />
+          <span className="text-sm font-medium text-gray-500">{group?.name}</span>
+        </div>
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">{session.title}</h1>
           <Badge

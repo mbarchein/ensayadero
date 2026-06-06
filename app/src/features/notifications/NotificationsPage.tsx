@@ -24,11 +24,11 @@ export default function NotificationsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notifications')
-        .select('*')
+        .select('*, groups(name)')
         .order('created_at', { ascending: false })
         .limit(50)
       if (error) throw error
-      return data as Notification[]
+      return data as (Notification & { groups: { name: string } | null })[]
     },
   })
 
@@ -84,6 +84,7 @@ export default function NotificationsPage() {
                     </p>
                   )}
                   <p className="text-xs text-gray-400">
+                    {n.groups?.name ? `${n.groups.name} · ` : ''}
                     {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: dateLocale() })}
                   </p>
                 </div>
