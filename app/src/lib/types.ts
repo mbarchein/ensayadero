@@ -9,6 +9,7 @@ export interface Profile {
   email: string
   name: string
   phone: string | null
+  gender: 'F' | 'M' | null
   avatar_url: string | null
   platform_role: PlatformRole
 }

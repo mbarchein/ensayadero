@@ -13,6 +13,10 @@
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",
+    "INSTRUCTOR_F": "Director",
+    "INSTRUCTOR_M": "Director",
+    "ACTOR_F": "Actress",
+    "ACTOR_M": "Actor",
     "SUPERADMIN": "Superadmin",
     "toInstructor": "→ Director",
     "toActor": "→ Actor"
@@ -110,7 +114,11 @@
     "regenerateAvatar": "Regenerate avatar",
     "leave": "Leave group",
     "leaveConfirm": "Leave this group? You'll be removed from its rehearsals.",
-    "tabs": { "sessions": "Rehearsals", "planner": "Plan", "members": "Members" }
+    "tabs": {
+      "sessions": "Rehearsals",
+      "planner": "Plan",
+      "members": "Members"
+    }
   },
   "invite": {
     "title": "Invite to the group",
@@ -137,11 +145,24 @@
     "planOne": "Plan a rehearsal",
     "pastAndCancelled": "Past and cancelled ({{count}})",
     "archive": "Archive",
-    "status": { "DRAFT": "Draft", "CONFIRMED": "Scheduled", "CANCELLED": "Cancelled" },
-    "response": { "going": "Going", "notGoing": "Not going", "pendingShort": "To confirm", "notGoingList": "Not going", "pending": "Pending" },
+    "status": {
+      "DRAFT": "Draft",
+      "CONFIRMED": "Scheduled",
+      "CANCELLED": "Cancelled"
+    },
+    "response": {
+      "going": "Going",
+      "notGoing": "Not going",
+      "pendingShort": "To confirm",
+      "notGoingList": "Not going",
+      "pending": "Pending"
+    },
     "backToSessions": "‹ Rehearsals",
     "scene": "Scene: {{scene}}",
-    "yourAttendance": { "required": "Your attendance is required.", "optional": "Your attendance is optional." },
+    "yourAttendance": {
+      "required": "Your attendance is required.",
+      "optional": "Your attendance is optional."
+    },
     "areYouGoing": "Are you going?",
     "goingBtn": "✓ Going",
     "cantGoBtn": "✗ Can't make it",
@@ -153,7 +174,8 @@
     "cancelBtn": "Cancel rehearsal",
     "cancelConfirm": "Cancel this rehearsal? All participants will be notified.",
     "deleteDraft": "Delete draft",
-    "deleteDraftConfirm": "Delete this draft?"
+    "deleteDraftConfirm": "Delete this draft?",
+    "editBtn": "Edit rehearsal"
   },
   "planner": {
     "title": "Plan rehearsal",
@@ -212,6 +234,11 @@
     "title": "Profile",
     "name": "Name",
     "phone": "Phone",
+    "gender": "Pronoun (optional)",
+    "genderHint": "Only used to show your role as actress/actor or director in the app.",
+    "genderNone": "Unspecified",
+    "genderF": "She",
+    "genderM": "He",
     "savingDetails": "Saving…",
     "detailsSaved": "✓ Saved",
     "pushTitle": "Push notifications",

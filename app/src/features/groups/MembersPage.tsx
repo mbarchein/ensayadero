@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { LogOut } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
+import { roleLabel } from '../../lib/roleLabel'
 import type { GroupRole, Invitation } from '../../lib/types'
 
 export default function MembersPage() {
@@ -92,7 +93,7 @@ export default function MembersPage() {
               <div>
                 <p className="text-sm font-medium">{m.profiles.name || m.profiles.email}</p>
                 <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                  {t(`roles.${m.role}`)}
+                  {roleLabel(t, m.role, m.profiles.gender)}
                 </Badge>
               </div>
             </div>

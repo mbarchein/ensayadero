@@ -13,6 +13,10 @@
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",
+    "INSTRUCTOR_F": "Directora",
+    "INSTRUCTOR_M": "Director",
+    "ACTOR_F": "Actriz",
+    "ACTOR_M": "Actor",
     "SUPERADMIN": "Superadmin",
     "toInstructor": "→ Director",
     "toActor": "→ Actor"
@@ -110,7 +114,11 @@
     "regenerateAvatar": "Regenerar avatar",
     "leave": "Abandonar grupo",
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos.",
-    "tabs": { "sessions": "Ensayos", "planner": "Planificar", "members": "Miembros" }
+    "tabs": {
+      "sessions": "Ensayos",
+      "planner": "Planificar",
+      "members": "Miembros"
+    }
   },
   "invite": {
     "title": "Invitar al grupo",
@@ -137,11 +145,24 @@
     "planOne": "Planificar un ensayo",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
     "archive": "Archivar",
-    "status": { "DRAFT": "Borrador", "CONFIRMED": "Programado", "CANCELLED": "Cancelado" },
-    "response": { "going": "Voy", "notGoing": "No voy", "pendingShort": "Por confirmar", "notGoingList": "No va", "pending": "Pendiente" },
+    "status": {
+      "DRAFT": "Borrador",
+      "CONFIRMED": "Programado",
+      "CANCELLED": "Cancelado"
+    },
+    "response": {
+      "going": "Voy",
+      "notGoing": "No voy",
+      "pendingShort": "Por confirmar",
+      "notGoingList": "No va",
+      "pending": "Pendiente"
+    },
     "backToSessions": "‹ Ensayos",
     "scene": "Escena: {{scene}}",
-    "yourAttendance": { "required": "Tu asistencia es obligatoria.", "optional": "Tu asistencia es opcional." },
+    "yourAttendance": {
+      "required": "Tu asistencia es obligatoria.",
+      "optional": "Tu asistencia es opcional."
+    },
     "areYouGoing": "¿Vas a ir?",
     "goingBtn": "✓ Voy",
     "cantGoBtn": "✗ No puedo",
@@ -153,7 +174,8 @@
     "cancelBtn": "Cancelar ensayo",
     "cancelConfirm": "¿Cancelar este ensayo? Se notificará a todos los participantes.",
     "deleteDraft": "Eliminar borrador",
-    "deleteDraftConfirm": "¿Eliminar este borrador?"
+    "deleteDraftConfirm": "¿Eliminar este borrador?",
+    "editBtn": "Editar ensayo"
   },
   "planner": {
     "title": "Planificar ensayo",
@@ -212,6 +234,11 @@
     "title": "Perfil",
     "name": "Nombre",
     "phone": "Teléfono",
+    "gender": "Pronombre (opcional)",
+    "genderHint": "Se usa solo para mostrar tu rol como actriz/actor o directora/director en la app.",
+    "genderNone": "Sin especificar",
+    "genderF": "Ella",
+    "genderM": "Él",
     "savingDetails": "Guardando…",
     "detailsSaved": "✓ Guardado",
     "pushTitle": "Notificaciones push",

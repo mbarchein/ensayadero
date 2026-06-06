@@ -12,17 +12,19 @@ export default function ProfilePage() {
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [gender, setGender] = useState<'' | 'F' | 'M'>('')
   const [savedAt, setSavedAt] = useState(false)
   useEffect(() => {
     setName(profile?.name ?? '')
     setPhone(profile?.phone ?? '')
+    setGender(profile?.gender ?? '')
   }, [profile])
 
   const saveDetails = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from('profiles')
-        .update({ name: name.trim(), phone: phone.trim() || null })
+        .update({ name: name.trim(), phone: phone.trim() || null, gender: gender || null })
         .eq('id', profile!.id)
       if (error) throw error
       await refreshProfile()
@@ -32,7 +34,10 @@ export default function ProfilePage() {
       setTimeout(() => setSavedAt(false), 2000)
     },
   })
-  const dirty = name.trim() !== (profile?.name ?? '') || phone.trim() !== (profile?.phone ?? '')
+  const dirty =
+    name.trim() !== (profile?.name ?? '') ||
+    phone.trim() !== (profile?.phone ?? '') ||
+    gender !== (profile?.gender ?? '')
 
   const deleteAccount = useMutation({
     mutationFn: async () => {
@@ -78,6 +83,19 @@ export default function ProfilePage() {
             className="mt-1 w-full rounded-lg border px-3 py-2"
             placeholder="+34 600 000 000"
           />
+        </label>
+        <label className="block text-sm">
+          {t('profile.gender')}
+          <select
+            value={gender}
+            onChange={(e) => setGender(e.target.value as '' | 'F' | 'M')}
+            className="mt-1 w-full rounded-lg border px-3 py-2"
+          >
+            <option value="">{t('profile.genderNone')}</option>
+            <option value="F">{t('profile.genderF')}</option>
+            <option value="M">{t('profile.genderM')}</option>
+          </select>
+          <span className="mt-1 block text-xs text-gray-500">{t('profile.genderHint')}</span>
         </label>
         {saveDetails.isError && (
           <p className="text-sm text-red-600">{(saveDetails.error as Error).message}</p>

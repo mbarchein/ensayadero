@@ -9,7 +9,8 @@ import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
-import { expandAvailability } from '../../lib/slots'
+import { expandAvailability, isoDay } from '../../lib/slots'
+import { roleLabel } from '../../lib/roleLabel'
 import { Badge, Button, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
@@ -195,6 +196,17 @@ export default function SessionDetailPage() {
 
       {isInstructor && (
         <section className="space-y-2 border-t pt-4">
+          {session.status !== 'CANCELLED' && (
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() =>
+                navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)
+              }
+            >
+              {t('sessions.editBtn')}
+            </Button>
+          )}
           {session.status === 'DRAFT' && (
             <Button onClick={() => setStatus.mutate('CONFIRMED')} className="w-full">
               {t('sessions.confirmBtn')}
@@ -253,7 +265,9 @@ function ParticipantList({
                 <span className="flex items-center gap-2">
                   {p.profiles.name || p.profiles.email}
                   {role && (
-                    <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>{t(`roles.${role}`)}</Badge>
+                    <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                      {roleLabel(t, role, p.profiles.gender)}
+                    </Badge>
                   )}
                 </span>
                 <Badge color={p.response === 'ACCEPTED' ? 'green' : p.response === 'DECLINED' ? 'red' : 'amber'}>

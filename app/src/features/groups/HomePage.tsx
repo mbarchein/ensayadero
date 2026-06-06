@@ -11,6 +11,7 @@ import { randomPlay } from '../../lib/plays'
 import { LogOut } from 'lucide-react'
 import { Badge, Button, EmptyState, Modal, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
+import { roleLabel } from '../../lib/roleLabel'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
 export default function HomePage() {
@@ -134,7 +135,7 @@ export default function HomePage() {
                     <div>
                       <p className="font-medium">{m.groups.name}</p>
                       <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                        {t(`roles.${m.role}`)}
+                        {roleLabel(t, m.role, profile?.gender)}
                       </Badge>
                     </div>
                   </div>
