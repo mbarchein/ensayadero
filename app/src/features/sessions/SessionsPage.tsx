@@ -8,6 +8,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { Badge, EmptyState, Spinner } from '../../components/ui'
+import GroupAvatar from '../groups/GroupAvatar'
 import type { SessionWithParticipants } from '../../lib/types'
 
 const STATUS_COLOR = {
@@ -72,7 +73,10 @@ export default function SessionsPage() {
         <Link to="/" className="text-sm text-gray-500">
           {t('group.backToGroups')}
         </Link>
-        <h1 className="text-xl font-bold">{group?.name}</h1>
+        <div className="flex items-center gap-3">
+          <GroupAvatar seed={groupId} />
+          <h1 className="text-xl font-bold">{group?.name}</h1>
+        </div>
       </header>
 
       <nav className="flex gap-2 text-sm">
