@@ -1,0 +1,41 @@
+# Stack de DESARROLLO local.
+# Nota: el backend local (Postgres, Auth, API, Studio) lo levanta `supabase start`
+# (la CLI gestiona sus propios contenedores). Este compose cubre el frontend.
+#
+#   make dev          → supabase start + vite dev (sin docker para el front)
+#   docker compose up → frontend dev containerizado (alternativa)
+
+services:
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./app:/app
+      - app_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      # host.docker.internal → supabase local de la CLI
+      VITE_SUPABASE_URL: http://host.docker.internal:54321
+    env_file:
+      - path: ./app/.env.local
+        required: false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Preview del build de producción
+  app-preview:
+    profiles: ["preview"]
+    build:
+      context: ./app
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-http://localhost:54321}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+        VITE_APP_URL: http://localhost:8080
+        VITE_VAPID_PUBLIC_KEY: ${VITE_VAPID_PUBLIC_KEY:-}
+    ports:
+      - "8080:80"
+
+volumes:
+  app_node_modules:

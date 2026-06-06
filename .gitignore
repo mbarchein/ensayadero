@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+.wrangler/
+
+# Entornos — nunca commitear secretos
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# PWA artefactos generados
+dev-dist/
