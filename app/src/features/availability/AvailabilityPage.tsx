@@ -275,19 +275,31 @@ export default function AvailabilityPage() {
         renderCell={({ day, slot }) => {
           const p = sessionCells.get(`${day}:${slot}`)
           if (p) {
-            // primer slot del ensayo: título + estado de mi respuesta
+            const title = `${p.sessions.title} — ${p.sessions.groups.name}`
             const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
-            if (!firstSlot) return null
-            const icon =
-              p.response === 'ACCEPTED' ? '✓' : p.response === 'DECLINED' ? '✗' : '•'
-            return (
-              <span
-                className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-indigo-800"
-                title={`${p.sessions.title} — ${p.sessions.groups.name}`}
-              >
-                {icon} {p.sessions.title}
-              </span>
-            )
+            const secondSlot =
+              !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
+            if (firstSlot) {
+              // primer slot: estado de mi respuesta + grupo
+              const icon = p.response === 'ACCEPTED' ? '✓' : p.response === 'DECLINED' ? '✗' : '•'
+              return (
+                <span
+                  className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-indigo-800"
+                  title={title}
+                >
+                  {icon} {p.sessions.groups.name}
+                </span>
+              )
+            }
+            if (secondSlot) {
+              // segundo slot: nombre del ensayo
+              return (
+                <span className="block truncate px-0.5 text-[8px] leading-6 text-indigo-500" title={title}>
+                  {p.sessions.title}
+                </span>
+              )
+            }
+            return null
           }
           return null
         }}
