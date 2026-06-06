@@ -5,7 +5,7 @@ import { useRef, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
-import { DAY_END_HOUR, DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY } from '../../lib/slots'
+import { DAY_END_HOUR, DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
 export interface CellPos {
   day: number
@@ -38,6 +38,8 @@ export default function WeekGrid({
   const paintingRef = useRef(false)
   const movedRef = useRef(false)
   const lastPos = useRef<CellPos | null>(null)
+  const now = new Date()
+  const isPast = (pos: CellPos) => slotRange(weekMonday, pos.day, pos.slot).end <= now
 
   const posFromEvent = (e: React.PointerEvent): CellPos | null => {
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
@@ -70,7 +72,7 @@ export default function WeekGrid({
           className="grid touch-none grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
-            if (!pos) return
+            if (!pos || isPast(pos)) return // no se edita el pasado
             movedRef.current = false
             if (onPaintStart) {
               paintingRef.current = true
@@ -86,7 +88,7 @@ export default function WeekGrid({
           onPointerMove={(e) => {
             if (!paintingRef.current) return
             const pos = posFromEvent(e)
-            if (!pos) return
+            if (!pos || isPast(pos)) return
             // ignorar moves dentro de la misma celda (evita falsos "moved" en taps)
             if (lastPos.current && pos.day === lastPos.current.day && pos.slot === lastPos.current.slot)
               return
@@ -101,7 +103,7 @@ export default function WeekGrid({
             }
             if (!movedRef.current && onCellTap) {
               const pos = posFromEvent(e)
-              if (pos) onCellTap(pos)
+              if (pos && !isPast(pos)) onCellTap(pos)
             }
           }}
           onPointerCancel={() => {
@@ -110,7 +112,14 @@ export default function WeekGrid({
           }}
         >
           {Array.from({ length: SLOTS_PER_DAY }, (_, s) => (
-            <Row key={s} slot={s} hours={hours} renderCell={renderCell} cellClass={cellClass} />
+            <Row
+              key={s}
+              slot={s}
+              hours={hours}
+              renderCell={renderCell}
+              cellClass={cellClass}
+              isPast={isPast}
+            />
           ))}
         </div>
       </div>
@@ -126,11 +135,13 @@ function Row({
   hours,
   renderCell,
   cellClass,
+  isPast,
 }: {
   slot: number
   hours: number[]
   renderCell: Props['renderCell']
   cellClass: Props['cellClass']
+  isPast: (pos: CellPos) => boolean
 }) {
   const isHourStart = slot % 2 === 0
   return (
@@ -138,18 +149,21 @@ function Row({
       <div className="relative h-6 pr-1 text-right text-[10px] text-gray-400">
         {isHourStart && <span className="absolute -top-1.5 right-1">{hours[slot / 2]}:00</span>}
       </div>
-      {Array.from({ length: 7 }, (_, day) => (
-        <div
-          key={day}
-          data-day={day}
-          data-slot={slot}
-          className={`h-6 border-b border-r border-gray-100 ${
-            isHourStart ? 'border-t border-t-gray-200' : ''
-          } ${cellClass({ day, slot })}`}
-        >
-          {renderCell({ day, slot })}
-        </div>
-      ))}
+      {Array.from({ length: 7 }, (_, day) => {
+        const past = isPast({ day, slot })
+        return (
+          <div
+            key={day}
+            data-day={day}
+            data-slot={slot}
+            className={`h-6 border-b border-r border-gray-100 ${
+              isHourStart ? 'border-t border-t-gray-200' : ''
+            } ${cellClass({ day, slot })} ${past ? 'opacity-35 grayscale' : ''}`}
+          >
+            {renderCell({ day, slot })}
+          </div>
+        )
+      })}
     </>
   )
 }

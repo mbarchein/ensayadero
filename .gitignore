@@ -28,3 +28,4 @@ coverage/
 
 # PWA artefactos generados
 dev-dist/
+*.tsbuildinfo

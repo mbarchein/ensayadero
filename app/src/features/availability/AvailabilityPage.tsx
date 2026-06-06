@@ -206,7 +206,12 @@ export default function AvailabilityPage() {
       </header>
 
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label={t('availability.prevWeek')}>
+        <Button
+          variant="ghost"
+          onClick={() => setWeekOffset((w) => Math.max(-6, w - 1))}
+          disabled={weekOffset <= -6}
+          aria-label={t('availability.prevWeek')}
+        >
           ‹
         </Button>
         <span className="text-sm font-medium">
