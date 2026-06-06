@@ -82,6 +82,12 @@
     "copyConfirm_one": "Copiar a la próxima semana",
     "copyConfirm_other": "Copiar a las próximas {{count}} semanas",
     "clearScheduledConfirm": "Esta franja tiene un ensayo programado. ¿Quitar tu disponibilidad igualmente?",
+    "clearScheduledTitle": "Quitar disponibilidad de un ensayo",
+    "clearScheduledBody": "Vas a quitar tu disponibilidad en franjas con un ensayo programado. ¿Qué quieres quitar?",
+    "clearSelected": "Quitar solo lo seleccionado",
+    "clearFull": "Quitar disponibilidad de todo el ensayo",
+    "slotsCount_one": "{{count}} tramo de 30 min",
+    "slotsCount_other": "{{count}} tramos de 30 min",
     "clearWeek": "Borrar semana",
     "clearWeekConfirm": "Se borrará toda tu disponibilidad de esta semana (los bloques recurrentes quedan como excepción solo esta semana). ¿Continuar?",
     "saveError": "Error al guardar: {{message}}",
@@ -195,6 +201,8 @@
       "SESSION_CONFIRMED": "Ensayo confirmado: {{title}}",
       "SESSION_CANCELLED": "Ensayo cancelado: {{title}}",
       "SESSION_CHANGED": "Cambio de hora: {{title}}",
+      "SESSION_CHANGED_LOCATION": "Cambio de lugar: {{title}}",
+      "SESSION_CHANGED_BOTH": "Cambio de hora y lugar: {{title}}",
       "REMINDER": "Recordatorio: {{title}}"
     }
   },

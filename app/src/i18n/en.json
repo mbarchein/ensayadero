@@ -82,6 +82,12 @@
     "copyConfirm_one": "Copy to next week",
     "copyConfirm_other": "Copy to the next {{count}} weeks",
     "clearScheduledConfirm": "This slot has a scheduled rehearsal. Remove your availability anyway?",
+    "clearScheduledTitle": "Remove availability from a rehearsal",
+    "clearScheduledBody": "You're about to remove your availability on slots with a scheduled rehearsal. What do you want to remove?",
+    "clearSelected": "Remove only the selected part",
+    "clearFull": "Remove availability for the whole rehearsal",
+    "slotsCount_one": "{{count}} 30-min slot",
+    "slotsCount_other": "{{count}} 30-min slots",
     "clearWeek": "Clear week",
     "clearWeekConfirm": "All your availability for this week will be removed (recurring blocks get an exception for this week only). Continue?",
     "saveError": "Error saving: {{message}}",
@@ -195,6 +201,8 @@
       "SESSION_CONFIRMED": "Rehearsal confirmed: {{title}}",
       "SESSION_CANCELLED": "Rehearsal cancelled: {{title}}",
       "SESSION_CHANGED": "Time change: {{title}}",
+      "SESSION_CHANGED_LOCATION": "Location change: {{title}}",
+      "SESSION_CHANGED_BOTH": "Time and location change: {{title}}",
       "REMINDER": "Reminder: {{title}}"
     }
   },

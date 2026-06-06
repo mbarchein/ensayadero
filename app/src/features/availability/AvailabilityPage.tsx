@@ -56,6 +56,7 @@ export default function AvailabilityPage() {
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const [copyOpen, setCopyOpen] = useState(false)
   const [copyN, setCopyN] = useState(1)
+  const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
 
   // ensayos a los que estoy convocado, superpuestos en las franjas horarias
   // de la semana visible. mapa "día:slot" → participación.
@@ -248,31 +249,59 @@ export default function AvailabilityPage() {
   }
 
   // al soltar: si se quitó disponibilidad de franjas con ensayo programado,
-  // pedir confirmación; si se rechaza, restaurarlas. (No usar confirm() durante
-  // el gesto: bloquea el hilo y se pierde el pointerup → clic "pillado".)
+  // abrir modal (no confirm() en el gesto: bloquea el hilo y se pierde el
+  // pointerup → clic "pillado").
   const onPaintEnd = () => {
     const d = draftRef.current
     if (d && serverGrid) {
       const reverted: CellPos[] = []
+      const sessionIds = new Set<string>()
       for (let day = 0; day < 7; day++) {
         for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
-          if (
-            serverGrid[day][slot] !== 'NONE' &&
-            d[day][slot] === 'NONE' &&
-            hasConfirmed({ day, slot })
-          ) {
+          if (serverGrid[day][slot] !== 'NONE' && d[day][slot] === 'NONE' && hasConfirmed({ day, slot })) {
             reverted.push({ day, slot })
+            const p = sessionCells.get(`${day}:${slot}`)
+            if (p) sessionIds.add(p.session_id)
           }
         }
       }
-      if (reverted.length > 0 && !confirm(t('availability.clearScheduledConfirm'))) {
-        setDraft((prev) => {
-          const base = (prev ?? d).map((col) => [...col])
-          for (const p of reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
-          return base
-        })
+      if (reverted.length > 0) {
+        setClearPrompt({ reverted, sessionIds: [...sessionIds] })
+        return // esperar elección del modal antes de guardar
       }
     }
+    scheduleSave()
+  }
+
+  // resolución del modal de franja con ensayo
+  const resolveClear = (choice: 'selected' | 'full' | 'cancel') => {
+    const prompt = clearPrompt
+    setClearPrompt(null)
+    if (!prompt || !serverGrid) {
+      scheduleSave()
+      return
+    }
+    if (choice === 'cancel') {
+      setDraft((prev) => {
+        const base = (prev ?? serverGrid).map((col) => [...col])
+        for (const p of prompt.reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
+        return base
+      })
+    } else if (choice === 'full') {
+      // quitar disponibilidad de TODAS las franjas de esos ensayos esta semana
+      setDraft((prev) => {
+        const base = (prev ?? serverGrid).map((col) => [...col])
+        for (const [key, p] of sessionCells) {
+          if (prompt.sessionIds.includes(p.session_id)) {
+            const [day, slot] = key.split(':').map(Number)
+            base[day][slot] = 'NONE'
+          }
+        }
+        return base
+      })
+    }
+    // 'selected' → dejar como está
+    editSeq.current++
     scheduleSave()
   }
 
@@ -430,6 +459,75 @@ export default function AvailabilityPage() {
               : t('availability.copyConfirm', { count: copyN })}
           </Button>
         </form>
+      </Modal>
+
+      <Modal
+        open={!!clearPrompt}
+        onClose={() => resolveClear('cancel')}
+        title={t('availability.clearScheduledTitle')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('availability.clearScheduledBody')}</p>
+          <ul className="space-y-2">
+            {(clearPrompt?.sessionIds ?? []).map((sid) => {
+              const p = (agenda.data ?? []).find((x) => x.session_id === sid)
+              if (!p) return null
+              const r = parseRange(p.sessions.time_range)
+              return (
+                <li key={sid} className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
+                  <p className="font-medium text-indigo-900">{p.sessions.title}</p>
+                  <p className="text-xs text-indigo-700">
+                    {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
+                  </p>
+                  <p className="text-xs text-indigo-600">
+                    {p.sessions.groups.name}
+                    {p.sessions.location ? ` · ${p.sessions.location}` : ''}
+                  </p>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="space-y-2">
+            {(() => {
+              const rangeOf = (cells: CellPos[]) => {
+                if (cells.length === 0) return ''
+                let start = Infinity
+                let end = -Infinity
+                for (const c of cells) {
+                  const r = slotRange(monday, c.day, c.slot)
+                  start = Math.min(start, r.start.getTime())
+                  end = Math.max(end, r.end.getTime())
+                }
+                return `${format(new Date(start), 'HH:mm')}–${format(new Date(end), 'HH:mm')}`
+              }
+              const selectedCells = clearPrompt?.reverted ?? []
+              const fullCells: CellPos[] = []
+              if (clearPrompt) {
+                for (const [key, p] of sessionCells) {
+                  if (clearPrompt.sessionIds.includes(p.session_id)) {
+                    const [day, slot] = key.split(':').map(Number)
+                    fullCells.push({ day, slot })
+                  }
+                }
+              }
+              return (
+                <>
+                  <Button className="w-full flex flex-col items-center gap-0.5 !py-2" onClick={() => resolveClear('selected')}>
+                    <span>{t('availability.clearSelected')}</span>
+                    <span className="text-xs font-normal opacity-80">{rangeOf(selectedCells)}</span>
+                  </Button>
+                  <Button variant="danger" className="w-full flex flex-col items-center gap-0.5 !py-2" onClick={() => resolveClear('full')}>
+                    <span>{t('availability.clearFull')}</span>
+                    <span className="text-xs font-normal opacity-80">{rangeOf(fullCells)}</span>
+                  </Button>
+                </>
+              )
+            })()}
+            <Button variant="ghost" className="w-full" onClick={() => resolveClear('cancel')}>
+              {t('common.cancel')}
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* ensayos convocados en la semana visible */}
