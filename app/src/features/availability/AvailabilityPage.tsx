@@ -2,7 +2,7 @@
 // Pintar arrastrando; tap cicla NONE → AVAILABLE → PREFERRED → NONE.
 // "Repetir cada semana" convierte los bloques de la semana en recurrentes.
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -63,6 +63,38 @@ export default function AvailabilityPage() {
   const [paintValue, setPaintValue] = useState<SlotState>('AVAILABLE')
   const grid = draft ?? serverGrid
 
+  // ── Autosave: debounce tras cada gesto; reintenta si hubo ediciones en vuelo ──
+  const editSeq = useRef(0) // nº de edición actual
+  const savedSeq = useRef(0) // nº de edición incluida en el último save OK
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const draftRef = useRef<SlotState[][] | null>(null)
+  draftRef.current = draft
+
+  const scheduleSave = () => {
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      const seqAtFire = editSeq.current
+      if (!draftRef.current || seqAtFire === savedSeq.current) return
+      save.mutate(draftRef.current, {
+        onSuccess: () => {
+          savedSeq.current = seqAtFire
+          if (editSeq.current === seqAtFire) {
+            setDraft(null) // sin ediciones nuevas: el servidor ya refleja la rejilla
+          } else {
+            scheduleSave() // hubo trazos durante el save: persistir de nuevo
+          }
+        },
+      })
+    }, 600)
+  }
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  // cambiar de semana invalida el borrador pendiente (cada semana se guarda al pintar)
+  useEffect(() => {
+    setDraft(null)
+    editSeq.current = savedSeq.current
+  }, [monday])
+
   const save = useMutation({
     mutationFn: async (newGrid: SlotState[][]) => {
       // Estrategia simple y robusta: reemplazar las disponibilidades NO recurrentes
@@ -89,7 +121,6 @@ export default function AvailabilityPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['availabilities'] })
-      setDraft(null)
     },
   })
 
@@ -145,6 +176,7 @@ export default function AvailabilityPage() {
   if (isLoading || !grid) return <Spinner />
 
   const applyCell = (pos: CellPos, value: SlotState) => {
+    editSeq.current++
     setDraft((prev) => {
       const base = prev ?? serverGrid!
       const copy = base.map((col) => [...col])
@@ -188,9 +220,7 @@ export default function AvailabilityPage() {
           applyCell(pos, next)
         }}
         onPaintMove={(pos) => applyCell(pos, paintValue)}
-        onPaintEnd={() => {
-          /* se guarda con el botón */
-        }}
+        onPaintEnd={scheduleSave}
       />
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
@@ -206,18 +236,13 @@ export default function AvailabilityPage() {
         </span>
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          onClick={() => draft && save.mutate(draft)}
-          disabled={!draft || save.isPending}
-          className="flex-1"
+      <div className="flex items-center gap-2">
+        <span
+          className={`flex-1 text-sm ${save.isPending || draft ? 'text-gray-400' : 'text-green-600'}`}
+          role="status"
         >
-          {save.isPending
-            ? t('availability.saving')
-            : draft
-              ? t('availability.saveChanges')
-              : t('availability.noChanges')}
-        </Button>
+          {save.isPending || draft ? t('availability.saving') : t('availability.saved')}
+        </span>
         <Button
           variant="secondary"
           onClick={() => {
