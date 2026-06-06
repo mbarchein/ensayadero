@@ -33,17 +33,20 @@ infra/      Terraform: Supabase, Cloudflare Pages + DNS, secrets GitHub
 
 ## Setup desarrollo local
 
-Requisitos: Node 22+, Docker, [Supabase CLI](https://supabase.com/docs/guides/cli), Terraform ≥1.9.
+Requisitos: Docker + make. **Sin Supabase CLI** — el stack completo es docker compose
+(Postgres con pg_cron, GoTrue, PostgREST, gateway nginx, Edge Function en Deno, frontend).
 
 ```bash
-cp .env.example .env
-cp app/.env.example app/.env.local
-supabase start                 # stack local (Postgres, Auth, Studio en :54323)
-# copiar anon key de `supabase status` a app/.env.local
-cd app && npm install && npm run dev
+make up           # todo: app http://localhost:5173, API :54321, db :54322
+make seed-users   # usuarios de prueba (password123) + grupo demo
+make logs         # logs
+make reset        # DB desde cero (migraciones + seed)
+make help         # resto de comandos
 ```
 
-O con docker compose: `docker compose up` (frontend) + `supabase start` (backend).
+Usuarios demo: `admin@local.test` (superadmin), `directora@local.test` (directora),
+`actor1..3@local.test`. Login local por password vía API (la UI usa Google;
+en local puedes activar Google real con `.env`, ver `.env.example`).
 
 ## Provisión de infra (Terraform)
 
