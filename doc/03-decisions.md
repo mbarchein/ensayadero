@@ -70,6 +70,12 @@ Login por password solo en build de desarrollo.
 | D-icons | Iconografía de acciones con `lucide-react`. |
 | D-clear-guard | Quitar disponibilidad sobre un ensayo programado abre modal con detalles y opción de quitar solo lo seleccionado o toda la franja del ensayo. El aviso se ejecuta al **soltar** (no `confirm()` dentro del gesto, que se tragaba el `pointerup`). |
 | D-notify-change | Las notificaciones distinguen cambio de hora / lugar / ambos; el cambio solo de lugar no reinicia respuestas. |
+| D-term-programar | En la UI en español, «Planificar» → «Programar» (pestaña/título). El enum de estado `CONFIRMED` se muestra como «Programado». En inglés se mantiene «Plan»/«Scheduled». El código (rol `INSTRUCTOR`, RPCs, claves i18n `planner.*`) no cambia. |
+| D-group-nav | La navegación del grupo dejó de ser pestañas tipo chip: **botones** «Programar» (CalendarPlus, solo director) y «Miembros» (Users). El chip «Ensayos» era redundante → título encima de la lista. |
+| D-planner-bg | En el planner, las celdas con ensayo tienen **fondo** propio (violeta=programado, ámbar=borrador) además del borde izquierdo, para distinguirlas del color de disponibilidad. |
+| D-invite-disabled | Al desactivar el código de invitación, se ocultan el código y todas las acciones (compartir/copiar/QR/email/regenerar); solo queda una nota y el botón de reactivar. |
+| D-back-consistent | El enlace «back» va pegado al título dentro de `<header>` en todas las vistas (mismo espaciado). |
+| D-promote-icons | Botón de cambiar rol con icono: `UserCog` (hacer director), `UserMinus` (pasar a actor). |
 
 ## Decisiones de modelado relevantes
 - Rangos temporales como `tstzrange` + índices GiST; solapes con `&&`.

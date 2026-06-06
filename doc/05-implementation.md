@@ -86,6 +86,15 @@ editables (`isPast`).
 - Upcoming: lista futura ordenada, aviso de pendientes, confirmación inline,
   «ver en mi agenda» (lleva a la semana del ensayo).
 
+### Vista de grupo (`SessionsPage`)
+Cabecera (back + avatar + nombre + editar grupo). Navegación por **botones**
+(«Programar» director, «Miembros»), no pestañas. Título «Ensayos» sobre la lista
+de próximos; desplegable de pasados/cancelados con botón archivar por tarjeta.
+
+### Planner — fondo de celdas con ensayo
+Las celdas que cubren un ensayo usan fondo propio (violeta=programado,
+ámbar=borrador) + borde izquierdo, distinguiéndose del color del heatmap.
+
 ### Sesión (`SessionDetailPage`)
 Cabecera con avatar+nombre de grupo; participantes con **chip de rol** (con
 género) y nota de **disponibilidad parcial** (horas en que sí puede) o sin
@@ -94,7 +103,8 @@ editar, confirmar, cancelar, eliminar borrador.
 
 ### Invitar (`InvitePanel`, `JoinPage`)
 Código de grupo, enlace (Web Share API + copiar), QR (canvas), regenerar /
-activar-desactivar, email en lote. `JoinPage` une por código; si no hay sesión,
+activar-desactivar, email en lote. Si el código está **desactivado**, se ocultan
+código y acciones; solo queda la nota y el botón de reactivar. `JoinPage` une por código; si no hay sesión,
 guarda el código y reanuda tras login (`AuthCallback`).
 
 ## PWA (`sw.ts`, `vite.config.ts`)
