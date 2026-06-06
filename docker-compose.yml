@@ -95,6 +95,29 @@ services:
       PGRST_JWT_SECRET: *jwt-secret
       PGRST_DB_MAX_ROWS: "1000"
 
+  realtime:
+    image: supabase/realtime:v2.30.23
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      PORT: "4000"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: supabase_admin
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: *jwt-secret
+      SECRET_KEY_BASE: realtimerealtimerealtimerealtimerealtimerealtimerealtime12
+      ERL_AFLAGS: -proto_dist inet_tcp
+      DNS_NODES: "''"
+      RLIMIT_NOFILE: "10000"
+      APP_NAME: realtime
+      SEED_SELF_HOST: "true"
+      RUN_JANITOR: "true"
+
   functions:
     image: denoland/deno:alpine
     depends_on:
