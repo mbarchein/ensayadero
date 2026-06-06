@@ -210,12 +210,13 @@ export default function PlannerPage() {
             const selected =
               selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
             const ses = sessionCells.get(`${day}:${slot}`)
-            const sesBorder = ses
+            // fondo distinto para ensayos: violeta=programado, ámbar=borrador
+            const sesBg = ses
               ? ses.status === 'CONFIRMED'
-                ? 'border-l-4 border-l-violet-600'
-                : 'border-l-4 border-l-amber-400'
-              : ''
-            return `${heatClass(grid[day][slot], total)} cursor-pointer ${sesBorder} ${
+                ? 'bg-violet-300 border-l-4 border-l-violet-700'
+                : 'bg-amber-200 border-l-4 border-l-amber-500'
+              : heatClass(grid[day][slot], total)
+            return `${sesBg} cursor-pointer ${
               selected ? 'ring-2 ring-inset ring-violet-600' : ''
             }`
           }}
