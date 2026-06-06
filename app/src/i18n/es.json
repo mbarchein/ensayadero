@@ -147,6 +147,8 @@
     "cantGoBtn": "✗ No puedo",
     "requiredList": "Obligatorios",
     "optionalList": "Opcionales",
+    "partialAvailability": "Disponibilidad parcial: {{hours}}",
+    "noAvailabilityNote": "Sin disponibilidad en esta franja",
     "confirmBtn": "Confirmar ensayo (notifica a todos)",
     "cancelBtn": "Cancelar ensayo",
     "cancelConfirm": "¿Cancelar este ensayo? Se notificará a todos los participantes.",

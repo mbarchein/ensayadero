@@ -147,6 +147,8 @@
     "cantGoBtn": "✗ Can't make it",
     "requiredList": "Required",
     "optionalList": "Optional",
+    "partialAvailability": "Partial availability: {{hours}}",
+    "noAvailabilityNote": "No availability in this slot",
     "confirmBtn": "Confirm rehearsal (notifies everyone)",
     "cancelBtn": "Cancel rehearsal",
     "cancelConfirm": "Cancel this rehearsal? All participants will be notified.",

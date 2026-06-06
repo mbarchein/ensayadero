@@ -8,14 +8,40 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { parseRange } from '../../lib/ranges'
+import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
+import { expandAvailability } from '../../lib/slots'
 import { Badge, Button, Spinner } from '../../components/ui'
-import type { ParticipantResponse, SessionWithParticipants } from '../../lib/types'
+import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
+
+/** Sub-intervalos disponibles (pintados) de un usuario dentro del rango `r`, fusionados. */
+function availableWithin(avails: Availability[], r: TimeRange): TimeRange[] {
+  const clamped: TimeRange[] = []
+  for (const a of avails) {
+    for (const iv of expandAvailability(a, r.start, r.end)) {
+      if (!overlaps(iv, r)) continue
+      clamped.push({
+        start: new Date(Math.max(iv.start.getTime(), r.start.getTime())),
+        end: new Date(Math.min(iv.end.getTime(), r.end.getTime())),
+      })
+    }
+  }
+  clamped.sort((a, b) => a.start.getTime() - b.start.getTime())
+  const merged: TimeRange[] = []
+  for (const iv of clamped) {
+    const last = merged[merged.length - 1]
+    if (last && iv.start.getTime() <= last.end.getTime()) {
+      if (iv.end > last.end) last.end = iv.end
+    } else {
+      merged.push({ ...iv })
+    }
+  }
+  return merged
+}
 
 export default function SessionDetailPage() {
   const { t } = useTranslation()
   const { sessionId } = useParams<{ sessionId: string }>()
-  const { groupId, group, isInstructor } = useGroup()
+  const { groupId, group, members, isInstructor } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -31,6 +57,21 @@ export default function SessionDetailPage() {
       if (error) throw error
       return data as SessionWithParticipants
     },
+  })
+
+  // disponibilidad de los participantes (para detectar disponibilidad parcial)
+  const participantIds = session?.session_participants.map((p) => p.user_id) ?? []
+  const { data: avails } = useQuery({
+    queryKey: ['session-avail', sessionId, participantIds.join(',')],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('availabilities')
+        .select('*')
+        .in('user_id', participantIds)
+      if (error) throw error
+      return data as Availability[]
+    },
+    enabled: !!session && participantIds.length > 0,
   })
 
   const invalidate = () => {
@@ -75,6 +116,24 @@ export default function SessionDetailPage() {
   const mine = session.session_participants.find((p) => p.user_id === profile?.id)
   const required = session.session_participants.filter((p) => p.required)
   const optional = session.session_participants.filter((p) => !p.required)
+
+  // disponibilidad de cada participante dentro del rango de la sesión
+  const availInfo = new Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>()
+  for (const p of session.session_participants) {
+    const intervals = availableWithin(
+      (avails ?? []).filter((a) => a.user_id === p.user_id),
+      r,
+    )
+    const covered = intervals.reduce((s, iv) => s + (iv.end.getTime() - iv.start.getTime()), 0)
+    const total = r.end.getTime() - r.start.getTime()
+    const coverage = covered === 0 ? 'none' : covered >= total ? 'full' : 'partial'
+    const label = intervals
+      .map((iv) => `${format(iv.start, 'HH:mm')}–${format(iv.end, 'HH:mm')}`)
+      .join(', ')
+    availInfo.set(p.user_id, { coverage, label })
+  }
+
+  const roleOf = (userId: string) => members.find((m) => m.user_id === userId)?.role ?? null
 
   return (
     <div className="space-y-5">
@@ -129,8 +188,10 @@ export default function SessionDetailPage() {
         </section>
       )}
 
-      <ParticipantList title={t('sessions.requiredList')} list={required} />
-      {optional.length > 0 && <ParticipantList title={t('sessions.optionalList')} list={optional} />}
+      <ParticipantList title={t('sessions.requiredList')} list={required} availInfo={availInfo} roleOf={roleOf} />
+      {optional.length > 0 && (
+        <ParticipantList title={t('sessions.optionalList')} list={optional} availInfo={availInfo} roleOf={roleOf} />
+      )}
 
       {isInstructor && (
         <section className="space-y-2 border-t pt-4">
@@ -170,27 +231,50 @@ export default function SessionDetailPage() {
 function ParticipantList({
   title,
   list,
+  availInfo,
+  roleOf,
 }: {
   title: string
   list: SessionWithParticipants['session_participants']
+  availInfo: Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>
+  roleOf: (userId: string) => 'INSTRUCTOR' | 'ACTOR' | null
 }) {
   const { t } = useTranslation()
   return (
     <section>
       <h2 className="mb-2 text-sm font-semibold text-gray-700">{title}</h2>
       <ul className="space-y-1">
-        {list.map((p) => (
-          <li key={p.user_id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm">
-            <span>{p.profiles.name || p.profiles.email}</span>
-            <Badge color={p.response === 'ACCEPTED' ? 'green' : p.response === 'DECLINED' ? 'red' : 'amber'}>
-              {p.response === 'ACCEPTED'
-                ? t('sessions.response.going')
-                : p.response === 'DECLINED'
-                  ? t('sessions.response.notGoingList')
-                  : t('sessions.response.pending')}
-            </Badge>
-          </li>
-        ))}
+        {list.map((p) => {
+          const role = roleOf(p.user_id)
+          const av = availInfo.get(p.user_id)
+          return (
+            <li key={p.user_id} className="rounded-lg bg-gray-50 px-3 py-2 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2">
+                  {p.profiles.name || p.profiles.email}
+                  {role && (
+                    <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>{t(`roles.${role}`)}</Badge>
+                  )}
+                </span>
+                <Badge color={p.response === 'ACCEPTED' ? 'green' : p.response === 'DECLINED' ? 'red' : 'amber'}>
+                  {p.response === 'ACCEPTED'
+                    ? t('sessions.response.going')
+                    : p.response === 'DECLINED'
+                      ? t('sessions.response.notGoingList')
+                      : t('sessions.response.pending')}
+                </Badge>
+              </div>
+              {av?.coverage === 'partial' && (
+                <p className="mt-1 text-xs text-amber-700">
+                  {t('sessions.partialAvailability', { hours: av.label })}
+                </p>
+              )}
+              {av?.coverage === 'none' && (
+                <p className="mt-1 text-xs text-gray-500">{t('sessions.noAvailabilityNote')}</p>
+              )}
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
