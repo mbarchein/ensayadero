@@ -18,6 +18,8 @@ export interface Group {
   name: string
   archived_at: string | null
   created_at: string
+  join_code: string
+  join_enabled: boolean
 }
 
 export interface Membership {

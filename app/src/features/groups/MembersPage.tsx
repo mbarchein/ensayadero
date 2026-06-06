@@ -1,20 +1,19 @@
-import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { Badge, Button, Modal, Spinner } from '../../components/ui'
+import { Badge, Button, Spinner } from '../../components/ui'
+import InvitePanel from './InvitePanel'
 import type { GroupRole, Invitation } from '../../lib/types'
 
 export default function MembersPage() {
   const { t } = useTranslation()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
-  const [inviteOpen, setInviteOpen] = useState(false)
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState<GroupRole>('ACTOR')
+  const navigate = useNavigate()
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations', groupId],
@@ -31,33 +30,18 @@ export default function MembersPage() {
     enabled: isInstructor,
   })
 
-  const invite = useMutation({
+  const leaveGroup = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('invitations').insert({
-        group_id: groupId,
-        email: email.trim().toLowerCase(),
-        role,
-        created_by: profile!.id,
-      })
-      if (error) throw error
-      // notificación de invitación → el worker la envía por email
-      const { data: inv } = await supabase
-        .from('invitations')
-        .select('id')
+      const { error } = await supabase
+        .from('memberships')
+        .delete()
         .eq('group_id', groupId)
-        .eq('email', email.trim().toLowerCase())
-        .is('accepted_at', null)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-      await supabase.functions.invoke('send-notifications', {
-        body: { invitation_id: inv?.id },
-      })
+        .eq('user_id', profile!.id)
+      if (error) throw error
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['invitations', groupId] })
-      setInviteOpen(false)
-      setEmail('')
+      qc.invalidateQueries({ queryKey: ['my-memberships'] })
+      navigate('/', { replace: true })
     },
   })
 
@@ -89,10 +73,9 @@ export default function MembersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
-        {isInstructor && <Button onClick={() => setInviteOpen(true)}>{t('group.invite')}</Button>}
-      </div>
+      <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
+
+      {isInstructor && group && <InvitePanel group={group} />}
 
       <ul className="space-y-2">
         {members.map((m) => (
@@ -158,42 +141,21 @@ export default function MembersPage() {
         </section>
       )}
 
-      <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title={t('group.inviteTitle')}>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault()
-            invite.mutate()
+      <div className="border-t pt-4">
+        <Button
+          variant="ghost"
+          className="text-red-600"
+          disabled={leaveGroup.isPending}
+          onClick={() => {
+            if (confirm(t('group.leaveConfirm'))) leaveGroup.mutate()
           }}
         >
-          <label className="block text-sm">
-            {t('group.email')}
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder="persona@ejemplo.com"
-            />
-          </label>
-          <label className="block text-sm">
-            {t('group.role')}
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as GroupRole)}
-              className="mt-1 w-full rounded-lg border px-3 py-2"
-            >
-              <option value="ACTOR">{t('roles.ACTOR')}</option>
-              <option value="INSTRUCTOR">{t('roles.INSTRUCTOR')}</option>
-            </select>
-          </label>
-          {invite.isError && <p className="text-sm text-red-600">{(invite.error as Error).message}</p>}
-          <Button type="submit" disabled={invite.isPending} className="w-full">
-            {invite.isPending ? t('group.sending') : t('group.sendInvite')}
-          </Button>
-        </form>
-      </Modal>
+          🚪 {t('group.leave')}
+        </Button>
+        {leaveGroup.isError && (
+          <p className="text-sm text-red-600">{(leaveGroup.error as Error).message}</p>
+        )}
+      </div>
     </div>
   )
 }
