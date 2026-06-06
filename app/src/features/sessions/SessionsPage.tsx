@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +20,7 @@ export default function SessionsPage() {
   const { t } = useTranslation()
   const { groupId, group, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
+  const qc = useQueryClient()
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions', groupId],
@@ -34,11 +35,36 @@ export default function SessionsPage() {
     },
   })
 
+  // ids de sesiones archivadas por el usuario actual (oculto solo para mí)
+  const { data: archivedIds } = useQuery({
+    queryKey: ['session-archives'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('session_archives').select('session_id')
+      if (error) throw error
+      return new Set((data as { session_id: string }[]).map((r) => r.session_id))
+    },
+  })
+
+  const archive = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const { error } = await supabase
+        .from('session_archives')
+        .insert({ user_id: profile!.id, session_id: sessionId })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['session-archives'] }),
+  })
+
   if (loading || isLoading) return <Spinner />
 
   const now = new Date()
-  const upcoming = sessions?.filter((s) => parseRange(s.time_range).end >= now && s.status !== 'CANCELLED') ?? []
-  const past = sessions?.filter((s) => parseRange(s.time_range).end < now || s.status === 'CANCELLED') ?? []
+  const hidden = archivedIds ?? new Set<string>()
+  const visible = (sessions ?? []).filter((s) => !hidden.has(s.id))
+  const upcoming = visible.filter((s) => parseRange(s.time_range).end >= now && s.status !== 'CANCELLED')
+  const past = visible.filter((s) => parseRange(s.time_range).end < now || s.status === 'CANCELLED')
+  // archivable: cancelado o ya pasado
+  const canArchive = (s: SessionWithParticipants) =>
+    s.status === 'CANCELLED' || parseRange(s.time_range).end < now
 
   return (
     <div className="space-y-5">
@@ -87,7 +113,13 @@ export default function SessionsPage() {
           </summary>
           <ul className="mt-2 space-y-2 opacity-60">
             {past.map((s) => (
-              <SessionCard key={s.id} session={s} groupId={groupId} userId={profile!.id} />
+              <SessionCard
+                key={s.id}
+                session={s}
+                groupId={groupId}
+                userId={profile!.id}
+                onArchive={canArchive(s) ? () => archive.mutate(s.id) : undefined}
+              />
             ))}
           </ul>
         </details>
@@ -103,16 +135,27 @@ function SessionCard({
   session: s,
   groupId,
   userId,
+  onArchive,
 }: {
   session: SessionWithParticipants
   groupId: string
   userId: string
+  onArchive?: () => void
 }) {
   const { t } = useTranslation()
   const r = parseRange(s.time_range)
   const mine = s.session_participants.find((p) => p.user_id === userId)
   return (
-    <li>
+    <li className="relative">
+      {onArchive && (
+        <button
+          onClick={onArchive}
+          className="absolute right-2 top-2 z-10 rounded-lg px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
+          title={t('sessions.archive')}
+        >
+          🗄 {t('sessions.archive')}
+        </button>
+      )}
       <Link
         to={`/g/${groupId}/sessions/${s.id}`}
         className="block rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"

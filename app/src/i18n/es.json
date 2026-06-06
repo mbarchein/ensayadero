@@ -79,6 +79,7 @@
     "empty": "No hay ensayos programados.",
     "planOne": "Planificar un ensayo",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
+    "archive": "Archivar",
     "status": { "DRAFT": "Borrador", "CONFIRMED": "Confirmado", "CANCELLED": "Cancelado" },
     "response": { "going": "Voy", "notGoing": "No voy", "pendingShort": "Por confirmar", "notGoingList": "No va", "pending": "Pendiente" },
     "backToSessions": "‹ Ensayos",
