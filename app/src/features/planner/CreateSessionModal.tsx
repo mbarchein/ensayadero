@@ -14,7 +14,7 @@ import { supabase } from '../../lib/supabase'
 import { formatRange, type TimeRange } from '../../lib/ranges'
 import { DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
 import { Badge, Button, Modal } from '../../components/ui'
-import type { MembershipWithProfile } from '../../lib/types'
+import type { MembershipWithProfile, SessionWithParticipants } from '../../lib/types'
 
 interface Props {
   groupId: string
@@ -24,6 +24,8 @@ interface Props {
   grid: HeatCell[][]
   weekMonday: Date
   onClose: () => void
+  /** Si se pasa, el modal edita esa sesión en vez de crear una nueva. */
+  session?: SessionWithParticipants
 }
 
 interface ParticipantDraft {
@@ -40,25 +42,30 @@ export default function CreateSessionModal({
   grid,
   weekMonday,
   onClose,
+  session,
 }: Props) {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
-  const [title, setTitle] = useState(() => t('planner.defaultTitle'))
-  const [scene, setScene] = useState('')
-  const [location, setLocation] = useState('')
+  const editing = !!session
+  const [title, setTitle] = useState(() => session?.title ?? t('planner.defaultTitle'))
+  const [scene, setScene] = useState(session?.scene ?? '')
+  const [location, setLocation] = useState(session?.location ?? '')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
-  // duración inicial = longitud de la franja arrastrada (mín. 30 min)
+  // duración inicial = longitud de la sesión / franja arrastrada (mín. 30 min)
   const [durationMin, setDurationMin] = useState(() =>
     Math.max(30, Math.round((initialRange.end.getTime() - initialRange.start.getTime()) / 60_000)),
   )
   const [participants, setParticipants] = useState<ParticipantDraft[]>(
-    members.map((m) => ({
-      userId: m.user_id,
-      included: preselectedIds.includes(m.user_id),
-      required: preselectedIds.includes(m.user_id),
-    })),
+    members.map((m) => {
+      const sp = session?.session_participants.find((p) => p.user_id === m.user_id)
+      return {
+        userId: m.user_id,
+        included: editing ? !!sp : preselectedIds.includes(m.user_id),
+        required: editing ? (sp?.required ?? false) : preselectedIds.includes(m.user_id),
+      }
+    }),
   )
 
   const day = initialRange.start
@@ -98,9 +105,54 @@ export default function CreateSessionModal({
     (p) => p.included && !p.required && !coverage.get(p.userId),
   )
 
+  // reconcilia session_participants: borra los quitados, upsert de los incluidos
+  const syncParticipants = async (sessionId: string) => {
+    const included = participants.filter((p) => p.included)
+    const includedIds = included.map((p) => p.userId)
+    const prevIds = (session?.session_participants ?? []).map((p) => p.user_id)
+    const toRemove = prevIds.filter((id) => !includedIds.includes(id))
+    if (toRemove.length > 0) {
+      const { error } = await supabase
+        .from('session_participants')
+        .delete()
+        .eq('session_id', sessionId)
+        .in('user_id', toRemove)
+      if (error) throw error
+    }
+    if (included.length > 0) {
+      const { error } = await supabase.from('session_participants').upsert(
+        included.map((p) => ({ session_id: sessionId, user_id: p.userId, required: p.required })),
+        { onConflict: 'session_id,user_id' },
+      )
+      if (error) throw error
+    }
+  }
+
   const create = useMutation({
     mutationFn: async (status: 'DRAFT' | 'CONFIRMED') => {
-      const { data: session, error } = await supabase
+      if (editing) {
+        // Actualizar: participantes ANTES de confirmar/cambiar hora, para que los
+        // triggers de notificación incluyan ya la lista correcta.
+        await syncParticipants(session!.id)
+        const { error } = await supabase
+          .from('sessions')
+          .update({
+            title,
+            scene: scene || null,
+            location: location || null,
+            time_range: formatRange(start, end),
+            status, // mantiene o promueve a CONFIRMED
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', session!.id)
+        if (error) throw error
+        if (status === 'CONFIRMED') {
+          supabase.functions.invoke('send-notifications', { body: {} }).catch(() => {})
+        }
+        return session!.id
+      }
+
+      const { data: created, error } = await supabase
         .from('sessions')
         .insert({
           group_id: groupId,
@@ -108,32 +160,30 @@ export default function CreateSessionModal({
           scene: scene || null,
           location: location || null,
           time_range: formatRange(start, end),
-          status: 'DRAFT', // siempre nace DRAFT; confirmar después dispara notificaciones a participantes ya insertados
+          status: 'DRAFT', // siempre nace DRAFT; confirmar dispara notificaciones a participantes ya insertados
           created_by: profile!.id,
         })
         .select()
         .single()
       if (error) throw error
 
-      const rows = participants
-        .filter((p) => p.included)
-        .map((p) => ({ session_id: session.id, user_id: p.userId, required: p.required }))
-      const { error: pError } = await supabase.from('session_participants').insert(rows)
-      if (pError) throw pError
+      await syncParticipants(created.id)
 
       if (status === 'CONFIRMED') {
         const { error: cError } = await supabase
           .from('sessions')
           .update({ status: 'CONFIRMED' })
-          .eq('id', session.id)
+          .eq('id', created.id)
         if (cError) throw cError
         supabase.functions.invoke('send-notifications', { body: {} }).catch(() => {})
       }
-      return session.id as string
+      return created.id as string
     },
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ['sessions', groupId] })
-      navigate(`/g/${groupId}/sessions/${id}`)
+      qc.invalidateQueries({ queryKey: ['week-sessions', groupId] })
+      if (editing) onClose()
+      else navigate(`/g/${groupId}/sessions/${id}`)
     },
   })
 
@@ -142,21 +192,21 @@ export default function CreateSessionModal({
     return m?.profiles.name || m?.profiles.email || '?'
   }
 
+  const confirmIfOutside = () =>
+    requiredOutside.length === 0 ||
+    confirm(
+      t('planner.requiredOutsideConfirm', {
+        names: requiredOutside.map((p) => nameOf(p.userId)).join(', '),
+      }),
+    )
+
   return (
-    <Modal open onClose={onClose} title={t('planner.newSession')}>
+    <Modal open onClose={onClose} title={editing ? t('planner.editSession') : t('planner.newSession')}>
       <form
         className="space-y-4"
         onSubmit={(e) => {
           e.preventDefault()
-          if (
-            requiredOutside.length > 0 &&
-            !confirm(
-              t('planner.requiredOutsideConfirm', {
-                names: requiredOutside.map((p) => nameOf(p.userId)).join(', '),
-              }),
-            )
-          )
-            return
+          if (!confirmIfOutside()) return
           create.mutate('CONFIRMED')
         }}
       >
@@ -296,17 +346,23 @@ export default function CreateSessionModal({
         {create.isError && <p className="text-sm text-red-600">{(create.error as Error).message}</p>}
 
         <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            className="flex-1"
-            disabled={create.isPending}
-            onClick={() => create.mutate('DRAFT')}
-          >
-            {t('planner.saveDraft')}
-          </Button>
+          {session?.status !== 'CONFIRMED' && (
+            <Button
+              type="button"
+              variant="secondary"
+              className="flex-1"
+              disabled={create.isPending}
+              onClick={() => create.mutate('DRAFT')}
+            >
+              {t('planner.saveDraft')}
+            </Button>
+          )}
           <Button type="submit" className="flex-1" disabled={create.isPending}>
-            {create.isPending ? t('planner.creating') : t('planner.confirmAndNotify')}
+            {create.isPending
+              ? t('planner.creating')
+              : session?.status === 'CONFIRMED'
+                ? t('planner.saveChanges')
+                : t('planner.confirmAndNotify')}
           </Button>
         </div>
       </form>

@@ -10,13 +10,13 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
 import { supabase } from '../../lib/supabase'
-import { parseRange, type TimeRange } from '../../lib/ranges'
-import { heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
+import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
+import { SLOTS_PER_DAY, heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
 import CreateSessionModal from './CreateSessionModal'
-import { Spinner } from '../../components/ui'
+import { Badge, Spinner } from '../../components/ui'
 import { Button } from '../../components/ui'
-import type { Availability } from '../../lib/types'
+import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
@@ -29,6 +29,7 @@ export default function PlannerPage() {
   const [sel, setSel] = useState<{ day: number; a: number; b: number } | null>(null)
   const [dragging, setDragging] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
+  const [editSession, setEditSession] = useState<SessionWithParticipants | null>(null)
   const selRange = sel ? { lo: Math.min(sel.a, sel.b), hi: Math.max(sel.a, sel.b) } : null
 
   const memberIds = members.map((m) => m.user_id)
@@ -58,6 +59,36 @@ export default function PlannerPage() {
       return data as { user_id: string; busy: string }[]
     },
   })
+
+  // sesiones del grupo que solapan la semana visible (borradores + confirmadas)
+  const { data: weekSessions } = useQuery({
+    queryKey: ['week-sessions', groupId, monday.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*, session_participants(*, profiles(*))')
+        .eq('group_id', groupId)
+        .neq('status', 'CANCELLED')
+        .filter('time_range', 'ov', `[${monday.toISOString()},${weekEnd.toISOString()})`)
+        .order('time_range', { ascending: true })
+      if (error) throw error
+      return data as SessionWithParticipants[]
+    },
+  })
+
+  // mapa [día][slot] → sesión que lo cubre (para pintar overlay en el grid)
+  const sessionCells = useMemo(() => {
+    const map = new Map<string, SessionWithParticipants>()
+    for (const s of weekSessions ?? []) {
+      const r = parseRange(s.time_range)
+      for (let d = 0; d < 7; d++) {
+        for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+          if (overlaps(slotRange(monday, d, slot), r)) map.set(`${d}:${slot}`, s)
+        }
+      }
+    }
+    return map
+  }, [weekSessions, monday])
 
   const grid = useMemo(() => {
     if (!availabilities) return null
@@ -151,11 +182,30 @@ export default function PlannerPage() {
           cellClass={({ day, slot }) => {
             const selected =
               selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
-            return `${heatClass(grid[day][slot], total)} cursor-pointer ${
+            const ses = sessionCells.get(`${day}:${slot}`)
+            const sesBorder = ses
+              ? ses.status === 'CONFIRMED'
+                ? 'border-l-4 border-l-violet-600'
+                : 'border-l-4 border-l-amber-400'
+              : ''
+            return `${heatClass(grid[day][slot], total)} cursor-pointer ${sesBorder} ${
               selected ? 'ring-2 ring-inset ring-violet-600' : ''
             }`
           }}
           renderCell={({ day, slot }) => {
+            const ses = sessionCells.get(`${day}:${slot}`)
+            if (ses) {
+              // primer slot de la sesión muestra su título abreviado
+              const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
+              return firstSlot ? (
+                <span
+                  className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-violet-900"
+                  title={ses.title}
+                >
+                  {ses.title}
+                </span>
+              ) : null
+            }
             const c = grid[day][slot]
             return c.available.length > 0 ? (
               <span className="block text-center text-[9px] leading-6 text-gray-700">
@@ -200,6 +250,40 @@ export default function PlannerPage() {
         </div>
       )}
 
+      {/* lista de ensayos de la semana (editable) */}
+      {(weekSessions?.length ?? 0) > 0 && (
+        <section>
+          <h2 className="mb-2 text-sm font-semibold text-gray-700">{t('planner.weekSessions')}</h2>
+          <ul className="space-y-2">
+            {weekSessions!.map((s) => {
+              const r = parseRange(s.time_range)
+              return (
+                <li
+                  key={s.id}
+                  className="flex items-center justify-between rounded-xl border bg-white p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-2 font-medium">
+                      <span className="truncate">{s.title}</span>
+                      <Badge color={s.status === 'CONFIRMED' ? 'green' : 'gray'}>
+                        {t(`sessions.status.${s.status}`)}
+                      </Badge>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {format(r.start, "EEE d · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
+                      {s.location ? ` · ${s.location}` : ''}
+                    </p>
+                  </div>
+                  <Button variant="secondary" onClick={() => setEditSession(s)}>
+                    {t('planner.edit')}
+                  </Button>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
+
       {createOpen && sel && selRange && grid && (
         <CreateSessionModal
           groupId={groupId}
@@ -215,6 +299,19 @@ export default function PlannerPage() {
             setCreateOpen(false)
             setSel(null)
           }}
+        />
+      )}
+
+      {editSession && grid && (
+        <CreateSessionModal
+          groupId={groupId}
+          members={members}
+          preselectedIds={[]}
+          session={editSession}
+          initialRange={parseRange(editSession.time_range)}
+          grid={grid}
+          weekMonday={monday}
+          onClose={() => setEditSession(null)}
         />
       )}
     </div>
