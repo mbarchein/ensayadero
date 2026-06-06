@@ -3,15 +3,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
+import { CheckCircle2, XCircle, Clock, AlarmClock, Bell, type LucideIcon } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Button, EmptyState, Spinner } from '../../components/ui'
 import type { Notification } from '../../lib/types'
 
-const TYPE_ICON: Record<string, string> = {
-  SESSION_CONFIRMED: '✅',
-  SESSION_CANCELLED: '❌',
-  SESSION_CHANGED: '🕐',
-  REMINDER: '⏰',
+const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
+  SESSION_CONFIRMED: { Icon: CheckCircle2, color: 'text-green-600' },
+  SESSION_CANCELLED: { Icon: XCircle, color: 'text-red-600' },
+  SESSION_CHANGED: { Icon: Clock, color: 'text-amber-600' },
+  REMINDER: { Icon: AlarmClock, color: 'text-violet-600' },
 }
 
 export default function NotificationsPage() {
@@ -63,8 +64,9 @@ export default function NotificationsPage() {
       ) : (
         <ul className="space-y-2">
           {notifications?.map((n) => {
-            const icon = TYPE_ICON[n.type] ?? '🔔'
-            const label = TYPE_ICON[n.type]
+            const meta = TYPE_ICON[n.type]
+            const Icon = meta?.Icon ?? Bell
+            const label = meta
               ? t(`notifications.types.${n.type}`, { title: String(n.payload.title ?? '') })
               : n.type
             const starts = n.payload.starts_at ? new Date(String(n.payload.starts_at)) : null
@@ -72,9 +74,7 @@ export default function NotificationsPage() {
               <div
                 className={`flex gap-3 rounded-xl border p-3 ${n.read_at ? 'bg-white' : 'border-violet-200 bg-violet-50'}`}
               >
-                <span className="text-xl" aria-hidden>
-                  {icon}
-                </span>
+                <Icon size={20} className={`mt-0.5 shrink-0 ${meta?.color ?? 'text-gray-500'}`} aria-hidden />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{label}</p>
                   {starts && (

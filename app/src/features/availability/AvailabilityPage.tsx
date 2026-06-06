@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Trash2 } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -328,8 +329,9 @@ export default function AvailabilityPage() {
             if (confirm(t('availability.clearWeekConfirm'))) clearWeek.mutate()
           }}
           disabled={clearWeek.isPending}
+          className="inline-flex items-center gap-1.5"
         >
-          🗑 {t('availability.clearWeek')}
+          <Trash2 size={15} /> {t('availability.clearWeek')}
         </Button>
       </div>
       {(save.isError || copyWeeks.isError || clearWeek.isError) && (

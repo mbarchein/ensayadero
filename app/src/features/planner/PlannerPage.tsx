@@ -8,6 +8,7 @@ import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { X } from 'lucide-react'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -243,7 +244,7 @@ export default function PlannerPage() {
               –{format(slotRange(monday, sel.day, selRange.hi).end, 'HH:mm')}
             </p>
             <button onClick={() => setSel(null)} className="text-gray-400" aria-label={t('common.close')}>
-              ✕
+              <X size={16} />
             </button>
           </div>
           <CellDetail

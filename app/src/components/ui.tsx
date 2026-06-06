@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { X } from 'lucide-react'
 
 export function Button({
   variant = 'primary',
@@ -67,7 +68,7 @@ export function Modal({
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 text-gray-500 hover:bg-gray-100">
-            ✕
+            <X size={18} />
           </button>
         </div>
         {children}

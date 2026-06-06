@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { LogOut } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import type { GroupRole, Invitation } from '../../lib/types'
@@ -144,13 +145,13 @@ export default function MembersPage() {
       <div className="border-t pt-4">
         <Button
           variant="ghost"
-          className="text-red-600"
+          className="inline-flex items-center gap-1.5 text-red-600"
           disabled={leaveGroup.isPending}
           onClick={() => {
             if (confirm(t('group.leaveConfirm'))) leaveGroup.mutate()
           }}
         >
-          🚪 {t('group.leave')}
+          <LogOut size={15} /> {t('group.leave')}
         </Button>
         {leaveGroup.isError && (
           <p className="text-sm text-red-600">{(leaveGroup.error as Error).message}</p>

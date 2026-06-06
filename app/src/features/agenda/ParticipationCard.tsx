@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
+import { CalendarDays } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { dateLocale } from '../../lib/dateLocale'
+import { Check, X, Clock } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
 import { Badge, Button } from '../../components/ui'
 import type { ParticipantResponse } from '../../lib/types'
-import type { MyParticipation } from './useMyAgenda'
+import { tallyResponses, type MyParticipation } from './useMyAgenda'
 
 export default function ParticipationCard({
   p,
@@ -22,6 +24,7 @@ export default function ParticipationCard({
   const s = p.sessions
   const r = parseRange(s.time_range)
   const confirmed = s.status === 'CONFIRMED'
+  const tally = tallyResponses(p)
 
   return (
     <li className="rounded-xl border bg-white p-4 shadow-sm">
@@ -45,6 +48,20 @@ export default function ParticipationCard({
           </Badge>
         </div>
       </div>
+
+      {confirmed && (
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+          <span className="inline-flex items-center gap-1 text-green-700">
+            <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
+          </span>
+          <span className="inline-flex items-center gap-1 text-red-600">
+            <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
+          </span>
+          <span className="inline-flex items-center gap-1 text-amber-600">
+            <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
+          </span>
+        </div>
+      )}
 
       {confirmed && (
         <div className="mt-3 flex items-center gap-2">
@@ -71,9 +88,9 @@ export default function ParticipationCard({
       {onViewAgenda && (
         <button
           onClick={onViewAgenda}
-          className="mt-2 text-xs font-medium text-violet-700 hover:underline"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-violet-700 hover:underline"
         >
-          🗓️ {t('upcoming.viewInAgenda')}
+          <CalendarDays size={13} /> {t('upcoming.viewInAgenda')}
         </button>
       )}
     </li>

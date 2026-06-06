@@ -8,7 +8,8 @@ import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
-import { Badge, EmptyState, Spinner } from '../../components/ui'
+import { Pencil, Archive } from 'lucide-react'
+import { Badge, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
 import EditGroupModal from '../groups/EditGroupModal'
 import type { SessionWithParticipants } from '../../lib/types'
@@ -80,13 +81,14 @@ export default function SessionsPage() {
           <GroupAvatar seed={group?.avatar_seed || groupId} />
           <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
           {isInstructor && group && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setEditOpen(true)}
-              className="rounded-lg px-2 py-1 text-sm text-violet-700 hover:bg-violet-50"
-              aria-label={t('group.editGroup')}
+              className="inline-flex items-center gap-1.5"
             >
-              ✏️
-            </button>
+              <Pencil size={15} />
+              {t('group.editGroup')}
+            </Button>
           )}
         </div>
       </header>
@@ -200,9 +202,9 @@ function SessionCard({
       {onArchive && (
         <button
           onClick={onArchive}
-          className="w-full rounded-b-xl border border-t-0 bg-gray-50 py-1.5 text-xs text-gray-500 hover:bg-gray-100"
+          className="flex w-full items-center justify-center gap-1.5 rounded-b-xl border border-t-0 bg-gray-50 py-1.5 text-xs text-gray-500 hover:bg-gray-100"
         >
-          🗄 {t('sessions.archive')}
+          <Archive size={13} /> {t('sessions.archive')}
         </button>
       )}
     </li>

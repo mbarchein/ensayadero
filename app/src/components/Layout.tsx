@@ -1,16 +1,17 @@
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Home, CalendarDays, ClipboardList, Bell, User, type LucideIcon } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../lib/supabase'
 import { Spinner } from './ui'
 
-const tabs = [
-  { to: '/', key: 'nav.home', icon: '🏠', end: true },
-  { to: '/availability', key: 'nav.availability', icon: '🗓️' },
-  { to: '/upcoming', key: 'nav.upcoming', icon: '📋' },
-  { to: '/notifications', key: 'nav.notifications', icon: '🔔' },
-  { to: '/profile', key: 'nav.profile', icon: '👤' },
+const tabs: { to: string; key: string; icon: LucideIcon; end?: boolean }[] = [
+  { to: '/', key: 'nav.home', icon: Home, end: true },
+  { to: '/availability', key: 'nav.availability', icon: CalendarDays },
+  { to: '/upcoming', key: 'nav.upcoming', icon: ClipboardList },
+  { to: '/notifications', key: 'nav.notifications', icon: Bell },
+  { to: '/profile', key: 'nav.profile', icon: User },
 ]
 
 export default function Layout() {
@@ -58,9 +59,7 @@ export default function Layout() {
                 }`
               }
             >
-              <span className="text-lg" aria-hidden>
-                {t2.icon}
-              </span>
+              <t2.icon size={20} aria-hidden />
               {t(t2.key)}
               {t2.to === '/notifications' && (unread ?? 0) > 0 && (
                 <span className="absolute right-1/4 top-1 rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white">

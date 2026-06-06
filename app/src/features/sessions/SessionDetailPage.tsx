@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
+import { MapPin } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
@@ -93,7 +94,11 @@ export default function SessionDetailPage() {
           {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
         </p>
         {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
-        {session.location && <p className="text-sm text-gray-600">📍 {session.location}</p>}
+        {session.location && (
+          <p className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPin size={14} /> {session.location}
+          </p>
+        )}
       </header>
 
       {mine && session.status === 'CONFIRMED' && (

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Dices } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Button, Modal } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
@@ -45,8 +46,12 @@ export default function EditGroupModal({ group, onClose }: { group: Group; onClo
       >
         <div className="flex flex-col items-center gap-2">
           <GroupAvatar seed={seed} size={72} />
-          <button type="button" onClick={regenerate} className="text-sm text-violet-700 hover:underline">
-            🎲 {t('group.regenerateAvatar')}
+          <button
+            type="button"
+            onClick={regenerate}
+            className="inline-flex items-center gap-1 text-sm text-violet-700 hover:underline"
+          >
+            <Dices size={15} /> {t('group.regenerateAvatar')}
           </button>
         </div>
         <label className="block text-sm">

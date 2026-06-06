@@ -6,23 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import QRCode from 'qrcode'
+import { Share2, Copy, QrCode, Mail, RefreshCw, Power } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/AuthContext'
 import { Button, Modal } from '../../components/ui'
 import type { Group, GroupRole } from '../../lib/types'
-
-// Icono de compartir tipo Android/Material (3 nodos conectados)
-function ShareIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="18" cy="5" r="3" />
-      <circle cx="6" cy="12" r="3" />
-      <circle cx="18" cy="19" r="3" />
-      <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
-      <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
-    </svg>
-  )
-}
 
 export default function InvitePanel({ group }: { group: Group }) {
   const { t } = useTranslation()
@@ -126,17 +114,16 @@ export default function InvitePanel({ group }: { group: Group }) {
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={share} className="inline-flex items-center gap-1.5">
-          <ShareIcon />
-          {t('invite.share')}
+          <Share2 size={16} /> {t('invite.share')}
         </Button>
-        <Button variant="secondary" onClick={copy}>
-          {copied ? t('invite.copied') : `🔗 ${t('invite.copyLink')}`}
+        <Button variant="secondary" onClick={copy} className="inline-flex items-center gap-1.5">
+          <Copy size={16} /> {copied ? t('invite.copied') : t('invite.copyLink')}
         </Button>
-        <Button variant="secondary" onClick={() => setQrOpen(true)}>
-          ▦ {t('invite.qr')}
+        <Button variant="secondary" onClick={() => setQrOpen(true)} className="inline-flex items-center gap-1.5">
+          <QrCode size={16} /> {t('invite.qr')}
         </Button>
-        <Button variant="secondary" onClick={() => setEmailsOpen(true)}>
-          ✉️ {t('invite.byEmail')}
+        <Button variant="secondary" onClick={() => setEmailsOpen(true)} className="inline-flex items-center gap-1.5">
+          <Mail size={16} /> {t('invite.byEmail')}
         </Button>
       </div>
       {shareError && (
@@ -145,12 +132,20 @@ export default function InvitePanel({ group }: { group: Group }) {
         </p>
       )}
 
-      <div className="flex gap-3 text-xs text-violet-700">
-        <button onClick={() => regenerate.mutate()} disabled={regenerate.isPending} className="hover:underline">
-          🔄 {t('invite.regenerate')}
+      <div className="flex gap-4 text-xs text-violet-700">
+        <button
+          onClick={() => regenerate.mutate()}
+          disabled={regenerate.isPending}
+          className="inline-flex items-center gap-1 hover:underline"
+        >
+          <RefreshCw size={13} /> {t('invite.regenerate')}
         </button>
-        <button onClick={() => toggleEnabled.mutate()} disabled={toggleEnabled.isPending} className="hover:underline">
-          {group.join_enabled ? `🚫 ${t('invite.disable')}` : `✅ ${t('invite.enable')}`}
+        <button
+          onClick={() => toggleEnabled.mutate()}
+          disabled={toggleEnabled.isPending}
+          className="inline-flex items-center gap-1 hover:underline"
+        >
+          <Power size={13} /> {group.join_enabled ? t('invite.disable') : t('invite.enable')}
         </button>
       </div>
 
