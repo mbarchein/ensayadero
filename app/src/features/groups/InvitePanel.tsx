@@ -100,46 +100,49 @@ export default function InvitePanel({ group }: { group: Group }) {
     <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
       <h2 className="font-semibold text-violet-900">{t('invite.title')}</h2>
 
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <p className="text-xs text-violet-700">{t('invite.code')}</p>
-          <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">
-            {group.join_code}
-          </p>
-        </div>
-        {!group.join_enabled && (
-          <span className="rounded bg-gray-200 px-2 py-1 text-xs text-gray-600">{t('invite.disabled')}</span>
-        )}
-      </div>
+      {group.join_enabled ? (
+        <>
+          <div>
+            <p className="text-xs text-violet-700">{t('invite.code')}</p>
+            <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">
+              {group.join_code}
+            </p>
+          </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={share} className="inline-flex items-center gap-1.5">
-          <Share2 size={16} /> {t('invite.share')}
-        </Button>
-        <Button variant="secondary" onClick={copy} className="inline-flex items-center gap-1.5">
-          <Copy size={16} /> {copied ? t('invite.copied') : t('invite.copyLink')}
-        </Button>
-        <Button variant="secondary" onClick={() => setQrOpen(true)} className="inline-flex items-center gap-1.5">
-          <QrCode size={16} /> {t('invite.qr')}
-        </Button>
-        <Button variant="secondary" onClick={() => setEmailsOpen(true)} className="inline-flex items-center gap-1.5">
-          <Mail size={16} /> {t('invite.byEmail')}
-        </Button>
-      </div>
-      {shareError && (
-        <p className="break-all text-xs text-gray-600">
-          {t('invite.copyManually')}: {shareError}
-        </p>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={share} className="inline-flex items-center gap-1.5">
+              <Share2 size={16} /> {t('invite.share')}
+            </Button>
+            <Button variant="secondary" onClick={copy} className="inline-flex items-center gap-1.5">
+              <Copy size={16} /> {copied ? t('invite.copied') : t('invite.copyLink')}
+            </Button>
+            <Button variant="secondary" onClick={() => setQrOpen(true)} className="inline-flex items-center gap-1.5">
+              <QrCode size={16} /> {t('invite.qr')}
+            </Button>
+            <Button variant="secondary" onClick={() => setEmailsOpen(true)} className="inline-flex items-center gap-1.5">
+              <Mail size={16} /> {t('invite.byEmail')}
+            </Button>
+          </div>
+          {shareError && (
+            <p className="break-all text-xs text-gray-600">
+              {t('invite.copyManually')}: {shareError}
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-sm text-gray-600">{t('invite.disabledNote')}</p>
       )}
 
       <div className="flex gap-4 text-xs text-violet-700">
-        <button
-          onClick={() => regenerate.mutate()}
-          disabled={regenerate.isPending}
-          className="inline-flex items-center gap-1 hover:underline"
-        >
-          <RefreshCw size={13} /> {t('invite.regenerate')}
-        </button>
+        {group.join_enabled && (
+          <button
+            onClick={() => regenerate.mutate()}
+            disabled={regenerate.isPending}
+            className="inline-flex items-center gap-1 hover:underline"
+          >
+            <RefreshCw size={13} /> {t('invite.regenerate')}
+          </button>
+        )}
         <button
           onClick={() => toggleEnabled.mutate()}
           disabled={toggleEnabled.isPending}

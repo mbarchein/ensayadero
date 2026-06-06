@@ -138,7 +138,8 @@
     "shareText": "Join \"{{group}}\" on Ensayo",
     "regenerate": "Regenerate code",
     "enable": "Enable code",
-    "disable": "Disable code"
+    "disable": "Disable code",
+    "disabledNote": "The code is disabled. No one can join with it."
   },
   "sessions": {
     "empty": "No rehearsals scheduled.",

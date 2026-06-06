@@ -138,7 +138,8 @@
     "shareText": "Únete a «{{group}}» en Ensayo",
     "regenerate": "Regenerar código",
     "enable": "Activar código",
-    "disable": "Desactivar código"
+    "disable": "Desactivar código",
+    "disabledNote": "El código está desactivado. Nadie puede unirse con él."
   },
   "sessions": {
     "empty": "No hay ensayos programados.",
