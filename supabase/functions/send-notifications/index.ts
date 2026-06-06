@@ -49,6 +49,9 @@ function emailBody(type: string, p: Record<string, unknown>): string {
     type === 'SESSION_CHANGED' && p.old_starts_at
       ? `<p>Hora anterior: <s>${fmtDate(p.old_starts_at)}</s></p>`
       : '',
+    type === 'SESSION_CHANGED' && p.old_location
+      ? `<p>Lugar anterior: <s>${p.old_location}</s></p>`
+      : '',
     p.required === false ? '<p>Tu asistencia es <strong>opcional</strong>.</p>' : '',
     type !== 'SESSION_CANCELLED' && p.session_id
       ? `<p><a href="${APP_URL}" style="background:#7c3aed;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirmar asistencia</a></p>`
