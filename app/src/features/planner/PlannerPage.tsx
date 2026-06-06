@@ -250,6 +250,7 @@ export default function PlannerPage() {
             cell={mergeCells(grid[sel.day], selRange.lo, selRange.hi)}
             activeIds={activeIds}
             nameOf={nameOf}
+            meId={profile?.id}
           />
           <Button className="mt-3 w-full" onClick={() => setCreateOpen(true)}>
             {t('planner.createHere')}
@@ -356,26 +357,45 @@ function heatClass(cell: HeatCell, total: number): string {
   return 'bg-emerald-500 ring-1 ring-inset ring-emerald-700'
 }
 
+function NameChip({ name, me }: { name: string; me: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+        me ? 'bg-violet-600 text-white ring-2 ring-violet-300' : 'bg-green-100 text-green-800'
+      }`}
+    >
+      {name}
+      {me && ' (tú)'}
+    </span>
+  )
+}
+
 function CellDetail({
   cell,
   activeIds,
   nameOf,
+  meId,
 }: {
   cell: HeatCell
   activeIds: string[]
   nameOf: (id: string) => string
+  meId?: string
 }) {
   const { t } = useTranslation()
   const unavailable = activeIds.filter(
     (id) => !cell.available.includes(id) && !cell.busy.includes(id),
   )
   return (
-    <div className="space-y-1 text-xs">
+    <div className="space-y-2 text-xs">
       {cell.available.length > 0 && (
-        <p>
-          <span className="font-medium text-green-700">{t('planner.availableLabel')}</span>{' '}
-          {cell.available.map(nameOf).join(', ')}
-        </p>
+        <div>
+          <span className="font-medium text-green-700">{t('planner.availableLabel')}</span>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {cell.available.map((id) => (
+              <NameChip key={id} name={nameOf(id)} me={id === meId} />
+            ))}
+          </div>
+        </div>
       )}
       {cell.busy.length > 0 && (
         <p>
