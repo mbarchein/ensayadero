@@ -53,6 +53,8 @@
     "noChanges": "No changes",
     "repeatWeekly": "🔁 Repeat every week",
     "repeatConfirm": "This will turn this week's painting into your recurring availability (every week). Continue?",
+    "clearWeek": "Clear week",
+    "clearWeekConfirm": "All your availability for this week will be removed (recurring blocks get an exception for this week only). Continue?",
     "saveError": "Error saving: {{message}}",
     "gridFooter": "{{minutes}} min slots · {{start}}:00–{{end}}:00"
   },
@@ -140,7 +142,13 @@
     "pushEnabled": "✓ Enabled on this device",
     "pushEnable": "Enable notifications",
     "pushError": "Could not enable. Check browser permissions or install the app (iOS requires installing it).",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "dangerZone": "Danger zone",
+    "deleteDescription": "Deletes your account and all your data: availability, groups, rehearsal responses and notifications. This cannot be undone.",
+    "deleteAccount": "Delete my account",
+    "deleteKeyword": "DELETE",
+    "deleteConfirm": "This action is irreversible. Type {{keyword}} to confirm:",
+    "deleting": "Deleting…"
   },
   "admin": {
     "title": "Administration",

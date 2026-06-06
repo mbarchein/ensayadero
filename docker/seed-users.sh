@@ -37,9 +37,15 @@ from (values
   ('actor3@local.test', 'ACTOR')
 ) as e(email, role)
 cross join (select id from public.profiles where email='admin@local.test') p
-where not exists (
+where not exists (              -- sin invitación PENDIENTE…
   select 1 from public.invitations i
-  where i.email = e.email and i.group_id = '00000000-0000-0000-0000-000000000001'
+  where i.email = e.email
+    and i.group_id = '00000000-0000-0000-0000-000000000001'
+    and i.accepted_at is null
+    and i.expires_at > now()
+)
+and not exists (                -- …y sin cuenta ya creada
+  select 1 from public.profiles p where p.email = e.email
 );
 SQL
 

@@ -12,6 +12,7 @@ import { supabase } from '../../lib/supabase'
 import { formatRange } from '../../lib/ranges'
 import {
   SLOTS_PER_DAY,
+  isoDay,
   slotRange,
   weekGrid,
   weekStart,
@@ -83,6 +84,35 @@ export default function AvailabilityPage() {
       }))
       if (rows.length > 0) {
         const { error } = await supabase.from('availabilities').insert(rows)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['availabilities'] })
+      setDraft(null)
+    },
+  })
+
+  const clearWeek = useMutation({
+    mutationFn: async () => {
+      const weekEnd = addDays(monday, 7)
+      // puntuales que solapan la semana → fuera
+      const { error: delError } = await supabase
+        .from('availabilities')
+        .delete()
+        .eq('user_id', profile!.id)
+        .is('rrule', null)
+        .filter('time_range', 'ov', `[${monday.toISOString()},${weekEnd.toISOString()})`)
+      if (delError) throw delError
+      // recurrentes → añadir los 7 días como excepciones
+      const weekDays = Array.from({ length: 7 }, (_, i) => isoDay(addDays(monday, i)))
+      const recurring = (availabilities ?? []).filter((a) => a.rrule)
+      for (const a of recurring) {
+        const merged = [...new Set([...(a.exception_dates ?? []), ...weekDays])]
+        const { error } = await supabase
+          .from('availabilities')
+          .update({ exception_dates: merged })
+          .eq('id', a.id)
         if (error) throw error
       }
     },
@@ -197,10 +227,21 @@ export default function AvailabilityPage() {
         >
           {t('availability.repeatWeekly')}
         </Button>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            if (confirm(t('availability.clearWeekConfirm'))) clearWeek.mutate()
+          }}
+          disabled={clearWeek.isPending}
+        >
+          🗑 {t('availability.clearWeek')}
+        </Button>
       </div>
-      {(save.isError || makeRecurring.isError) && (
+      {(save.isError || makeRecurring.isError || clearWeek.isError) && (
         <p className="text-sm text-red-600">
-          {t('availability.saveError', { message: ((save.error || makeRecurring.error) as Error).message })}
+          {t('availability.saveError', {
+            message: ((save.error || makeRecurring.error || clearWeek.error) as Error).message,
+          })}
         </p>
       )}
     </div>
