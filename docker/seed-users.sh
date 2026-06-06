@@ -62,3 +62,12 @@ echo "  actor1..3@local.test   actores"
 echo
 echo "Login local por password (la UI solo tiene Google):"
 echo "  curl '$API/auth/v1/token?grant_type=password' -H 'apikey: <anon>' -d '{\"email\":\"...\",\"password\":\"password123\"}'"
+
+# Realtime (local): alinear jwt_secret del tenant con el JWT_SECRET para que
+# los canales validen los tokens de usuario (si no, el tenant se siembra con un
+# secreto aleatorio y la suscripción falla). Idempotente.
+ENC=$(node -e 'const c=require("crypto").createCipheriv("aes-128-ecb",Buffer.from("supabaserealtime"),null);let e=c.update("your-super-secret-jwt-token-with-at-least-32-characters-long","utf8","base64");e+=c.final("base64");process.stdout.write(e)' 2>/dev/null)
+if [ -n "$ENC" ]; then
+  $PSQL -c "update _realtime.tenants set jwt_secret='$ENC' where external_id='realtime-dev';" >/dev/null 2>&1 \
+    && echo "✓ realtime tenant secret alineado" || echo "↷ realtime aún no listo (reintenta make seed-users)"
+fi

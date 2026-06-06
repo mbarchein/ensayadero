@@ -20,6 +20,7 @@ make help         # other commands
 | auth (GoTrue) | — | Auth; email+password enabled only locally |
 | rest (PostgREST) | — | API with RLS |
 | functions (Deno) | — | `send-notifications` |
+| realtime (supabase/realtime) | — | WebSockets (Postgres changes). Tenant `realtime-dev` |
 | migrate | — | Applies `supabase/migrations/*` (`_migrations` table) + `seed.sql` |
 
 Details:
@@ -30,6 +31,9 @@ Details:
 - `docker/gateway.conf` routes and adds CORS for auth and functions (GoTrue/Deno
   don't emit them; PostgREST does). Without this, browser login fails.
 - Local JWT: anon/service pair signed with the compose `JWT_SECRET` (local only).
+- Realtime: the WS route forces the `realtime-dev` tenant Host in the gateway.
+  `make seed-users` aligns the tenant `jwt_secret` with `JWT_SECRET` (the tenant
+  is seeded with a random secret on first boot); re-run it after `make reset`.
 
 ## Demo users (`make seed-users`, password `password123`)
 
