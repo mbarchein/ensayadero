@@ -21,8 +21,8 @@ import {
 } from '../../lib/slots'
 import WeekGrid, { type CellPos } from './WeekGrid'
 import { Button, Modal, Spinner } from '../../components/ui'
-import { parseRange } from '../../lib/ranges'
-import { useMyAgenda } from '../agenda/useMyAgenda'
+import { overlaps, parseRange } from '../../lib/ranges'
+import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
 import ParticipationCard from '../agenda/ParticipationCard'
 import type { Availability } from '../../lib/types'
 
@@ -56,14 +56,30 @@ export default function AvailabilityPage() {
   const [copyOpen, setCopyOpen] = useState(false)
   const [copyN, setCopyN] = useState(1)
 
-  // ensayos a los que estoy convocado esta semana visible (cualquier grupo)
+  // ensayos a los que estoy convocado, superpuestos en las franjas horarias
+  // de la semana visible. mapa "día:slot" → participación.
   const agenda = useMyAgenda()
+  const sessionCells = useMemo(() => {
+    const map = new Map<string, MyParticipation>()
+    const windowEnd = addDays(monday, 7)
+    for (const p of agenda.data ?? []) {
+      const r = parseRange(p.sessions.time_range)
+      if (r.start >= windowEnd || r.end <= monday) continue
+      for (let d = 0; d < 7; d++) {
+        for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+          if (overlaps(slotRange(monday, d, slot), r)) map.set(`${d}:${slot}`, p)
+        }
+      }
+    }
+    return map
+  }, [agenda.data, monday])
+
+  // lista (con confirmar/rechazar) de los ensayos de la semana visible
   const weekParticipations = useMemo(() => {
-    const start = monday.getTime()
-    const end = addDays(monday, 7).getTime()
+    const windowEnd = addDays(monday, 7)
     return (agenda.data ?? []).filter((p) => {
       const r = parseRange(p.sessions.time_range)
-      return r.start.getTime() < end && r.end.getTime() > start
+      return r.start < windowEnd && r.end > monday
     })
   }, [agenda.data, monday])
 
@@ -250,14 +266,34 @@ export default function AvailabilityPage() {
 
       <WeekGrid
         weekMonday={monday}
-        cellClass={({ day, slot }) => `${CELL_STYLE[grid[day][slot]]} cursor-pointer`}
-        renderCell={({ day, slot }) =>
-          grid[day][slot] === 'PREFERRED' ? (
+        cellClass={({ day, slot }) => {
+          const ses = sessionCells.get(`${day}:${slot}`)
+          const overlay = ses ? 'ring-2 ring-inset ring-indigo-500' : ''
+          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${overlay}`
+        }}
+        renderCell={({ day, slot }) => {
+          const p = sessionCells.get(`${day}:${slot}`)
+          if (p) {
+            // primer slot del ensayo: título + estado de mi respuesta
+            const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
+            if (!firstSlot) return null
+            const icon =
+              p.response === 'ACCEPTED' ? '✓' : p.response === 'DECLINED' ? '✗' : '•'
+            return (
+              <span
+                className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-indigo-800"
+                title={`${p.sessions.title} — ${p.sessions.groups.name}`}
+              >
+                {icon} {p.sessions.title}
+              </span>
+            )
+          }
+          return grid[day][slot] === 'PREFERRED' ? (
             <span className="block text-center text-[9px] leading-6 text-white" aria-hidden>
               ★
             </span>
           ) : null
-        }
+        }}
         onPaintStart={(pos) => {
           const next = CYCLE[grid[pos.day][pos.slot]]
           setPaintValue(next)
@@ -277,6 +313,10 @@ export default function AvailabilityPage() {
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded border bg-white" /> {t('availability.unmarked')}
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-3 w-3 rounded ring-2 ring-inset ring-indigo-500" />{' '}
+          {t('availability.rehearsal')}
         </span>
       </div>
 
