@@ -1,63 +1,63 @@
-# 07 · Desarrollo local
+# 07 · Local development
 
-Stack completo en docker-compose, **sin** Supabase CLI.
+Full stack in docker-compose, **without** the Supabase CLI.
 
-## Arranque
+## Start
 
 ```bash
-make up           # levanta todo
-make seed-users   # usuarios demo + grupo demo
+make up           # bring everything up
+make seed-users   # demo users + demo group
 make logs         # logs
-make reset        # DB desde cero (down -v + up; re-aplica migraciones + seed)
-make help         # resto de comandos
+make reset        # DB from scratch (down -v + up; re-applies migrations + seed)
+make help         # other commands
 ```
 
-| Servicio | Puerto | Rol |
-|----------|--------|-----|
-| app (Vite) | 5173 | Frontend dev |
-| gateway (nginx) | 54321 | Emula Kong: `/auth/v1`, `/rest/v1`, `/functions/v1` (+ CORS) |
-| db (supabase/postgres) | 54322 | Postgres con pg_cron/pg_net |
-| auth (GoTrue) | — | Auth; email+password habilitado solo en local |
-| rest (PostgREST) | — | API con RLS |
+| Service | Port | Role |
+|---------|------|------|
+| app (Vite) | 5173 | Dev frontend |
+| gateway (nginx) | 54321 | Emulates Kong: `/auth/v1`, `/rest/v1`, `/functions/v1` (+ CORS) |
+| db (supabase/postgres) | 54322 | Postgres with pg_cron/pg_net |
+| auth (GoTrue) | — | Auth; email+password enabled only locally |
+| rest (PostgREST) | — | API with RLS |
 | functions (Deno) | — | `send-notifications` |
-| migrate | — | Aplica `supabase/migrations/*` (tabla `_migrations`) + `seed.sql` |
+| migrate | — | Applies `supabase/migrations/*` (`_migrations` table) + `seed.sql` |
 
-Detalles:
-- `docker/db-init.sql` sincroniza contraseñas de roles internos con
-  `POSTGRES_PASSWORD` (solo local).
-- `docker/migrate.sh` espera a que GoTrue cree `auth.users`, aplica migraciones
-  en orden una sola vez, luego `seed.sql`.
-- `docker/gateway.conf` enruta y añade CORS para auth y functions (GoTrue/Deno no
-  los emiten; PostgREST sí). Sin esto, el login por navegador falla.
-- JWT local: par anon/service firmado con `JWT_SECRET` del compose (solo local).
+Details:
+- `docker/db-init.sql` syncs internal role passwords with `POSTGRES_PASSWORD`
+  (local only).
+- `docker/migrate.sh` waits for GoTrue to create `auth.users`, applies migrations
+  in order once each, then `seed.sql`.
+- `docker/gateway.conf` routes and adds CORS for auth and functions (GoTrue/Deno
+  don't emit them; PostgREST does). Without this, browser login fails.
+- Local JWT: anon/service pair signed with the compose `JWT_SECRET` (local only).
 
-## Usuarios demo (`make seed-users`, password `password123`)
+## Demo users (`make seed-users`, password `password123`)
 
-| Email | Rol |
-|-------|-----|
+| Email | Role |
+|-------|------|
 | `admin@local.test` | Superadmin |
-| `directora@local.test` | Directora del grupo demo «La Tempestad (demo)» |
-| `actor1@…`, `actor2@…`, `actor3@…` | Actores |
+| `directora@local.test` | Director of the demo group "La Tempestad (demo)" |
+| `actor1@…`, `actor2@…`, `actor3@…` | Actors |
 
-El seed crea invitaciones antes de cada usuario; el alta las autoacepta y crea
-las membresías. `seed-users.sh` recrea usuarios borrados (filtra por invitación
-pendiente y por perfil ya existente).
+The seed creates invitations before each user; sign-up auto-accepts them and
+creates the memberships. `seed-users.sh` recreates deleted users (filters by
+pending invitation and existing profile).
 
-## Login en dev
-La UI muestra una caja **«dev login»** (solo `import.meta.env.DEV`, ausente en
-producción) para entrar por email+password. Google opcional en local exportando
-`GOOGLE_OAUTH_ENABLED=true` + client id/secret en `.env`.
+## Dev login
+The UI shows a **"dev login"** box (only `import.meta.env.DEV`, absent in
+production) to sign in with email+password. Google optional locally by exporting
+`GOOGLE_OAUTH_ENABLED=true` + client id/secret in `.env`.
 
-## Comandos útiles
+## Useful commands
 ```bash
-make psql                       # shell SQL
-docker compose up migrate       # re-aplicar migraciones nuevas
+make psql                       # SQL shell
+docker compose up migrate       # re-apply new migrations
 docker compose exec app npm run typecheck
 docker compose exec app npm test
 ```
 
-## Notas
-- Node 24 local; el contenedor `app` usa su propio volumen de `node_modules`
-  (al añadir libs: `docker compose exec app npm install`).
-- `dist/` puede quedar como root si se construyó en contenedor; borrar con
-  `docker compose exec app rm -rf /app/dist` o reconstruir.
+## Notes
+- Node 24 locally; the `app` container uses its own `node_modules` volume (when
+  adding libs: `docker compose exec app npm install`).
+- `dist/` may be left owned by root if built in the container; remove with
+  `docker compose exec app rm -rf /app/dist` or rebuild.

@@ -1,16 +1,16 @@
-# 05 · Implementación (frontend)
+# 05 · Implementation (frontend)
 
-## Estructura de `app/src`
+## Structure of `app/src`
 
 ```
-auth/          AuthContext (sesión + perfil + refreshProfile), LoginPage, AuthCallback
+auth/          AuthContext (session + profile + refreshProfile), LoginPage, AuthCallback
 components/    Layout (bottom nav), ui.tsx (Button/Badge/Modal/Spinner/EmptyState)
 features/
   groups/      HomePage, JoinPage, MembersPage, InvitePanel, EditGroupModal,
                GroupAvatar, useGroup
-  availability/ AvailabilityPage, WeekGrid (rejilla genérica pintable)
-  planner/     PlannerPage (heatmap), CreateSessionModal (crear/editar/cancelar)
-  sessions/    SessionsPage (lista+pestañas), SessionDetailPage
+  availability/ AvailabilityPage, WeekGrid (generic paintable grid)
+  planner/     PlannerPage (heatmap), CreateSessionModal (create/edit/cancel)
+  sessions/    SessionsPage (list + nav), SessionDetailPage
   agenda/      UpcomingPage, ParticipationCard, useMyAgenda
   notifications/ NotificationsPage
   profile/     ProfilePage
@@ -20,104 +20,102 @@ i18n/          index.ts + es.json/en.json
 sw.ts          service worker (precache + runtime cache + Web Push)
 ```
 
-Patrón de datos: `react-query` con claves por entidad (`['session', id]`,
-`['my-agenda']`, `['group-members', gid]`…); mutaciones invalidan las claves
-afectadas. Sin estado global propio.
+Data pattern: `react-query` with per-entity keys (`['session', id]`,
+`['my-agenda']`, `['group-members', gid]`…); mutations invalidate the affected
+keys. No custom global state. No realtime; updates land on refetch (window focus)
+or after your own mutations.
 
-## Lógica núcleo (testeada)
+## Core logic (tested)
 
 ### `lib/ranges.ts`
-Parseo/serialización de `tstzrange` de Postgres (`["2026… +00", …)`),
-`overlaps`, `contains`, `subtract` (resta de ocupaciones). Tests en
-`ranges.test.ts`.
+Parse/serialize Postgres `tstzrange` (`["2026… +00", …)`), `overlaps`,
+`contains`, `subtract` (subtract busy ranges). Tests in `ranges.test.ts`.
 
 ### `lib/slots.ts`
-Rejilla semanal: franjas de 30 min, 08:00–23:00 (`SLOT_MINUTES`,
-`DAY_START_HOUR`, `SLOTS_PER_DAY`).
-- `expandAvailability(av, ini, fin)` — materializa puntuales y recurrentes
-  (RRULE) en una ventana, aplicando `exception_dates`.
-- `weekGrid(avs, lunes)` — matriz `[día][slot]` de estado de un usuario.
-- `heatmap(users, lunes)` — por celda: `available` (libres tras descontar
-  `busy`, D1), `preferred`, `busy` (pintado pero ocupado por otra sesión).
-- `fullCoverageRanges(grid, obligatorios, lunes)` — franjas contiguas donde
-  coinciden todos los requeridos.
-Tests en `slots.test.ts` (expansión rrule, descuento D1, cobertura).
+Weekly grid: 30-min slots, 08:00–23:00 (`SLOT_MINUTES`, `DAY_START_HOUR`,
+`SLOTS_PER_DAY`).
+- `expandAvailability(av, start, end)` — materializes one-off and recurring
+  (RRULE) availabilities within a window, applying `exception_dates`.
+- `weekGrid(avs, monday)` — `[day][slot]` matrix of a user's state.
+- `heatmap(users, monday)` — per cell: `available` (free after subtracting
+  `busy`, D1), `preferred`, `busy` (painted but busy with another session).
+- `fullCoverageRanges(grid, required, monday)` — contiguous slots where all
+  required people overlap.
+Tests in `slots.test.ts` (rrule expansion, D1 discount, coverage).
 
 ### `WeekGrid.tsx`
-Rejilla reutilizable (pintado o visualización). Pointer Events para ratón+táctil
-(`touch-action: none`). El estado de «pintando» va en **ref** (no estado React)
-porque el handler de `pointermove` corre síncrono tras `pointerdown` y un
-`setState` aún no estaría aplicado (causaba pintar solo la primera celda).
-`setPointerCapture` envuelto en try/catch. Franjas pasadas atenuadas y no
-editables (`isPast`).
+Reusable grid (painting or display). Pointer Events for mouse+touch
+(`touch-action: none`). The "painting" flag is a **ref** (not React state)
+because the `pointermove` handler runs synchronously after `pointerdown` and a
+`setState` wouldn't be applied yet (it caused only the first cell to be painted).
+`setPointerCapture` wrapped in try/catch. Past slots dimmed and non-editable
+(`isPast`).
 
-### Disponibilidad (`AvailabilityPage`)
-- Pintar alterna disponible↔sin marcar (preferido retirado).
-- **Autosave** con debounce 600 ms al soltar; un contador de ediciones
-  re-guarda si llegan trazos durante un guardado en vuelo.
-- Persistencia por semana: borra disponibilidad puntual que solapa la semana y
-  reinserta los bloques pintados (rangos contiguos).
-- **Copiar a N semanas** (modal) en vez de recurrencia.
-- **Borrar semana**: puntuales fuera; recurrentes → añade los 7 días como
-  excepción.
-- Overlay de ensayos convocados sobre las franjas (grupo en negrita + nombre),
-  borde por respuesta (verde/rojo/ámbar) e icono lucide.
-- **Guard**: al quitar disponibilidad en franja con ensayo programado, modal con
-  detalles del ensayo y opciones (solo lo seleccionado / toda la franja), con la
-  hora inicio-fin de cada opción. El aviso corre al soltar el gesto.
+### Availability (`AvailabilityPage`)
+- Paint toggles available↔unmarked (preferred removed).
+- **Autosave** with 600ms debounce on gesture end; an edit counter re-saves if
+  strokes arrive during an in-flight save.
+- Per-week persistence: deletes one-off availability overlapping the week and
+  reinserts the painted blocks (contiguous ranges).
+- **Copy to N weeks** (modal) instead of recurrence.
+- **Clear week**: one-off out; recurring → adds the 7 days as exceptions.
+- Overlay of convened rehearsals over the slots (group bold + name), border by
+  response (green/red/amber) and a lucide icon.
+- **Guard**: removing availability over a scheduled rehearsal opens a modal with
+  the rehearsal details and options (only the selected part / the whole slot),
+  each option showing its start–end time. The warning runs on gesture end.
 
 ### Planner (`PlannerPage` + `CreateSessionModal`)
-- Heatmap semanal con chips de selección de personas; intensidad por % de
-  disponibles; borde si 100% obligatorios.
-- Arrastrar selecciona franjas consecutivas; el detalle muestra chips de
-  disponibles/ocupados/no disponibles (chip propio resaltado «(tú)»).
-- `CreateSessionModal` crea o edita: título por defecto «<grupo> d-M», escena,
-  lugar, hora inicio + duración (derivada del arrastre), participantes
-  obligatorio/opcional; avisos rojo/ámbar si fuera de disponibilidad; reconcilia
-  participantes (alta/baja/upsert) al editar; cancelar (confirmada→CANCELLED con
-  notificación, borrador→delete).
-- Overlay de sesiones de la semana en el grid + lista editable. Botón Editar solo
-  para el creador o el director. Apertura por enlace `?d=&edit=<id>`.
+- Weekly heatmap with people-selection chips; intensity by % available; border
+  if 100% of required. Cells with a rehearsal use a distinct **background**
+  (violet=scheduled, amber=draft).
+- Dragging selects consecutive slots; the detail shows chips of
+  available/busy/unavailable (own chip highlighted "(tú)").
+- `CreateSessionModal` creates or edits: default title "<group> d-M", scene,
+  location, start time + duration (derived from the drag), required/optional
+  participants; red/amber warnings if outside availability; reconciles
+  participants (add/remove/upsert) on edit; cancel (confirmed→CANCELLED with
+  notification, draft→delete).
+- Overlay of the week's sessions in the grid + editable list. Edit button only
+  for the creator or the director. Opening via `?d=&edit=<id>` link.
+
+### Group view (`SessionsPage`)
+Header (back + avatar + name + edit group). Navigation via **buttons**
+("Programar" director, "Miembros"), not tabs. "Ensayos" title above the upcoming
+list; collapsible past/cancelled with a per-card archive button.
 
 ### Agenda (`useMyAgenda`, `UpcomingPage`, `ParticipationCard`)
-- `useMyAgenda`: mis participaciones (no canceladas, no archivadas) con todos los
-  participantes para el resumen; mutación `respond`. `tallyResponses` cuenta
-  voy/no van/pendientes y total.
-- Upcoming: lista futura ordenada, aviso de pendientes, confirmación inline,
-  «ver en mi agenda» (lleva a la semana del ensayo).
+- `useMyAgenda`: my participations (non-cancelled, non-archived) with all
+  participants for the tally; `respond` mutation. `tallyResponses` counts
+  going/not-going/pending and total.
+- Upcoming: ordered future list, pending notice, inline confirmation, "view in
+  my schedule" (jumps to the rehearsal's week).
 
-### Vista de grupo (`SessionsPage`)
-Cabecera (back + avatar + nombre + editar grupo). Navegación por **botones**
-(«Programar» director, «Miembros»), no pestañas. Título «Ensayos» sobre la lista
-de próximos; desplegable de pasados/cancelados con botón archivar por tarjeta.
+### Session (`SessionDetailPage`)
+Header with group avatar+name; participants with a **role chip** (gendered) and a
+**partial availability** note (the hours they can) or no-availability, computed
+with `expandAvailability` ∩ range. Director actions: edit, confirm, cancel,
+delete draft.
 
-### Planner — fondo de celdas con ensayo
-Las celdas que cubren un ensayo usan fondo propio (violeta=programado,
-ámbar=borrador) + borde izquierdo, distinguiéndose del color del heatmap.
-
-### Sesión (`SessionDetailPage`)
-Cabecera con avatar+nombre de grupo; participantes con **chip de rol** (con
-género) y nota de **disponibilidad parcial** (horas en que sí puede) o sin
-disponibilidad, calculada con `expandAvailability` ∩ rango. Acciones de director:
-editar, confirmar, cancelar, eliminar borrador.
-
-### Invitar (`InvitePanel`, `JoinPage`)
-Código de grupo, enlace (Web Share API + copiar), QR (canvas), regenerar /
-activar-desactivar, email en lote. Si el código está **desactivado**, se ocultan
-código y acciones; solo queda la nota y el botón de reactivar. `JoinPage` une por código; si no hay sesión,
-guarda el código y reanuda tras login (`AuthCallback`).
+### Invite (`InvitePanel`, `JoinPage`)
+Group code, link (Web Share API + copy), QR (canvas), regenerate /
+enable-disable, bulk email. When the code is **disabled**, the code and actions
+are hidden; only the note and re-enable toggle remain. `JoinPage` joins by code;
+if there's no session, it stashes the code and resumes after login
+(`AuthCallback`).
 
 ## PWA (`sw.ts`, `vite.config.ts`)
-- `injectManifest`: precache de assets, runtime `NetworkFirst` para `/rest/v1/`
-  (lectura offline), navegación SPA con denylist `/auth/`.
-- Web Push: `push` muestra notificación; `notificationclick` enfoca/abre la URL.
-- `lib/push.ts` suscribe (VAPID) y guarda en `push_subscriptions`.
+- `injectManifest`: asset precache, runtime `NetworkFirst` for `/rest/v1/`
+  (offline reads), SPA navigation with `/auth/` denylist.
+- Web Push: `push` shows a notification; `notificationclick` focuses/opens the
+  URL.
+- `lib/push.ts` subscribes (VAPID) and stores in `push_subscriptions`.
 
 ## i18n
-`i18next` + detección de idioma, fallback `es`. Plurales (`_one/_other`).
-`lib/roleLabel.ts` resuelve la etiqueta de rol según pronombre
-(`roles.INSTRUCTOR_F`…). Fechas con locale dinámico (`lib/dateLocale.ts`).
+`i18next` + language detection, fallback `es`. Plurals (`_one/_other`).
+`lib/roleLabel.ts` resolves the role label by pronoun (`roles.INSTRUCTOR_F`…).
+Dates with dynamic locale (`lib/dateLocale.ts`). Spanish UI uses "Programar".
 
 ## Tests
-`vitest` sobre la lógica pura (`ranges`, `slots`): 17 casos. La UI se verificó
-con Playwright durante el desarrollo (no en el repo).
+`vitest` over pure logic (`ranges`, `slots`): 17 cases. The UI was verified with
+Playwright during development (not in the repo).

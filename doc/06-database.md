@@ -1,59 +1,58 @@
-# 06 · Base de datos
+# 06 · Database
 
-PostgreSQL (imagen `supabase/postgres`). Extensiones: `btree_gist`, `pg_cron`,
-`pg_net`. RLS en todas las tablas públicas.
+PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
+`pg_net`. RLS on every public table.
 
-## Migraciones (orden)
+## Migrations (order)
 
-| Fichero | Contenido |
-|---------|-----------|
-| `…000_init` | Enums, tablas núcleo, helpers de autorización, trigger de alta con gate de invitación (D5), vista de ocupación `busy_ranges`, RLS completo. |
-| `…001_planner_notifications` | `group_busy_ranges`, triggers `notify_session_change` y `notify_participant_added`, `generate_reminders` + `cron.schedule`. |
-| `…002_delete_account` | `delete_my_account()` (borra `auth.users`, cascada). |
+| File | Contents |
+|------|----------|
+| `…000_init` | Enums, core tables, authorization helpers, sign-up trigger with invitation gate (D5), `busy_ranges` view, full RLS. |
+| `…001_planner_notifications` | `group_busy_ranges`, triggers `notify_session_change` and `notify_participant_added`, `generate_reminders` + `cron.schedule`. |
+| `…002_delete_account` | `delete_my_account()` (deletes `auth.users`, cascade). |
 | `…003_profile_phone` | `profiles.phone`. |
-| `…004_open_create_and_archive` | `groups.created_by` + trigger creador→director; insert de grupos por autenticados; lectura de disponibilidad por co-miembros; sessions insert/update/delete por director o creador; tabla `session_archives`. |
-| `…005_join_codes` | **Registro abierto** (quita el gate); `groups.join_code`/`join_enabled`; `join_by_code`, `regenerate_join_code`, `set_join_enabled`. |
-| `…006_alnum_join_code` | `gen_join_code()` alfanumérico A-Z0-9. |
-| `…007_join_code_no_io` | Alfabeto sin I/O (confunden con 1/0). |
-| `…008_leave_group` | Política: borrar la propia membresía (abandonar). |
-| `…009_only_directors_plan` | Revierte insert de sesiones a solo directores. |
+| `…004_open_create_and_archive` | `groups.created_by` + creator→director trigger; group insert by authenticated; availability read by co-members; sessions insert/update/delete by director or creator; `session_archives` table. |
+| `…005_join_codes` | **Open registration** (drops the gate); `groups.join_code`/`join_enabled`; `join_by_code`, `regenerate_join_code`, `set_join_enabled`. |
+| `…006_alnum_join_code` | `gen_join_code()` alphanumeric A-Z0-9. |
+| `…007_join_code_no_io` | Alphabet without I/O (confused with 1/0). |
+| `…008_leave_group` | Policy: delete your own membership (leave). |
+| `…009_only_directors_plan` | Reverts session insert to directors only. |
 | `…010_group_meta` | `groups.avatar_seed`; `update_group_meta(name, seed)`. |
-| `…011_notify_location_change` | `notify_session_change` también ante cambio de **lugar**; payload con `old_location`; solo el cambio de hora reinicia respuestas. |
+| `…011_notify_location_change` | `notify_session_change` also on **location** change; payload with `old_location`; only a time change resets responses. |
 | `…012_profile_gender` | `profiles.gender` (`F`/`M`, check). |
 
-## Funciones helper (RLS)
+## Helper functions (RLS)
 `is_superadmin(uid)`, `is_member(uid, gid)`, `is_instructor(uid, gid)` —
 `stable security definer`, `search_path=public`.
 
-## RPCs (security definer, con chequeo de rol)
-| Función | Uso |
-|---------|-----|
-| `group_busy_ranges(gid, search)` | Ocupación por usuario del grupo en una ventana (D1), sin revelar sesión/grupo. Requiere ser miembro. |
-| `busy_ranges(uid, search)` | Ocupación de un usuario (sesiones confirmadas en cualquier grupo). |
-| `join_by_code(code)` | Une al usuario actual como ACTOR al grupo del código (si habilitado). |
-| `regenerate_join_code(gid)` / `set_join_enabled(gid, enabled)` | Solo director. |
-| `update_group_meta(gid, name, seed)` | Renombra/regenera avatar; solo director. |
-| `delete_my_account()` | Borra la cuenta del usuario actual (cascada). |
+## RPCs (security definer, with role checks)
+| Function | Use |
+|----------|-----|
+| `group_busy_ranges(gid, search)` | Busy ranges per group member in a window (D1), without revealing session/group. Requires membership. |
+| `busy_ranges(uid, search)` | Busy ranges of a user (confirmed sessions in any group). |
+| `join_by_code(code)` | Joins the current user as ACTOR to the code's group (if enabled). |
+| `regenerate_join_code(gid)` / `set_join_enabled(gid, enabled)` | Director only. |
+| `update_group_meta(gid, name, seed)` | Rename/regenerate avatar; director only. |
+| `delete_my_account()` | Deletes the current user's account (cascade). |
 
 ## Triggers
-- `on_auth_user_created` → `handle_new_user`: crea `profiles`, autoacepta
-  invitaciones por email pendientes (tras D5', sin bloquear el alta).
-- `on_group_created` → `handle_new_group`: añade al `created_by` como
-  INSTRUCTOR.
-- `on_session_change` → `notify_session_change`: genera notificaciones
-  `SESSION_CONFIRMED` / `SESSION_CANCELLED` / `SESSION_CHANGED` (hora y/o lugar);
-  el cambio de hora reinicia `response` a PENDING.
-- `on_participant_added` → `notify_participant_added`: notifica al añadir alguien
-  a una sesión ya confirmada.
+- `on_auth_user_created` → `handle_new_user`: creates `profiles`, auto-accepts
+  pending email invitations (after D5', without blocking sign-up).
+- `on_group_created` → `handle_new_group`: adds `created_by` as INSTRUCTOR.
+- `on_session_change` → `notify_session_change`: generates `SESSION_CONFIRMED` /
+  `SESSION_CANCELLED` / `SESSION_CHANGED` (time and/or location) notifications; a
+  time change resets `response` to PENDING.
+- `on_participant_added` → `notify_participant_added`: notifies when someone is
+  added to an already-confirmed session.
 
 ## Jobs (pg_cron)
-- `generate-reminders` (`*/15 * * * *`) → `generate_reminders()`: recordatorios
-  24h (evita duplicados por sesión/usuario).
-- `process-notifications` (manual, ver BOOTSTRAP §11): `net.http_post` a la Edge
-  Function `send-notifications` cada minuto.
+- `generate-reminders` (`*/15 * * * *`) → `generate_reminders()`: 24h reminders
+  (avoids duplicates per session/user).
+- `process-notifications` (manual, see BOOTSTRAP §11): `net.http_post` to the
+  Edge Function `send-notifications` every minute.
 
-## Tipos de notificación (`notifications.type`)
+## Notification types (`notifications.type`)
 `SESSION_CONFIRMED`, `SESSION_CANCELLED`, `SESSION_CHANGED`, `REMINDER`,
-`INVITATION`. El `payload` jsonb lleva `session_id`, `title`, `location`,
-`starts_at`, `ends_at`, `required`, y para cambios `old_starts_at`/`old_location`
-(presentes solo si ese campo cambió → distingue hora/lugar/ambos).
+`INVITATION`. The jsonb `payload` carries `session_id`, `title`, `location`,
+`starts_at`, `ends_at`, `required`, and for changes `old_starts_at`/`old_location`
+(present only if that field changed → distinguishes time/location/both).
