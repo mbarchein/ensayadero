@@ -66,9 +66,19 @@ export default function NotificationsPage() {
           {notifications?.map((n) => {
             const meta = TYPE_ICON[n.type]
             const Icon = meta?.Icon ?? Bell
-            const label = meta
-              ? t(`notifications.types.${n.type}`, { title: String(n.payload.title ?? '') })
-              : n.type
+            const title = String(n.payload.title ?? '')
+            let typeKey = n.type
+            if (n.type === 'SESSION_CHANGED') {
+              // distinguir hora / lugar / ambos según el payload
+              const timeChanged = !!n.payload.old_starts_at
+              const locChanged = !!n.payload.old_location
+              typeKey = locChanged && timeChanged
+                ? 'SESSION_CHANGED_BOTH'
+                : locChanged
+                  ? 'SESSION_CHANGED_LOCATION'
+                  : 'SESSION_CHANGED'
+            }
+            const label = meta ? t(`notifications.types.${typeKey}`, { title }) : n.type
             const starts = n.payload.starts_at ? new Date(String(n.payload.starts_at)) : null
             const inner = (
               <div

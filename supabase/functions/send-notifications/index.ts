@@ -28,7 +28,12 @@ if (VAPID_PUBLIC && VAPID_PRIVATE) {
 const SUBJECTS: Record<string, (p: Record<string, unknown>) => string> = {
   SESSION_CONFIRMED: (p) => `✅ Ensayo confirmado: ${p.title}`,
   SESSION_CANCELLED: (p) => `❌ Ensayo cancelado: ${p.title}`,
-  SESSION_CHANGED: (p) => `🕐 Cambio de hora: ${p.title}`,
+  SESSION_CHANGED: (p) => {
+    const time = !!p.old_starts_at
+    const loc = !!p.old_location
+    const what = loc && time ? 'Cambio de hora y lugar' : loc ? 'Cambio de lugar' : 'Cambio de hora'
+    return `🕐 ${what}: ${p.title}`
+  },
   REMINDER: (p) => `⏰ Recordatorio: ${p.title}`,
 }
 
