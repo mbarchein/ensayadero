@@ -37,6 +37,7 @@
     "pendingTitle_one": "Tienes {{count}} ensayo por confirmar",
     "pendingTitle_other": "Tienes {{count}} ensayos por confirmar",
     "myGroups": "Mis grupos",
+    "signOut": "Salir",
     "noGroups": "Aún no perteneces a ningún grupo. Espera una invitación de tu director."
   },
   "availability": {

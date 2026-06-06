@@ -37,6 +37,7 @@
     "pendingTitle_one": "You have {{count}} rehearsal to confirm",
     "pendingTitle_other": "You have {{count}} rehearsals to confirm",
     "myGroups": "My groups",
+    "signOut": "Sign out",
     "noGroups": "You don't belong to any group yet. Wait for an invitation from your director."
   },
   "availability": {

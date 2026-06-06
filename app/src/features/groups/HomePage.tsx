@@ -11,7 +11,7 @@ import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib
 
 export default function HomePage() {
   const { t } = useTranslation()
-  const { profile } = useAuth()
+  const { profile, signOut } = useAuth()
 
   const { data: memberships, isLoading } = useQuery({
     queryKey: ['my-memberships'],
@@ -49,11 +49,20 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold">
           {t('home.greeting', { name: profile?.name?.split(' ')[0] || '' })}
         </h1>
-        {profile?.platform_role === 'SUPERADMIN' && (
-          <Link to="/admin" className="text-sm font-medium text-violet-700 underline">
-            {t('home.admin')}
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {profile?.platform_role === 'SUPERADMIN' && (
+            <Link to="/admin" className="text-sm font-medium text-violet-700 underline">
+              {t('home.admin')}
+            </Link>
+          )}
+          <button
+            onClick={signOut}
+            className="rounded-lg px-2 py-1 text-sm text-gray-500 hover:bg-gray-100"
+            title={t('profile.signOut')}
+          >
+            ⎋ {t('home.signOut')}
+          </button>
+        </div>
       </header>
 
       {(pending?.length ?? 0) > 0 && (
