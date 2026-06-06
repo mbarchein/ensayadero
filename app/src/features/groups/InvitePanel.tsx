@@ -11,6 +11,19 @@ import { useAuth } from '../../auth/AuthContext'
 import { Button, Modal } from '../../components/ui'
 import type { Group, GroupRole } from '../../lib/types'
 
+// Icono de compartir tipo Android/Material (3 nodos conectados)
+function ShareIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+      <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
+    </svg>
+  )
+}
+
 export default function InvitePanel({ group }: { group: Group }) {
   const { t } = useTranslation()
   const { profile } = useAuth()
@@ -112,7 +125,10 @@ export default function InvitePanel({ group }: { group: Group }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={share}>📤 {t('invite.share')}</Button>
+        <Button onClick={share} className="inline-flex items-center gap-1.5">
+          <ShareIcon />
+          {t('invite.share')}
+        </Button>
         <Button variant="secondary" onClick={copy}>
           {copied ? t('invite.copied') : `🔗 ${t('invite.copyLink')}`}
         </Button>
