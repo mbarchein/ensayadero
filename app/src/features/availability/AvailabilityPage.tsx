@@ -112,7 +112,6 @@ export default function AvailabilityPage() {
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const draftRef = useRef<SlotState[][] | null>(null)
   draftRef.current = draft
-  const allowClear = useRef(true) // permiso del gesto para limpiar franjas con ensayo
 
   const scheduleSave = () => {
     clearTimeout(timer.current)
@@ -239,8 +238,6 @@ export default function AvailabilityPage() {
   }
 
   const applyCell = (pos: CellPos, value: SlotState) => {
-    // no quitar disponibilidad de una franja con ensayo programado sin permiso
-    if (value === 'NONE' && hasConfirmed(pos) && !allowClear.current) return
     editSeq.current++
     setDraft((prev) => {
       const base = prev ?? serverGrid!
@@ -248,6 +245,35 @@ export default function AvailabilityPage() {
       copy[pos.day][pos.slot] = value
       return copy
     })
+  }
+
+  // al soltar: si se quitó disponibilidad de franjas con ensayo programado,
+  // pedir confirmación; si se rechaza, restaurarlas. (No usar confirm() durante
+  // el gesto: bloquea el hilo y se pierde el pointerup → clic "pillado".)
+  const onPaintEnd = () => {
+    const d = draftRef.current
+    if (d && serverGrid) {
+      const reverted: CellPos[] = []
+      for (let day = 0; day < 7; day++) {
+        for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+          if (
+            serverGrid[day][slot] !== 'NONE' &&
+            d[day][slot] === 'NONE' &&
+            hasConfirmed({ day, slot })
+          ) {
+            reverted.push({ day, slot })
+          }
+        }
+      }
+      if (reverted.length > 0 && !confirm(t('availability.clearScheduledConfirm'))) {
+        setDraft((prev) => {
+          const base = (prev ?? d).map((col) => [...col])
+          for (const p of reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
+          return base
+        })
+      }
+    }
+    scheduleSave()
   }
 
   return (
@@ -328,17 +354,11 @@ export default function AvailabilityPage() {
         }}
         onPaintStart={(pos) => {
           const next = CYCLE[grid[pos.day][pos.slot]]
-          // aviso al quitar disponibilidad en franja con ensayo programado
-          allowClear.current = true
-          if (next === 'NONE' && hasConfirmed(pos)) {
-            allowClear.current = confirm(t('availability.clearScheduledConfirm'))
-            if (!allowClear.current) return
-          }
           setPaintValue(next)
           applyCell(pos, next)
         }}
         onPaintMove={(pos) => applyCell(pos, paintValue)}
-        onPaintEnd={scheduleSave}
+        onPaintEnd={onPaintEnd}
       />
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
