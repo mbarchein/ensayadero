@@ -20,6 +20,9 @@ import {
 } from '../../lib/slots'
 import WeekGrid, { type CellPos } from './WeekGrid'
 import { Button, Spinner } from '../../components/ui'
+import { parseRange } from '../../lib/ranges'
+import { useMyAgenda } from '../agenda/useMyAgenda'
+import ParticipationCard from '../agenda/ParticipationCard'
 import type { Availability } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
@@ -40,6 +43,17 @@ export default function AvailabilityPage() {
   const qc = useQueryClient()
   const [weekOffset, setWeekOffset] = useState(0)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
+
+  // ensayos a los que estoy convocado esta semana visible (cualquier grupo)
+  const agenda = useMyAgenda()
+  const weekParticipations = useMemo(() => {
+    const start = monday.getTime()
+    const end = addDays(monday, 7).getTime()
+    return (agenda.data ?? []).filter((p) => {
+      const r = parseRange(p.sessions.time_range)
+      return r.start.getTime() < end && r.end.getTime() > start
+    })
+  }, [agenda.data, monday])
 
   const { data: availabilities, isLoading } = useQuery({
     queryKey: ['availabilities', profile?.id],
@@ -268,6 +282,23 @@ export default function AvailabilityPage() {
             message: ((save.error || makeRecurring.error || clearWeek.error) as Error).message,
           })}
         </p>
+      )}
+
+      {/* ensayos convocados en la semana visible */}
+      {weekParticipations.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-gray-700">{t('availability.weekSessions')}</h2>
+          <ul className="space-y-3">
+            {weekParticipations.map((p) => (
+              <ParticipationCard
+                key={p.session_id}
+                p={p}
+                pending={agenda.respond.isPending}
+                onRespond={(response) => agenda.respond.mutate({ sessionId: p.session_id, response })}
+              />
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   )

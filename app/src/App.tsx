@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
 import MembersPage from './features/groups/MembersPage'
 import AvailabilityPage from './features/availability/AvailabilityPage'
+import UpcomingPage from './features/agenda/UpcomingPage'
 import SessionsPage from './features/sessions/SessionsPage'
 import SessionDetailPage from './features/sessions/SessionDetailPage'
 import PlannerPage from './features/planner/PlannerPage'
@@ -22,6 +23,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/availability" element={<AvailabilityPage />} />
+          <Route path="/upcoming" element={<UpcomingPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />

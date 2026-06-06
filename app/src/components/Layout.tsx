@@ -8,6 +8,7 @@ import { Spinner } from './ui'
 const tabs = [
   { to: '/', key: 'nav.home', icon: '🏠', end: true },
   { to: '/availability', key: 'nav.availability', icon: '🗓️' },
+  { to: '/upcoming', key: 'nav.upcoming', icon: '📋' },
   { to: '/notifications', key: 'nav.notifications', icon: '🔔' },
   { to: '/profile', key: 'nav.profile', icon: '👤' },
 ]

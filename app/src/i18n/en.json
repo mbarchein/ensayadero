@@ -20,8 +20,15 @@
   "nav": {
     "home": "Home",
     "availability": "My schedule",
+    "upcoming": "Upcoming",
     "notifications": "Alerts",
     "profile": "Profile"
+  },
+  "upcoming": {
+    "title": "Upcoming rehearsals",
+    "empty": "You have no upcoming rehearsals.",
+    "pendingNotice_one": "You have {{count}} rehearsal to confirm.",
+    "pendingNotice_other": "You have {{count}} rehearsals to confirm."
   },
   "login": {
     "tagline": "Plan your theatre group's rehearsals",
@@ -53,6 +60,7 @@
     "unmarked": "Unmarked",
     "saving": "Saving…",
     "saved": "✓ Saved",
+    "weekSessions": "Your rehearsals this week",
     "repeatWeekly": "🔁 Repeat every week",
     "repeatConfirm": "This will turn this week's painting into your recurring availability (every week). Continue?",
     "clearWeek": "Clear week",
