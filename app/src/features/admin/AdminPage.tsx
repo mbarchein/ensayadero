@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { randomPlay } from '../../lib/plays'
 import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import type { Group, MembershipWithProfile, Profile } from '../../lib/types'
 
@@ -15,6 +16,11 @@ export default function AdminPage() {
   const { profile, loading } = useAuth()
   const qc = useQueryClient()
   const [newGroupOpen, setNewGroupOpen] = useState(false)
+  const [placeholder, setPlaceholder] = useState(randomPlay)
+  const openNewGroup = () => {
+    setPlaceholder(randomPlay())
+    setNewGroupOpen(true)
+  }
   const [groupName, setGroupName] = useState('')
   const [instructorEmail, setInstructorEmail] = useState('')
 
@@ -126,7 +132,7 @@ export default function AdminPage() {
           </Link>
           <h1 className="text-xl font-bold">{t('admin.title')}</h1>
         </div>
-        <Button onClick={() => setNewGroupOpen(true)}>{t('admin.newGroup')}</Button>
+        <Button onClick={openNewGroup}>{t('admin.newGroup')}</Button>
       </header>
 
       <section>
@@ -203,7 +209,7 @@ export default function AdminPage() {
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder={t('admin.groupNamePlaceholder')}
+              placeholder={placeholder}
             />
           </label>
           <label className="block text-sm">

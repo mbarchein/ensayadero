@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
+import { randomPlay } from '../../lib/plays'
 import { Badge, Button, EmptyState, Modal, Spinner } from '../../components/ui'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
@@ -16,6 +17,11 @@ export default function HomePage() {
   const qc = useQueryClient()
   const [newGroupOpen, setNewGroupOpen] = useState(false)
   const [groupName, setGroupName] = useState('')
+  const [placeholder, setPlaceholder] = useState(randomPlay)
+  const openNewGroup = () => {
+    setPlaceholder(randomPlay()) // obra famosa aleatoria cada apertura
+    setNewGroupOpen(true)
+  }
 
   const createGroup = useMutation({
     mutationFn: async () => {
@@ -103,7 +109,7 @@ export default function HomePage() {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{t('home.myGroups')}</h2>
-          <Button onClick={() => setNewGroupOpen(true)}>{t('home.newGroup')}</Button>
+          <Button onClick={openNewGroup}>{t('home.newGroup')}</Button>
         </div>
         {memberships?.length === 0 ? (
           <EmptyState message={t('home.noGroups')} />
@@ -146,7 +152,7 @@ export default function HomePage() {
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder={t('admin.groupNamePlaceholder')}
+              placeholder={placeholder}
             />
           </label>
           <p className="text-xs text-gray-500">{t('home.newGroupHint')}</p>
