@@ -28,8 +28,8 @@ import type { Availability } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
   NONE: 'AVAILABLE',
-  AVAILABLE: 'PREFERRED',
-  PREFERRED: 'NONE',
+  AVAILABLE: 'NONE',
+  PREFERRED: 'NONE', // estado heredado; ya no se pinta
 }
 
 const CELL_STYLE: Record<SlotState, string> = {
@@ -288,11 +288,7 @@ export default function AvailabilityPage() {
               </span>
             )
           }
-          return grid[day][slot] === 'PREFERRED' ? (
-            <span className="block text-center text-[9px] leading-6 text-white" aria-hidden>
-              ★
-            </span>
-          ) : null
+          return null
         }}
         onPaintStart={(pos) => {
           const next = CYCLE[grid[pos.day][pos.slot]]
@@ -306,10 +302,6 @@ export default function AvailabilityPage() {
       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded bg-green-300" /> {t('availability.available')}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-green-600 text-center text-[8px] text-white">★</span>{' '}
-          {t('availability.preferred')}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded border bg-white" /> {t('availability.unmarked')}
