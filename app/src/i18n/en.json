@@ -144,6 +144,10 @@
   },
   "profile": {
     "title": "Profile",
+    "name": "Name",
+    "phone": "Phone",
+    "savingDetails": "Saving…",
+    "detailsSaved": "✓ Saved",
     "pushTitle": "Push notifications",
     "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",
     "pushEnabled": "✓ Enabled on this device",

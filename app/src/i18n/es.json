@@ -144,6 +144,10 @@
   },
   "profile": {
     "title": "Perfil",
+    "name": "Nombre",
+    "phone": "Teléfono",
+    "savingDetails": "Guardando…",
+    "detailsSaved": "✓ Guardado",
     "pushTitle": "Notificaciones push",
     "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",
     "pushEnabled": "✓ Activadas en este dispositivo",

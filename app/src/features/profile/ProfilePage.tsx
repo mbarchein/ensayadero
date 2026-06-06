@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@tanstack/react-query'
 import { useAuth } from '../../auth/AuthContext'
@@ -8,7 +8,31 @@ import { Button } from '../../components/ui'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
-  const { profile, signOut } = useAuth()
+  const { profile, signOut, refreshProfile } = useAuth()
+
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [savedAt, setSavedAt] = useState(false)
+  useEffect(() => {
+    setName(profile?.name ?? '')
+    setPhone(profile?.phone ?? '')
+  }, [profile])
+
+  const saveDetails = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ name: name.trim(), phone: phone.trim() || null })
+        .eq('id', profile!.id)
+      if (error) throw error
+      await refreshProfile()
+    },
+    onSuccess: () => {
+      setSavedAt(true)
+      setTimeout(() => setSavedAt(false), 2000)
+    },
+  })
+  const dirty = name.trim() !== (profile?.name ?? '') || phone.trim() !== (profile?.phone ?? '')
 
   const deleteAccount = useMutation({
     mutationFn: async () => {
@@ -26,11 +50,45 @@ export default function ProfilePage() {
       <h1 className="text-xl font-bold">{t('profile.title')}</h1>
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
         {profile?.avatar_url && <img src={profile.avatar_url} alt="" className="h-14 w-14 rounded-full" />}
-        <div>
-          <p className="font-medium">{profile?.name}</p>
-          <p className="text-sm text-gray-500">{profile?.email}</p>
-        </div>
+        <p className="text-sm text-gray-500">{profile?.email}</p>
       </div>
+
+      <form
+        className="space-y-3 rounded-xl border bg-white p-4"
+        onSubmit={(e) => {
+          e.preventDefault()
+          saveDetails.mutate()
+        }}
+      >
+        <label className="block text-sm">
+          {t('profile.name')}
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 w-full rounded-lg border px-3 py-2"
+          />
+        </label>
+        <label className="block text-sm">
+          {t('profile.phone')}
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="mt-1 w-full rounded-lg border px-3 py-2"
+            placeholder="+34 600 000 000"
+          />
+        </label>
+        {saveDetails.isError && (
+          <p className="text-sm text-red-600">{(saveDetails.error as Error).message}</p>
+        )}
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={!dirty || saveDetails.isPending}>
+            {saveDetails.isPending ? t('profile.savingDetails') : t('common.save')}
+          </Button>
+          {savedAt && <span className="text-sm text-green-600">{t('profile.detailsSaved')}</span>}
+        </div>
+      </form>
 
       <section className="rounded-xl border bg-white p-4">
         <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>

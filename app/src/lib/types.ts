@@ -8,6 +8,7 @@ export interface Profile {
   id: string
   email: string
   name: string
+  phone: string | null
   avatar_url: string | null
   platform_role: PlatformRole
 }
