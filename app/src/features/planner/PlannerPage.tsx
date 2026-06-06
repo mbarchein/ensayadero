@@ -2,13 +2,14 @@
 // Selección de subconjunto de personas, intensidad = nº disponibles,
 // tap en celda → crear sesión con horas prefijadas.
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -24,7 +25,15 @@ export default function PlannerPage() {
   const { t } = useTranslation()
   const { groupId, group, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
-  const [weekOffset, setWeekOffset] = useState(0)
+  const [params] = useSearchParams()
+  const initialOffset = useMemo(() => {
+    const d = params.get('d')
+    if (!d) return 0
+    const diff = weekStart(new Date(d)).getTime() - weekStart(new Date()).getTime()
+    return Math.max(-6, Math.round(diff / (7 * 86_400_000)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const weekEnd = useMemo(() => addDays(monday, 7), [monday])
   const [selected, setSelected] = useState<Set<string> | null>(null) // null = todos
@@ -78,6 +87,16 @@ export default function PlannerPage() {
       return data as SessionWithParticipants[]
     },
   })
+
+  // abrir edición directamente desde un enlace ?edit=<sessionId>
+  const editId = params.get('edit')
+  useEffect(() => {
+    if (editId && weekSessions) {
+      const s = weekSessions.find((x) => x.id === editId)
+      if (s) setEditSession(s)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, weekSessions])
 
   // mapa [día][slot] → sesión que lo cubre (para pintar overlay en el grid)
   const sessionCells = useMemo(() => {
