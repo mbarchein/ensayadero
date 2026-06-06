@@ -88,7 +88,7 @@
     "planOne": "Plan a rehearsal",
     "pastAndCancelled": "Past and cancelled ({{count}})",
     "archive": "Archive",
-    "status": { "DRAFT": "Draft", "CONFIRMED": "Confirmed", "CANCELLED": "Cancelled" },
+    "status": { "DRAFT": "Draft", "CONFIRMED": "Scheduled", "CANCELLED": "Cancelled" },
     "response": { "going": "Going", "notGoing": "Not going", "pendingShort": "To confirm", "notGoingList": "Not going", "pending": "Pending" },
     "backToSessions": "‹ Rehearsals",
     "scene": "Scene: {{scene}}",

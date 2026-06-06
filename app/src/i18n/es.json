@@ -88,7 +88,7 @@
     "planOne": "Planificar un ensayo",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
     "archive": "Archivar",
-    "status": { "DRAFT": "Borrador", "CONFIRMED": "Confirmado", "CANCELLED": "Cancelado" },
+    "status": { "DRAFT": "Borrador", "CONFIRMED": "Programado", "CANCELLED": "Cancelado" },
     "response": { "going": "Voy", "notGoing": "No voy", "pendingShort": "Por confirmar", "notGoingList": "No va", "pending": "Pendiente" },
     "backToSessions": "‹ Ensayos",
     "scene": "Escena: {{scene}}",
