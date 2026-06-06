@@ -49,10 +49,8 @@
   "login": {
     "tagline": "Planifica los ensayos de tu grupo de teatro",
     "googleButton": "Continuar con Google",
-    "inviteNotice": "Necesitas una invitación de tu director para crear cuenta.",
     "entering": "Entrando…",
-    "inviteRequired": "Necesitas una invitación para crear una cuenta. Pide a tu director que te invite.",
-    "noProfile": "Tu cuenta no tiene perfil. Probablemente necesitas una invitación — contacta con tu director."
+    "noProfile": "Tu cuenta aún no está lista. Recarga la página; si persiste, contacta con soporte."
   },
   "home": {
     "greeting": "Hola, {{name}} 👋",
@@ -65,7 +63,7 @@
     "newGroupTitle": "Nuevo grupo",
     "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
     "signOut": "Salir",
-    "noGroups": "Aún no perteneces a ningún grupo. Espera una invitación de tu director."
+    "noGroups": "Aún no perteneces a ningún grupo. Únete con un código o crea el tuyo."
   },
   "availability": {
     "title": "Mi disponibilidad",

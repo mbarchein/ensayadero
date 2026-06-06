@@ -13,14 +13,9 @@ export default function AuthCallback() {
     // supabase-js procesa el hash/code automáticamente; esperamos sesión
     supabase.auth.getSession().then(({ data, error }) => {
       if (error || !data.session) {
-        // signup sin invitación → trigger lanza SIGNUP_REQUIRES_INVITATION
         const params = new URLSearchParams(window.location.search + window.location.hash.replace('#', '&'))
         const desc = params.get('error_description') ?? error?.message
-        setError(
-          desc?.includes('SIGNUP_REQUIRES_INVITATION') || desc?.includes('Database error')
-            ? t('login.inviteRequired')
-            : desc ?? null,
-        )
+        setError(desc ?? null)
         if (!desc) navigate('/login', { replace: true })
         return
       }

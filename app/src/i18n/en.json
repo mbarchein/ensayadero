@@ -49,10 +49,8 @@
   "login": {
     "tagline": "Plan your theatre group's rehearsals",
     "googleButton": "Continue with Google",
-    "inviteNotice": "You need an invitation from your director to create an account.",
     "entering": "Signing in…",
-    "inviteRequired": "You need an invitation to create an account. Ask your director to invite you.",
-    "noProfile": "Your account has no profile. You probably need an invitation — contact your director."
+    "noProfile": "Your account isn't ready yet. Reload the page; if it persists, contact support."
   },
   "home": {
     "greeting": "Hi, {{name}} 👋",
@@ -65,7 +63,7 @@
     "newGroupTitle": "New group",
     "newGroupHint": "You'll be the director of this group and can invite the others.",
     "signOut": "Sign out",
-    "noGroups": "You don't belong to any group yet. Wait for an invitation from your director."
+    "noGroups": "You don't belong to any group yet. Join with a code or create your own."
   },
   "availability": {
     "title": "My availability",

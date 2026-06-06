@@ -120,16 +120,16 @@ Verificar en `https://app.tudominio.es`.
 ## 10. Bootstrap del superadmin
 
 1. Entrar en la app y hacer login con Google con **tu cuenta**.
-   El primer usuario puede registrarse sin invitación solo mientras no exista
-   ningún superadmin (excepción de bootstrap en el trigger).
+   El registro es abierto: cualquiera puede crear cuenta.
 2. Supabase dashboard → SQL editor:
    ```sql
    update public.profiles
    set platform_role = 'SUPERADMIN'
    where email = 'you@example.com';
    ```
-3. A partir de aquí: crear grupos desde `/admin`, invitar instructores, y todo
-   registro nuevo exige invitación.
+3. A partir de aquí: crear grupos desde `/admin` e invitar instructores. El
+   registro sigue abierto; el acceso a cada grupo se controla por su código/enlace
+   e invitaciones por email.
 
 ## 11. Programar recordatorios (una vez, SQL editor)
 

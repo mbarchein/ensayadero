@@ -37,9 +37,10 @@ resource "supabase_settings" "main" {
       "http://localhost:5173/auth/callback", # dev local
     ]
 
-    # Registro abierto desactivado: solo invitación (RF2).
-    # Las cuentas se crean vía invite o al aceptar invitación con token propio.
-    disable_signup = false # OAuth necesita signup habilitado; el gate de invitación se aplica en DB (trigger valida invitación pendiente)
+    # Registro abierto: cualquiera puede crear cuenta (Google/email).
+    # El acceso a grupos se controla por código/enlace de grupo e invitaciones
+    # por email (auto-aceptadas en el trigger handle_new_user).
+    disable_signup = false
 
     external_google_enabled   = true
     external_google_client_id = var.google_oauth_client_id

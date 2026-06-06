@@ -50,7 +50,6 @@ export default function LoginPage() {
         {t('login.googleButton')}
       </button>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <p className="max-w-xs text-center text-xs text-violet-500">{t('login.inviteNotice')}</p>
 
       {import.meta.env.DEV && (
         <form
