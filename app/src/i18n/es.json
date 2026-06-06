@@ -81,6 +81,7 @@
     "copyWeeksLabel": "¿Cuántas semanas siguientes?",
     "copyConfirm_one": "Copiar a la próxima semana",
     "copyConfirm_other": "Copiar a las próximas {{count}} semanas",
+    "clearScheduledConfirm": "Esta franja tiene un ensayo programado. ¿Quitar tu disponibilidad igualmente?",
     "clearWeek": "Borrar semana",
     "clearWeekConfirm": "Se borrará toda tu disponibilidad de esta semana (los bloques recurrentes quedan como excepción solo esta semana). ¿Continuar?",
     "saveError": "Error al guardar: {{message}}",

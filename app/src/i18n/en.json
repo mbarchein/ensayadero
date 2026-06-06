@@ -81,6 +81,7 @@
     "copyWeeksLabel": "How many following weeks?",
     "copyConfirm_one": "Copy to next week",
     "copyConfirm_other": "Copy to the next {{count}} weeks",
+    "clearScheduledConfirm": "This slot has a scheduled rehearsal. Remove your availability anyway?",
     "clearWeek": "Clear week",
     "clearWeekConfirm": "All your availability for this week will be removed (recurring blocks get an exception for this week only). Continue?",
     "saveError": "Error saving: {{message}}",

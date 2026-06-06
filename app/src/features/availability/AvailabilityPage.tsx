@@ -112,6 +112,7 @@ export default function AvailabilityPage() {
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const draftRef = useRef<SlotState[][] | null>(null)
   draftRef.current = draft
+  const allowClear = useRef(true) // permiso del gesto para limpiar franjas con ensayo
 
   const scheduleSave = () => {
     clearTimeout(timer.current)
@@ -231,7 +232,15 @@ export default function AvailabilityPage() {
 
   if (isLoading || !grid) return <Spinner />
 
+  // ¿la franja tiene un ensayo PROGRAMADO (confirmado)?
+  const hasConfirmed = (pos: CellPos) => {
+    const p = sessionCells.get(`${pos.day}:${pos.slot}`)
+    return !!p && p.sessions.status === 'CONFIRMED'
+  }
+
   const applyCell = (pos: CellPos, value: SlotState) => {
+    // no quitar disponibilidad de una franja con ensayo programado sin permiso
+    if (value === 'NONE' && hasConfirmed(pos) && !allowClear.current) return
     editSeq.current++
     setDraft((prev) => {
       const base = prev ?? serverGrid!
@@ -319,6 +328,12 @@ export default function AvailabilityPage() {
         }}
         onPaintStart={(pos) => {
           const next = CYCLE[grid[pos.day][pos.slot]]
+          // aviso al quitar disponibilidad en franja con ensayo programado
+          allowClear.current = true
+          if (next === 'NONE' && hasConfirmed(pos)) {
+            allowClear.current = confirm(t('availability.clearScheduledConfirm'))
+            if (!allowClear.current) return
+          }
           setPaintValue(next)
           applyCell(pos, next)
         }}
