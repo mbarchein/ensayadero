@@ -357,11 +357,16 @@ function heatClass(cell: HeatCell, total: number): string {
   return 'bg-emerald-500 ring-1 ring-inset ring-emerald-700'
 }
 
-function NameChip({ name, me }: { name: string; me: boolean }) {
+function NameChip({ name, me, variant }: { name: string; me: boolean; variant: 'available' | 'busy' | 'unavailable' }) {
+  const base = {
+    available: 'bg-green-100 text-green-800',
+    busy: 'bg-amber-100 text-amber-800',
+    unavailable: 'bg-gray-100 text-gray-500',
+  }[variant]
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-        me ? 'bg-violet-600 text-white ring-2 ring-violet-300' : 'bg-green-100 text-green-800'
+        me ? 'bg-violet-600 text-white ring-2 ring-violet-300' : base
       }`}
     >
       {name}
@@ -392,22 +397,30 @@ function CellDetail({
           <span className="font-medium text-green-700">{t('planner.availableLabel')}</span>
           <div className="mt-1 flex flex-wrap gap-1">
             {cell.available.map((id) => (
-              <NameChip key={id} name={nameOf(id)} me={id === meId} />
+              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="available" />
             ))}
           </div>
         </div>
       )}
       {cell.busy.length > 0 && (
-        <p>
-          <span className="font-medium text-amber-700">{t('planner.busyLabel')}</span>{' '}
-          {cell.busy.map(nameOf).join(', ')}
-        </p>
+        <div>
+          <span className="font-medium text-amber-700">{t('planner.busyLabel')}</span>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {cell.busy.map((id) => (
+              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="busy" />
+            ))}
+          </div>
+        </div>
       )}
       {unavailable.length > 0 && (
-        <p>
-          <span className="font-medium text-gray-500">{t('planner.unavailableLabel')}</span>{' '}
-          {unavailable.map(nameOf).join(', ')}
-        </p>
+        <div>
+          <span className="font-medium text-gray-500">{t('planner.unavailableLabel')}</span>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {unavailable.map((id) => (
+              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="unavailable" />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )
