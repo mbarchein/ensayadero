@@ -1,0 +1,36 @@
+import { Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import LoginPage from './auth/LoginPage'
+import AuthCallback from './auth/AuthCallback'
+import Layout from './components/Layout'
+import HomePage from './features/groups/HomePage'
+import MembersPage from './features/groups/MembersPage'
+import AvailabilityPage from './features/availability/AvailabilityPage'
+import SessionsPage from './features/sessions/SessionsPage'
+import SessionDetailPage from './features/sessions/SessionDetailPage'
+import PlannerPage from './features/planner/PlannerPage'
+import NotificationsPage from './features/notifications/NotificationsPage'
+import ProfilePage from './features/profile/ProfilePage'
+import AdminPage from './features/admin/AdminPage'
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/availability" element={<AvailabilityPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/g/:groupId" element={<SessionsPage />} />
+          <Route path="/g/:groupId/planner" element={<PlannerPage />} />
+          <Route path="/g/:groupId/members" element={<MembersPage />} />
+          <Route path="/g/:groupId/sessions/:sessionId" element={<SessionDetailPage />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
+  )
+}
