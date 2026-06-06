@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
@@ -75,6 +75,9 @@ export default function MembersPage() {
 
   return (
     <div className="space-y-6">
+      <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
+        {t('sessions.backToSessions')}
+      </Link>
       <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
 
       {isInstructor && group && <InvitePanel group={group} />}
