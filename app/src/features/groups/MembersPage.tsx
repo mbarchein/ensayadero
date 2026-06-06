@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { LogOut } from 'lucide-react'
+import { LogOut, UserCog, UserMinus } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import { roleLabel } from '../../lib/roleLabel'
@@ -100,7 +100,8 @@ export default function MembersPage() {
             {isInstructor && m.user_id !== profile?.id && (
               <div className="flex gap-2">
                 <Button
-                  variant="ghost"
+                  variant="secondary"
+                  className="inline-flex items-center gap-1.5"
                   onClick={() =>
                     changeRole.mutate({
                       userId: m.user_id,
@@ -108,6 +109,7 @@ export default function MembersPage() {
                     })
                   }
                 >
+                  {m.role === 'INSTRUCTOR' ? <UserMinus size={15} /> : <UserCog size={15} />}
                   {m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
                 </Button>
                 <Button

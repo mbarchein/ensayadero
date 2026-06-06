@@ -18,8 +18,8 @@
     "ACTOR_F": "Actriz",
     "ACTOR_M": "Actor",
     "SUPERADMIN": "Superadmin",
-    "toInstructor": "→ Director",
-    "toActor": "→ Actor"
+    "toInstructor": "Hacer director",
+    "toActor": "Pasar a actor"
   },
   "nav": {
     "home": "Inicio",
