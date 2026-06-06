@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Home, CalendarDays, ClipboardList, Bell, User, type LucideIcon } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../lib/supabase'
+import { useRealtime } from '../lib/useRealtime'
 import { Spinner } from './ui'
 
 const tabs: { to: string; key: string; icon: LucideIcon; end?: boolean }[] = [
@@ -17,6 +18,7 @@ const tabs: { to: string; key: string; icon: LucideIcon; end?: boolean }[] = [
 export default function Layout() {
   const { t } = useTranslation()
   const { session, profile, loading } = useAuth()
+  useRealtime(!!session)
 
   const { data: unread } = useQuery({
     queryKey: ['unread-count'],
