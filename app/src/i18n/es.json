@@ -37,9 +37,10 @@
     "pendingNotice_one": "Tienes {{count}} ensayo por confirmar.",
     "pendingNotice_other": "Tienes {{count}} ensayos por confirmar.",
     "viewInAgenda": "Ver en mi agenda",
-    "going": "Voy",
+    "going": "Van",
     "notGoing": "No van",
-    "pending": "Pendientes"
+    "pending": "Pendientes",
+    "all": "(todos)"
   },
   "login": {
     "tagline": "Planifica los ensayos de tu grupo de teatro",

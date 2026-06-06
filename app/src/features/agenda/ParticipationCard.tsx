@@ -51,15 +51,24 @@ export default function ParticipationCard({
 
       {confirmed && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-          <span className="inline-flex items-center gap-1 text-green-700">
-            <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
-          </span>
-          <span className="inline-flex items-center gap-1 text-red-600">
-            <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
-          </span>
-          <span className="inline-flex items-center gap-1 text-amber-600">
-            <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
-          </span>
+          {tally.accepted > 0 && (
+            <span className="inline-flex items-center gap-1 text-green-700">
+              <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
+              {tally.accepted === tally.total && ` ${t('upcoming.all')}`}
+            </span>
+          )}
+          {tally.declined > 0 && (
+            <span className="inline-flex items-center gap-1 text-red-600">
+              <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
+              {tally.declined === tally.total && ` ${t('upcoming.all')}`}
+            </span>
+          )}
+          {tally.pending > 0 && (
+            <span className="inline-flex items-center gap-1 text-amber-600">
+              <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
+              {tally.pending === tally.total && ` ${t('upcoming.all')}`}
+            </span>
+          )}
         </div>
       )}
 

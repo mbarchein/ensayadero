@@ -39,7 +39,8 @@
     "viewInAgenda": "View in my schedule",
     "going": "Going",
     "notGoing": "Not going",
-    "pending": "Pending"
+    "pending": "Pending",
+    "all": "(all)"
   },
   "login": {
     "tagline": "Plan your theatre group's rehearsals",

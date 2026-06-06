@@ -18,6 +18,7 @@ export interface MyParticipation extends SessionParticipant {
 export function tallyResponses(p: MyParticipation) {
   const all = p.sessions.session_participants ?? []
   return {
+    total: all.length,
     accepted: all.filter((x) => x.response === 'ACCEPTED').length,
     declined: all.filter((x) => x.response === 'DECLINED').length,
     pending: all.filter((x) => x.response === 'PENDING').length,
