@@ -146,19 +146,12 @@ function SessionCard({
   const r = parseRange(s.time_range)
   const mine = s.session_participants.find((p) => p.user_id === userId)
   return (
-    <li className="relative">
-      {onArchive && (
-        <button
-          onClick={onArchive}
-          className="absolute right-2 top-2 z-10 rounded-lg px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
-          title={t('sessions.archive')}
-        >
-          🗄 {t('sessions.archive')}
-        </button>
-      )}
+    <li>
       <Link
         to={`/g/${groupId}/sessions/${s.id}`}
-        className="block rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"
+        className={`block rounded-xl border bg-white p-4 shadow-sm transition hover:shadow ${
+          onArchive ? 'rounded-b-none' : ''
+        }`}
       >
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -184,6 +177,14 @@ function SessionCard({
           </div>
         </div>
       </Link>
+      {onArchive && (
+        <button
+          onClick={onArchive}
+          className="w-full rounded-b-xl border border-t-0 bg-gray-50 py-1.5 text-xs text-gray-500 hover:bg-gray-100"
+        >
+          🗄 {t('sessions.archive')}
+        </button>
+      )}
     </li>
   )
 }
