@@ -1,84 +1,84 @@
-# 03 · Decisiones de diseño
+# 03 · Design decisions
 
-Decisiones tomadas durante el diseño y la evolución. Formato ADR ligero. Las
-revisadas se marcan con la versión vigente.
+Decisions made during design and evolution. Lightweight ADR format. Revised ones
+show the current version.
 
-## Núcleo (acordadas al inicio)
+## Core (agreed at the start)
 
-### D1 — Disponibilidad global por usuario + ocupaciones cruzadas
-La disponibilidad NO es por grupo: una sola agenda por persona
-(`availabilities.user_id`, sin `group_id`). Una sesión **confirmada** en
-cualquier grupo descuenta esa franja de la disponibilidad mostrada en los demás
-grupos, **sin revelar** en qué grupo ni por qué.
-- Por qué: refleja la realidad (la persona solo tiene una agenda), evita doble
-  reserva entre grupos.
-- Cómo: `group_busy_ranges()` (security definer) devuelve rangos ocupados por
-  usuario sin exponer la sesión/grupo de origen; el heatmap los descuenta.
+### D1 — Global per-user availability + cross-group busy
+Availability is NOT per group: a single agenda per person
+(`availabilities.user_id`, no `group_id`). A **confirmed** session in any group
+discounts that slot from the availability shown in other groups, **without
+revealing** which group or why.
+- Why: reflects reality (a person has a single agenda), avoids double-booking
+  across groups.
+- How: `group_busy_ranges()` (security definer) returns busy ranges per user
+  without exposing the originating session/group; the heatmap discounts them.
 
-### D2 — Superadmin ve solo estructura
-El superadmin ve grupos, miembros, roles, sesiones, invitaciones y estadísticas,
-pero **nunca** disponibilidades individuales.
-- Cómo: las políticas RLS de `availabilities` no incluyen bypass de superadmin.
+### D2 — Superadmin sees structure only
+The superadmin sees groups, members, roles, sessions, invitations and stats, but
+**never** individual availability.
+- How: `availabilities` RLS policies include no superadmin bypass.
 
-### D3 — Rol por membresía + capa de plataforma
-`INSTRUCTOR`/`ACTOR` viven en `Membership` (por grupo). `USER`/`SUPERADMIN` en
-`User` (plataforma). Capas independientes; misma persona con roles distintos por
-grupo; varios directores por grupo.
+### D3 — Role per membership + platform layer
+`INSTRUCTOR`/`ACTOR` live in `Membership` (per group). `USER`/`SUPERADMIN` in
+`User` (platform). Independent layers; same person with different roles per
+group; several directors per group.
 
-### D4 — Aislamiento total entre grupos
-Miembros, sesiones, subgrupos y notificaciones de un grupo no cruzan a otro.
-Único cruce: el descuento de disponibilidad de D1.
+### D4 — Full isolation between groups
+Members, sessions, subgroups and notifications of one group don't cross to
+another. Only crossing: the availability discount from D1.
 
-### D5 — Registro solo por invitación → **D5' Registro abierto**
-- D5 (inicial): el alta requería invitación pendiente por email (gate en trigger
-  `handle_new_user`).
-- **D5' (vigente)**: al permitir que cualquiera cree grupos y unirse por código,
-  el gate dejó de tener sentido. Registro **abierto** con Google; las
-  invitaciones por email pendientes se autoaceptan al entrar. Migración
-  `20260607000005`.
+### D5 — Invitation-only registration → **D5' Open registration**
+- D5 (initial): sign-up required a pending email invitation (gate in the
+  `handle_new_user` trigger).
+- **D5' (current)**: once anyone could create groups and join by code, the gate
+  no longer made sense. **Open** registration with Google; pending email
+  invitations are auto-accepted on sign-in. Migration `20260607000005`.
 
-## Infraestructura
+## Infrastructure
 
-### D-stack — Supabase free tier (revisado de VPS)
-Se evaluó VPS self-hosted (~5 €/mes) vs free tier. Elegido **free tier**:
-Supabase (DB+Auth+RLS+Edge) + Cloudflare Pages + Resend + Web Push. Coste ~0 €.
-Asumidas limitaciones (pausa por inactividad, 500MB).
+### D-stack — Supabase free tier (revised from VPS)
+A self-hosted VPS (~€5/mo) vs free tier was evaluated. Chosen **free tier**:
+Supabase (DB+Auth+RLS+Edge) + Cloudflare Pages + Resend + Web Push. ~€0 cost.
+Limitations assumed (pause on inactivity, 500MB).
 
-### D-iac — Toda la infra con Terraform
-`infra/` provisiona Supabase, Cloudflare Pages+DNS y secrets de GitHub. Pasos no
-automatizables (OAuth client, tokens, dominio Resend, VAPID) en `BOOTSTRAP.md`.
+### D-iac — All infra with Terraform
+`infra/` provisions Supabase, Cloudflare Pages+DNS and GitHub secrets.
+Non-automatable steps (OAuth client, tokens, Resend domain, VAPID) in
+`BOOTSTRAP.md`.
 
-### D-local — Stack local completo en docker-compose (sin Supabase CLI)
-Postgres (imagen supabase con pg_cron/pg_net), GoTrue, PostgREST, gateway nginx
-(emula Kong), Edge Function en Deno, runner de migraciones, frontend Vite.
-Login por password solo en build de desarrollo.
+### D-local — Full local stack in docker-compose (no Supabase CLI)
+Postgres (supabase image with pg_cron/pg_net), GoTrue, PostgREST, nginx gateway
+(emulates Kong), Edge Function in Deno, migration runner, Vite frontend. Password
+login only in the development build.
 
-## Producto / UX (evolución)
+## Product / UX (evolution)
 
-| Decisión | Resumen |
+| Decision | Summary |
 |----------|---------|
-| D-create-open | Cualquier usuario crea **grupo** (pasa a director) y, al principio, ensayos. Luego revertido: **solo directores planifican** (`20260607000009`). |
-| D-availability-read | Para que un miembro planificara se amplió la lectura de disponibilidad a co-miembros; con la reversión a solo-directores la lectura sigue siendo de co-miembros (necesaria para el heatmap del director). |
-| D-archive | Archivado **por usuario** (oculta solo para ti) de sesiones canceladas/pasadas (`session_archives`). |
-| D-join | Invitar fácil: **código de grupo** reutilizable (alfanumérico A-Z0-9 **sin I/O** para no confundir con 1/0), enlace `/join/:code`, QR y email en lote. Enlaces/códigos **abiertos** (quien los tenga entra); el director puede regenerar/desactivar. |
-| D-copy | «Repetir cada semana» (recurrencia) sustituido por **copiar la semana a N semanas siguientes** (copia explícita, no RRULE). |
-| D-preferred-out | Estado «preferido» retirado del pintado; solo disponible/sin marcar. |
-| D-autosave | La disponibilidad se guarda con autosave (debounce 600 ms) al soltar el gesto, no con botón. |
-| D-past | Franjas pasadas atenuadas y no editables; navegación atrás limitada a 6 semanas. |
-| D-avatar | Avatar geométrico determinista por grupo (DiceBear «shapes»), con semilla `avatar_seed` regenerable por el director. |
-| D-pronoun | Pronombre opcional (F/M) que solo adapta la etiqueta de rol (actriz/actor, directora/director). No se usa para nada más. |
-| D-icons | Iconografía de acciones con `lucide-react`. |
-| D-clear-guard | Quitar disponibilidad sobre un ensayo programado abre modal con detalles y opción de quitar solo lo seleccionado o toda la franja del ensayo. El aviso se ejecuta al **soltar** (no `confirm()` dentro del gesto, que se tragaba el `pointerup`). |
-| D-notify-change | Las notificaciones distinguen cambio de hora / lugar / ambos; el cambio solo de lugar no reinicia respuestas. |
-| D-term-programar | En la UI en español, «Planificar» → «Programar» (pestaña/título). El enum de estado `CONFIRMED` se muestra como «Programado». En inglés se mantiene «Plan»/«Scheduled». El código (rol `INSTRUCTOR`, RPCs, claves i18n `planner.*`) no cambia. |
-| D-group-nav | La navegación del grupo dejó de ser pestañas tipo chip: **botones** «Programar» (CalendarPlus, solo director) y «Miembros» (Users). El chip «Ensayos» era redundante → título encima de la lista. |
-| D-planner-bg | En el planner, las celdas con ensayo tienen **fondo** propio (violeta=programado, ámbar=borrador) además del borde izquierdo, para distinguirlas del color de disponibilidad. |
-| D-invite-disabled | Al desactivar el código de invitación, se ocultan el código y todas las acciones (compartir/copiar/QR/email/regenerar); solo queda una nota y el botón de reactivar. |
-| D-back-consistent | El enlace «back» va pegado al título dentro de `<header>` en todas las vistas (mismo espaciado). |
-| D-promote-icons | Botón de cambiar rol con icono: `UserCog` (hacer director), `UserMinus` (pasar a actor). |
+| D-create-open | Any user creates a **group** (becomes director) and, initially, rehearsals. Later reverted: **only directors schedule** (`20260607000009`). |
+| D-availability-read | To let a member schedule, availability read was widened to co-members; with the revert to directors-only, read remains co-member scoped (needed for the director's heatmap). |
+| D-archive | **Per-user** archiving (hides only for you) of cancelled/past sessions (`session_archives`). |
+| D-join | Easy invite: reusable **group code** (alphanumeric A-Z0-9 **without I/O** to avoid confusion with 1/0), `/join/:code` link, QR and bulk email. Links/codes are **open** (whoever has them joins); the director can regenerate/disable. |
+| D-copy | "Repeat every week" (recurrence) replaced by **copy the week to N following weeks** (explicit copy, not RRULE). |
+| D-preferred-out | "Preferred" state removed from painting; only available/unmarked. |
+| D-autosave | Availability saved with autosave (600ms debounce) on gesture end, no button. |
+| D-past | Past slots dimmed and non-editable; back navigation limited to 6 weeks. |
+| D-avatar | Deterministic geometric avatar per group (DiceBear "shapes"), with regenerable `avatar_seed` (director). |
+| D-pronoun | Optional pronoun (F/M) that only adapts the role label (actress/actor, directora/director). Used for nothing else. |
+| D-icons | Action iconography with `lucide-react`. |
+| D-clear-guard | Removing availability over a scheduled rehearsal opens a modal with details and an option to remove only the selected part or the whole rehearsal slot. The warning runs on **gesture end** (not `confirm()` inside the gesture, which swallowed `pointerup`). |
+| D-notify-change | Notifications distinguish time / location / both changes; a location-only change does not reset responses. |
+| D-term-programar | In the Spanish UI, "Planificar" → "Programar" (tab/title). The `CONFIRMED` state shows as "Programado"/"Scheduled". Code (role `INSTRUCTOR`, RPCs, `planner.*` i18n keys) unchanged. |
+| D-group-nav | Group navigation stopped being chip tabs: **buttons** "Programar" (CalendarPlus, director only) and "Miembros" (Users). The redundant "Ensayos" chip → title above the list. |
+| D-planner-bg | In the planner, cells with a rehearsal have their own **background** (violet=scheduled, amber=draft) plus a left border, to stand out from the availability color. |
+| D-invite-disabled | Disabling the join code hides the code and all actions (share/copy/QR/email/regenerate); only a note and the re-enable toggle remain. |
+| D-back-consistent | The "back" link sits tight above the title inside `<header>` in every view (same spacing). |
+| D-promote-icons | Role change button with icon: `UserCog` (make director), `UserMinus` (make actor). |
 
-## Decisiones de modelado relevantes
-- Rangos temporales como `tstzrange` + índices GiST; solapes con `&&`.
-- Recurrencia de disponibilidad con RRULE + `exception_dates`, materializada al
-  consultar (no al guardar).
-- Estados de sesión como enum; transiciones disparan notificaciones por trigger.
+## Relevant modeling decisions
+- Time ranges as `tstzrange` + GiST indexes; overlaps with `&&`.
+- Availability recurrence with RRULE + `exception_dates`, materialized on read
+  (not on save).
+- Session states as enum; transitions trigger notifications via trigger.

@@ -1,28 +1,28 @@
-# Documentación — Ensayo
+# Documentation — Ensayo
 
-PWA para planificar ensayos de teatro según la disponibilidad del grupo.
-Cada miembro pinta su disponibilidad; el director ve el heatmap combinado y
-programa sesiones; notificaciones por push y email.
+PWA to plan a theatre group's rehearsals based on members' availability. Each
+member paints their availability; the director sees the combined heatmap and
+schedules sessions; notifications via push and email.
 
-## Índice
+## Index
 
-| Doc | Contenido |
-|-----|-----------|
-| [01-overview.md](01-overview.md) | Visión, roles, glosario, recorrido de uso |
-| [02-requirements.md](02-requirements.md) | Requisitos funcionales (RF) y no funcionales (RNF) |
-| [03-decisions.md](03-decisions.md) | Todas las decisiones de diseño tomadas (D1…) + evolución |
-| [04-architecture.md](04-architecture.md) | Stack, diagrama, modelo de datos, seguridad (RLS) |
-| [05-implementation.md](05-implementation.md) | Frontend: estructura, lógica núcleo, PWA, i18n |
-| [06-database.md](06-database.md) | Esquema SQL, RLS, funciones, triggers, migraciones |
-| [07-local-dev.md](07-local-dev.md) | Stack local docker-compose, usuarios demo |
-| [08-deployment.md](08-deployment.md) | Terraform, CI/CD, pasos manuales (bootstrap) |
+| Doc | Contents |
+|-----|----------|
+| [01-overview.md](01-overview.md) | Vision, roles, glossary, usage walkthrough |
+| [02-requirements.md](02-requirements.md) | Functional (FR) and non-functional (NFR) requirements |
+| [03-decisions.md](03-decisions.md) | All design decisions (D1…) + evolution |
+| [04-architecture.md](04-architecture.md) | Stack, diagram, data model, security (RLS) |
+| [05-implementation.md](05-implementation.md) | Frontend: structure, core logic, PWA, i18n |
+| [06-database.md](06-database.md) | SQL schema, RLS, functions, triggers, migrations |
+| [07-local-dev.md](07-local-dev.md) | Local docker-compose stack, demo users |
+| [08-deployment.md](08-deployment.md) | Terraform, CI/CD, manual steps (bootstrap) |
 
-Ver también, en la raíz del repo: `README.md` (resumen) y `BOOTSTRAP.md`
-(pasos manuales de puesta en producción).
+See also, in the repo root: `README.md` (summary) and `BOOTSTRAP.md` (manual
+production setup steps).
 
-## Estado
+## Status
 
-- Frontend: React + Vite + TypeScript + Tailwind, PWA (Workbox/Serwist).
+- Frontend: React + Vite + TypeScript + Tailwind, PWA (Workbox/injectManifest).
 - Backend: Supabase (Postgres + GoTrue + PostgREST + Edge Functions).
-- 13 migraciones SQL, 17 tests unitarios de lógica núcleo.
-- i18n es/en. Verificado E2E con Playwright a lo largo del desarrollo.
+- 13 SQL migrations, 17 unit tests of core logic.
+- i18n es/en. Verified E2E with Playwright throughout development.

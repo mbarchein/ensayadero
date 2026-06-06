@@ -1,6 +1,6 @@
-# 04 · Arquitectura
+# 04 · Architecture
 
-## Diagrama
+## Diagram
 
 ```
 ┌──────────────────────────┐        ┌─────────────────────────────┐
@@ -13,28 +13,28 @@
         │                                   │            │
    Cloudflare Pages                    Resend (email)  Web Push (VAPID)
         │                                   ▲
-   GitHub Actions (CI/CD) ─ migraciones ────┘ (Edge Function entrega)
+   GitHub Actions (CI/CD) ─ migrations ─────┘ (Edge Function delivers)
 ```
 
 ## Stack
 
-| Capa | Tecnología |
-|------|-----------|
-| Frontend | React 18, Vite 5, TypeScript, Tailwind 3 |
-| Estado/datos | @tanstack/react-query; sin store global |
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite 5, TypeScript, Tailwind 3, lucide-react |
+| State/data | @tanstack/react-query; no global store |
 | Routing | react-router-dom 6 |
-| PWA | vite-plugin-pwa (injectManifest), Workbox, SW propio (`src/sw.ts`) |
-| Auth | Supabase GoTrue, OAuth Google (password solo dev) |
-| API | PostgREST con Row Level Security |
-| DB | PostgreSQL 15 (imagen supabase: `btree_gist`, `pg_cron`, `pg_net`) |
-| Jobs | pg_cron (recordatorios) → pg_net → Edge Function |
+| PWA | vite-plugin-pwa (injectManifest), Workbox, own SW (`src/sw.ts`) |
+| Auth | Supabase GoTrue, Google OAuth (password only in dev) |
+| API | PostgREST with Row Level Security |
+| DB | PostgreSQL 15 (supabase image: `btree_gist`, `pg_cron`, `pg_net`) |
+| Jobs | pg_cron (reminders) → pg_net → Edge Function |
 | Email | Resend (Edge Function) |
-| Push | Web Push estándar (VAPID), sin Firebase |
-| Avatares | DiceBear «shapes» (cliente) |
-| QR | qrcode (cliente) |
+| Push | Standard Web Push (VAPID), no Firebase |
+| Avatars | DiceBear "shapes" (client) |
+| QR | qrcode (client) |
 | Infra | Terraform; Cloudflare Pages; GitHub Actions |
 
-## Modelo de datos (núcleo)
+## Data model (core)
 
 ```
 profiles(id↔auth.users, email, name, phone, gender F|M, avatar_url, platform_role)
@@ -54,47 +54,53 @@ push_subscriptions(id, user_id, endpoint, keys jsonb)
 audit_log(id, actor_id, action, target_type, target_id, created_at)
 ```
 
-Claves de diseño:
+Design keys:
 - `tstzrange` + GiST (`availabilities_user_range`, `sessions_group_range`).
-- `availabilities` **sin** `group_id` (D1).
-- Enums Postgres para roles, estados y respuestas.
+- `availabilities` has **no** `group_id` (D1).
+- Postgres enums for roles, states and responses.
 
-## Seguridad (RLS)
+## Security (RLS)
 
-RLS activado en todas las tablas. Patrón: funciones helper `is_member`,
+RLS enabled on every table. Pattern: helper functions `is_member`,
 `is_instructor`, `is_superadmin` (security definer, `search_path=public`).
 
-Resumen de políticas:
-- **profiles**: el propio, co-miembros de grupo y superadmin (estructura).
-- **groups**: miembros y superadmin leen; cualquier autenticado inserta
-  (creador→director por trigger); superadmin gestiona.
-- **memberships**: visibles en el grupo + superadmin; instructor gestiona;
-  cualquiera borra **su propia** membresía (abandonar).
-- **invitations**: instructor del grupo + superadmin.
-- **availabilities**: dueño CRUD; **co-miembros** leen (para el heatmap);
-  superadmin **sin** política (D2).
-- **sessions**: miembros leen, superadmin lee; insertan **directores**
-  (`is_instructor` + `created_by=auth.uid()`); editan/borran director o creador.
-- **session_participants**: visibles en el grupo; gestiona instructor o creador;
-  el participante actualiza su propia `response`.
-- **session_archives / notification_preferences / push_subscriptions**: solo el
-  dueño.
-- **notifications**: solo el destinatario (select/marcar leído).
-- **audit_log**: solo superadmin lee; escritura desde service role.
+Policy summary:
+- **profiles**: self, group co-members and superadmin (structure).
+- **groups**: members and superadmin read; any authenticated user inserts
+  (creator→director via trigger); superadmin manages.
+- **memberships**: visible within the group + superadmin; instructor manages;
+  anyone deletes **their own** membership (leave).
+- **invitations**: group instructor + superadmin.
+- **availabilities**: owner CRUD; **co-members** read (for the heatmap);
+  superadmin **no** policy (D2).
+- **sessions**: members read, superadmin reads; **directors** insert
+  (`is_instructor` + `created_by=auth.uid()`); director or creator edit/delete.
+- **session_participants**: visible within the group; instructor or creator
+  manages; the participant updates their own `response`.
+- **session_archives / notification_preferences / push_subscriptions**: owner
+  only.
+- **notifications**: recipient only (select/mark read).
+- **audit_log**: superadmin reads only; writes via service role.
 
-Operaciones que necesitan saltarse el scoping usan **RPC security definer** con
-chequeo explícito de rol: `join_by_code`, `regenerate_join_code`,
-`set_join_enabled`, `update_group_meta`, `delete_my_account`, `group_busy_ranges`.
+Operations that must bypass scoping use **security-definer RPCs** with explicit
+role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
+`update_group_meta`, `delete_my_account`, `group_busy_ranges`.
 
-## Flujo de notificaciones
+## Notification flow
 
-1. Trigger `notify_session_change` (INSERT/UPDATE de `sessions`) y
-   `notify_participant_added` insertan filas en `notifications`.
-2. `generate_reminders` (pg_cron */15) crea recordatorios 24h.
-3. La Edge Function `send-notifications` (invocada por pg_cron y por la app tras
-   confirmar/cancelar) entrega email (Resend) y Web Push (VAPID) según
-   `notification_preferences`, y marca `sent_email_at`/`sent_push_at`.
+1. Triggers `notify_session_change` (INSERT/UPDATE on `sessions`) and
+   `notify_participant_added` insert rows into `notifications`.
+2. `generate_reminders` (pg_cron */15) creates 24h reminders.
+3. The Edge Function `send-notifications` (invoked by pg_cron and by the app
+   after confirm/cancel) delivers email (Resend) and Web Push (VAPID) per
+   `notification_preferences`, and stamps `sent_email_at`/`sent_push_at`.
 
-## Zonas horarias
-Todo en UTC en DB (`tstzrange`/`timestamptz`). El cliente formatea en local con
-`date-fns`; los emails formatean en `Europe/Madrid`.
+## Data freshness (no realtime)
+No Supabase Realtime. react-query refetches on window focus and invalidates
+caches after your own mutations; the unread badge polls every 60s. Other users'
+changes (availability, new rehearsals) appear on refocus/navigation, not live.
+Web Push delivers session changes as OS notifications regardless.
+
+## Time zones
+Everything in UTC in the DB (`tstzrange`/`timestamptz`). The client formats in
+local time with `date-fns`; emails format in `Europe/Madrid`.

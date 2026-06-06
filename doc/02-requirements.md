@@ -1,67 +1,67 @@
-# 02 · Requisitos
+# 02 · Requirements
 
-Estado: ✅ implementado · 🟡 parcial · ⬜ pendiente.
+Status: ✅ implemented · 🟡 partial · ⬜ pending.
 
-## Funcionales
+## Functional
 
-### Autenticación y acceso
-- ✅ RF1. Login OAuth con Google (Auth.js/GoTrue). Otros providers preparados.
-- 🟡 RF2. Invitación: por email, por **código de grupo** reutilizable, enlace y
-  QR. *Nota:* el registro pasó a **abierto** (D5'), la invitación añade a un grupo.
-- ✅ RF3. Rol por membresía (INSTRUCTOR/ACTOR); selector implícito por grupo.
-- ✅ RF4. Un usuario en varios grupos, con rol distinto en cada uno.
+### Authentication and access
+- ✅ FR1. OAuth login with Google (GoTrue). Other providers prepared.
+- 🟡 FR2. Invitation: by email, by reusable **group code**, link and QR.
+  *Note:* registration became **open** (D5'); the invitation adds you to a group.
+- ✅ FR3. Role per membership (INSTRUCTOR/ACTOR); implicit per-group selection.
+- ✅ FR4. A user in several groups, with a different role in each.
 
-### Disponibilidad
-- ✅ RF5. Calendario semanal pintable (arrastrar; tap alterna).
-- 🟡 RF6. Vista mensual resumen — no implementada; se navega por semanas.
-- ✅ RF7. Recurrencia: sustituida por **copiar a N semanas** (D-copy). RRULE
-  soportado en datos/expansión pero ya no se crea desde UI.
-- ✅ RF8. Estados de disponibilidad: disponible / sin marcar. «Preferido»
-  retirado de la UI (queda en datos, decisión revisada).
-- ✅ RF9. Edición offline parcial vía PWA (lectura cacheada). Autosave al pintar.
+### Availability
+- ✅ FR5. Paintable weekly calendar (drag; tap toggles).
+- 🟡 FR6. Monthly summary view — not implemented; navigation is week by week.
+- ✅ FR7. Recurrence: replaced by **copy to N weeks** (D-copy). RRULE supported in
+  data/expansion but no longer created from the UI.
+- ✅ FR8. Availability states: available / unmarked. "Preferred" removed from the
+  UI (kept in data, revised decision).
+- ✅ FR9. Partial offline via PWA (cached reads). Autosave on paint.
 
-### Planificación (director)
-- ✅ RF10. Heatmap de disponibilidad del grupo (color = nº disponibles).
-- ✅ RF11. Filtro por subconjunto de personas (chips). Subgrupos guardados:
-  tabla existe, UI pendiente (⬜).
-- 🟡 RF12. Sugerencia de franjas: `fullCoverageRanges()` existe en lib; sin UI
-  dedicada (el heatmap ya resalta cobertura).
-- ✅ RF13. Crear sesión: título, escena, lugar, hora inicio/fin (arrastre),
-  obligatorio/opcional por persona.
-- ✅ RF14. Aviso si la hora cae fuera de la disponibilidad de alguien
-  obligatorio (rojo) u opcional (ámbar); confirmación.
-- ✅ RF15. Estados borrador→programado→cancelado; cambio de hora re-notifica.
+### Scheduling (director)
+- ✅ FR10. Group availability heatmap (color = number available).
+- ✅ FR11. Filter by subset of people (chips). Saved subgroups: table exists, UI
+  pending (⬜).
+- 🟡 FR12. Slot suggestion: `fullCoverageRanges()` exists in lib; no dedicated UI
+  (the heatmap already highlights coverage).
+- ✅ FR13. Create session: title, scene, location, start/end time (drag),
+  required/optional per person.
+- ✅ FR14. Warning if the time falls outside a required person's availability
+  (red) or optional (amber); confirmation.
+- ✅ FR15. States draft→scheduled→cancelled; time change re-notifies.
 
-### Notificaciones
-- ✅ RF16. Al confirmar/cancelar/cambiar: push in-app + email a afectados.
-- ✅ RF17. Confirmar/rechazar asistencia (inline en varias vistas).
-- 🟡 RF18. Recordatorios configurables: job `generate_reminders` (24h) creado;
-  ventana 2h y preferencia de antelación no expuestas en UI.
-- 🟡 RF19. Preferencias por canal: tabla `notification_preferences` + lógica en
-  Edge Function; UI de preferencias pendiente (⬜).
-- ✅ RF20. El director ve el estado de respuestas (pendiente/voy/no voy) y
-  resumen agregado.
+### Notifications
+- ✅ FR16. On confirm/cancel/change: in-app push + email to affected people.
+- ✅ FR17. Confirm/decline attendance (inline in several views).
+- 🟡 FR18. Configurable reminders: `generate_reminders` job (24h) created; 2h
+  window and antecedence preference not exposed in UI.
+- 🟡 FR19. Per-channel preferences: `notification_preferences` table + logic in
+  the Edge Function; preferences UI pending (⬜).
+- ✅ FR20. The director sees response status (pending/going/not going) and an
+  aggregate tally.
 
-### No funcionales
-- ✅ RNF1. PWA instalable (manifest, SW, precache, push).
-- ✅ RNF2. Mobile-first (bottom nav, gestos táctiles, objetivos 44px).
-- ✅ RNF3. i18n (es por defecto, en).
-- ✅ RNF4. Zonas horarias: se guarda en UTC (`tstzrange`), se muestra en local.
-- ✅ RNF5. GDPR: borrado de cuenta propio (cascada), datos mínimos.
-- 🟡 RNF6. Accesibilidad: estados no dependen solo del color (iconos/bordes);
-  auditoría WCAG completa pendiente.
+### Non-functional
+- ✅ NFR1. Installable PWA (manifest, SW, precache, push).
+- ✅ NFR2. Mobile-first (bottom nav, touch gestures, 44px targets).
+- ✅ NFR3. i18n (es default, en).
+- ✅ NFR4. Time zones: stored in UTC (`tstzrange`), shown in local time.
+- ✅ NFR5. GDPR: own account deletion (cascade), minimal data.
+- 🟡 NFR6. Accessibility: states don't rely on color alone (icons/borders); full
+  WCAG audit pending.
 
-## Requisitos derivados de decisiones posteriores
+## Requirements from later decisions
 
-- ✅ RF21. Aislamiento total entre grupos (D4); único cruce: descuento de
-  disponibilidad por sesiones confirmadas (sin revelar origen).
-- ✅ RF22. Director promueve/degrada roles; varios directores posibles.
-- ✅ RF23. Abandonar grupo (borra membresía propia).
-- ✅ RF24. Inicio multi-grupo con avatar geométrico por grupo.
-- ✅ RF25–29. Superadmin ve estructura, gestiona grupos/usuarios, auditoría
-  (`audit_log`), bootstrap por SQL.
-- ✅ RF30. Crear grupo cualquier usuario (pasa a director).
-- ✅ RF31. Archivado **por usuario** de ensayos cancelados/pasados.
-- ✅ RF32. Pronombre opcional → etiqueta de rol con género (actriz/actor…).
-- ✅ RF33. Aviso al quitar disponibilidad en franja con ensayo programado, con
-  opción de quitar solo lo seleccionado o toda la franja del ensayo.
+- ✅ FR21. Full isolation between groups (D4); only crossing: availability
+  discount from confirmed sessions (without revealing the origin).
+- ✅ FR22. Director promotes/demotes roles; several directors possible.
+- ✅ FR23. Leave group (deletes own membership).
+- ✅ FR24. Multi-group home with a geometric avatar per group.
+- ✅ FR25–29. Superadmin sees structure, manages groups/users, audit
+  (`audit_log`), bootstrap via SQL.
+- ✅ FR30. Any user can create a group (becomes director).
+- ✅ FR31. **Per-user** archiving of cancelled/past rehearsals.
+- ✅ FR32. Optional pronoun → gendered role label (actress/actor…).
+- ✅ FR33. Warning when removing availability over a scheduled rehearsal, with an
+  option to remove only the selected part or the whole rehearsal slot.

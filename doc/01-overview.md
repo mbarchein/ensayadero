@@ -1,71 +1,70 @@
-# 01 · Visión general
+# 01 · Overview
 
-## Qué es
+## What it is
 
-Aplicación web instalable (PWA) para que un grupo de teatro planifique sus
-ensayos. Resuelve el problema de cuadrar agendas: cada persona indica cuándo
-puede, y quien dirige programa los ensayos sobre las franjas en que coincide la
-gente necesaria.
+Installable web app (PWA) for a theatre group to plan rehearsals. It solves the
+scheduling problem: each person marks when they can attend, and the director
+schedules rehearsals over the slots where the needed people overlap.
 
 ## Roles
 
-Dos capas de rol **independientes**:
+Two **independent** role layers:
 
-### Rol de plataforma (atributo de `User`)
-- **USER** — usuario normal.
-- **SUPERADMIN** — ve toda la estructura (grupos, miembros, usuarios), gestiona
-  grupos y usuarios. **No** ve disponibilidades individuales (decisión D2). No
-  recibe notificaciones de grupos salvo membresía propia.
+### Platform role (attribute of `User`)
+- **USER** — normal user.
+- **SUPERADMIN** — sees the whole structure (groups, members, users), manages
+  groups and users. Does **not** see individual availability (decision D2). Gets
+  no group notifications except for their own memberships.
 
-### Rol de grupo (atributo de `Membership`, por grupo)
-- **INSTRUCTOR** (UI: «Director/Directora») — planifica, crea/edita/cancela
-  ensayos, invita y gestiona miembros del grupo, edita nombre/avatar del grupo.
-- **ACTOR** (UI: «Actor/Actriz») — pinta su disponibilidad, ve y confirma
-  asistencia a los ensayos a los que se le convoca.
+### Group role (attribute of `Membership`, per group)
+- **INSTRUCTOR** (UI: "Director/Directora") — schedules and creates/edits/cancels
+  rehearsals, invites and manages group members, edits the group name/avatar.
+- **ACTOR** (UI: "Actor/Actriz") — paints their availability, sees and confirms
+  attendance to rehearsals they are convened to.
 
-La misma persona puede ser director en un grupo y actor en otro. Puede haber
-varios directores por grupo.
+The same person can be director in one group and actor in another. A group can
+have several directors.
 
-## Glosario
+## Glossary
 
-| Término | Significado |
-|---------|-------------|
-| Grupo | Compañía/montaje. Tenant aislado (D4). |
-| Disponibilidad | Franjas en que un usuario puede ensayar. **Global** por usuario (D1), no por grupo. |
-| Ensayo / Sesión | Evento con título, escena, lugar, rango horario, participantes y estado. |
-| Estado de sesión | `DRAFT` (Borrador), `CONFIRMED` (Programado), `CANCELLED` (Cancelado). |
-| Participante | Usuario convocado a una sesión; `required` (obligatorio) u opcional; con respuesta PENDING/ACCEPTED/DECLINED. |
-| Heatmap | Rejilla semanal del planner: intensidad = nº de personas disponibles por franja. |
-| Código de grupo | Código corto reutilizable para unirse al grupo (enlace/QR/manual). |
+| Term | Meaning |
+|------|---------|
+| Group | Company/production. Isolated tenant (D4). |
+| Availability | Slots when a user can rehearse. **Global** per user (D1), not per group. |
+| Rehearsal / Session | Event with title, scene, location, time range, participants and status. |
+| Session status | `DRAFT`, `CONFIRMED` (shown "Scheduled"/"Programado"), `CANCELLED`. |
+| Participant | User convened to a session; `required` or optional; response PENDING/ACCEPTED/DECLINED. |
+| Heatmap | Planner weekly grid: intensity = number of people available per slot. |
+| Join code | Short reusable code to join the group (link/QR/manual). |
 
-## Recorrido típico
+## Typical walkthrough
 
-1. **Alta**: cualquiera entra con Google (registro abierto, decisión revisada
-   D5'); o llega por enlace/código de invitación a un grupo.
-2. **Crear grupo**: cualquier usuario crea un grupo y pasa a ser su director.
-3. **Invitar**: el director comparte código/enlace/QR o invita por email (lote).
-4. **Disponibilidad**: cada miembro pinta su disponibilidad semanal (autosave).
-5. **Planificar**: el director abre el heatmap, filtra personas, arrastra una
-   franja y crea el ensayo (obligatorios/opcionales), avisos si alguien
-   obligatorio no tiene disponibilidad.
-6. **Confirmar**: al confirmar la sesión, los convocados reciben push + email.
-7. **Responder**: cada convocado marca «Voy / No puedo» (pestaña Próximos, Mi
-   agenda o detalle de sesión).
-8. **Cambios**: cambios de hora o lugar y cancelaciones re-notifican.
+1. **Sign-up**: anyone signs in with Google (open registration, revised D5'); or
+   arrives via an invitation link/code to a group.
+2. **Create group**: any user creates a group and becomes its director.
+3. **Invite**: the director shares a code/link/QR or invites by email (bulk).
+4. **Availability**: each member paints their weekly availability (autosave).
+5. **Schedule**: the director opens the heatmap, filters people, drags a slot and
+   creates the rehearsal (required/optional), warnings if a required person has
+   no availability.
+6. **Confirm**: confirming the session sends push + email to the convened.
+7. **Respond**: each convened person marks "Going / Can't" (Upcoming tab, My
+   schedule, or the session detail).
+8. **Changes**: time/location changes and cancellations re-notify.
 
-## Pantallas (rutas)
+## Screens (routes)
 
-| Ruta | Pantalla |
-|------|----------|
-| `/login`, `/auth/callback` | Acceso (Google; password solo en dev) |
-| `/` | Inicio: mis grupos (avatar+rol), pendientes, crear/unir grupo |
-| `/availability` | Mi agenda: calendario de disponibilidad + ensayos superpuestos |
-| `/upcoming` | Próximos ensayos (todos los grupos) + confirmación |
-| `/notifications` | Avisos |
-| `/profile` | Perfil: nombre, teléfono, pronombre, push, borrar cuenta |
-| `/join`, `/join/:code` | Unirse a un grupo por código |
-| `/g/:groupId` | Grupo: lista de ensayos + pestañas |
-| `/g/:groupId/planner` | Heatmap y planificación (director) |
-| `/g/:groupId/members` | Miembros + panel de invitación (director) |
-| `/g/:groupId/sessions/:id` | Detalle de sesión |
-| `/admin` | Panel superadmin (estructura) |
+| Route | Screen |
+|-------|--------|
+| `/login`, `/auth/callback` | Sign in (Google; password only in dev) |
+| `/` | Home: my groups (avatar+role), pending, create/join group |
+| `/availability` | My schedule: availability calendar + overlaid rehearsals |
+| `/upcoming` | Upcoming rehearsals (all groups) + confirmation |
+| `/notifications` | Alerts |
+| `/profile` | Profile: name, phone, pronoun, push, delete account |
+| `/join`, `/join/:code` | Join a group by code |
+| `/g/:groupId` | Group: rehearsal list + nav buttons |
+| `/g/:groupId/planner` | Heatmap and scheduling (director) |
+| `/g/:groupId/members` | Members + invitation panel (director) |
+| `/g/:groupId/sessions/:id` | Session detail |
+| `/admin` | Superadmin panel (structure) |
