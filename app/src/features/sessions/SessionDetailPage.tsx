@@ -138,11 +138,10 @@ export default function SessionDetailPage() {
 
   return (
     <div className="space-y-5">
-      <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
-        {t('sessions.backToSessions')}
-      </Link>
-
       <header className="space-y-1">
+        <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
+          {t('sessions.backToSessions')}
+        </Link>
         <div className="flex items-center gap-2">
           <GroupAvatar seed={group?.avatar_seed || groupId} size={28} />
           <span className="text-sm font-medium text-gray-500">{group?.name}</span>
