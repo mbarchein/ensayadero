@@ -306,6 +306,7 @@ export default function PlannerPage() {
           }}
           grid={grid}
           weekMonday={monday}
+          groupName={group?.name}
           onClose={() => {
             setCreateOpen(false)
             setSel(null)

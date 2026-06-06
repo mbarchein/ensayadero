@@ -24,6 +24,7 @@ interface Props {
   grid: HeatCell[][]
   weekMonday: Date
   onClose: () => void
+  groupName?: string
   /** Si se pasa, el modal edita esa sesión en vez de crear una nueva. */
   session?: SessionWithParticipants
 }
@@ -42,6 +43,7 @@ export default function CreateSessionModal({
   grid,
   weekMonday,
   onClose,
+  groupName,
   session,
 }: Props) {
   const { t } = useTranslation()
@@ -49,7 +51,9 @@ export default function CreateSessionModal({
   const qc = useQueryClient()
   const navigate = useNavigate()
   const editing = !!session
-  const [title, setTitle] = useState(() => session?.title ?? t('planner.defaultTitle'))
+  // título por defecto: "<grupo> d-M" (ej. "La Tempestad 7-6")
+  const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd-M')}`
+  const [title, setTitle] = useState(() => session?.title ?? defaultTitle)
   const [scene, setScene] = useState(session?.scene ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
