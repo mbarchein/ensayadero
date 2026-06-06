@@ -4,12 +4,14 @@
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import type { Group, MembershipWithProfile, Profile } from '../../lib/types'
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const { profile, loading } = useAuth()
   const qc = useQueryClient()
   const [newGroupOpen, setNewGroupOpen] = useState(false)
@@ -120,15 +122,15 @@ export default function AdminPage() {
       <header className="flex items-center justify-between">
         <div>
           <Link to="/" className="text-sm text-gray-500">
-            ‹ Inicio
+            {t('admin.backHome')}
           </Link>
-          <h1 className="text-xl font-bold">Administración</h1>
+          <h1 className="text-xl font-bold">{t('admin.title')}</h1>
         </div>
-        <Button onClick={() => setNewGroupOpen(true)}>+ Grupo</Button>
+        <Button onClick={() => setNewGroupOpen(true)}>{t('admin.newGroup')}</Button>
       </header>
 
       <section>
-        <h2 className="mb-2 font-semibold">Grupos ({groups?.length ?? 0})</h2>
+        <h2 className="mb-2 font-semibold">{t('admin.groups', { count: groups?.length ?? 0 })}</h2>
         <ul className="space-y-2">
           {groups?.map((g) => {
             const ms = membersOf(g.id)
@@ -138,14 +140,16 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">
-                      {g.name} {g.archived_at && <Badge color="gray">Archivado</Badge>}
+                      {g.name} {g.archived_at && <Badge color="gray">{t('admin.archived')}</Badge>}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {ms.length} miembros ·{' '}
+                      {t('admin.members', { count: ms.length })} ·{' '}
                       {instructors.length === 0 ? (
-                        <span className="font-medium text-red-600">⚠ sin instructor</span>
+                        <span className="font-medium text-red-600">{t('admin.noDirector')}</span>
                       ) : (
-                        `instructor: ${instructors.map((i) => i.profiles.name || i.profiles.email).join(', ')}`
+                        t('admin.directorLabel', {
+                          names: instructors.map((i) => i.profiles.name || i.profiles.email).join(', '),
+                        })
                       )}
                     </p>
                   </div>
@@ -153,11 +157,10 @@ export default function AdminPage() {
                     <Button
                       variant="ghost"
                       onClick={() => {
-                        if (confirm(`¿Archivar "${g.name}"? Dejará de ser visible para sus miembros.`))
-                          archiveGroup.mutate(g.id)
+                        if (confirm(t('admin.archiveConfirm', { name: g.name }))) archiveGroup.mutate(g.id)
                       }}
                     >
-                      Archivar
+                      {t('admin.archive')}
                     </Button>
                   )}
                 </div>
@@ -168,7 +171,7 @@ export default function AdminPage() {
       </section>
 
       <section>
-        <h2 className="mb-2 font-semibold">Usuarios ({users?.length ?? 0})</h2>
+        <h2 className="mb-2 font-semibold">{t('admin.users', { count: users?.length ?? 0 })}</h2>
         <ul className="space-y-1 text-sm">
           {users?.map((u) => {
             const ms = memberships?.filter((m) => m.user_id === u.id) ?? []
@@ -176,18 +179,16 @@ export default function AdminPage() {
               <li key={u.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
                 <span>
                   {u.name || u.email}{' '}
-                  {u.platform_role === 'SUPERADMIN' && <Badge color="violet">Superadmin</Badge>}
+                  {u.platform_role === 'SUPERADMIN' && <Badge color="violet">{t('roles.SUPERADMIN')}</Badge>}
                 </span>
-                <span className="text-xs text-gray-500">
-                  {ms.length} grupo{ms.length !== 1 ? 's' : ''}
-                </span>
+                <span className="text-xs text-gray-500">{t('admin.groupsCount', { count: ms.length })}</span>
               </li>
             )
           })}
         </ul>
       </section>
 
-      <Modal open={newGroupOpen} onClose={() => setNewGroupOpen(false)} title="Nuevo grupo">
+      <Modal open={newGroupOpen} onClose={() => setNewGroupOpen(false)} title={t('admin.newGroupTitle')}>
         <form
           className="space-y-4"
           onSubmit={(e) => {
@@ -196,33 +197,31 @@ export default function AdminPage() {
           }}
         >
           <label className="block text-sm">
-            Nombre del grupo
+            {t('admin.groupName')}
             <input
               required
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder="La Tempestad — montaje 2026"
+              placeholder={t('admin.groupNamePlaceholder')}
             />
           </label>
           <label className="block text-sm">
-            Email del instructor inicial (opcional)
+            {t('admin.directorEmail')}
             <input
               type="email"
               value={instructorEmail}
               onChange={(e) => setInstructorEmail(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder="instructor@ejemplo.com"
+              placeholder="directora@ejemplo.com"
             />
-            <span className="text-xs text-gray-500">
-              Si no tiene cuenta, se le enviará invitación con rol Instructor.
-            </span>
+            <span className="text-xs text-gray-500">{t('admin.directorEmailHint')}</span>
           </label>
           {createGroup.isError && (
             <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>
           )}
           <Button type="submit" disabled={createGroup.isPending} className="w-full">
-            {createGroup.isPending ? 'Creando…' : 'Crear grupo'}
+            {createGroup.isPending ? t('admin.creating') : t('admin.createGroup')}
           </Button>
         </form>
       </Modal>

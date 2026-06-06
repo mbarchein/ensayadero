@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { enablePush } from '../../lib/push'
 import { Button } from '../../components/ui'
 
 export default function ProfilePage() {
+  const { t } = useTranslation()
   const { profile, signOut } = useAuth()
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>(
     typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'ok' : 'idle',
@@ -11,7 +13,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold">Perfil</h1>
+      <h1 className="text-xl font-bold">{t('profile.title')}</h1>
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
         {profile?.avatar_url && <img src={profile.avatar_url} alt="" className="h-14 w-14 rounded-full" />}
         <div>
@@ -21,26 +23,22 @@ export default function ProfilePage() {
       </div>
 
       <section className="rounded-xl border bg-white p-4">
-        <h2 className="mb-2 font-semibold">Notificaciones push</h2>
-        <p className="mb-3 text-sm text-gray-600">
-          Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.
-        </p>
+        <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
+        <p className="mb-3 text-sm text-gray-600">{t('profile.pushDescription')}</p>
         {pushState === 'ok' ? (
-          <p className="text-sm font-medium text-green-700">✓ Activadas en este dispositivo</p>
+          <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
         ) : (
           <Button onClick={async () => setPushState((await enablePush()) ? 'ok' : 'fail')}>
-            Activar notificaciones
+            {t('profile.pushEnable')}
           </Button>
         )}
         {pushState === 'fail' && (
-          <p className="mt-2 text-sm text-red-600">
-            No se pudo activar. Revisa permisos del navegador o instala la app (iOS requiere instalarla).
-          </p>
+          <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
         )}
       </section>
 
       <Button variant="secondary" onClick={signOut} className="w-full">
-        Cerrar sesión
+        {t('profile.signOut')}
       </Button>
     </div>
   )

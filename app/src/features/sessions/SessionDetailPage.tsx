@@ -1,7 +1,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { dateLocale } from '../../lib/dateLocale'
+import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -10,6 +11,7 @@ import { Badge, Button, Spinner } from '../../components/ui'
 import type { ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 export default function SessionDetailPage() {
+  const { t } = useTranslation()
   const { sessionId } = useParams<{ sessionId: string }>()
   const { groupId, isInstructor } = useGroup()
   const { profile } = useAuth()
@@ -75,7 +77,7 @@ export default function SessionDetailPage() {
   return (
     <div className="space-y-5">
       <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
-        ‹ Ensayos
+        {t('sessions.backToSessions')}
       </Link>
 
       <header className="space-y-1">
@@ -84,69 +86,69 @@ export default function SessionDetailPage() {
           <Badge
             color={session.status === 'CONFIRMED' ? 'green' : session.status === 'CANCELLED' ? 'red' : 'gray'}
           >
-            {session.status === 'CONFIRMED' ? 'Confirmado' : session.status === 'CANCELLED' ? 'Cancelado' : 'Borrador'}
+            {t(`sessions.status.${session.status}`)}
           </Badge>
         </div>
         <p className="text-gray-700">
-          {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: es })}–{format(r.end, 'HH:mm')}
+          {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
         </p>
-        {session.scene && <p className="text-sm text-gray-600">Escena: {session.scene}</p>}
+        {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
         {session.location && <p className="text-sm text-gray-600">📍 {session.location}</p>}
       </header>
 
       {mine && session.status === 'CONFIRMED' && (
         <section className="rounded-xl border border-violet-200 bg-violet-50 p-4">
           <p className="mb-2 text-sm font-medium text-violet-900">
-            {mine.required ? 'Tu asistencia es obligatoria.' : 'Tu asistencia es opcional.'} ¿Vas a ir?
+            {mine.required ? t('sessions.yourAttendance.required') : t('sessions.yourAttendance.optional')}{' '}
+            {t('sessions.areYouGoing')}
           </p>
           <div className="flex gap-2">
             <Button
               variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
               onClick={() => respond.mutate('ACCEPTED')}
             >
-              ✓ Voy
+              {t('sessions.goingBtn')}
             </Button>
             <Button
               variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
               onClick={() => respond.mutate('DECLINED')}
             >
-              ✗ No puedo
+              {t('sessions.cantGoBtn')}
             </Button>
           </div>
         </section>
       )}
 
-      <ParticipantList title="Obligatorios" list={required} />
-      {optional.length > 0 && <ParticipantList title="Opcionales" list={optional} />}
+      <ParticipantList title={t('sessions.requiredList')} list={required} />
+      {optional.length > 0 && <ParticipantList title={t('sessions.optionalList')} list={optional} />}
 
       {isInstructor && (
         <section className="space-y-2 border-t pt-4">
           {session.status === 'DRAFT' && (
             <Button onClick={() => setStatus.mutate('CONFIRMED')} className="w-full">
-              Confirmar ensayo (notifica a todos)
+              {t('sessions.confirmBtn')}
             </Button>
           )}
           {session.status === 'CONFIRMED' && (
             <Button
               variant="danger"
               onClick={() => {
-                if (confirm('¿Cancelar este ensayo? Se notificará a todos los participantes.'))
-                  setStatus.mutate('CANCELLED')
+                if (confirm(t('sessions.cancelConfirm'))) setStatus.mutate('CANCELLED')
               }}
               className="w-full"
             >
-              Cancelar ensayo
+              {t('sessions.cancelBtn')}
             </Button>
           )}
           {session.status === 'DRAFT' && (
             <Button
               variant="ghost"
               onClick={() => {
-                if (confirm('¿Eliminar este borrador?')) remove.mutate()
+                if (confirm(t('sessions.deleteDraftConfirm'))) remove.mutate()
               }}
               className="w-full"
             >
-              Eliminar borrador
+              {t('sessions.deleteDraft')}
             </Button>
           )}
         </section>
@@ -162,6 +164,7 @@ function ParticipantList({
   title: string
   list: SessionWithParticipants['session_participants']
 }) {
+  const { t } = useTranslation()
   return (
     <section>
       <h2 className="mb-2 text-sm font-semibold text-gray-700">{title}</h2>
@@ -170,7 +173,11 @@ function ParticipantList({
           <li key={p.user_id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm">
             <span>{p.profiles.name || p.profiles.email}</span>
             <Badge color={p.response === 'ACCEPTED' ? 'green' : p.response === 'DECLINED' ? 'red' : 'amber'}>
-              {p.response === 'ACCEPTED' ? 'Voy' : p.response === 'DECLINED' ? 'No va' : 'Pendiente'}
+              {p.response === 'ACCEPTED'
+                ? t('sessions.response.going')
+                : p.response === 'DECLINED'
+                  ? t('sessions.response.notGoingList')
+                  : t('sessions.response.pending')}
             </Badge>
           </li>
         ))}

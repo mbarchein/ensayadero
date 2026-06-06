@@ -3,8 +3,9 @@
 
 import { useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY } from '../../lib/slots'
+import { dateLocale } from '../../lib/dateLocale'
+import { useTranslation } from 'react-i18next'
+import { DAY_END_HOUR, DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY } from '../../lib/slots'
 
 export interface CellPos {
   day: number
@@ -30,6 +31,7 @@ export default function WeekGrid({
   onPaintEnd,
   onCellTap,
 }: Props) {
+  const { t } = useTranslation()
   const gridRef = useRef<HTMLDivElement>(null)
   const [painting, setPainting] = useState(false)
   const movedRef = useRef(false)
@@ -54,7 +56,7 @@ export default function WeekGrid({
             const isToday = format(date, 'yyyyMMdd') === format(new Date(), 'yyyyMMdd')
             return (
               <div key={d} className={`py-1 ${isToday ? 'font-bold text-violet-700' : ''}`}>
-                {format(date, 'EEE d', { locale: es })}
+                {format(date, 'EEE d', { locale: dateLocale() })}
               </div>
             )
           })}
@@ -100,7 +102,7 @@ export default function WeekGrid({
         </div>
       </div>
       <p className="mt-1 text-center text-[10px] text-gray-400">
-        Franjas de {SLOT_MINUTES} min · {DAY_START_HOUR}:00–23:00
+        {t('availability.gridFooter', { minutes: SLOT_MINUTES, start: DAY_START_HOUR, end: DAY_END_HOUR })}
       </p>
     </div>
   )

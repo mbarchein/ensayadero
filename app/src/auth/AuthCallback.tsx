@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
 export default function AuthCallback() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 
@@ -15,7 +17,7 @@ export default function AuthCallback() {
         const desc = params.get('error_description') ?? error?.message
         setError(
           desc?.includes('SIGNUP_REQUIRES_INVITATION') || desc?.includes('Database error')
-            ? 'Necesitas una invitación para crear una cuenta. Pide a tu instructor que te invite.'
+            ? t('login.inviteRequired')
             : desc ?? null,
         )
         if (!desc) navigate('/login', { replace: true })
@@ -30,14 +32,14 @@ export default function AuthCallback() {
       <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6">
         <p className="max-w-sm text-center text-red-600">{error}</p>
         <button onClick={() => navigate('/login')} className="text-violet-700 underline">
-          Volver
+          {t('common.back')}
         </button>
       </main>
     )
   }
   return (
     <main className="flex min-h-dvh items-center justify-center">
-      <p className="animate-pulse text-violet-600">Entrando…</p>
+      <p className="animate-pulse text-violet-600">{t('login.entering')}</p>
     </main>
   )
 }

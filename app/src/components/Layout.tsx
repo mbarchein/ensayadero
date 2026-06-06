@@ -1,17 +1,19 @@
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../lib/supabase'
 import { Spinner } from './ui'
 
 const tabs = [
-  { to: '/', label: 'Inicio', icon: '🏠', end: true },
-  { to: '/availability', label: 'Mi agenda', icon: '🗓️' },
-  { to: '/notifications', label: 'Avisos', icon: '🔔' },
-  { to: '/profile', label: 'Perfil', icon: '👤' },
+  { to: '/', key: 'nav.home', icon: '🏠', end: true },
+  { to: '/availability', key: 'nav.availability', icon: '🗓️' },
+  { to: '/notifications', key: 'nav.notifications', icon: '🔔' },
+  { to: '/profile', key: 'nav.profile', icon: '👤' },
 ]
 
 export default function Layout() {
+  const { t } = useTranslation()
   const { session, profile, loading } = useAuth()
 
   const { data: unread } = useQuery({
@@ -32,7 +34,7 @@ export default function Layout() {
   if (!profile) {
     return (
       <main className="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-gray-600">
-        Tu cuenta no tiene perfil. Probablemente necesitas una invitación — contacta con tu instructor.
+        {t('login.noProfile')}
       </main>
     )
   }
@@ -44,11 +46,11 @@ export default function Layout() {
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-white pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex max-w-3xl">
-          {tabs.map((t) => (
+          {tabs.map((t2) => (
             <NavLink
-              key={t.to}
-              to={t.to}
-              end={t.end}
+              key={t2.to}
+              to={t2.to}
+              end={t2.end}
               className={({ isActive }) =>
                 `relative flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
                   isActive ? 'font-semibold text-violet-700' : 'text-gray-500'
@@ -56,10 +58,10 @@ export default function Layout() {
               }
             >
               <span className="text-lg" aria-hidden>
-                {t.icon}
+                {t2.icon}
               </span>
-              {t.label}
-              {t.to === '/notifications' && (unread ?? 0) > 0 && (
+              {t(t2.key)}
+              {t2.to === '/notifications' && (unread ?? 0) > 0 && (
                 <span className="absolute right-1/4 top-1 rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white">
                   {unread}
                 </span>

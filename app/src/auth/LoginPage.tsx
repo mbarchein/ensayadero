@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const [error, setError] = useState<string | null>(null)
 
   const signIn = async () => {
@@ -17,9 +19,7 @@ export default function LoginPage() {
       <div className="flex flex-col items-center gap-2">
         <img src="/icons/icon-192.png" alt="" className="h-20 w-20 rounded-2xl shadow-lg" />
         <h1 className="text-3xl font-bold text-violet-900">Ensayo</h1>
-        <p className="text-center text-sm text-violet-700">
-          Planifica los ensayos de tu grupo de teatro
-        </p>
+        <p className="text-center text-sm text-violet-700">{t('login.tagline')}</p>
       </div>
       <button
         onClick={signIn}
@@ -31,12 +31,10 @@ export default function LoginPage() {
           <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.49 12c0-.73.13-1.43.35-2.1V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 12 1 11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
         </svg>
-        Continuar con Google
+        {t('login.googleButton')}
       </button>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <p className="max-w-xs text-center text-xs text-violet-500">
-        Necesitas una invitación de tu instructor para crear cuenta.
-      </p>
+      <p className="max-w-xs text-center text-xs text-violet-500">{t('login.inviteNotice')}</p>
     </main>
   )
 }

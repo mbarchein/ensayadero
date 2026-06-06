@@ -6,8 +6,9 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, isSameDay } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { formatRange, type TimeRange } from '../../lib/ranges'
@@ -40,10 +41,11 @@ export default function CreateSessionModal({
   weekMonday,
   onClose,
 }: Props) {
+  const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
-  const [title, setTitle] = useState('Ensayo')
+  const [title, setTitle] = useState(() => t('planner.defaultTitle'))
   const [scene, setScene] = useState('')
   const [location, setLocation] = useState('')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
@@ -138,7 +140,7 @@ export default function CreateSessionModal({
   }
 
   return (
-    <Modal open onClose={onClose} title="Nuevo ensayo">
+    <Modal open onClose={onClose} title={t('planner.newSession')}>
       <form
         className="space-y-4"
         onSubmit={(e) => {
@@ -146,8 +148,9 @@ export default function CreateSessionModal({
           if (
             requiredOutside.length > 0 &&
             !confirm(
-              `Atención: ${requiredOutside.map((p) => nameOf(p.userId)).join(', ')} ` +
-                `(obligatorios) NO tienen disponibilidad en esta franja. ¿Crear igualmente?`,
+              t('planner.requiredOutsideConfirm', {
+                names: requiredOutside.map((p) => nameOf(p.userId)).join(', '),
+              }),
             )
           )
             return
@@ -155,12 +158,12 @@ export default function CreateSessionModal({
         }}
       >
         <p className="text-sm font-medium text-violet-800">
-          {format(day, "EEEE d 'de' MMMM", { locale: es })}
+          {format(day, "EEEE d 'de' MMMM", { locale: dateLocale() })}
           {!isSameDay(day, start) && ' ⚠️'}
         </p>
 
         <label className="block text-sm">
-          Título
+          {t('planner.sessionTitle')}
           <input
             required
             value={title}
@@ -171,28 +174,28 @@ export default function CreateSessionModal({
 
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm">
-            Escena (opcional)
+            {t('planner.sceneField')}
             <input
               value={scene}
               onChange={(e) => setScene(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder="Acto II, esc. 3"
+              placeholder={t('planner.scenePlaceholder')}
             />
           </label>
           <label className="block text-sm">
-            Lugar (opcional)
+            {t('planner.locationField')}
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder="Sala 2"
+              placeholder={t('planner.locationPlaceholder')}
             />
           </label>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm">
-            Hora inicio
+            {t('planner.startTime')}
             <input
               type="time"
               required
@@ -203,7 +206,7 @@ export default function CreateSessionModal({
             />
           </label>
           <label className="block text-sm">
-            Duración
+            {t('planner.duration')}
             <select
               value={durationMin}
               onChange={(e) => setDurationMin(Number(e.target.value))}
@@ -222,7 +225,7 @@ export default function CreateSessionModal({
         </p>
 
         <fieldset>
-          <legend className="mb-2 text-sm font-medium">Participantes</legend>
+          <legend className="mb-2 text-sm font-medium">{t('planner.participants')}</legend>
           <ul className="max-h-52 space-y-1 overflow-y-auto">
             {participants.map((p, i) => {
               const ok = coverage.get(p.userId)
@@ -251,7 +254,7 @@ export default function CreateSessionModal({
                     />
                     {nameOf(p.userId)}
                     {p.included && !ok && (
-                      <Badge color={p.required ? 'red' : 'amber'}>sin disponibilidad</Badge>
+                      <Badge color={p.required ? 'red' : 'amber'}>{t('planner.noAvailability')}</Badge>
                     )}
                   </label>
                   {p.included && (
@@ -266,7 +269,7 @@ export default function CreateSessionModal({
                         p.required ? 'bg-violet-600 text-white' : 'bg-gray-200 text-gray-600'
                       }`}
                     >
-                      {p.required ? 'Obligatorio' : 'Opcional'}
+                      {p.required ? t('planner.required') : t('planner.optional')}
                     </button>
                   )}
                 </li>
@@ -277,13 +280,12 @@ export default function CreateSessionModal({
 
         {requiredOutside.length > 0 && (
           <p className="text-sm text-red-700">
-            ⚠️ {requiredOutside.length} obligatorio{requiredOutside.length > 1 ? 's' : ''} fuera de su
-            disponibilidad.
+            {t('planner.requiredOutside', { count: requiredOutside.length })}
           </p>
         )}
         {optionalOutside.length > 0 && requiredOutside.length === 0 && (
           <p className="text-sm text-amber-700">
-            {optionalOutside.length} opcional{optionalOutside.length > 1 ? 'es' : ''} fuera de su disponibilidad.
+            {t('planner.optionalOutside', { count: optionalOutside.length })}
           </p>
         )}
         {create.isError && <p className="text-sm text-red-600">{(create.error as Error).message}</p>}
@@ -296,10 +298,10 @@ export default function CreateSessionModal({
             disabled={create.isPending}
             onClick={() => create.mutate('DRAFT')}
           >
-            Guardar borrador
+            {t('planner.saveDraft')}
           </Button>
           <Button type="submit" className="flex-1" disabled={create.isPending}>
-            {create.isPending ? 'Creando…' : 'Confirmar y notificar'}
+            {create.isPending ? t('planner.creating') : t('planner.confirmAndNotify')}
           </Button>
         </div>
       </form>

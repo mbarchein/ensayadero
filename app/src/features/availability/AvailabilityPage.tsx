@@ -4,8 +4,9 @@
 
 import { useMemo, useState } from 'react'
 import { addDays, addWeeks, format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { formatRange } from '../../lib/ranges'
@@ -33,6 +34,7 @@ const CELL_STYLE: Record<SlotState, string> = {
 }
 
 export default function AvailabilityPage() {
+  const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const [weekOffset, setWeekOffset] = useState(0)
@@ -124,18 +126,18 @@ export default function AvailabilityPage() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Mi disponibilidad</h1>
+        <h1 className="text-xl font-bold">{t('availability.title')}</h1>
       </header>
 
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label="Semana anterior">
+        <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label={t('availability.prevWeek')}>
           ‹
         </Button>
         <span className="text-sm font-medium">
-          {format(monday, "d MMM", { locale: es })} – {format(addDays(monday, 6), "d MMM yyyy", { locale: es })}
-          {weekOffset === 0 && ' (esta semana)'}
+          {format(monday, "d MMM", { locale: dateLocale() })} – {format(addDays(monday, 6), "d MMM yyyy", { locale: dateLocale() })}
+          {weekOffset === 0 && ` ${t('availability.thisWeek')}`}
         </span>
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label="Semana siguiente">
+        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
           ›
         </Button>
       </div>
@@ -163,14 +165,14 @@ export default function AvailabilityPage() {
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
         <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-green-300" /> Disponible
+          <span className="inline-block h-3 w-3 rounded bg-green-300" /> {t('availability.available')}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded bg-green-600 text-center text-[8px] text-white">★</span>{' '}
-          Preferido
+          {t('availability.preferred')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded border bg-white" /> Sin marcar
+          <span className="inline-block h-3 w-3 rounded border bg-white" /> {t('availability.unmarked')}
         </span>
       </div>
 
@@ -180,22 +182,25 @@ export default function AvailabilityPage() {
           disabled={!draft || save.isPending}
           className="flex-1"
         >
-          {save.isPending ? 'Guardando…' : draft ? 'Guardar cambios' : 'Sin cambios'}
+          {save.isPending
+            ? t('availability.saving')
+            : draft
+              ? t('availability.saveChanges')
+              : t('availability.noChanges')}
         </Button>
         <Button
           variant="secondary"
           onClick={() => {
-            if (confirm('Esto convertirá lo pintado esta semana en tu disponibilidad recurrente (todas las semanas). ¿Continuar?'))
-              makeRecurring.mutate()
+            if (confirm(t('availability.repeatConfirm'))) makeRecurring.mutate()
           }}
           disabled={makeRecurring.isPending}
         >
-          🔁 Repetir cada semana
+          {t('availability.repeatWeekly')}
         </Button>
       </div>
       {(save.isError || makeRecurring.isError) && (
         <p className="text-sm text-red-600">
-          Error al guardar: {((save.error || makeRecurring.error) as Error).message}
+          {t('availability.saveError', { message: ((save.error || makeRecurring.error) as Error).message })}
         </p>
       )}
     </div>

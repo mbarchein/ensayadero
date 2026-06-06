@@ -5,8 +5,9 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { addDays, addWeeks, format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
 import { supabase } from '../../lib/supabase'
 import { parseRange, type TimeRange } from '../../lib/ranges'
@@ -18,6 +19,7 @@ import { Button } from '../../components/ui'
 import type { Availability } from '../../lib/types'
 
 export default function PlannerPage() {
+  const { t } = useTranslation()
   const { groupId, group, members, isInstructor, loading } = useGroup()
   const [weekOffset, setWeekOffset] = useState(0)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
@@ -74,7 +76,7 @@ export default function PlannerPage() {
 
   if (loading) return <Spinner />
   if (!isInstructor) {
-    return <p className="py-10 text-center text-sm text-gray-500">Solo los instructores pueden planificar.</p>
+    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
   }
 
   const total = activeIds.length
@@ -89,7 +91,7 @@ export default function PlannerPage() {
         <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
           ‹ {group?.name}
         </Link>
-        <h1 className="text-xl font-bold">Planificar ensayo</h1>
+        <h1 className="text-xl font-bold">{t('planner.title')}</h1>
       </header>
 
       {/* selector de personas */}
@@ -98,7 +100,7 @@ export default function PlannerPage() {
           onClick={() => setSelected(null)}
           className={chip(selected === null)}
         >
-          Todos ({memberIds.length})
+          {t('planner.all', { count: memberIds.length })}
         </button>
         {members.map((m) => {
           const active = selected === null || selected.has(m.user_id)
@@ -127,13 +129,13 @@ export default function PlannerPage() {
       </div>
 
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label="Semana anterior">
+        <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label={t('availability.prevWeek')}>
           ‹
         </Button>
         <span className="text-sm font-medium">
-          {format(monday, 'd MMM', { locale: es })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: es })}
+          {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
         </span>
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label="Semana siguiente">
+        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
           ›
         </Button>
       </div>
@@ -156,25 +158,22 @@ export default function PlannerPage() {
         />
       )}
 
-      <p className="text-xs text-gray-500">
-        El número indica cuántas personas seleccionadas están disponibles. Verde intenso = todas.
-        Toca una franja para ver detalle y crear el ensayo.
-      </p>
+      <p className="text-xs text-gray-500">{t('planner.legend')}</p>
 
       {/* detalle de celda */}
       {inspect && grid && (
         <div className="rounded-xl border bg-white p-4 shadow">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-semibold">
-              {format(slotRange(monday, inspect.day, inspect.slot).start, "EEE d · HH:mm", { locale: es })}
+              {format(slotRange(monday, inspect.day, inspect.slot).start, "EEE d · HH:mm", { locale: dateLocale() })}
             </p>
-            <button onClick={() => setInspect(null)} className="text-gray-400" aria-label="Cerrar">
+            <button onClick={() => setInspect(null)} className="text-gray-400" aria-label={t('common.close')}>
               ✕
             </button>
           </div>
           <CellDetail cell={grid[inspect.day][inspect.slot]} activeIds={activeIds} nameOf={nameOf} />
           <Button className="mt-3 w-full" onClick={() => setCreateAt(inspect)}>
-            Crear ensayo en esta franja
+            {t('planner.createHere')}
           </Button>
         </div>
       )}
@@ -221,6 +220,7 @@ function CellDetail({
   activeIds: string[]
   nameOf: (id: string) => string
 }) {
+  const { t } = useTranslation()
   const unavailable = activeIds.filter(
     (id) => !cell.available.includes(id) && !cell.busy.includes(id),
   )
@@ -228,19 +228,19 @@ function CellDetail({
     <div className="space-y-1 text-xs">
       {cell.available.length > 0 && (
         <p>
-          <span className="font-medium text-green-700">Disponibles:</span>{' '}
+          <span className="font-medium text-green-700">{t('planner.availableLabel')}</span>{' '}
           {cell.available.map(nameOf).join(', ')}
         </p>
       )}
       {cell.busy.length > 0 && (
         <p>
-          <span className="font-medium text-amber-700">Ocupados (otro ensayo):</span>{' '}
+          <span className="font-medium text-amber-700">{t('planner.busyLabel')}</span>{' '}
           {cell.busy.map(nameOf).join(', ')}
         </p>
       )}
       {unavailable.length > 0 && (
         <p>
-          <span className="font-medium text-gray-500">Sin disponibilidad:</span>{' '}
+          <span className="font-medium text-gray-500">{t('planner.unavailableLabel')}</span>{' '}
           {unavailable.map(nameOf).join(', ')}
         </p>
       )}
