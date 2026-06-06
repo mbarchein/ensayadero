@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
@@ -8,7 +8,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 
-  const signIn = async () => {
+  const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback` },
@@ -16,30 +16,30 @@ export default function LoginPage() {
     if (error) setError(error.message)
   }
 
-  // Login por password — SOLO build de desarrollo (stack local docker).
-  // En producción GoTrue tiene signup por email y este formulario no se compila.
-  const [devEmail, setDevEmail] = useState('directora@local.test')
-  const [devPassword, setDevPassword] = useState('password123')
-  const devSignIn = async (e: React.FormEvent) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const signInWithPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    const { error } = await supabase.auth.signInWithPassword({
-      email: devEmail,
-      password: devPassword,
-    })
+    setError(null)
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoading(false)
     if (error) setError(error.message)
     else navigate('/', { replace: true })
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-violet-50 p-6">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-violet-50 p-6">
       <div className="flex flex-col items-center gap-2">
         <img src="/icons/icon-192.png" alt="" className="h-20 w-20 rounded-2xl shadow-lg" />
         <h1 className="text-3xl font-bold text-violet-900">Ensayo</h1>
         <p className="text-center text-sm text-violet-700">{t('login.tagline')}</p>
       </div>
+
       <button
-        onClick={signIn}
-        className="flex items-center gap-3 rounded-xl bg-white px-6 py-3 font-medium shadow-md transition hover:shadow-lg"
+        onClick={signInWithGoogle}
+        className="flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-white px-6 py-3 font-medium shadow-md transition hover:shadow-lg"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/>
@@ -49,33 +49,50 @@ export default function LoginPage() {
         </svg>
         {t('login.googleButton')}
       </button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {import.meta.env.DEV && (
-        <form
-          onSubmit={devSignIn}
-          className="flex w-full max-w-xs flex-col gap-2 rounded-xl border border-dashed border-violet-300 p-4"
+      <div className="flex w-full max-w-xs items-center gap-3 text-xs text-violet-400">
+        <span className="h-px flex-1 bg-violet-200" />
+        {t('login.or')}
+        <span className="h-px flex-1 bg-violet-200" />
+      </div>
+
+      <form onSubmit={signInWithPassword} className="flex w-full max-w-xs flex-col gap-3">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-lg border px-3 py-2 text-sm"
+          placeholder={t('login.emailPlaceholder')}
+          autoComplete="email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="rounded-lg border px-3 py-2 text-sm"
+          placeholder={t('login.passwordPlaceholder')}
+          autoComplete="current-password"
+          required
+        />
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-xl bg-violet-600 py-2.5 font-medium text-white shadow-md transition hover:bg-violet-700 disabled:opacity-60"
         >
-          <p className="text-center text-xs font-semibold uppercase text-violet-400">dev login</p>
-          <input
-            type="email"
-            value={devEmail}
-            onChange={(e) => setDevEmail(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-            placeholder="email"
-          />
-          <input
-            type="password"
-            value={devPassword}
-            onChange={(e) => setDevPassword(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-            placeholder="password"
-          />
-          <button type="submit" className="rounded-lg bg-violet-200 py-2 text-sm font-medium text-violet-900">
-            Entrar (dev)
-          </button>
-        </form>
-      )}
+          {loading ? t('login.signingIn') : t('login.loginButton')}
+        </button>
+      </form>
+
+      <div className="flex w-full max-w-xs items-center justify-between text-sm text-violet-700">
+        <Link to="/signup" className="underline">
+          {t('login.signupLink')}
+        </Link>
+        <Link to="/forgot-password" className="underline">
+          {t('login.forgotLink')}
+        </Link>
+      </div>
     </main>
   )
 }

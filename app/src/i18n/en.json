@@ -49,8 +49,46 @@
   "login": {
     "tagline": "Plan your theatre group's rehearsals",
     "googleButton": "Continue with Google",
+    "or": "or",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "loginButton": "Sign in",
+    "signingIn": "Signing in…",
+    "signupLink": "Create account",
+    "forgotLink": "Forgot your password?",
     "entering": "Signing in…",
     "noProfile": "Your account isn't ready yet. Reload the page; if it persists, contact support."
+  },
+  "signup": {
+    "title": "Create account",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password (min. 8 characters)",
+    "createButton": "Create account",
+    "creating": "Creating…",
+    "haveAccount": "I already have an account",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We've sent an activation link to {{email}}. Open it to activate your account.",
+    "backToLogin": "Back to sign in"
+  },
+  "forgot": {
+    "title": "Reset password",
+    "hint": "We'll send you a link to reset your password.",
+    "emailPlaceholder": "Email",
+    "sendButton": "Send link",
+    "sending": "Sending…",
+    "sentTitle": "Check your email",
+    "sentBody": "If an account exists for {{email}}, we've sent a link to reset the password.",
+    "backToLogin": "Back to sign in"
+  },
+  "reset": {
+    "title": "New password",
+    "newPasswordPlaceholder": "New password (min. 8 characters)",
+    "saveButton": "Save password",
+    "saving": "Saving…",
+    "done": "Password updated. Signing in…",
+    "invalidLink": "Invalid or expired link.",
+    "requestAgain": "Request a new link"
   },
   "home": {
     "greeting": "Hi, {{name}} 👋",

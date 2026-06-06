@@ -34,7 +34,9 @@ resource "supabase_settings" "main" {
     site_url = local.app_url
     additional_redirect_urls = [
       "${local.app_url}/auth/callback",
+      "${local.app_url}/reset-password",
       "http://localhost:5173/auth/callback", # dev local
+      "http://localhost:5173/reset-password",
     ]
 
     # Registro abierto: cualquiera puede crear cuenta (Google/email).
@@ -46,6 +48,16 @@ resource "supabase_settings" "main" {
     external_google_client_id = var.google_oauth_client_id
     external_google_secret    = var.google_oauth_client_secret
 
-    mailer_autoconfirm = false
+    # Email+password con activación obligatoria (mailer_autoconfirm=false).
+    # SMTP vía Resend (mismo API key que las notificaciones). Si resend_api_key
+    # está vacío, los correos de activación/recuperación no se enviarán.
+    mailer_autoconfirm                 = false
+    mailer_secure_email_change_enabled = true
+    smtp_admin_email                   = "noreply@${var.domain}"
+    smtp_host                          = "smtp.resend.com"
+    smtp_port                          = 465
+    smtp_user                          = "resend"
+    smtp_pass                          = var.resend_api_key
+    smtp_sender_name                   = "Ensayo"
   })
 }

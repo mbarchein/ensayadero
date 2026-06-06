@@ -86,6 +86,9 @@ Anota outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_ur
    supabase secrets set RESEND_API_KEY=re_xxx --project-ref <project-ref>
    supabase secrets set EMAIL_FROM="Ensayo <notificaciones@tudominio.es>" --project-ref <project-ref>
    ```
+6. La misma `resend_api_key` configura el SMTP de Auth (Terraform lo aplica en
+   `supabase_settings`): correos de **activación de cuenta** y **recuperación de
+   contraseña** del registro email+password. Sin ella esos correos no se envían.
 
 ## 7. Claves VAPID (Web Push)
 

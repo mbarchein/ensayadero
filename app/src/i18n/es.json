@@ -49,8 +49,46 @@
   "login": {
     "tagline": "Planifica los ensayos de tu grupo de teatro",
     "googleButton": "Continuar con Google",
+    "or": "o",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Contraseña",
+    "loginButton": "Entrar",
+    "signingIn": "Entrando…",
+    "signupLink": "Crear cuenta",
+    "forgotLink": "¿Olvidaste tu contraseña?",
     "entering": "Entrando…",
     "noProfile": "Tu cuenta aún no está lista. Recarga la página; si persiste, contacta con soporte."
+  },
+  "signup": {
+    "title": "Crear cuenta",
+    "namePlaceholder": "Tu nombre",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Contraseña (mín. 8 caracteres)",
+    "createButton": "Crear cuenta",
+    "creating": "Creando…",
+    "haveAccount": "Ya tengo cuenta",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailBody": "Te hemos enviado un enlace de activación a {{email}}. Ábrelo para activar tu cuenta.",
+    "backToLogin": "Volver al inicio de sesión"
+  },
+  "forgot": {
+    "title": "Recuperar contraseña",
+    "hint": "Te enviaremos un enlace para restablecer tu contraseña.",
+    "emailPlaceholder": "Email",
+    "sendButton": "Enviar enlace",
+    "sending": "Enviando…",
+    "sentTitle": "Revisa tu correo",
+    "sentBody": "Si existe una cuenta para {{email}}, te hemos enviado un enlace para restablecer la contraseña.",
+    "backToLogin": "Volver al inicio de sesión"
+  },
+  "reset": {
+    "title": "Nueva contraseña",
+    "newPasswordPlaceholder": "Nueva contraseña (mín. 8 caracteres)",
+    "saveButton": "Guardar contraseña",
+    "saving": "Guardando…",
+    "done": "Contraseña actualizada. Entrando…",
+    "invalidLink": "Enlace no válido o caducado.",
+    "requestAgain": "Pedir un nuevo enlace"
   },
   "home": {
     "greeting": "Hola, {{name}} 👋",

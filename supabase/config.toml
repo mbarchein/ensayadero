@@ -18,14 +18,28 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://localhost:5173"
-additional_redirect_urls = ["http://localhost:5173/auth/callback"]
+additional_redirect_urls = [
+  "http://localhost:5173/auth/callback",
+  "http://localhost:5173/reset-password",
+]
 jwt_expiry = 3600
 enable_signup = true
+
+[auth.email]
+enable_signup = true
+# Exige activación por email antes de poder entrar.
+enable_confirmations = true
+double_confirm_changes = true
 
 [auth.external.google]
 enabled = true
 client_id = "env(GOOGLE_OAUTH_CLIENT_ID)"
 secret = "env(GOOGLE_OAUTH_CLIENT_SECRET)"
+
+# Capturador de correo para `supabase start` (el stack docker usa mailpit).
+[inbucket]
+enabled = true
+port = 54324
 
 [edge_runtime]
 enabled = true
