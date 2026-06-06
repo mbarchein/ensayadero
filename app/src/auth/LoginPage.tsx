@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
 export default function LoginPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 
   const signIn = async () => {
@@ -12,6 +14,20 @@ export default function LoginPage() {
       options: { redirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback` },
     })
     if (error) setError(error.message)
+  }
+
+  // Login por password — SOLO build de desarrollo (stack local docker).
+  // En producción GoTrue tiene signup por email y este formulario no se compila.
+  const [devEmail, setDevEmail] = useState('directora@local.test')
+  const [devPassword, setDevPassword] = useState('password123')
+  const devSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: devEmail,
+      password: devPassword,
+    })
+    if (error) setError(error.message)
+    else navigate('/', { replace: true })
   }
 
   return (
@@ -35,6 +51,32 @@ export default function LoginPage() {
       </button>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <p className="max-w-xs text-center text-xs text-violet-500">{t('login.inviteNotice')}</p>
+
+      {import.meta.env.DEV && (
+        <form
+          onSubmit={devSignIn}
+          className="flex w-full max-w-xs flex-col gap-2 rounded-xl border border-dashed border-violet-300 p-4"
+        >
+          <p className="text-center text-xs font-semibold uppercase text-violet-400">dev login</p>
+          <input
+            type="email"
+            value={devEmail}
+            onChange={(e) => setDevEmail(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+            placeholder="email"
+          />
+          <input
+            type="password"
+            value={devPassword}
+            onChange={(e) => setDevPassword(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+            placeholder="password"
+          />
+          <button type="submit" className="rounded-lg bg-violet-200 py-2 text-sm font-medium text-violet-900">
+            Entrar (dev)
+          </button>
+        </form>
+      )}
     </main>
   )
 }
