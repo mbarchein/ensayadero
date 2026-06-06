@@ -19,7 +19,7 @@ import {
   type SlotState,
 } from '../../lib/slots'
 import WeekGrid, { type CellPos } from './WeekGrid'
-import { Button, Spinner } from '../../components/ui'
+import { Button, Modal, Spinner } from '../../components/ui'
 import { parseRange } from '../../lib/ranges'
 import { useMyAgenda } from '../agenda/useMyAgenda'
 import ParticipationCard from '../agenda/ParticipationCard'
@@ -43,6 +43,8 @@ export default function AvailabilityPage() {
   const qc = useQueryClient()
   const [weekOffset, setWeekOffset] = useState(0)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
+  const [copyOpen, setCopyOpen] = useState(false)
+  const [copyN, setCopyN] = useState(1)
 
   // ensayos a los que estoy convocado esta semana visible (cualquier grupo)
   const agenda = useMyAgenda()
@@ -167,24 +169,37 @@ export default function AvailabilityPage() {
     },
   })
 
-  const makeRecurring = useMutation({
-    mutationFn: async () => {
+  // Copiar la semana visible a las próximas N semanas (sustituye su
+  // disponibilidad puntual). No crea recurrencia: copia explícita.
+  const copyWeeks = useMutation({
+    mutationFn: async (weeks: number) => {
       if (!grid) return
-      // bloques de esta semana → filas recurrentes semanales
-      const rows = gridToRanges(grid, monday).map((r) => ({
-        user_id: profile!.id,
-        time_range: formatRange(r.start, r.end),
-        kind: r.kind,
-        rrule: 'FREQ=WEEKLY',
-      }))
-      // eliminar pintado previo (puntual y recurrente) para evitar duplicados
-      await supabase.from('availabilities').delete().eq('user_id', profile!.id)
-      if (rows.length > 0) {
-        const { error } = await supabase.from('availabilities').insert(rows)
-        if (error) throw error
+      const blocks = gridToRanges(grid, monday)
+      for (let i = 1; i <= weeks; i++) {
+        const wStart = addDays(monday, 7 * i)
+        const wEnd = addDays(wStart, 7)
+        const { error: delError } = await supabase
+          .from('availabilities')
+          .delete()
+          .eq('user_id', profile!.id)
+          .is('rrule', null)
+          .filter('time_range', 'ov', `[${wStart.toISOString()},${wEnd.toISOString()})`)
+        if (delError) throw delError
+        const rows = blocks.map((b) => ({
+          user_id: profile!.id,
+          time_range: formatRange(addDays(b.start, 7 * i), addDays(b.end, 7 * i)),
+          kind: b.kind,
+        }))
+        if (rows.length > 0) {
+          const { error } = await supabase.from('availabilities').insert(rows)
+          if (error) throw error
+        }
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['availabilities'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['availabilities'] })
+      setCopyOpen(false)
+    },
   })
 
   if (isLoading || !grid) return <Spinner />
@@ -262,14 +277,8 @@ export default function AvailabilityPage() {
         >
           {save.isPending || draft ? t('availability.saving') : t('availability.saved')}
         </span>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            if (confirm(t('availability.repeatConfirm'))) makeRecurring.mutate()
-          }}
-          disabled={makeRecurring.isPending}
-        >
-          {t('availability.repeatWeekly')}
+        <Button variant="secondary" onClick={() => setCopyOpen(true)} disabled={copyWeeks.isPending}>
+          {t('availability.copyWeeks')}
         </Button>
         <Button
           variant="ghost"
@@ -281,13 +290,42 @@ export default function AvailabilityPage() {
           🗑 {t('availability.clearWeek')}
         </Button>
       </div>
-      {(save.isError || makeRecurring.isError || clearWeek.isError) && (
+      {(save.isError || copyWeeks.isError || clearWeek.isError) && (
         <p className="text-sm text-red-600">
           {t('availability.saveError', {
-            message: ((save.error || makeRecurring.error || clearWeek.error) as Error).message,
+            message: ((save.error || copyWeeks.error || clearWeek.error) as Error).message,
           })}
         </p>
       )}
+
+      <Modal open={copyOpen} onClose={() => setCopyOpen(false)} title={t('availability.copyTitle')}>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            copyWeeks.mutate(copyN)
+          }}
+        >
+          <p className="text-sm text-gray-600">{t('availability.copyHint')}</p>
+          <label className="block text-sm">
+            {t('availability.copyWeeksLabel')}
+            <input
+              type="number"
+              min={1}
+              max={12}
+              required
+              value={copyN}
+              onChange={(e) => setCopyN(Math.min(12, Math.max(1, Number(e.target.value))))}
+              className="mt-1 w-full rounded-lg border px-3 py-2"
+            />
+          </label>
+          <Button type="submit" disabled={copyWeeks.isPending} className="w-full">
+            {copyWeeks.isPending
+              ? t('availability.saving')
+              : t('availability.copyConfirm', { count: copyN })}
+          </Button>
+        </form>
+      </Modal>
 
       {/* ensayos convocados en la semana visible */}
       {weekParticipations.length > 0 && (
