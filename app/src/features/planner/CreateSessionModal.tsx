@@ -187,6 +187,29 @@ export default function CreateSessionModal({
     },
   })
 
+  // Cancelar (solo edición): confirmada → estado CANCELLED (trigger notifica a
+  // los convocados); borrador → se elimina (nadie fue convocado aún).
+  const cancel = useMutation({
+    mutationFn: async () => {
+      if (session!.status === 'CONFIRMED') {
+        const { error } = await supabase
+          .from('sessions')
+          .update({ status: 'CANCELLED', updated_at: new Date().toISOString() })
+          .eq('id', session!.id)
+        if (error) throw error
+        supabase.functions.invoke('send-notifications', { body: {} }).catch(() => {})
+      } else {
+        const { error } = await supabase.from('sessions').delete().eq('id', session!.id)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions', groupId] })
+      qc.invalidateQueries({ queryKey: ['week-sessions', groupId] })
+      onClose()
+    },
+  })
+
   const nameOf = (id: string) => {
     const m = members.find((x) => x.user_id === id)
     return m?.profiles.name || m?.profiles.email || '?'
@@ -365,6 +388,22 @@ export default function CreateSessionModal({
                 : t('planner.confirmAndNotify')}
           </Button>
         </div>
+
+        {editing && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full text-red-600"
+            disabled={cancel.isPending}
+            onClick={() => {
+              if (confirm(t(session!.status === 'CONFIRMED' ? 'planner.cancelConfirm' : 'planner.deleteDraftConfirm')))
+                cancel.mutate()
+            }}
+          >
+            {session!.status === 'CONFIRMED' ? t('planner.cancelSession') : t('sessions.deleteDraft')}
+          </Button>
+        )}
+        {cancel.isError && <p className="text-sm text-red-600">{(cancel.error as Error).message}</p>}
       </form>
     </Modal>
   )
