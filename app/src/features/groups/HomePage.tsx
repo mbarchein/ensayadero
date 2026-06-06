@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { randomPlay } from '../../lib/plays'
 import { Badge, Button, EmptyState, Modal, Spinner } from '../../components/ui'
+import GroupAvatar from './GroupAvatar'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
 export default function HomePage() {
@@ -127,11 +128,14 @@ export default function HomePage() {
                   to={`/g/${m.group_id}`}
                   className="flex items-center justify-between rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"
                 >
-                  <div>
-                    <p className="font-medium">{m.groups.name}</p>
-                    <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                      {t(`roles.${m.role}`)}
-                    </Badge>
+                  <div className="flex items-center gap-3">
+                    <GroupAvatar seed={m.group_id} />
+                    <div>
+                      <p className="font-medium">{m.groups.name}</p>
+                      <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                        {t(`roles.${m.role}`)}
+                      </Badge>
+                    </div>
                   </div>
                   <span aria-hidden className="text-gray-400">
                     ›
