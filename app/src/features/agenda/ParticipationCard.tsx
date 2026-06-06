@@ -11,10 +11,12 @@ export default function ParticipationCard({
   p,
   onRespond,
   pending,
+  onViewAgenda,
 }: {
   p: MyParticipation
   onRespond: (r: ParticipantResponse) => void
   pending?: boolean
+  onViewAgenda?: () => void
 }) {
   const { t } = useTranslation()
   const s = p.sessions
@@ -64,6 +66,15 @@ export default function ParticipationCard({
             <span className="text-xs font-medium text-amber-600">{t('sessions.response.pendingShort')}</span>
           )}
         </div>
+      )}
+
+      {onViewAgenda && (
+        <button
+          onClick={onViewAgenda}
+          className="mt-2 text-xs font-medium text-violet-700 hover:underline"
+        >
+          🗓️ {t('upcoming.viewInAgenda')}
+        </button>
       )}
     </li>
   )

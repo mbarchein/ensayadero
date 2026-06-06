@@ -3,6 +3,7 @@
 // "Repetir cada semana" convierte los bloques de la semana en recurrentes.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -41,7 +42,16 @@ export default function AvailabilityPage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
-  const [weekOffset, setWeekOffset] = useState(0)
+  // semana inicial: ?d=YYYY-MM-DD (desde "ver en mi agenda"), si no la actual
+  const [params] = useSearchParams()
+  const initialOffset = useMemo(() => {
+    const d = params.get('d')
+    if (!d) return 0
+    const diff = weekStart(new Date(d)).getTime() - weekStart(new Date()).getTime()
+    return Math.max(-6, Math.round(diff / (7 * 86_400_000)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const [copyOpen, setCopyOpen] = useState(false)
   const [copyN, setCopyN] = useState(1)

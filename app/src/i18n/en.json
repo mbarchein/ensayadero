@@ -28,7 +28,8 @@
     "title": "Upcoming rehearsals",
     "empty": "You have no upcoming rehearsals.",
     "pendingNotice_one": "You have {{count}} rehearsal to confirm.",
-    "pendingNotice_other": "You have {{count}} rehearsals to confirm."
+    "pendingNotice_other": "You have {{count}} rehearsals to confirm.",
+    "viewInAgenda": "View in my schedule"
   },
   "login": {
     "tagline": "Plan your theatre group's rehearsals",

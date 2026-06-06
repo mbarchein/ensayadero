@@ -1,14 +1,17 @@
 // "Próximos": lista ordenada de mis ensayos futuros (todos los grupos),
 // con flujo de confirmación inline.
 
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { parseRange } from '../../lib/ranges'
+import { isoDay } from '../../lib/slots'
 import { EmptyState, Spinner } from '../../components/ui'
 import { useMyAgenda } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
 
 export default function UpcomingPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { data, isLoading, respond } = useMyAgenda()
 
   if (isLoading) return <Spinner />
@@ -39,6 +42,9 @@ export default function UpcomingPage() {
               p={p}
               pending={respond.isPending}
               onRespond={(response) => respond.mutate({ sessionId: p.session_id, response })}
+              onViewAgenda={() =>
+                navigate(`/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}`)
+              }
             />
           ))}
         </ul>

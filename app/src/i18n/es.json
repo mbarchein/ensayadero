@@ -28,7 +28,8 @@
     "title": "Próximos ensayos",
     "empty": "No tienes ensayos próximos.",
     "pendingNotice_one": "Tienes {{count}} ensayo por confirmar.",
-    "pendingNotice_other": "Tienes {{count}} ensayos por confirmar."
+    "pendingNotice_other": "Tienes {{count}} ensayos por confirmar.",
+    "viewInAgenda": "Ver en mi agenda"
   },
   "login": {
     "tagline": "Planifica los ensayos de tu grupo de teatro",
