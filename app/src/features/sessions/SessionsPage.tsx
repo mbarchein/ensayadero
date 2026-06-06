@@ -83,9 +83,11 @@ export default function SessionsPage() {
         <NavLink to={`/g/${groupId}`} end className={tabClass}>
           {t('group.tabs.sessions')}
         </NavLink>
-        <NavLink to={`/g/${groupId}/planner`} className={tabClass}>
-          {t('group.tabs.planner')}
-        </NavLink>
+        {isInstructor && (
+          <NavLink to={`/g/${groupId}/planner`} className={tabClass}>
+            {t('group.tabs.planner')}
+          </NavLink>
+        )}
         <NavLink to={`/g/${groupId}/members`} className={tabClass}>
           {t('group.tabs.members')}
         </NavLink>

@@ -21,7 +21,7 @@ import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
-  const { groupId, group, members, myRole, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const [weekOffset, setWeekOffset] = useState(0)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
@@ -111,8 +111,8 @@ export default function PlannerPage() {
   }, [availabilities, busyRows, activeIds, monday])
 
   if (loading) return <Spinner />
-  if (!myRole) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.membersOnly')}</p>
+  if (!isInstructor) {
+    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
   }
 
   const total = activeIds.length
@@ -282,7 +282,7 @@ export default function PlannerPage() {
                       {s.location ? ` · ${s.location}` : ''}
                     </p>
                   </div>
-                  {(myRole === 'INSTRUCTOR' || s.created_by === profile?.id) && (
+                  {(isInstructor || s.created_by === profile?.id) && (
                     <Button variant="secondary" onClick={() => setEditSession(s)}>
                       {t('planner.edit')}
                     </Button>
