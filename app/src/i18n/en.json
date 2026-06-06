@@ -98,6 +98,7 @@
   "planner": {
     "title": "Plan rehearsal",
     "directorsOnly": "Only directors can plan.",
+    "membersOnly": "You must be a group member to plan.",
     "all": "Everyone ({{count}})",
     "legend": "The number shows how many selected people are available. Deep green = everyone. Tap a slot to see details and create the rehearsal.",
     "legendDrag": "The number shows how many selected people are available. Drag to select several consecutive slots and create the rehearsal with that duration.",

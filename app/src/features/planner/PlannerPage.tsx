@@ -9,6 +9,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
+import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { SLOTS_PER_DAY, heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
@@ -20,7 +21,8 @@ import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
-  const { groupId, group, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, myRole, loading } = useGroup()
+  const { profile } = useAuth()
   const [weekOffset, setWeekOffset] = useState(0)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const weekEnd = useMemo(() => addDays(monday, 7), [monday])
@@ -109,8 +111,8 @@ export default function PlannerPage() {
   }, [availabilities, busyRows, activeIds, monday])
 
   if (loading) return <Spinner />
-  if (!isInstructor) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
+  if (!myRole) {
+    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.membersOnly')}</p>
   }
 
   const total = activeIds.length
@@ -274,9 +276,11 @@ export default function PlannerPage() {
                       {s.location ? ` · ${s.location}` : ''}
                     </p>
                   </div>
-                  <Button variant="secondary" onClick={() => setEditSession(s)}>
-                    {t('planner.edit')}
-                  </Button>
+                  {(myRole === 'INSTRUCTOR' || s.created_by === profile?.id) && (
+                    <Button variant="secondary" onClick={() => setEditSession(s)}>
+                      {t('planner.edit')}
+                    </Button>
+                  )}
                 </li>
               )
             })}
