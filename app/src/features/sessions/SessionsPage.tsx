@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
@@ -8,7 +8,7 @@ import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
-import { Pencil, Archive } from 'lucide-react'
+import { Pencil, Archive, CalendarPlus, Users } from 'lucide-react'
 import { Badge, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
 import EditGroupModal from '../groups/EditGroupModal'
@@ -25,6 +25,7 @@ export default function SessionsPage() {
   const { groupId, group, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const [editOpen, setEditOpen] = useState(false)
 
   const { data: sessions, isLoading } = useQuery({
@@ -95,19 +96,25 @@ export default function SessionsPage() {
 
       {editOpen && group && <EditGroupModal group={group} onClose={() => setEditOpen(false)} />}
 
-      <nav className="flex gap-2 text-sm">
-        <NavLink to={`/g/${groupId}`} end className={tabClass}>
-          {t('group.tabs.sessions')}
-        </NavLink>
+      <div className="flex gap-2">
         {isInstructor && (
-          <NavLink to={`/g/${groupId}/planner`} className={tabClass}>
-            {t('group.tabs.planner')}
-          </NavLink>
+          <Button
+            onClick={() => navigate(`/g/${groupId}/planner`)}
+            className="inline-flex items-center gap-1.5"
+          >
+            <CalendarPlus size={16} /> {t('group.tabs.planner')}
+          </Button>
         )}
-        <NavLink to={`/g/${groupId}/members`} className={tabClass}>
-          {t('group.tabs.members')}
-        </NavLink>
-      </nav>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(`/g/${groupId}/members`)}
+          className="inline-flex items-center gap-1.5"
+        >
+          <Users size={16} /> {t('group.tabs.members')}
+        </Button>
+      </div>
+
+      <h2 className="text-lg font-semibold">{t('group.tabs.sessions')}</h2>
 
       {upcoming.length === 0 ? (
         <EmptyState
@@ -149,9 +156,6 @@ export default function SessionsPage() {
     </div>
   )
 }
-
-const tabClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-full px-3 py-1 ${isActive ? 'bg-violet-600 text-white' : 'bg-violet-50 text-violet-700'}`
 
 function SessionCard({
   session: s,
