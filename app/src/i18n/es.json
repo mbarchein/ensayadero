@@ -37,6 +37,9 @@
     "pendingTitle_one": "Tienes {{count}} ensayo por confirmar",
     "pendingTitle_other": "Tienes {{count}} ensayos por confirmar",
     "myGroups": "Mis grupos",
+    "newGroup": "Crear grupo",
+    "newGroupTitle": "Nuevo grupo",
+    "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
     "signOut": "Salir",
     "noGroups": "Aún no perteneces a ningún grupo. Espera una invitación de tu director."
   },

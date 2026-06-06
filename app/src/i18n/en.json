@@ -37,6 +37,9 @@
     "pendingTitle_one": "You have {{count}} rehearsal to confirm",
     "pendingTitle_other": "You have {{count}} rehearsals to confirm",
     "myGroups": "My groups",
+    "newGroup": "Create group",
+    "newGroupTitle": "New group",
+    "newGroupHint": "You'll be the director of this group and can invite the others.",
     "signOut": "Sign out",
     "noGroups": "You don't belong to any group yet. Wait for an invitation from your director."
   },
