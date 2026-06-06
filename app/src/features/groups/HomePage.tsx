@@ -129,7 +129,7 @@ export default function HomePage() {
                   className="flex items-center justify-between rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"
                 >
                   <div className="flex items-center gap-3">
-                    <GroupAvatar seed={m.group_id} />
+                    <GroupAvatar seed={m.groups.avatar_seed || m.group_id} />
                     <div>
                       <p className="font-medium">{m.groups.name}</p>
                       <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>

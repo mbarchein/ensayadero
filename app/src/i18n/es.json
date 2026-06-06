@@ -95,6 +95,8 @@
     "remove": "Quitar",
     "removeConfirm": "¿Quitar a {{name}} del grupo?",
     "backToGroups": "‹ Mis grupos",
+    "editGroup": "Editar grupo",
+    "regenerateAvatar": "Regenerar avatar",
     "leave": "Abandonar grupo",
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos.",
     "tabs": { "sessions": "Ensayos", "planner": "Planificar", "members": "Miembros" }

@@ -95,6 +95,8 @@
     "remove": "Remove",
     "removeConfirm": "Remove {{name}} from the group?",
     "backToGroups": "‹ My groups",
+    "editGroup": "Edit group",
+    "regenerateAvatar": "Regenerate avatar",
     "leave": "Leave group",
     "leaveConfirm": "Leave this group? You'll be removed from its rehearsals.",
     "tabs": { "sessions": "Rehearsals", "planner": "Plan", "members": "Members" }

@@ -20,6 +20,7 @@ export interface Group {
   created_at: string
   join_code: string
   join_enabled: boolean
+  avatar_seed: string | null
 }
 
 export interface Membership {

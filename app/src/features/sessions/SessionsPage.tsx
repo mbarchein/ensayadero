@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -9,6 +10,7 @@ import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { Badge, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
+import EditGroupModal from '../groups/EditGroupModal'
 import type { SessionWithParticipants } from '../../lib/types'
 
 const STATUS_COLOR = {
@@ -22,6 +24,7 @@ export default function SessionsPage() {
   const { groupId, group, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
+  const [editOpen, setEditOpen] = useState(false)
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions', groupId],
@@ -74,10 +77,21 @@ export default function SessionsPage() {
           {t('group.backToGroups')}
         </Link>
         <div className="flex items-center gap-3">
-          <GroupAvatar seed={groupId} />
-          <h1 className="text-xl font-bold">{group?.name}</h1>
+          <GroupAvatar seed={group?.avatar_seed || groupId} />
+          <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
+          {isInstructor && group && (
+            <button
+              onClick={() => setEditOpen(true)}
+              className="rounded-lg px-2 py-1 text-sm text-violet-700 hover:bg-violet-50"
+              aria-label={t('group.editGroup')}
+            >
+              ✏️
+            </button>
+          )}
         </div>
       </header>
+
+      {editOpen && group && <EditGroupModal group={group} onClose={() => setEditOpen(false)} />}
 
       <nav className="flex gap-2 text-sm">
         <NavLink to={`/g/${groupId}`} end className={tabClass}>
