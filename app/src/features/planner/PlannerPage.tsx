@@ -8,7 +8,6 @@ import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
@@ -17,8 +16,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { SLOTS_PER_DAY, heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
 import CreateSessionModal from './CreateSessionModal'
-import { Badge, Spinner } from '../../components/ui'
-import { Button } from '../../components/ui'
+import { Spinner, Button, Modal } from '../../components/ui'
 import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
@@ -157,6 +155,17 @@ export default function PlannerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availabilities, busyRows, editSession, monday])
 
+  // tapping/selecting a slot that holds a session opens its editor instead of
+  // the create flow
+  const selLo = sel ? Math.min(sel.a, sel.b) : 0
+  const sessionAtSel = sel ? sessionCells.get(`${sel.day}:${selLo}`) ?? null : null
+  useEffect(() => {
+    if (sel && !dragging && sessionAtSel) {
+      setEditSession(sessionAtSel)
+      setSel(null)
+    }
+  }, [sel, dragging, sessionAtSel])
+
   if (loading) return <Spinner />
   if (!isInstructor) {
     return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
@@ -169,8 +178,9 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
+    // fixed full-height layout: only the calendar scrolls (its own scroll box)
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <header className="-mx-4 bg-white px-4 py-2">
         <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
           ‹ {group?.name}
         </Link>
@@ -277,70 +287,34 @@ export default function PlannerPage() {
             setSel((prev) => (prev && pos.day === prev.day ? { ...prev, b: pos.slot } : prev))
           }
           onPaintEnd={() => setDragging(false)}
+          fill
         />
       )}
 
-      <p className="text-xs text-gray-500">{t('planner.legendDrag')}</p>
-
-      {/* details of the selected slot (range aggregate) */}
-      {sel && selRange && grid && !dragging && (
-        <div className="rounded-xl border bg-white p-4 shadow">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold">
-              {format(slotRange(monday, sel.day, selRange.lo).start, "EEE d · HH:mm", { locale: dateLocale() })}
-              –{format(slotRange(monday, sel.day, selRange.hi).end, 'HH:mm')}
-            </p>
-            <button onClick={() => setSel(null)} className="text-gray-400" aria-label={t('common.close')}>
-              <X size={16} />
-            </button>
+      {/* selected slot: availability detail + create (overlay, nothing below the grid) */}
+      <Modal
+        open={!!sel && !dragging && !createOpen && !sessionAtSel}
+        onClose={() => setSel(null)}
+        title={
+          sel && selRange
+            ? `${format(slotRange(monday, sel.day, selRange.lo).start, "EEE d · HH:mm", { locale: dateLocale() })}–${format(slotRange(monday, sel.day, selRange.hi).end, 'HH:mm')}`
+            : ''
+        }
+      >
+        {sel && selRange && grid && (
+          <div className="space-y-3">
+            <CellDetail
+              cell={mergeCells(grid[sel.day], selRange.lo, selRange.hi)}
+              activeIds={activeIds}
+              nameOf={nameOf}
+              meId={profile?.id}
+            />
+            <Button className="w-full" onClick={() => setCreateOpen(true)}>
+              {t('planner.createHere')}
+            </Button>
           </div>
-          <CellDetail
-            cell={mergeCells(grid[sel.day], selRange.lo, selRange.hi)}
-            activeIds={activeIds}
-            nameOf={nameOf}
-            meId={profile?.id}
-          />
-          <Button className="mt-3 w-full" onClick={() => setCreateOpen(true)}>
-            {t('planner.createHere')}
-          </Button>
-        </div>
-      )}
-
-      {/* list of the week's rehearsals (editable) */}
-      {(weekSessions?.length ?? 0) > 0 && (
-        <section>
-          <h2 className="mb-2 text-sm font-semibold text-gray-700">{t('planner.weekSessions')}</h2>
-          <ul className="space-y-2">
-            {weekSessions!.map((s) => {
-              const r = parseRange(s.time_range)
-              return (
-                <li
-                  key={s.id}
-                  className="flex items-center justify-between rounded-xl border bg-white p-3"
-                >
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-2 font-medium">
-                      <span className="truncate">{s.title}</span>
-                      <Badge color={s.status === 'CONFIRMED' ? 'green' : 'gray'}>
-                        {t(`sessions.status.${s.status}`)}
-                      </Badge>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {format(r.start, "EEE d · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-                      {s.location ? ` · ${s.location}` : ''}
-                    </p>
-                  </div>
-                  {(isInstructor || s.created_by === profile?.id) && (
-                    <Button variant="secondary" onClick={() => setEditSession(s)}>
-                      {t('planner.edit')}
-                    </Button>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-      )}
+        )}
+      </Modal>
 
       {createOpen && sel && selRange && grid && (
         <CreateSessionModal
