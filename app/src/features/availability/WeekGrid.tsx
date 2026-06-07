@@ -69,14 +69,19 @@ export default function WeekGrid({
 
         <div
           ref={gridRef}
-          className="grid touch-none grid-cols-[3rem_repeat(7,1fr)]"
+          // Allow the page (pan-y) and the wide grid wrapper (pan-x) to scroll
+          // on touch. Drag-to-paint is mouse/pen only; touch paints via tap
+          // (a single drag can't both scroll and paint).
+          style={{ touchAction: 'pan-x pan-y' }}
+          className="grid grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
             if (!pos || isPast(pos)) return // the past is not editable
             movedRef.current = false
-            if (onPaintStart) {
+            lastPos.current = pos
+            // touch is reserved for scrolling; it paints on tap (pointerup)
+            if (onPaintStart && e.pointerType !== 'touch') {
               paintingRef.current = true
-              lastPos.current = pos
               try {
                 gridRef.current?.setPointerCapture(e.pointerId)
               } catch {
@@ -101,9 +106,16 @@ export default function WeekGrid({
               paintingRef.current = false
               onPaintEnd?.()
             }
-            if (!movedRef.current && onCellTap) {
+            // a stationary tap: cycle one cell (touch) or fire onCellTap
+            if (!movedRef.current) {
               const pos = posFromEvent(e)
-              if (pos && !isPast(pos)) onCellTap(pos)
+              if (pos && !isPast(pos)) {
+                if (onCellTap) onCellTap(pos)
+                else if (e.pointerType === 'touch' && onPaintStart) {
+                  onPaintStart(pos)
+                  onPaintEnd?.()
+                }
+              }
             }
           }}
           onPointerCancel={() => {
