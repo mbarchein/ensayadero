@@ -4,6 +4,7 @@ import LoginPage from './auth/LoginPage'
 import SignupPage from './auth/SignupPage'
 import ForgotPasswordPage from './auth/ForgotPasswordPage'
 import ResetPasswordPage from './auth/ResetPasswordPage'
+import GoodbyePage from './auth/GoodbyePage'
 import AuthCallback from './auth/AuthCallback'
 import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/goodbye" element={<GoodbyePage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         {/* /join/:code gestiona su propio login (enlace compartible) */}
         <Route path="/join/:code" element={<JoinPage />} />

@@ -70,6 +70,11 @@
     "entering": "Entrando…",
     "noProfile": "Tu cuenta aún no está lista. Recarga la página; si persiste, contacta con soporte."
   },
+  "goodbye": {
+    "title": "Cuenta borrada",
+    "body": "Tu cuenta y tus datos se han eliminado. Gracias por usar Ensayadero.",
+    "toLogin": "Volver al inicio"
+  },
   "signup": {
     "title": "Crear cuenta",
     "namePlaceholder": "Tu nombre",

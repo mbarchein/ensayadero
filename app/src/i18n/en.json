@@ -70,6 +70,11 @@
     "entering": "Signing in…",
     "noProfile": "Your account isn't ready yet. Reload the page; if it persists, contact support."
   },
+  "goodbye": {
+    "title": "Account deleted",
+    "body": "Your account and data have been removed. Thanks for using Ensayadero.",
+    "toLogin": "Back to start"
+  },
   "signup": {
     "title": "Create account",
     "namePlaceholder": "Your name",

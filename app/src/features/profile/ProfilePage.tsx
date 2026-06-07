@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@tanstack/react-query'
 import { LogOut, Trash2 } from 'lucide-react'
@@ -10,6 +11,7 @@ import { Button, Modal } from '../../components/ui'
 export default function ProfilePage() {
   const { t } = useTranslation()
   const { profile, signOut, refreshProfile } = useAuth()
+  const navigate = useNavigate()
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -44,7 +46,11 @@ export default function ProfilePage() {
     mutationFn: async () => {
       const { error } = await supabase.rpc('delete_my_account')
       if (error) throw error
-      await signOut()
+    },
+    onSuccess: () => {
+      // go to the public farewell screen first, then clear the session
+      navigate('/goodbye', { replace: true })
+      signOut()
     },
   })
   const [deleteOpen, setDeleteOpen] = useState(false)
