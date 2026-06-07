@@ -1,83 +1,87 @@
-# Ensayo — Planificador de ensayos de teatro
+# Ensayo — Theatre rehearsal planner
 
-PWA para planificar ensayos según disponibilidad del grupo. Cada miembro pinta su
-disponibilidad en un calendario; el instructor ve el heatmap combinado y programa
-sesiones con participantes obligatorios/opcionales. Notificaciones push + email.
+PWA for planning rehearsals around the group's availability. Each member paints their
+availability on a calendar; the instructor sees the combined heatmap and schedules
+sessions with required/optional participants. Push + email notifications.
 
-## Arquitectura (coste cloud ~0 €)
+## Architecture (cloud cost ~€0)
 
-| Pieza | Servicio | Tier |
-|-------|----------|------|
+| Piece | Service | Tier |
+|-------|---------|------|
 | Frontend PWA | Cloudflare Pages | free |
 | DB + Auth + API + RLS | Supabase | free |
-| Jobs programados | pg_cron + Edge Functions | free |
-| Email | Resend | free (3k/mes) |
-| Push | Web Push VAPID | gratis |
+| Scheduled jobs | pg_cron + Edge Functions | free |
+| Email | Resend | free (3k/month) |
+| Push | Web Push VAPID | free |
 | Infra as code | Terraform (`infra/`) | — |
 
-Decisiones de diseño clave:
-- **D1** Disponibilidad global por usuario; sesiones confirmadas en cualquier grupo
-  descuentan disponibilidad visible en los demás (sin revelar origen).
-- **D2** Superadmin ve solo estructura, nunca disponibilidades.
-- **D3** Rol (`INSTRUCTOR`/`ACTOR`) por membresía de grupo; `SUPERADMIN` a nivel plataforma.
-- **D4** Aislamiento total entre grupos.
-- **D5** Registro solo por invitación (gate en trigger de DB).
+Key design decisions:
+- **D1** Global per-user availability; sessions confirmed in any group reduce the
+  availability shown in the others (without revealing the origin).
+- **D2** Superadmin sees only structure, never availability.
+- **D3** Role (`INSTRUCTOR`/`ACTOR`) per group membership; `SUPERADMIN` at platform level.
+- **D4** Full isolation between groups.
+- **D5** Open registration (Google, Facebook/Meta, or email+password); access to each
+  group is controlled by its join code/link and email invitations.
 
-## Estructura
+## Structure
 
 ```
-app/        Frontend React + Vite + PWA (vite-plugin-pwa)
-supabase/   Migraciones SQL (schema + RLS), Edge Functions, seed
-infra/      Terraform: Supabase, Cloudflare Pages + DNS, secrets GitHub
+app/        React + Vite + PWA frontend (vite-plugin-pwa)
+supabase/   SQL migrations (schema + RLS), Edge Functions, seed
+infra/      Terraform: Supabase, Cloudflare Pages + DNS, GitHub secrets
 ```
 
-## Setup desarrollo local
+## Local development setup
 
-Requisitos: Docker + make. **Sin Supabase CLI** — el stack completo es docker compose
-(Postgres con pg_cron, GoTrue, PostgREST, gateway nginx, Edge Function en Deno, frontend).
+Requirements: Docker + make. **No Supabase CLI** — the whole stack is docker compose
+(Postgres with pg_cron, GoTrue, PostgREST, nginx gateway, Edge Function on Deno, frontend).
 
 ```bash
-make up           # todo: app http://localhost:5173, API :54321, db :54322
-make seed-users   # usuarios de prueba (password123) + grupo demo
+make up           # everything: app http://localhost:5173, API :54321, db :54322
+make seed-users   # test users (password123) + demo group
 make logs         # logs
-make reset        # DB desde cero (migraciones + seed)
-make help         # resto de comandos
+make reset        # DB from scratch (migrations + seed)
+make help         # remaining commands
 ```
 
-Usuarios demo: `admin@local.test` (superadmin), `directora@local.test` (directora),
-`actor1..3@local.test`. Login local por password vía API (la UI usa Google;
-en local puedes activar Google real con `.env`, ver `.env.example`).
+Demo users: `admin@local.test` (superadmin), `directora@local.test` (instructor),
+`actor1..3@local.test`. The UI offers email/password sign-in, Google, and Facebook;
+sign in locally with the demo password (`password123`). You can enable real Google
+locally via `.env` (see `.env.example`). Activation and recovery emails are caught by
+mailpit at http://localhost:54324.
 
-## Provisión de infra (Terraform)
+## Infra provisioning (Terraform)
 
 ```bash
 cd infra
-cp terraform.tfvars.example terraform.tfvars   # rellenar
+cp terraform.tfvars.example terraform.tfvars   # fill in
 terraform init && terraform apply
 ```
 
-### Pasos manuales (no automatizables con TF)
+### Manual steps (not automatable with TF)
 
 1. **Google OAuth client** — [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   → crear OAuth client (Web). Redirect URI: output `google_oauth_redirect_uri`
-   (`https://<ref>.supabase.co/auth/v1/callback`). Copiar id/secret a tfvars y re-apply.
-2. **Tokens** — Supabase access token, Cloudflare API token, GitHub token → tfvars.
-3. **Resend** — añadir dominio en dashboard, copiar records DNS a `resend_dkim_records`,
-   re-apply, verificar. Crear API key → tfvars.
-4. **VAPID keys** — `npx web-push generate-vapid-keys`; pública a variable
-   `VITE_VAPID_PUBLIC_KEY` (GitHub vars), privada a secrets de Edge Functions:
+   → create OAuth client (Web). Redirect URI: output `google_oauth_redirect_uri`
+   (`https://<ref>.supabase.co/auth/v1/callback`). Copy id/secret to tfvars and re-apply.
+2. **Meta/Facebook OAuth** (optional, Instagram login path) — create a Meta app, add
+   Facebook Login, set the same redirect URI, copy App ID/Secret to tfvars. See BOOTSTRAP.
+3. **Tokens** — Supabase access token, Cloudflare API token, GitHub token → tfvars.
+4. **Resend** — add the domain in the dashboard, copy the DNS records to
+   `resend_dkim_records`, re-apply, verify. Create an API key → tfvars.
+5. **VAPID keys** — `npx web-push generate-vapid-keys`; public to the
+   `VITE_VAPID_PUBLIC_KEY` variable (GitHub vars), private to Edge Functions secrets:
    `supabase secrets set VAPID_PRIVATE_KEY=...`
-5. **Superadmin** — tras primer login, en SQL editor:
+6. **Superadmin** — after the first login, in the SQL editor:
    `update profiles set platform_role='SUPERADMIN' where email='...';`
 
 ## Deploy
 
-Push a `main` → GitHub Actions: tests → migraciones + Edge Functions (Supabase CLI)
+Push to `main` → GitHub Actions: tests → migrations + Edge Functions (Supabase CLI)
 → build → Cloudflare Pages (wrangler).
 
-## Limitaciones free tier (asumidas)
+## Free tier limitations (assumed)
 
-- Proyecto Supabase free se **pausa tras ~1 semana sin actividad**; uso semanal real
-  lo mantiene vivo. Mitigación posible: ping pg_cron externo o upgrade.
-- DB 500 MB, 50k MAU auth, Edge Functions 500k invocaciones/mes — sobra para grupos de teatro.
-- Vercel descartado: plan Hobby prohíbe uso comercial y limita crons.
+- A free Supabase project is **paused after ~1 week without activity**; real weekly use
+  keeps it alive. Possible mitigation: external pg_cron ping or upgrade.
+- DB 500 MB, 50k auth MAU, Edge Functions 500k invocations/month — plenty for theatre groups.

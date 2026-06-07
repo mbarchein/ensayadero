@@ -1,57 +1,57 @@
-# BOOTSTRAP — Pasos manuales para poner Ensayo en producción
+# BOOTSTRAP — Manual steps to ship Ensayo to production
 
-Todo lo demás está automatizado (Terraform + GitHub Actions). Estos pasos requieren
-intervención humana porque los proveedores no exponen API/Terraform para ellos, o
-porque implican secretos que debes generar tú.
+Everything else is automated (Terraform + GitHub Actions). These steps need human
+intervention because the providers don't expose an API/Terraform for them, or
+because they involve secrets you must generate yourself.
 
-Orden recomendado: seguir las secciones de arriba a abajo.
+Recommended order: follow the sections top to bottom.
 
 ---
 
-## 0. Prerequisitos locales
+## 0. Local prerequisites
 
 ```bash
-# Herramientas
+# Tools
 node >= 22, docker, terraform >= 1.9
 # Supabase CLI
-npm install -g supabase   # o brew install supabase/tap/supabase
+npm install -g supabase   # or brew install supabase/tap/supabase
 ```
 
-## 1. Cuentas necesarias (crear si no existen)
+## 1. Required accounts (create if they don't exist)
 
-| Servicio | URL | Plan |
-|----------|-----|------|
+| Service | URL | Plan |
+|---------|-----|------|
 | Supabase | https://supabase.com | Free |
-| Cloudflare | https://dash.cloudflare.com | Free (el dominio debe estar en una zona CF) |
+| Cloudflare | https://dash.cloudflare.com | Free (the domain must be in a CF zone) |
 | Resend | https://resend.com | Free |
-| Google Cloud | https://console.cloud.google.com | Free (solo OAuth) |
-| GitHub | repo del proyecto | Free |
+| Google Cloud | https://console.cloud.google.com | Free (OAuth only) |
+| GitHub | project repo | Free |
 
-## 2. Dominio en Cloudflare
+## 2. Domain in Cloudflare
 
-1. Comprar/transferir dominio (ej. `ensayoapp.es`) y añadirlo como zona en Cloudflare.
-2. Apuntar nameservers del registrador a los de Cloudflare.
-3. Anotar **Account ID** (dashboard, sidebar derecha de la zona).
+1. Buy/transfer a domain (e.g. `ensayoapp.es`) and add it as a zone in Cloudflare.
+2. Point the registrar's nameservers to Cloudflare's.
+3. Note the **Account ID** (dashboard, right sidebar of the zone).
 
-## 3. Tokens de API → `infra/terraform.tfvars`
+## 3. API tokens → `infra/terraform.tfvars`
 
 ```bash
 cd infra && cp terraform.tfvars.example terraform.tfvars
 ```
 
-| Variable | Dónde se genera |
-|----------|-----------------|
+| Variable | Where it's generated |
+|----------|----------------------|
 | `supabase_access_token` | https://supabase.com/dashboard/account/tokens → "Generate new token" |
-| `supabase_org_id` | Dashboard → org settings → slug de la organización |
-| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token con permisos: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (zona del dominio) |
-| `cloudflare_account_id` | Paso 2.3 |
-| `github_token` | https://github.com/settings/tokens → classic, scopes `repo` (incluye secrets) |
-| `github_owner` / `github_repo` | Crear repo vacío en GitHub y poner aquí owner/nombre |
-| `domain` / `app_subdomain` | Tu dominio del paso 2 |
+| `supabase_org_id` | Dashboard → org settings → organization slug |
+| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token with permissions: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (the domain's zone) |
+| `cloudflare_account_id` | Step 2.3 |
+| `github_token` | https://github.com/settings/tokens → classic, `repo` scopes (includes secrets) |
+| `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
+| `domain` / `app_subdomain` | Your domain from step 2 |
 
-## 4. Primer `terraform apply` (parcial)
+## 4. First `terraform apply` (partial)
 
-Google OAuth aún no existe — usar placeholders en `google_oauth_client_id/secret`:
+Google OAuth doesn't exist yet — use placeholders in `google_oauth_client_id/secret`:
 
 ```bash
 cd infra
@@ -59,135 +59,135 @@ terraform init
 terraform apply
 ```
 
-Anota outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_uri`.
+Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_uri`.
 
-## 5. Google OAuth client (manual — Google no lo expone vía Terraform)
+## 5. Google OAuth client (manual — Google doesn't expose it via Terraform)
 
-1. https://console.cloud.google.com → crear proyecto (o reutilizar).
-2. **APIs & Services → OAuth consent screen**: tipo *External*, nombre "Ensayo",
-   dominios autorizados: tu dominio. Publicar (no hace falta verificación para
-   scopes básicos email/profile).
-3. **Credentials → Create credentials → OAuth client ID**: tipo *Web application*.
-   - Authorized JavaScript origins: `https://app.tudominio.es` y `http://localhost:5173`
-   - Authorized redirect URIs: **valor del output `google_oauth_redirect_uri`**
+1. https://console.cloud.google.com → create a project (or reuse one).
+2. **APIs & Services → OAuth consent screen**: type *External*, name "Ensayo",
+   authorized domains: your domain. Publish (no verification needed for the basic
+   email/profile scopes).
+3. **Credentials → Create credentials → OAuth client ID**: type *Web application*.
+   - Authorized JavaScript origins: `https://app.yourdomain.es` and `http://localhost:5173`
+   - Authorized redirect URIs: **value of the `google_oauth_redirect_uri` output**
      (`https://<project-ref>.supabase.co/auth/v1/callback`)
-4. Copiar Client ID y Client Secret a `terraform.tfvars` → `terraform apply` de nuevo.
+4. Copy the Client ID and Client Secret to `terraform.tfvars` → `terraform apply` again.
 
-## 5b. Meta/Facebook OAuth — opcional (login con Instagram)
+## 5b. Meta/Facebook OAuth — optional (Instagram login)
 
-> Supabase **no** tiene provider Instagram nativo. El login con cuentas de
-> Instagram se obtiene a través de **Meta** (Facebook Login): autentica cuentas
-> de Meta, cubriendo usuarios con Instagram y Facebook vinculados. Dejar las
-> variables `facebook_oauth_*` vacías deshabilita el provider.
+> Supabase has **no** native Instagram provider. Login with Instagram accounts is
+> obtained through **Meta** (Facebook Login): it authenticates Meta accounts,
+> covering users with linked Instagram and Facebook accounts. Leaving the
+> `facebook_oauth_*` variables empty disables the provider.
 
-1. https://developers.facebook.com → **My Apps → Create App** → tipo *Consumer*.
-2. Añadir el producto **Facebook Login**. (Opcional: añadir también el producto
-   **Instagram** si quieres mostrar la marca/IG en la pantalla de permisos.)
+1. https://developers.facebook.com → **My Apps → Create App** → type *Consumer*.
+2. Add the **Facebook Login** product. (Optional: also add the **Instagram**
+   product if you want to show the IG branding on the permission screen.)
 3. **Facebook Login → Settings → Valid OAuth Redirect URIs**:
    `https://<project-ref>.supabase.co/auth/v1/callback`
-   (mismo valor que el output `google_oauth_redirect_uri`).
-4. **Settings → Basic**: copiar **App ID** y **App Secret** a `terraform.tfvars`
+   (same value as the `google_oauth_redirect_uri` output).
+4. **Settings → Basic**: copy the **App ID** and **App Secret** to `terraform.tfvars`
    (`facebook_oauth_client_id` / `facebook_oauth_client_secret`) → `terraform apply`.
-5. Para producción Meta exige la app en modo **Live** y revisión del permiso
-   `email` (verificación de negocio). En modo *Development* solo entran los
-   usuarios con rol en la app (testers).
+5. For production, Meta requires the app in **Live** mode and review of the `email`
+   permission (business verification). In *Development* mode only users with a role
+   in the app (testers) can sign in.
 
 ## 6. Resend (email)
 
-1. https://resend.com/domains → **Add domain** → tu dominio.
-2. Resend muestra records DNS (DKIM TXT, SPF TXT, MX). Copiarlos a
-   `resend_dkim_records` en `terraform.tfvars` → `terraform apply`.
-3. En Resend pulsar **Verify** (tarda minutos tras propagación DNS).
-4. https://resend.com/api-keys → crear API key → `resend_api_key` en tfvars →
-   `terraform apply` (la sube como secret de GitHub Actions).
-5. Subirla también a Edge Functions:
+1. https://resend.com/domains → **Add domain** → your domain.
+2. Resend shows DNS records (DKIM TXT, SPF TXT, MX). Copy them to
+   `resend_dkim_records` in `terraform.tfvars` → `terraform apply`.
+3. In Resend click **Verify** (takes a few minutes after DNS propagation).
+4. https://resend.com/api-keys → create an API key → `resend_api_key` in tfvars →
+   `terraform apply` (it uploads it as a GitHub Actions secret).
+5. Also upload it to the Edge Functions:
    ```bash
    supabase secrets set RESEND_API_KEY=re_xxx --project-ref <project-ref>
-   supabase secrets set EMAIL_FROM="Ensayo <notificaciones@tudominio.es>" --project-ref <project-ref>
+   supabase secrets set EMAIL_FROM="Ensayo <notifications@yourdomain.es>" --project-ref <project-ref>
    ```
-6. La misma `resend_api_key` configura el SMTP de Auth (Terraform lo aplica en
-   `supabase_settings`): correos de **activación de cuenta** y **recuperación de
-   contraseña** del registro email+password. Sin ella esos correos no se envían.
+6. The same `resend_api_key` configures the Auth SMTP (Terraform applies it in
+   `supabase_settings`): the **account activation** and **password recovery** emails
+   for email+password registration. Without it those emails won't be sent.
 
-## 6b. Endurecimiento de los formularios de auth
+## 6b. Hardening the auth forms
 
-Terraform ya aplica (en `supabase_settings.auth`) las defensas que no necesitan
-cuentas externas:
+Terraform already applies (in `supabase_settings.auth`) the defenses that don't need
+external accounts:
 
-- **Anti-enumeración**: `/recover` responde igual exista o no la cuenta, y con
-  `mailer_autoconfirm=false` el registro no revela emails ya existentes. El
-  frontend muestra siempre el mismo mensaje neutro. **No actives autoconfirm.**
-- **Anti email-bombing**: `rate_limit_email_sent=10` correos/hora.
-- **Enlaces de un solo uso y caducidad corta**: `mailer_otp_exp=900` (15 min).
-- **Política de contraseñas**: `password_min_length=8`.
-- **Open redirect**: `additional_redirect_urls` con rutas exactas, **sin
-  comodines** (`*`/`**` abrirían fuga del token de recuperación). No añadas
-  comodines de host.
+- **Anti-enumeration**: `/recover` responds the same whether or not the account
+  exists, and with `mailer_autoconfirm=false` registration doesn't reveal existing
+  emails. The frontend always shows the same neutral message. **Do not enable
+  autoconfirm.**
+- **Anti email-bombing**: `rate_limit_email_sent=10` emails/hour.
+- **Single-use links with short expiry**: `mailer_otp_exp=900` (15 min).
+- **Password policy**: `password_min_length=8`.
+- **Open redirect**: `additional_redirect_urls` with exact paths, **no wildcards**
+  (`*`/`**` would open a recovery-token leak). Don't add host wildcards.
 
-Pasos manuales recomendados (necesitan cuenta/plan):
+Recommended manual steps (need an account/plan):
 
-1. **CAPTCHA (Cloudflare Turnstile)** — la mejor defensa contra bots y
-   enumeración por volumen. Crear un widget en
-   https://dash.cloudflare.com/?to=/:account/turnstile, y en Supabase dashboard
-   → Authentication → Attack Protection → activar CAPTCHA (provider *Turnstile*,
-   pegar el *secret*). Luego pasar el token en el frontend
-   (`options.captchaToken` en `signUp`/`signInWithPassword`/`resetPasswordForEmail`).
-2. **Contraseñas filtradas (HIBP)** — `password_hibp_enabled=true` en
-   `terraform.tfvars`. Requiere **plan Pro** de Supabase.
+1. **CAPTCHA (Cloudflare Turnstile)** — the best defense against bots and
+   volume-based enumeration. Create a widget at
+   https://dash.cloudflare.com/?to=/:account/turnstile, then in the Supabase
+   dashboard → Authentication → Attack Protection → enable CAPTCHA (provider
+   *Turnstile*, paste the *secret*). Then pass the token in the frontend
+   (`options.captchaToken` in `signUp`/`signInWithPassword`/`resetPasswordForEmail`).
+2. **Leaked passwords (HIBP)** — `password_hibp_enabled=true` in `terraform.tfvars`.
+   Requires the Supabase **Pro plan**.
 
-## 7. Claves VAPID (Web Push)
+## 7. VAPID keys (Web Push)
 
 ```bash
 npx web-push generate-vapid-keys
 ```
 
-- **Pública** → GitHub → repo → Settings → Secrets and variables → Actions →
-  **Variables** → `VITE_VAPID_PUBLIC_KEY` (y a `app/.env.local` para dev).
-- **Privada** → secrets de Edge Functions:
+- **Public** → GitHub → repo → Settings → Secrets and variables → Actions →
+  **Variables** → `VITE_VAPID_PUBLIC_KEY` (and to `app/.env.local` for dev).
+- **Private** → Edge Functions secrets:
   ```bash
   supabase secrets set VAPID_PRIVATE_KEY=xxx --project-ref <project-ref>
-  supabase secrets set VAPID_SUBJECT=mailto:admin@tudominio.es --project-ref <project-ref>
+  supabase secrets set VAPID_SUBJECT=mailto:admin@yourdomain.es --project-ref <project-ref>
   ```
 
-## 8. Variable de frontend restante
+## 8. Remaining frontend variable
 
-GitHub → Variables de Actions: `VITE_SUPABASE_ANON_KEY` = anon key del proyecto
-(Supabase dashboard → Settings → API). `VITE_SUPABASE_URL` y `VITE_APP_URL` ya
-las creó Terraform.
+GitHub → Actions Variables: `VITE_SUPABASE_ANON_KEY` = the project's anon key
+(Supabase dashboard → Settings → API). `VITE_SUPABASE_URL` and `VITE_APP_URL` were
+already created by Terraform.
 
-## 9. Primer deploy
+## 9. First deploy
 
 ```bash
 git remote add origin git@github.com:<owner>/<repo>.git
 git push -u origin main
 ```
 
-GitHub Actions: tests → migraciones + Edge Functions → build → Cloudflare Pages.
-Verificar en `https://app.tudominio.es`.
+GitHub Actions: tests → migrations + Edge Functions → build → Cloudflare Pages.
+Verify at `https://app.yourdomain.es`.
 
-## 10. Bootstrap del superadmin
+## 10. Superadmin bootstrap
 
-1. Entrar en la app y hacer login con Google con **tu cuenta**.
-   El registro es abierto: cualquiera puede crear cuenta.
+1. Open the app and sign in with Google using **your account**.
+   Registration is open: anyone can create an account.
 2. Supabase dashboard → SQL editor:
    ```sql
    update public.profiles
    set platform_role = 'SUPERADMIN'
    where email = 'you@example.com';
    ```
-3. A partir de aquí: crear grupos desde `/admin` e invitar instructores. El
-   registro sigue abierto; el acceso a cada grupo se controla por su código/enlace
-   e invitaciones por email.
+3. From here on: create groups from `/admin` and invite instructors. Registration
+   stays open; access to each group is controlled by its join code/link and email
+   invitations.
 
-## 11. Programar recordatorios (una vez, SQL editor)
+## 11. Schedule reminders (once, SQL editor)
 
-`pg_cron` y `pg_net` se activan por migración, pero el *schedule* referencia la URL
-del proyecto y la service key — crear manualmente:
+`pg_cron` and `pg_net` are enabled by migration, but the *schedule* references the
+project URL and the service key — create it manually:
 
 ```sql
 select cron.schedule(
   'process-notifications',
-  '* * * * *',  -- cada minuto
+  '* * * * *',  -- every minute
   $$
   select net.http_post(
     url := 'https://<project-ref>.supabase.co/functions/v1/send-notifications',
@@ -201,25 +201,25 @@ select cron.schedule(
 );
 ```
 
-(Sustituir `<project-ref>` y `<SERVICE_ROLE_KEY>` — dashboard → Settings → API.)
+(Replace `<project-ref>` and `<SERVICE_ROLE_KEY>` — dashboard → Settings → API.)
 
-## 12. Mantener vivo el free tier (opcional)
+## 12. Keep the free tier alive (optional)
 
-Supabase free pausa proyectos tras ~1 semana sin tráfico. El cron del paso 11 ya
-genera actividad de DB suficiente. Si aun así se pausa: dashboard → Restore, o
-considerar upgrade a Pro (25 $/mes).
+Supabase free pauses projects after ~1 week without traffic. The cron from step 11
+already generates enough DB activity. If it still pauses: dashboard → Restore, or
+consider upgrading to Pro ($25/month).
 
 ---
 
-## Checklist rápido
+## Quick checklist
 
-- [ ] Dominio en Cloudflare, nameservers OK
-- [ ] tfvars con todos los tokens
-- [ ] `terraform apply` inicial
+- [ ] Domain in Cloudflare, nameservers OK
+- [ ] tfvars with all tokens
+- [ ] Initial `terraform apply`
 - [ ] Google OAuth client + redirect URI + re-apply
-- [ ] Resend: dominio verificado + API key + secrets Edge Functions
-- [ ] VAPID: pública en GH vars, privada en Edge Functions secrets
-- [ ] `VITE_SUPABASE_ANON_KEY` en GH vars
-- [ ] push a main → deploy verde
-- [ ] login propio + promoción a SUPERADMIN
-- [ ] cron `process-notifications` creado
+- [ ] Resend: domain verified + API key + Edge Functions secrets
+- [ ] VAPID: public in GH vars, private in Edge Functions secrets
+- [ ] `VITE_SUPABASE_ANON_KEY` in GH vars
+- [ ] push to main → green deploy
+- [ ] own login + promotion to SUPERADMIN
+- [ ] `process-notifications` cron created
