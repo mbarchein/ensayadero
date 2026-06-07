@@ -156,11 +156,13 @@
     "pendingInvites": "Invitaciones pendientes",
     "expires": "expira {{date}}",
     "remove": "Quitar",
+    "removeTitle": "Quitar del grupo",
     "removeConfirm": "¿Quitar a {{name}} del grupo?",
     "backToGroups": "‹ Mis grupos",
     "editGroup": "Editar grupo",
     "regenerateAvatar": "Regenerar avatar",
     "leave": "Abandonar grupo",
+    "leaveTitle": "Abandonar grupo",
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos.",
     "tabs": {
       "sessions": "Ensayos",

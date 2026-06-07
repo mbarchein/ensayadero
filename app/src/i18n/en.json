@@ -156,11 +156,13 @@
     "pendingInvites": "Pending invitations",
     "expires": "expires {{date}}",
     "remove": "Remove",
+    "removeTitle": "Remove from group",
     "removeConfirm": "Remove {{name}} from the group?",
     "backToGroups": "‹ My groups",
     "editGroup": "Edit group",
     "regenerateAvatar": "Regenerate avatar",
     "leave": "Leave group",
+    "leaveTitle": "Leave group",
     "leaveConfirm": "Leave this group? You'll be removed from its rehearsals.",
     "tabs": {
       "sessions": "Rehearsals",

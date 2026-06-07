@@ -1,14 +1,15 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { LogOut, UserCog, UserMinus } from 'lucide-react'
-import { Badge, Button, Spinner } from '../../components/ui'
+import { LogOut, UserCog, UserMinus, UserX } from 'lucide-react'
+import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import { roleLabel } from '../../lib/roleLabel'
-import type { GroupRole, Invitation } from '../../lib/types'
+import type { GroupRole, Invitation, MembershipWithProfile } from '../../lib/types'
 
 export default function MembersPage() {
   const { t } = useTranslation()
@@ -16,6 +17,8 @@ export default function MembersPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  const [removeTarget, setRemoveTarget] = useState<MembershipWithProfile | null>(null)
+  const [leaveOpen, setLeaveOpen] = useState(false)
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations', groupId],
@@ -103,10 +106,12 @@ export default function MembersPage() {
               </div>
             </div>
             {isInstructor && m.user_id !== profile?.id && (
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <Button
-                  variant="secondary"
-                  className="inline-flex items-center gap-1.5"
+                  variant="ghost"
+                  className="p-2"
+                  title={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+                  aria-label={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
                   onClick={() =>
                     changeRole.mutate({
                       userId: m.user_id,
@@ -114,17 +119,16 @@ export default function MembersPage() {
                     })
                   }
                 >
-                  {m.role === 'INSTRUCTOR' ? <UserMinus size={15} /> : <UserCog size={15} />}
-                  {m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+                  {m.role === 'INSTRUCTOR' ? <UserMinus size={18} /> : <UserCog size={18} />}
                 </Button>
                 <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm(t('group.removeConfirm', { name: m.profiles.name || m.profiles.email })))
-                      removeMember.mutate(m.user_id)
-                  }}
+                  variant="ghost"
+                  className="p-2 text-red-600"
+                  title={t('group.remove')}
+                  aria-label={t('group.remove')}
+                  onClick={() => setRemoveTarget(m)}
                 >
-                  {t('group.remove')}
+                  <UserX size={18} />
                 </Button>
               </div>
             )}
@@ -152,19 +156,71 @@ export default function MembersPage() {
 
       <div className="border-t pt-4">
         <Button
-          variant="ghost"
-          className="inline-flex items-center gap-1.5 text-red-600"
+          variant="warning"
+          className="inline-flex items-center gap-1.5"
           disabled={leaveGroup.isPending}
-          onClick={() => {
-            if (confirm(t('group.leaveConfirm'))) leaveGroup.mutate()
-          }}
+          onClick={() => setLeaveOpen(true)}
         >
-          <LogOut size={15} /> {t('group.leave')}
+          <LogOut size={16} /> {t('group.leave')}
         </Button>
         {leaveGroup.isError && (
           <p className="text-sm text-red-600">{(leaveGroup.error as Error).message}</p>
         )}
       </div>
+
+      {/* remove member */}
+      <Modal
+        open={!!removeTarget}
+        onClose={() => setRemoveTarget(null)}
+        title={t('group.removeTitle')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            {t('group.removeConfirm', {
+              name: removeTarget?.profiles.name || removeTarget?.profiles.email || '',
+            })}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setRemoveTarget(null)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={removeMember.isPending}
+              onClick={() => {
+                if (removeTarget) removeMember.mutate(removeTarget.user_id)
+                setRemoveTarget(null)
+              }}
+            >
+              <UserX size={16} /> {t('group.remove')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* leave group */}
+      <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('group.leaveTitle')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('group.leaveConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setLeaveOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="warning"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={leaveGroup.isPending}
+              onClick={() => {
+                leaveGroup.mutate()
+                setLeaveOpen(false)
+              }}
+            >
+              <LogOut size={16} /> {t('group.leave')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
