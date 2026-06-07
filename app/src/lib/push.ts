@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-/** Suscribe el navegador a Web Push y guarda la suscripción en DB. */
+/** Subscribes the browser to Web Push and saves the subscription in the DB. */
 export async function enablePush(): Promise<boolean> {
   const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
   if (!vapidKey || !('serviceWorker' in navigator) || !('PushManager' in window)) return false

@@ -4,14 +4,14 @@ data "cloudflare_zone" "main" {
   }
 }
 
-# ── Cloudflare Pages: frontend PWA ──────────────────────────
+# ── Cloudflare Pages: PWA frontend ──────────────────────────
 resource "cloudflare_pages_project" "app" {
   account_id        = var.cloudflare_account_id
   name              = var.project_name
   production_branch = "main"
 
-  # Deploy vía GitHub Actions con wrangler (direct upload),
-  # no integración Git nativa — más control desde CI.
+  # Deploy via GitHub Actions with wrangler (direct upload),
+  # no native Git integration — more control from CI.
   build_config = {
     build_command   = ""
     destination_dir = ""
@@ -37,7 +37,7 @@ resource "cloudflare_dns_record" "app" {
   ttl     = 1
 }
 
-# ── DNS verificación Resend (SPF/DKIM/MX) ───────────────────
+# ── Resend verification DNS (SPF/DKIM/MX) ───────────────────
 resource "cloudflare_dns_record" "resend" {
   for_each = { for r in var.resend_dkim_records : "${r.type}-${r.name}" => r }
 

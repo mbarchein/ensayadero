@@ -1,7 +1,7 @@
-// Edge Function: entrega notificaciones pendientes por email (Resend) y Web Push (VAPID).
-// Invocada por: pg_cron cada minuto (BOOTSTRAP §11), o directamente desde la app
-// tras confirmar/cancelar una sesión para entrega inmediata.
-// También envía emails de invitación si recibe { invitation_id }.
+// Edge Function: delivers pending notifications via email (Resend) and Web Push (VAPID).
+// Invoked by: pg_cron every minute (BOOTSTRAP §11), or directly from the app
+// after confirming/cancelling a session for immediate delivery.
+// Also sends invitation emails when it receives { invitation_id }.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
@@ -91,7 +91,7 @@ async function sendPush(userId: string, title: string, body: string): Promise<bo
       )
       any = true
     } catch (err: unknown) {
-      // 404/410 → suscripción muerta, limpiar
+      // 404/410 → dead subscription, clean up
       const status = (err as { statusCode?: number }).statusCode
       if (status === 404 || status === 410) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id)
@@ -121,16 +121,16 @@ async function processInvitation(invitationId: string): Promise<void> {
 }
 
 Deno.serve(async (req) => {
-  // entrega de invitación específica
+  // delivery of a specific invitation
   try {
     const body = await req.json().catch(() => ({}))
     if (body.invitation_id) {
       await processInvitation(body.invitation_id)
       return Response.json({ ok: true, invitation: true })
     }
-  } catch { /* sin body → procesar cola */ }
+  } catch { /* no body → process queue */ }
 
-  // procesar cola de notificaciones pendientes
+  // process the pending notifications queue
   const { data: pending, error } = await supabase
     .from('notifications')
     .select('id, user_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name)')
@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
     const profile = n.profiles as unknown as { email: string; name: string }
     const updates: Record<string, string> = {}
 
-    // preferencias del usuario (default BOTH)
+    // user preferences (default BOTH)
     const { data: pref } = await supabase
       .from('notification_preferences')
       .select('channel')
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
       if (channel === 'EMAIL' || channel === 'BOTH') {
         if (await sendEmail(profile.email, subject, emailBody(n.type, payload))) emails++
       }
-      updates.sent_email_at = new Date().toISOString() // marcar también si canal lo excluye
+      updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
     }
     if (!n.sent_push_at) {
       if (channel === 'PUSH' || channel === 'BOTH') {

@@ -1,5 +1,5 @@
-// Lógica de slots de calendario: expansión de disponibilidades (con recurrencia),
-// descuento de ocupaciones (D1) y cálculo de heatmap. Pura, sin dependencias de UI.
+// Calendar slot logic: expansion of availabilities (with recurrence),
+// subtraction of busy times (D1) and heatmap computation. Pure, no UI dependencies.
 
 import { RRule } from 'rrule'
 import { addDays, addMinutes, startOfWeek } from 'date-fns'
@@ -16,12 +16,12 @@ export interface ExpandedInterval extends TimeRange {
   sourceId: string
 }
 
-/** Lunes 00:00 local de la semana que contiene `d`. */
+/** Monday 00:00 local of the week containing `d`. */
 export function weekStart(d: Date): Date {
   return startOfWeek(d, { weekStartsOn: 1 })
 }
 
-/** Expande una disponibilidad (puntual o recurrente) dentro de una ventana. */
+/** Expands an availability (one-off or recurring) within a window. */
 export function expandAvailability(
   av: Availability,
   windowStart: Date,
@@ -49,7 +49,7 @@ export function expandAvailability(
       ? av.rrule
       : `DTSTART:${toRRuleDate(base.start)}\nRRULE:${av.rrule.replace(/^RRULE:/, '')}`,
   )
-  // margen de un día por husos horarios
+  // one-day margin for time zones
   const occurrences = rule.between(addDays(windowStart, -1), addDays(windowEnd, 1), true)
   return occurrences.map(make).filter((x): x is ExpandedInterval => x !== null)
 }
@@ -65,7 +65,7 @@ export function isoDay(d: Date): string {
   return `${y}-${m}-${day}`
 }
 
-/** Slot (día, índice) → rango temporal real. */
+/** Slot (day, index) → actual time range. */
 export function slotRange(weekMonday: Date, dayIndex: number, slotIndex: number): TimeRange {
   const day = addDays(weekMonday, dayIndex)
   const start = addMinutes(
@@ -77,7 +77,7 @@ export function slotRange(weekMonday: Date, dayIndex: number, slotIndex: number)
 
 export type SlotState = 'NONE' | 'AVAILABLE' | 'PREFERRED'
 
-/** Matriz semanal [día][slot] del estado de disponibilidad de UN usuario. */
+/** Weekly matrix [day][slot] of ONE user's availability state. */
 export function weekGrid(
   availabilities: Availability[],
   weekMonday: Date,
@@ -92,7 +92,7 @@ export function weekGrid(
       const r = slotRange(weekMonday, d, s)
       for (const iv of intervals) {
         if (overlaps(iv, r)) {
-          // PREFERRED pisa AVAILABLE
+          // PREFERRED overrides AVAILABLE
           if (grid[d][s] !== 'PREFERRED') grid[d][s] = iv.kind === 'PREFERRED' ? 'PREFERRED' : 'AVAILABLE'
         }
       }
@@ -104,16 +104,16 @@ export function weekGrid(
 export interface UserWeekData {
   userId: string
   availabilities: Availability[]
-  busy: TimeRange[] // sesiones confirmadas en cualquier grupo (D1)
+  busy: TimeRange[] // confirmed sessions in any group (D1)
 }
 
 export interface HeatCell {
-  available: string[] // userIds disponibles (tras descontar busy)
+  available: string[] // available userIds (after subtracting busy)
   preferred: string[]
-  busy: string[] // disponibles según pintado pero ocupados por otra sesión
+  busy: string[] // available per painting but busy with another session
 }
 
-/** Heatmap semanal [día][slot] para un conjunto de usuarios. */
+/** Weekly heatmap [day][slot] for a set of users. */
 export function heatmap(users: UserWeekData[], weekMonday: Date): HeatCell[][] {
   const windowEnd = addDays(weekMonday, 7)
   const expanded = users.map((u) => ({
@@ -147,7 +147,7 @@ export function heatmap(users: UserWeekData[], weekMonday: Date): HeatCell[][] {
   return grid
 }
 
-/** Franjas contiguas donde TODOS los `requiredIds` están disponibles. */
+/** Contiguous bands where ALL `requiredIds` are available. */
 export function fullCoverageRanges(
   grid: HeatCell[][],
   requiredIds: string[],

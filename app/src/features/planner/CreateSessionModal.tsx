@@ -1,7 +1,7 @@
-// Modal de creación de sesión: hora inicio/fin ajustable, participantes con
-// toggle obligatorio/opcional, validación contra disponibilidad (RF14):
-// obligatorio fuera de disponibilidad → rojo (requiere confirmación),
-// opcional fuera → ámbar (aviso).
+// Session creation modal: adjustable start/end time, participants with a
+// required/optional toggle, validation against availability (RF14):
+// required outside availability → red (needs confirmation),
+// optional outside → amber (warning).
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -25,7 +25,7 @@ interface Props {
   weekMonday: Date
   onClose: () => void
   groupName?: string
-  /** Si se pasa, el modal edita esa sesión en vez de crear una nueva. */
+  /** If provided, the modal edits that session instead of creating a new one. */
   session?: SessionWithParticipants
 }
 
@@ -51,13 +51,13 @@ export default function CreateSessionModal({
   const qc = useQueryClient()
   const navigate = useNavigate()
   const editing = !!session
-  // título por defecto: "<grupo> d-M" (ej. "La Tempestad 7-6")
+  // default title: "<group> d-M" (e.g. "La Tempestad 7-6")
   const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd-M')}`
   const [title, setTitle] = useState(() => session?.title ?? defaultTitle)
   const [scene, setScene] = useState(session?.scene ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
-  // duración inicial = longitud de la sesión / franja arrastrada (mín. 30 min)
+  // initial duration = session length / dragged slot range (min. 30 min)
   const [durationMin, setDurationMin] = useState(() =>
     Math.max(30, Math.round((initialRange.end.getTime() - initialRange.start.getTime()) / 60_000)),
   )
@@ -81,7 +81,7 @@ export default function CreateSessionModal({
   }, [day, startMin])
   const end = useMemo(() => new Date(start.getTime() + durationMin * 60_000), [start, durationMin])
 
-  // disponibilidad de cada participante en el rango elegido (vía grid de slots)
+  // availability of each participant in the chosen range (via the slot grid)
   const coverage = useMemo(() => {
     const dayIndex = Math.round((stripTime(day).getTime() - stripTime(weekMonday).getTime()) / 86_400_000)
     if (dayIndex < 0 || dayIndex > 6) return new Map<string, boolean>()
@@ -109,7 +109,7 @@ export default function CreateSessionModal({
     (p) => p.included && !p.required && !coverage.get(p.userId),
   )
 
-  // reconcilia session_participants: borra los quitados, upsert de los incluidos
+  // reconcile session_participants: delete the removed ones, upsert the included ones
   const syncParticipants = async (sessionId: string) => {
     const included = participants.filter((p) => p.included)
     const includedIds = included.map((p) => p.userId)
@@ -135,8 +135,8 @@ export default function CreateSessionModal({
   const create = useMutation({
     mutationFn: async (status: 'DRAFT' | 'CONFIRMED') => {
       if (editing) {
-        // Actualizar: participantes ANTES de confirmar/cambiar hora, para que los
-        // triggers de notificación incluyan ya la lista correcta.
+        // Update: participants BEFORE confirming/changing the time, so the
+        // notification triggers already include the correct list.
         await syncParticipants(session!.id)
         const { error } = await supabase
           .from('sessions')
@@ -145,7 +145,7 @@ export default function CreateSessionModal({
             scene: scene || null,
             location: location || null,
             time_range: formatRange(start, end),
-            status, // mantiene o promueve a CONFIRMED
+            status, // keeps or promotes to CONFIRMED
             updated_at: new Date().toISOString(),
           })
           .eq('id', session!.id)
@@ -164,7 +164,7 @@ export default function CreateSessionModal({
           scene: scene || null,
           location: location || null,
           time_range: formatRange(start, end),
-          status: 'DRAFT', // siempre nace DRAFT; confirmar dispara notificaciones a participantes ya insertados
+          status: 'DRAFT', // always born DRAFT; confirming triggers notifications to already-inserted participants
           created_by: profile!.id,
         })
         .select()
@@ -191,8 +191,8 @@ export default function CreateSessionModal({
     },
   })
 
-  // Cancelar (solo edición): confirmada → estado CANCELLED (trigger notifica a
-  // los convocados); borrador → se elimina (nadie fue convocado aún).
+  // Cancel (edit only): confirmed → CANCELLED status (trigger notifies the
+  // summoned participants); draft → deleted (nobody was summoned yet).
   const cancel = useMutation({
     mutationFn: async () => {
       if (session!.status === 'CONFIRMED') {

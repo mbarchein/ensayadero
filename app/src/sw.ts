@@ -11,14 +11,14 @@ declare const self: ServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
-// SPA fallback (excepto rutas de auth, que gestiona Supabase con redirects)
+// SPA fallback (except auth routes, which Supabase handles with redirects)
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('index.html'), {
     denylist: [/^\/auth\//],
   }),
 )
 
-// API Supabase: network-first → lectura offline de últimos datos
+// Supabase API: network-first → offline read of latest data
 registerRoute(
   ({ url }) => url.pathname.startsWith('/rest/v1/'),
   new NetworkFirst({

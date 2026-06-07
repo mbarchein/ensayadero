@@ -1,4 +1,4 @@
--- Editar nombre y semilla de avatar del grupo (solo director).
+-- Edit the group's name and avatar seed (director only).
 alter table public.groups add column if not exists avatar_seed text;
 
 create or replace function public.update_group_meta(gid uuid, new_name text, new_seed text)

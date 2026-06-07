@@ -1,5 +1,5 @@
--- Sincroniza passwords de roles internos de la imagen supabase/postgres
--- con POSTGRES_PASSWORD (solo stack local). Se ejecuta una vez en initdb.
+-- Syncs the passwords of the supabase/postgres image's internal roles
+-- with POSTGRES_PASSWORD (local stack only). Runs once at initdb.
 alter user supabase_auth_admin with password 'postgres';
 alter user authenticator with password 'postgres';
 alter user supabase_storage_admin with password 'postgres';

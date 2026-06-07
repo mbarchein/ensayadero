@@ -1,8 +1,8 @@
--- Seed de desarrollo local. NO se ejecuta en producción.
--- Promoción de superadmin en prod: manual una vez vía SQL editor:
+-- Local development seed. Does NOT run in production.
+-- Superadmin promotion in prod: done manually once via the SQL editor:
 --   update profiles set platform_role = 'SUPERADMIN' where email = 'you@example.com';
 
--- Promueve a superadmin al primer usuario que coincida (idempotente)
+-- Promotes the first matching user to superadmin (idempotent)
 update public.profiles
 set platform_role = 'SUPERADMIN'
 where email = 'you@example.com';

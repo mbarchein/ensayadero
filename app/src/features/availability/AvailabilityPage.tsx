@@ -1,6 +1,6 @@
-// Calendario personal de disponibilidad (D1: global, no por grupo).
-// Pintar arrastrando; tap cicla NONE → AVAILABLE → PREFERRED → NONE.
-// "Repetir cada semana" convierte los bloques de la semana en recurrentes.
+// Personal availability calendar (D1: global, not per group).
+// Paint by dragging; tap cycles NONE → AVAILABLE → PREFERRED → NONE.
+// "Repeat every week" turns the week's blocks into recurring ones.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -30,7 +30,7 @@ import type { Availability } from '../../lib/types'
 const CYCLE: Record<SlotState, SlotState> = {
   NONE: 'AVAILABLE',
   AVAILABLE: 'NONE',
-  PREFERRED: 'NONE', // estado heredado; ya no se pinta
+  PREFERRED: 'NONE', // legacy state; no longer painted
 }
 
 const CELL_STYLE: Record<SlotState, string> = {
@@ -43,7 +43,7 @@ export default function AvailabilityPage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
-  // semana inicial: ?d=YYYY-MM-DD (desde "ver en mi agenda"), si no la actual
+  // initial week: ?d=YYYY-MM-DD (from "view in my agenda"), otherwise the current one
   const [params] = useSearchParams()
   const initialOffset = useMemo(() => {
     const d = params.get('d')
@@ -58,8 +58,8 @@ export default function AvailabilityPage() {
   const [copyN, setCopyN] = useState(1)
   const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
 
-  // ensayos a los que estoy convocado, superpuestos en las franjas horarias
-  // de la semana visible. mapa "día:slot" → participación.
+  // rehearsals I'm summoned to, overlaid on the time slots
+  // of the visible week. map "day:slot" → participation.
   const agenda = useMyAgenda()
   const sessionCells = useMemo(() => {
     const map = new Map<string, MyParticipation>()
@@ -76,7 +76,7 @@ export default function AvailabilityPage() {
     return map
   }, [agenda.data, monday])
 
-  // lista (con confirmar/rechazar) de los ensayos de la semana visible
+  // list (with accept/decline) of the visible week's rehearsals
   const weekParticipations = useMemo(() => {
     const windowEnd = addDays(monday, 7)
     return (agenda.data ?? []).filter((p) => {
@@ -98,7 +98,7 @@ export default function AvailabilityPage() {
     enabled: !!profile,
   })
 
-  // estado local de la semana visible (optimistic, se persiste al soltar)
+  // local state of the visible week (optimistic, persisted on release)
   const serverGrid = useMemo(
     () => (availabilities ? weekGrid(availabilities, monday) : null),
     [availabilities, monday],
@@ -107,9 +107,9 @@ export default function AvailabilityPage() {
   const [paintValue, setPaintValue] = useState<SlotState>('AVAILABLE')
   const grid = draft ?? serverGrid
 
-  // ── Autosave: debounce tras cada gesto; reintenta si hubo ediciones en vuelo ──
-  const editSeq = useRef(0) // nº de edición actual
-  const savedSeq = useRef(0) // nº de edición incluida en el último save OK
+  // ── Autosave: debounce after each gesture; retry if there were in-flight edits ──
+  const editSeq = useRef(0) // current edit number
+  const savedSeq = useRef(0) // edit number included in the last successful save
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const draftRef = useRef<SlotState[][] | null>(null)
   draftRef.current = draft
@@ -123,9 +123,9 @@ export default function AvailabilityPage() {
         onSuccess: () => {
           savedSeq.current = seqAtFire
           if (editSeq.current === seqAtFire) {
-            setDraft(null) // sin ediciones nuevas: el servidor ya refleja la rejilla
+            setDraft(null) // no new edits: the server already reflects the grid
           } else {
-            scheduleSave() // hubo trazos durante el save: persistir de nuevo
+            scheduleSave() // there were strokes during the save: persist again
           }
         },
       })
@@ -133,7 +133,7 @@ export default function AvailabilityPage() {
   }
   useEffect(() => () => clearTimeout(timer.current), [])
 
-  // cambiar de semana invalida el borrador pendiente (cada semana se guarda al pintar)
+  // switching weeks invalidates the pending draft (each week is saved on paint)
   useEffect(() => {
     setDraft(null)
     editSeq.current = savedSeq.current
@@ -141,9 +141,9 @@ export default function AvailabilityPage() {
 
   const save = useMutation({
     mutationFn: async (newGrid: SlotState[][]) => {
-      // Estrategia simple y robusta: reemplazar las disponibilidades NO recurrentes
-      // que solapan esta semana por los bloques pintados. Las recurrentes se
-      // convierten con "Repetir cada semana".
+      // Simple and robust strategy: replace the NON-recurring availabilities
+      // overlapping this week with the painted blocks. Recurring ones are
+      // converted with "Repeat every week".
       const weekEnd = addDays(monday, 7)
       const { error: delError } = await supabase
         .from('availabilities')
@@ -171,7 +171,7 @@ export default function AvailabilityPage() {
   const clearWeek = useMutation({
     mutationFn: async () => {
       const weekEnd = addDays(monday, 7)
-      // puntuales que solapan la semana → fuera
+      // one-off entries overlapping the week → removed
       const { error: delError } = await supabase
         .from('availabilities')
         .delete()
@@ -179,7 +179,7 @@ export default function AvailabilityPage() {
         .is('rrule', null)
         .filter('time_range', 'ov', `[${monday.toISOString()},${weekEnd.toISOString()})`)
       if (delError) throw delError
-      // recurrentes → añadir los 7 días como excepciones
+      // recurring → add the 7 days as exceptions
       const weekDays = Array.from({ length: 7 }, (_, i) => isoDay(addDays(monday, i)))
       const recurring = (availabilities ?? []).filter((a) => a.rrule)
       for (const a of recurring) {
@@ -197,8 +197,8 @@ export default function AvailabilityPage() {
     },
   })
 
-  // Copiar la semana visible a las próximas N semanas (sustituye su
-  // disponibilidad puntual). No crea recurrencia: copia explícita.
+  // Copy the visible week to the next N weeks (replaces their one-off
+  // availability). Does not create recurrence: an explicit copy.
   const copyWeeks = useMutation({
     mutationFn: async (weeks: number) => {
       if (!grid) return
@@ -232,7 +232,7 @@ export default function AvailabilityPage() {
 
   if (isLoading || !grid) return <Spinner />
 
-  // ¿la franja tiene un ensayo PROGRAMADO (confirmado)?
+  // does the slot have a SCHEDULED (confirmed) rehearsal?
   const hasConfirmed = (pos: CellPos) => {
     const p = sessionCells.get(`${pos.day}:${pos.slot}`)
     return !!p && p.sessions.status === 'CONFIRMED'
@@ -248,9 +248,9 @@ export default function AvailabilityPage() {
     })
   }
 
-  // al soltar: si se quitó disponibilidad de franjas con ensayo programado,
-  // abrir modal (no confirm() en el gesto: bloquea el hilo y se pierde el
-  // pointerup → clic "pillado").
+  // on release: if availability was removed from slots with a scheduled rehearsal,
+  // open a modal (no confirm() in the gesture: it blocks the thread and the
+  // pointerup is lost → "stuck" click).
   const onPaintEnd = () => {
     const d = draftRef.current
     if (d && serverGrid) {
@@ -267,13 +267,13 @@ export default function AvailabilityPage() {
       }
       if (reverted.length > 0) {
         setClearPrompt({ reverted, sessionIds: [...sessionIds] })
-        return // esperar elección del modal antes de guardar
+        return // wait for the modal's choice before saving
       }
     }
     scheduleSave()
   }
 
-  // resolución del modal de franja con ensayo
+  // resolution of the rehearsal-slot modal
   const resolveClear = (choice: 'selected' | 'full' | 'cancel') => {
     const prompt = clearPrompt
     setClearPrompt(null)
@@ -288,7 +288,7 @@ export default function AvailabilityPage() {
         return base
       })
     } else if (choice === 'full') {
-      // quitar disponibilidad de TODAS las franjas de esos ensayos esta semana
+      // remove availability from ALL slots of those rehearsals this week
       setDraft((prev) => {
         const base = (prev ?? serverGrid).map((col) => [...col])
         for (const [key, p] of sessionCells) {
@@ -300,7 +300,7 @@ export default function AvailabilityPage() {
         return base
       })
     }
-    // 'selected' → dejar como está
+    // 'selected' → leave as is
     editSeq.current++
     scheduleSave()
   }
@@ -350,7 +350,7 @@ export default function AvailabilityPage() {
             const secondSlot =
               !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
             if (firstSlot) {
-              // primer slot: icono de mi respuesta + grupo
+              // first slot: my response icon + group
               const RespIcon =
                 p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
               const color =
@@ -370,7 +370,7 @@ export default function AvailabilityPage() {
               )
             }
             if (secondSlot) {
-              // segundo slot: nombre del ensayo
+              // second slot: rehearsal name
               return (
                 <span className="block truncate px-0.5 text-[8px] leading-6 text-gray-500" title={title}>
                   {p.sessions.title}
@@ -530,7 +530,7 @@ export default function AvailabilityPage() {
         </div>
       </Modal>
 
-      {/* ensayos convocados en la semana visible */}
+      {/* rehearsals summoned in the visible week */}
       {weekParticipations.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold text-gray-700">{t('availability.weekSessions')}</h2>
@@ -550,7 +550,7 @@ export default function AvailabilityPage() {
   )
 }
 
-/** Convierte la matriz de slots en rangos contiguos por día y tipo. */
+/** Converts the slot matrix into contiguous ranges by day and type. */
 function gridToRanges(grid: SlotState[][], monday: Date) {
   const out: { start: Date; end: Date; kind: 'AVAILABLE' | 'PREFERRED' }[] = []
   for (let d = 0; d < 7; d++) {

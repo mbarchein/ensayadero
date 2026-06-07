@@ -1,5 +1,5 @@
-// Rejilla semanal genérica: pintado (modo edición) o visualización (heatmap).
-// Pointer events → funciona con ratón y táctil (touch-action: none).
+// Generic weekly grid: painting (edit mode) or display (heatmap).
+// Pointer events → works with mouse and touch (touch-action: none).
 
 import { useRef, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
@@ -33,8 +33,8 @@ export default function WeekGrid({
 }: Props) {
   const { t } = useTranslation()
   const gridRef = useRef<HTMLDivElement>(null)
-  // ref, no state: el handler de pointermove se ejecuta síncronamente tras
-  // pointerdown y un setState no estaría aplicado todavía (closure obsoleta).
+  // ref, not state: the pointermove handler runs synchronously after
+  // pointerdown and a setState wouldn't be applied yet (stale closure).
   const paintingRef = useRef(false)
   const movedRef = useRef(false)
   const lastPos = useRef<CellPos | null>(null)
@@ -53,7 +53,7 @@ export default function WeekGrid({
   return (
     <div className="select-none overflow-x-auto">
       <div className="min-w-[560px]">
-        {/* cabecera días */}
+        {/* days header */}
         <div className="grid grid-cols-[3rem_repeat(7,1fr)] text-center text-xs font-medium text-gray-600">
           <div />
           {Array.from({ length: 7 }, (_, d) => {
@@ -72,7 +72,7 @@ export default function WeekGrid({
           className="grid touch-none grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
-            if (!pos || isPast(pos)) return // no se edita el pasado
+            if (!pos || isPast(pos)) return // the past is not editable
             movedRef.current = false
             if (onPaintStart) {
               paintingRef.current = true
@@ -80,7 +80,7 @@ export default function WeekGrid({
               try {
                 gridRef.current?.setPointerCapture(e.pointerId)
               } catch {
-                /* puntero no capturable (algunos entornos); moves caen vía elementFromPoint */
+                /* pointer not capturable (some environments); moves fall through via elementFromPoint */
               }
               onPaintStart(pos)
             }
@@ -89,7 +89,7 @@ export default function WeekGrid({
             if (!paintingRef.current) return
             const pos = posFromEvent(e)
             if (!pos || isPast(pos)) return
-            // ignorar moves dentro de la misma celda (evita falsos "moved" en taps)
+            // ignore moves within the same cell (avoids false "moved" on taps)
             if (lastPos.current && pos.day === lastPos.current.day && pos.slot === lastPos.current.slot)
               return
             movedRef.current = true

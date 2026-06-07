@@ -1,6 +1,6 @@
-// Ensayos a los que estoy convocado (cualquier grupo) + mi respuesta,
-// con mutación para confirmar/rechazar asistencia. Reutilizado por
-// "Mi agenda" (semana) y "Próximos" (lista completa).
+// Rehearsals I'm summoned to (any group) + my response,
+// with a mutation to accept/decline attendance. Reused by
+// "My agenda" (week) and "Upcoming" (full list).
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../auth/AuthContext'
@@ -10,7 +10,7 @@ import type { ParticipantResponse, Session, SessionParticipant } from '../../lib
 export interface MyParticipation extends SessionParticipant {
   sessions: Session & {
     groups: { name: string }
-    // todos los participantes (para el resumen voy/no voy/pendientes)
+    // all participants (for the going/not going/pending summary)
     session_participants: { response: ParticipantResponse }[]
   }
 }

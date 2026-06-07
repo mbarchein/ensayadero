@@ -11,8 +11,8 @@ import {
 } from './slots'
 import type { Availability } from './types'
 
-// semana de referencia: lunes 2026-06-08 (local)
-const MONDAY = weekStart(new Date(2026, 5, 10)) // miércoles 10 jun → lunes 8 jun
+// reference week: Monday 2026-06-08 (local)
+const MONDAY = weekStart(new Date(2026, 5, 10)) // Wednesday Jun 10 → Monday Jun 8
 
 function av(partial: Partial<Availability> & { time_range: string }): Availability {
   return {
@@ -35,21 +35,21 @@ function localRange(day: number, hStart: number, hEnd: number): string {
 }
 
 describe('expandAvailability', () => {
-  it('puntual dentro de ventana → 1 intervalo', () => {
+  it('one-off within the window → 1 interval', () => {
     const a = av({ time_range: localRange(1, 18, 21) })
     const out = expandAvailability(a, MONDAY, addDays(MONDAY, 7))
     expect(out).toHaveLength(1)
   })
 
-  it('recurrente semanal aparece en semanas futuras', () => {
+  it('weekly recurrence appears in future weeks', () => {
     const a = av({ time_range: localRange(1, 18, 21), rrule: 'FREQ=WEEKLY' })
     const nextWeek = addDays(MONDAY, 7)
     const out = expandAvailability(a, nextWeek, addDays(nextWeek, 7))
     expect(out).toHaveLength(1)
-    expect(out[0].start.getDay()).toBe(2) // martes
+    expect(out[0].start.getDay()).toBe(2) // Tuesday
   })
 
-  it('respeta excepciones', () => {
+  it('respects exceptions', () => {
     const a = av({ time_range: localRange(1, 18, 21), rrule: 'FREQ=WEEKLY' })
     const occurrence = expandAvailability(a, MONDAY, addDays(MONDAY, 7))[0]
     const exDate = isoDay(occurrence.start)
@@ -59,16 +59,16 @@ describe('expandAvailability', () => {
 })
 
 describe('weekGrid', () => {
-  it('marca slots correctos', () => {
+  it('marks the correct slots', () => {
     const grid = weekGrid([av({ time_range: localRange(0, 18, 20) })], MONDAY)
     const slot18 = (18 - DAY_START_HOUR) * 2
     expect(grid[0][slot18]).toBe('AVAILABLE')
     expect(grid[0][slot18 + 3]).toBe('AVAILABLE') // 19:30
     expect(grid[0][slot18 + 4]).toBe('NONE') // 20:00
-    expect(grid[1][slot18]).toBe('NONE') // otro día
+    expect(grid[1][slot18]).toBe('NONE') // another day
   })
 
-  it('PREFERRED pisa AVAILABLE', () => {
+  it('PREFERRED overrides AVAILABLE', () => {
     const grid = weekGrid(
       [
         av({ time_range: localRange(0, 18, 20) }),
@@ -82,8 +82,8 @@ describe('weekGrid', () => {
   })
 })
 
-describe('heatmap (D1: descuento de ocupaciones)', () => {
-  it('usuario ocupado por sesión confirmada no cuenta como disponible', () => {
+describe('heatmap (D1: busy-time discount)', () => {
+  it('a user busy with a confirmed session does not count as available', () => {
     const busyStart = new Date(MONDAY)
     busyStart.setDate(busyStart.getDate())
     busyStart.setHours(18, 0, 0, 0)
@@ -104,13 +104,13 @@ describe('heatmap (D1: descuento de ocupaciones)', () => {
     const slot18 = (18 - DAY_START_HOUR) * 2
     const slot20 = (20 - DAY_START_HOUR) * 2
     expect(grid[0][slot18].available).toEqual(['a'])
-    expect(grid[0][slot18].busy).toEqual(['b']) // pintado pero ocupado
-    expect(grid[0][slot20].available.sort()).toEqual(['a', 'b']) // tras la sesión, libre
+    expect(grid[0][slot18].busy).toEqual(['b']) // painted but busy
+    expect(grid[0][slot20].available.sort()).toEqual(['a', 'b']) // after the session, free
   })
 })
 
 describe('fullCoverageRanges', () => {
-  it('encuentra franja donde todos los obligatorios coinciden', () => {
+  it('finds a slot where all required participants overlap', () => {
     const grid = heatmap(
       [
         { userId: 'a', availabilities: [av({ user_id: 'a', time_range: localRange(2, 17, 21) })], busy: [] },
@@ -124,7 +124,7 @@ describe('fullCoverageRanges', () => {
     expect(ranges[0].end.getHours()).toBe(21)
   })
 
-  it('sin intersección → vacío', () => {
+  it('no intersection → empty', () => {
     const grid = heatmap(
       [
         { userId: 'a', availabilities: [av({ user_id: 'a', time_range: localRange(2, 10, 12) })], busy: [] },
@@ -136,7 +136,7 @@ describe('fullCoverageRanges', () => {
   })
 })
 
-it('SLOTS_PER_DAY coherente', () => {
+it('SLOTS_PER_DAY is consistent', () => {
   expect(SLOTS_PER_DAY).toBe(30)
 })
 

@@ -1,5 +1,5 @@
-// Unirse a un grupo por código (enlace /join/:code o introduciéndolo).
-// Si no hay sesión, guarda el código y lanza login; AuthCallback retoma.
+// Join a group by code (link /join/:code or by entering it).
+// If there's no session, store the code and start login; AuthCallback resumes.
 
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -35,7 +35,7 @@ export default function JoinPage() {
     navigate(`/g/${data}`, { replace: true })
   }
 
-  // con código en la URL: si hay sesión, unir directo; si no, login y retomar
+  // with a code in the URL: if there's a session, join directly; otherwise log in and resume
   useEffect(() => {
     if (loading || !codeParam || tried.current) return
     tried.current = true

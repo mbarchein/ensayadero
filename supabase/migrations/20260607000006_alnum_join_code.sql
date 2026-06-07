@@ -1,4 +1,4 @@
--- Código de grupo con alfabeto completo A-Z0-9 (no solo hex).
+-- Group code using the full A-Z0-9 alphabet (not just hex).
 
 create or replace function public.gen_join_code()
 returns text language sql volatile set search_path = public as $$
@@ -11,7 +11,7 @@ $$;
 
 alter table public.groups alter column join_code set default public.gen_join_code();
 
--- regenerar códigos existentes con el nuevo alfabeto
+-- regenerate existing codes with the new alphabet
 update public.groups set join_code = public.gen_join_code();
 
 create or replace function public.regenerate_join_code(gid uuid)

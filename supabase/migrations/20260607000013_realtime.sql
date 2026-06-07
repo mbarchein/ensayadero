@@ -1,5 +1,5 @@
--- Habilitar Realtime (WebSockets) en las tablas que la UI observa.
--- La entrega respeta RLS (cada cliente solo recibe filas que puede leer).
+-- Enable Realtime (WebSockets) on the tables the UI observes.
+-- Delivery respects RLS (each client only receives rows it can read).
 
 do $$
 begin
@@ -17,7 +17,7 @@ begin
     begin
       execute format('alter publication supabase_realtime add table public.%I', t);
     exception when others then
-      -- ya estaba en la publicación
+      -- already in the publication
       null;
     end;
   end loop;

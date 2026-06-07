@@ -1,47 +1,47 @@
 .DEFAULT_GOAL := help
 .PHONY: help up down reset logs ps psql seed-users test typecheck build preview clean infra-plan infra-apply
 
-help: ## Lista de comandos
+help: ## List of commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
-up: ## Levanta stack completo local (app :5173, API :54321, db :54322)
+up: ## Bring up the full local stack (app :5173, API :54321, db :54322)
 	docker compose up -d
 	@echo "App:     http://localhost:5173"
 	@echo "API:     http://localhost:54321"
 	@echo "Postgres: localhost:54322 (supabase_admin/postgres)"
 
-down: ## Para el stack
+down: ## Stop the stack
 	docker compose down
 
-reset: ## Destruye la DB y re-aplica migraciones + seed
+reset: ## Destroy the DB and re-apply migrations + seed
 	docker compose down -v
 	docker compose up -d
 
-logs: ## Logs de todos los servicios
+logs: ## Logs of all services
 	docker compose logs -f --tail=50
 
-ps: ## Estado de servicios
+ps: ## Service status
 	docker compose ps
 
-psql: ## Shell SQL en la DB local
+psql: ## SQL shell on the local DB
 	docker compose exec db psql -U supabase_admin -d postgres
 
-seed-users: ## Crea usuarios de prueba + grupo demo (password123)
+seed-users: ## Create test users + demo group (password123)
 	bash docker/seed-users.sh
 
-test: ## Tests del frontend
+test: ## Frontend tests
 	docker compose exec app npm test
 
-typecheck: ## Typecheck del frontend
+typecheck: ## Frontend typecheck
 	docker compose exec app npm run typecheck
 
-build: ## Build de producción del frontend
+build: ## Production build of the frontend
 	docker compose exec app npm run build
 
-preview: ## Build prod servido en :8080
+preview: ## Prod build served on :8080
 	docker compose --profile preview up --build -d app-preview
 
-clean: ## Para todo y borra volúmenes (DB incluida)
+clean: ## Stop everything and delete volumes (DB included)
 	docker compose --profile preview down -v
 
 infra-plan: ## terraform plan

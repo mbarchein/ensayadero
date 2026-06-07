@@ -69,7 +69,7 @@ export default function NotificationsPage() {
             const title = String(n.payload.title ?? '')
             let typeKey = n.type
             if (n.type === 'SESSION_CHANGED') {
-              // distinguir hora / lugar / ambos según el payload
+              // distinguish time / place / both based on the payload
               const timeChanged = !!n.payload.old_starts_at
               const locChanged = !!n.payload.old_location
               typeKey = locChanged && timeChanged

@@ -1,4 +1,4 @@
--- Excluir I y O del alfabeto del código (se confunden con 1 y 0).
+-- Exclude I and O from the code alphabet (confused with 1 and 0).
 create or replace function public.gen_join_code()
 returns text language sql volatile set search_path = public as $$
   select string_agg(

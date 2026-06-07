@@ -1,14 +1,14 @@
 -- ============================================================
--- Apertura de permisos + archivado por usuario
---  - Cualquier usuario autenticado crea grupos (pasa a INSTRUCTOR)
---  - Cualquier miembro de un grupo crea ensayos (su creador o el
---    director los edita/cancela)
---  - Co-miembros pueden leer la disponibilidad de su grupo (antes
---    solo el director) — necesario para que cualquiera planifique
---  - Archivado por usuario de ensayos cancelados/pasados
+-- Opening up permissions + per-user archiving
+--  - Any authenticated user can create groups (becomes INSTRUCTOR)
+--  - Any member of a group can create rehearsals (its creator or the
+--    director edits/cancels them)
+--  - Co-members can read their group's availability (previously
+--    only the director) — needed so anyone can plan
+--  - Per-user archiving of cancelled/past rehearsals
 -- ============================================================
 
--- ── Grupos: creador y auto-membresía ────────────────────────
+-- ── Groups: creator and auto-membership ─────────────────────
 alter table public.groups
   add column if not exists created_by uuid references public.profiles (id) default auth.uid();
 
@@ -31,7 +31,7 @@ create trigger on_group_created
 create policy groups_insert on public.groups for insert
   to authenticated with check (created_by = auth.uid());
 
--- ── Disponibilidad: lectura para cualquier co-miembro ───────
+-- ── Availability: read access for any co-member ─────────────
 drop policy if exists availabilities_instructor_read on public.availabilities;
 create policy availabilities_comember_read on public.availabilities for select using (
   exists (
@@ -42,7 +42,7 @@ create policy availabilities_comember_read on public.availabilities for select u
   )
 );
 
--- ── Sesiones: crea cualquier miembro; modifica creador o director ──
+-- ── Sessions: any member creates; creator or director modifies ──
 drop policy if exists sessions_manage on public.sessions;
 create policy sessions_insert on public.sessions for insert
   with check (is_member(auth.uid(), group_id) and created_by = auth.uid());
@@ -60,7 +60,7 @@ create policy sp_manage on public.session_participants for all using (
   )
 );
 
--- ── Archivado por usuario ───────────────────────────────────
+-- ── Per-user archiving ──────────────────────────────────────
 create table if not exists public.session_archives (
   user_id uuid not null references public.profiles (id) on delete cascade,
   session_id uuid not null references public.sessions (id) on delete cascade,

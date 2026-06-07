@@ -1,5 +1,5 @@
--- Notificar también cuando cambia el LUGAR de una sesión confirmada.
--- Cambio de hora → reinicia respuestas (PENDING); cambio solo de lugar → no.
+-- Also notify when the LOCATION of a confirmed session changes.
+-- Time change → resets responses (PENDING); location-only change → does not.
 
 create or replace function public.notify_session_change()
 returns trigger language plpgsql security definer set search_path = public as $$
@@ -22,7 +22,7 @@ begin
     elsif new.status = 'CONFIRMED'
           and (time_changed or old.location is distinct from new.location) then
       ntype := 'SESSION_CHANGED';
-      -- solo el cambio de hora invalida las respuestas
+      -- only a time change invalidates the responses
       if time_changed then
         update session_participants set response = 'PENDING' where session_id = new.id;
       end if;

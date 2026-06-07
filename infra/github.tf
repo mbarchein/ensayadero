@@ -1,7 +1,7 @@
-# Secrets de GitHub Actions para CI/CD:
-# - deploy frontend a Cloudflare Pages (wrangler)
-# - aplicar migraciones Supabase (supabase CLI)
-# - desplegar Edge Functions
+# GitHub Actions secrets for CI/CD:
+# - deploy frontend to Cloudflare Pages (wrangler)
+# - apply Supabase migrations (supabase CLI)
+# - deploy Edge Functions
 
 resource "github_actions_secret" "cloudflare_api_token" {
   repository      = var.github_repo
@@ -40,7 +40,7 @@ resource "github_actions_secret" "resend_api_key" {
   plaintext_value = var.resend_api_key
 }
 
-# Variables públicas del frontend (no sensibles)
+# Public frontend variables (not sensitive)
 resource "github_actions_variable" "supabase_url" {
   repository    = var.github_repo
   variable_name = "VITE_SUPABASE_URL"

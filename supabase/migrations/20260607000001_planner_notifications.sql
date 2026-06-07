@@ -1,10 +1,10 @@
 -- ============================================================
--- Planner: ocupaciones de miembros de un grupo (D1, sin revelar origen)
--- + Notificaciones: triggers de sesión y recordatorios pg_cron
+-- Planner: busy times of a group's members (D1, without revealing source)
+-- + Notifications: session triggers and pg_cron reminders
 -- ============================================================
 
--- Ocupaciones de todos los miembros de un grupo en una ventana.
--- Solo instructores del grupo pueden llamarla. No expone qué sesión/grupo ocupa.
+-- Busy times of all members of a group within a window.
+-- Only group instructors may call it. Does not expose which session/group is busy.
 create or replace function public.group_busy_ranges(gid uuid, search tstzrange)
 returns table (user_id uuid, busy tstzrange)
 language plpgsql stable security definer set search_path = public as $$
@@ -23,7 +23,7 @@ end;
 $$;
 
 -- ============================================================
--- Notificaciones automáticas en cambios de sesión
+-- Automatic notifications on session changes
 -- ============================================================
 
 create or replace function public.notify_session_change()
@@ -31,7 +31,7 @@ returns trigger language plpgsql security definer set search_path = public as $$
 declare
   ntype text;
 begin
-  -- INSERT confirmada directamente
+  -- INSERT created directly as confirmed
   if tg_op = 'INSERT' then
     if new.status = 'CONFIRMED' then
       ntype := 'SESSION_CONFIRMED';
@@ -39,14 +39,14 @@ begin
       return new;
     end if;
   else
-    -- UPDATE: transiciones relevantes
+    -- UPDATE: relevant transitions
     if old.status != 'CONFIRMED' and new.status = 'CONFIRMED' then
       ntype := 'SESSION_CONFIRMED';
     elsif old.status = 'CONFIRMED' and new.status = 'CANCELLED' then
       ntype := 'SESSION_CANCELLED';
     elsif new.status = 'CONFIRMED' and old.time_range != new.time_range then
       ntype := 'SESSION_CHANGED';
-      -- cambio de hora → respuestas vuelven a pendiente
+      -- time change → responses revert to pending
       update session_participants set response = 'PENDING' where session_id = new.id;
     else
       return new;
@@ -78,7 +78,7 @@ create trigger on_session_change
   after insert or update on public.sessions
   for each row execute function public.notify_session_change();
 
--- Participante añadido a sesión ya confirmada → notificarle
+-- Participant added to an already confirmed session → notify them
 create or replace function public.notify_participant_added()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -101,9 +101,9 @@ create trigger on_participant_added
   for each row execute function public.notify_participant_added();
 
 -- ============================================================
--- Recordatorios: job pg_cron que genera notifications REMINDER
--- (la ENTREGA por email/push la hace la Edge Function — cron HTTP
---  se crea manualmente, ver BOOTSTRAP.md §11)
+-- Reminders: pg_cron job that generates REMINDER notifications
+-- (email/push DELIVERY is handled by the Edge Function — the HTTP cron
+--  is created manually, see BOOTSTRAP.md §11)
 -- ============================================================
 
 create extension if not exists pg_cron;
@@ -112,7 +112,7 @@ create extension if not exists pg_net;
 create or replace function public.generate_reminders()
 returns void language plpgsql security definer set search_path = public as $$
 begin
-  -- recordatorio 24h antes (ventana de 15 min para no duplicar con ejecución cada 15 min)
+  -- reminder 24h before (15 min window to avoid duplicates with the every-15-min run)
   insert into notifications (user_id, group_id, type, payload)
   select sp.user_id, s.group_id, 'REMINDER',
     jsonb_build_object(

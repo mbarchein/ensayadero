@@ -1,5 +1,5 @@
-// Avatar geométrico determinista por grupo (DiceBear, estilo "shapes").
-// Mismo id de grupo → mismo avatar siempre.
+// Deterministic geometric avatar per group (DiceBear, "shapes" style).
+// Same group id → always the same avatar.
 
 import { useMemo } from 'react'
 import { createAvatar } from '@dicebear/core'

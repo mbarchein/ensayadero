@@ -1,13 +1,13 @@
 -- ============================================================
--- Invitación fácil: registro abierto + código/enlace de grupo
---  - Cualquiera con Google puede crear cuenta (el gate por email ya
---    no encaja: cualquiera crea grupos y se une por enlace/código).
---    Las invitaciones por email pendientes se siguen auto-aceptando.
---  - groups.join_code: código corto reutilizable → enlace + QR + código.
+-- Easy invitation: open signup + group code/link
+--  - Anyone with Google can create an account (the email gate no
+--    longer fits: anyone creates groups and joins via link/code).
+--    Pending email invitations are still auto-accepted.
+--  - groups.join_code: short reusable code → link + QR + code.
 --  - RPCs join_by_code / regenerate_join_code.
 -- ============================================================
 
--- ── Registro abierto (sustituye el gate de invitación) ──────
+-- ── Open signup (replaces the invitation gate) ──────────────
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -19,7 +19,7 @@ begin
     new.raw_user_meta_data ->> 'avatar_url'
   );
 
-  -- aceptar invitaciones por email pendientes → membresías
+  -- accept pending email invitations → memberships
   insert into memberships (user_id, group_id, role)
   select new.id, i.group_id, i.role
   from invitations i
@@ -38,19 +38,19 @@ begin
 end;
 $$;
 
--- ── Código de grupo (reutilizable) ──────────────────────────
+-- ── Group code (reusable) ───────────────────────────────────
 alter table public.groups
   add column if not exists join_code text unique
     default upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6)),
   add column if not exists join_enabled boolean not null default true;
 
--- rellenar grupos existentes sin código
+-- backfill existing groups without a code
 update public.groups
 set join_code = upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6))
 where join_code is null;
 
--- Unirse por código: añade al usuario actual como ACTOR. SECURITY DEFINER
--- para poder leer el grupo por código sin exponer la tabla entera.
+-- Join by code: adds the current user as ACTOR. SECURITY DEFINER
+-- so the group can be read by code without exposing the whole table.
 create or replace function public.join_by_code(code text)
 returns uuid language plpgsql security definer set search_path = public as $$
 declare gid uuid;
@@ -68,7 +68,7 @@ begin
 end;
 $$;
 
--- Regenerar código (solo director del grupo)
+-- Regenerate code (group director only)
 create or replace function public.regenerate_join_code(gid uuid)
 returns text language plpgsql security definer set search_path = public as $$
 declare c text;
@@ -80,7 +80,7 @@ begin
 end;
 $$;
 
--- Activar/desactivar el código (solo director)
+-- Enable/disable the code (director only)
 create or replace function public.set_join_enabled(gid uuid, enabled boolean)
 returns void language plpgsql security definer set search_path = public as $$
 begin

@@ -20,9 +20,9 @@ terraform {
     }
   }
 
-  # Estado local para empezar. Para equipo, descomentar HCP Terraform (free tier):
+  # Local state to start with. For a team, uncomment HCP Terraform (free tier):
   # cloud {
-  #   organization = "TU_ORG"
+  #   organization = "YOUR_ORG"
   #   workspaces {
   #     name = "ensayo"
   #   }

@@ -1,4 +1,4 @@
-// Títulos de obras de teatro famosas, para placeholders de nombre de grupo.
+// Titles of famous theatre plays, for group name placeholders.
 export const FAMOUS_PLAYS = [
   'La vida es sueño',
   'Bodas de sangre',

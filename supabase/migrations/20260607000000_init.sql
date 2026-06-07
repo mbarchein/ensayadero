@@ -1,9 +1,9 @@
 -- ============================================================
--- Esquema inicial: planificador de ensayos de teatro
--- Decisiones: D1 disponibilidad global + ocupaciones cruzadas,
---             D2 superadmin solo estructura,
---             D3 rol por membresía, D4 aislamiento entre grupos,
---             D5 registro solo por invitación.
+-- Initial schema: theater rehearsal planner
+-- Decisions: D1 global availability + cross-group busy times,
+--             D2 superadmin sees structure only,
+--             D3 role per membership, D4 isolation between groups,
+--             D5 signup by invitation only.
 -- ============================================================
 
 create extension if not exists btree_gist;
@@ -16,7 +16,7 @@ create type session_status as enum ('DRAFT', 'CONFIRMED', 'CANCELLED');
 create type participant_response as enum ('PENDING', 'ACCEPTED', 'DECLINED');
 create type notification_channel as enum ('PUSH', 'EMAIL', 'BOTH', 'NONE');
 
--- ── Perfiles (espejo de auth.users) ─────────────────────────
+-- ── Profiles (mirror of auth.users) ─────────────────────────
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text not null unique,
@@ -26,7 +26,7 @@ create table public.profiles (
   created_at timestamptz not null default now()
 );
 
--- ── Grupos y membresías ─────────────────────────────────────
+-- ── Groups and memberships ──────────────────────────────────
 create table public.groups (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -54,14 +54,14 @@ create table public.invitations (
   created_at timestamptz not null default now()
 );
 
--- ── Disponibilidad GLOBAL por usuario (D1) ──────────────────
+-- ── GLOBAL availability per user (D1) ───────────────────────
 create table public.availabilities (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   time_range tstzrange not null,
   kind availability_kind not null default 'AVAILABLE',
-  rrule text,              -- regla de recurrencia iCal (RFC 5545); null = puntual
-  exception_dates date[],  -- excepciones a la recurrencia
+  rrule text,              -- iCal recurrence rule (RFC 5545); null = one-off
+  exception_dates date[],  -- exceptions to the recurrence
   created_at timestamptz not null default now(),
   constraint valid_range check (not isempty(time_range))
 );
@@ -69,7 +69,7 @@ create table public.availabilities (
 create index availabilities_user_range on public.availabilities
   using gist (user_id, time_range);
 
--- ── Subgrupos ("elenco escena 3") ───────────────────────────
+-- ── Subgroups ("scene 3 cast") ──────────────────────────────
 create table public.subgroups (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.groups (id) on delete cascade,
@@ -83,7 +83,7 @@ create table public.subgroup_members (
   primary key (subgroup_id, user_id)
 );
 
--- ── Sesiones de ensayo ──────────────────────────────────────
+-- ── Rehearsal sessions ──────────────────────────────────────
 create table public.sessions (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.groups (id) on delete cascade,
@@ -108,7 +108,7 @@ create table public.session_participants (
   primary key (session_id, user_id)
 );
 
--- ── Notificaciones ──────────────────────────────────────────
+-- ── Notifications ───────────────────────────────────────────
 create table public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
@@ -138,7 +138,7 @@ create table public.push_subscriptions (
   created_at timestamptz not null default now()
 );
 
--- ── Auditoría superadmin (RF29) ─────────────────────────────
+-- ── Superadmin audit (RF29) ─────────────────────────────────
 create table public.audit_log (
   id bigint generated always as identity primary key,
   actor_id uuid not null references public.profiles (id),
@@ -149,7 +149,7 @@ create table public.audit_log (
 );
 
 -- ============================================================
--- Funciones helper de autorización
+-- Authorization helper functions
 -- ============================================================
 
 create or replace function public.is_superadmin(uid uuid)
@@ -175,9 +175,9 @@ returns boolean language sql stable security definer set search_path = public as
 $$;
 
 -- ============================================================
--- Trigger: crear perfil al registrarse + gate de invitación (D5)
--- Solo se permite signup si existe invitación pendiente para el email
--- o si el email es el superadmin seed.
+-- Trigger: create profile on signup + invitation gate (D5)
+-- Signup is only allowed if a pending invitation exists for the email
+-- or if the email is the seed superadmin.
 -- ============================================================
 
 create or replace function public.handle_new_user()
@@ -193,7 +193,7 @@ begin
   ) into has_invite;
 
   if not has_invite and not exists (select 1 from profiles where platform_role = 'SUPERADMIN') then
-    -- bootstrap: primer usuario sin superadmins existentes → ver seed.sql
+    -- bootstrap: first user with no existing superadmins → see seed.sql
     has_invite := true;
   end if;
 
@@ -209,7 +209,7 @@ begin
     new.raw_user_meta_data ->> 'avatar_url'
   );
 
-  -- aceptar invitaciones pendientes → crear membresías
+  -- accept pending invitations → create memberships
   insert into memberships (user_id, group_id, role)
   select new.id, i.group_id, i.role
   from invitations i
@@ -233,9 +233,9 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ============================================================
--- Vista de disponibilidad efectiva (D1):
--- disponibilidad pintada MENOS sesiones confirmadas en CUALQUIER grupo.
--- No expone grupo ni motivo de la ocupación (D2/D4).
+-- Effective availability view (D1):
+-- declared availability MINUS confirmed sessions in ANY group.
+-- Does not expose the group or the reason for the busy time (D2/D4).
 -- ============================================================
 
 create or replace function public.busy_ranges(uid uuid, search tstzrange)
@@ -267,7 +267,7 @@ alter table public.notification_preferences enable row level security;
 alter table public.push_subscriptions enable row level security;
 alter table public.audit_log enable row level security;
 
--- profiles: el propio, compañeros de grupo, superadmin (estructura)
+-- profiles: own profile, group mates, superadmin (structure)
 create policy profiles_select on public.profiles for select using (
   id = auth.uid()
   or is_superadmin(auth.uid())
@@ -280,13 +280,13 @@ create policy profiles_select on public.profiles for select using (
 create policy profiles_update_own on public.profiles for update
   using (id = auth.uid()) with check (id = auth.uid() and platform_role = 'USER' or is_superadmin(auth.uid()));
 
--- groups: miembros y superadmin ven; superadmin crea/archiva
+-- groups: members and superadmin can view; superadmin creates/archives
 create policy groups_select on public.groups for select using (
   is_member(auth.uid(), id) or is_superadmin(auth.uid())
 );
 create policy groups_admin on public.groups for all using (is_superadmin(auth.uid()));
 
--- memberships: visibles dentro del grupo + superadmin; instructor gestiona
+-- memberships: visible within the group + superadmin; instructor manages
 create policy memberships_select on public.memberships for select using (
   is_member(auth.uid(), group_id) or is_superadmin(auth.uid())
 );
@@ -294,13 +294,13 @@ create policy memberships_manage on public.memberships for all using (
   is_instructor(auth.uid(), group_id) or is_superadmin(auth.uid())
 );
 
--- invitations: instructor del grupo + superadmin
+-- invitations: group instructor + superadmin
 create policy invitations_manage on public.invitations for all using (
   is_instructor(auth.uid(), group_id) or is_superadmin(auth.uid())
 );
 
--- availabilities (D1+D2): dueño CRUD; instructores de grupos compartidos SOLO lectura.
--- Superadmin NO tiene política → no ve disponibilidades.
+-- availabilities (D1+D2): owner CRUD; instructors of shared groups READ-ONLY.
+-- Superadmin has NO policy → cannot see availabilities.
 create policy availabilities_own on public.availabilities for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy availabilities_instructor_read on public.availabilities for select using (
@@ -313,7 +313,7 @@ create policy availabilities_instructor_read on public.availabilities for select
   )
 );
 
--- subgroups: miembros leen, instructor gestiona
+-- subgroups: members read, instructor manages
 create policy subgroups_select on public.subgroups for select using (
   is_member(auth.uid(), group_id) or is_superadmin(auth.uid())
 );
@@ -329,7 +329,7 @@ create policy subgroup_members_manage on public.subgroup_members for all using (
           and is_instructor(auth.uid(), sg.group_id))
 );
 
--- sessions: miembros del grupo leen, instructor gestiona, superadmin lee (estructura)
+-- sessions: group members read, instructor manages, superadmin reads (structure)
 create policy sessions_select on public.sessions for select using (
   is_member(auth.uid(), group_id) or is_superadmin(auth.uid())
 );
@@ -337,7 +337,7 @@ create policy sessions_manage on public.sessions for all using (
   is_instructor(auth.uid(), group_id)
 );
 
--- session_participants: visibles en el grupo; instructor gestiona; participante actualiza su response
+-- session_participants: visible within the group; instructor manages; participant updates their response
 create policy sp_select on public.session_participants for select using (
   exists (select 1 from sessions s where s.id = session_id
           and (is_member(auth.uid(), s.group_id) or is_superadmin(auth.uid())))
@@ -349,16 +349,16 @@ create policy sp_manage on public.session_participants for all using (
 create policy sp_respond on public.session_participants for update
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- notifications: solo el destinatario
+-- notifications: recipient only
 create policy notifications_own on public.notifications for select using (user_id = auth.uid());
 create policy notifications_mark_read on public.notifications for update
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- preferences y push: solo el dueño
+-- preferences and push: owner only
 create policy prefs_own on public.notification_preferences for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy push_own on public.push_subscriptions for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- audit_log: solo superadmin lee; escritura desde service role
+-- audit_log: superadmin reads only; writes from service role
 create policy audit_select on public.audit_log for select using (is_superadmin(auth.uid()));

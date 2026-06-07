@@ -1,6 +1,6 @@
-// Suscripción Realtime: en cada cambio en las tablas observadas, invalida las
-// queries de react-query afectadas (invalidateQueries casa por prefijo de clave).
-// La entrega ya está filtrada por RLS con el JWT del usuario.
+// Realtime subscription: on each change in the observed tables, invalidates the
+// affected react-query queries (invalidateQueries matches by key prefix).
+// Delivery is already filtered by RLS with the user's JWT.
 
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'

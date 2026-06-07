@@ -1,5 +1,5 @@
-// Panel superadmin: solo ESTRUCTURA (D2) — grupos, miembros, usuarios.
-// Nunca muestra disponibilidades (RLS lo impide además a nivel de datos).
+// Superadmin panel: STRUCTURE only (D2) — groups, members, users.
+// Never shows availabilities (RLS also prevents it at the data level).
 
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
@@ -68,7 +68,7 @@ export default function AdminPage() {
         target_type: 'group',
         target_id: group.id,
       })
-      // primer instructor por invitación (o membresía directa si ya existe el usuario)
+      // first instructor by invitation (or direct membership if the user already exists)
       const email = instructorEmail.trim().toLowerCase()
       if (email) {
         const { data: existing } = await supabase

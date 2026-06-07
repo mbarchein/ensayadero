@@ -1,6 +1,6 @@
-// Panel de invitación del director: código de grupo, enlace compartible
-// (Web Share + copiar), QR, regenerar/activar código, e invitar por email
-// (uno o varios en lote).
+// Director's invite panel: group code, shareable link
+// (Web Share + copy), QR, regenerate/enable code, and invite by email
+// (one or several in bulk).
 
 import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -54,7 +54,7 @@ export default function InvitePanel({ group }: { group: Group }) {
         .from('invitations')
         .insert(list.map((email) => ({ group_id: group.id, email, role, created_by: profile!.id })))
       if (error) throw error
-      // enviar emails (best-effort)
+      // send emails (best-effort)
       const { data: created } = await supabase
         .from('invitations')
         .select('id, email')
@@ -80,7 +80,7 @@ export default function InvitePanel({ group }: { group: Group }) {
       try {
         await navigator.share(payload)
       } catch {
-        /* cancelado por el usuario */
+        /* cancelled by the user */
       }
     } else {
       copy()

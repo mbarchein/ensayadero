@@ -10,7 +10,7 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // supabase-js procesa el hash/code automáticamente; esperamos sesión
+    // supabase-js processes the hash/code automatically; we wait for the session
     supabase.auth.getSession().then(({ data, error }) => {
       if (error || !data.session) {
         const params = new URLSearchParams(window.location.search + window.location.hash.replace('#', '&'))
@@ -19,7 +19,7 @@ export default function AuthCallback() {
         if (!desc) navigate('/login', { replace: true })
         return
       }
-      // retomar unión por código si se inició desde un enlace /join/:code
+      // resume join by code if it was started from a /join/:code link
       const pending = localStorage.getItem(PENDING_JOIN_KEY)
       if (pending) {
         localStorage.removeItem(PENDING_JOIN_KEY)

@@ -1,6 +1,6 @@
-// Heatmap de disponibilidad del grupo (instructor).
-// Selección de subconjunto de personas, intensidad = nº disponibles,
-// tap en celda → crear sesión con horas prefijadas.
+// Group availability heatmap (instructor).
+// Select a subset of people, intensity = number available,
+// tap a cell → create a session with prefilled times.
 
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -36,8 +36,8 @@ export default function PlannerPage() {
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const weekEnd = useMemo(() => addDays(monday, 7), [monday])
-  const [selected, setSelected] = useState<Set<string> | null>(null) // null = todos
-  // selección de franja: día + slot ancla + slot final (arrastrar). a/b sin ordenar.
+  const [selected, setSelected] = useState<Set<string> | null>(null) // null = all
+  // slot selection: day + anchor slot + end slot (drag). a/b unordered.
   const [sel, setSel] = useState<{ day: number; a: number; b: number } | null>(null)
   const [dragging, setDragging] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
@@ -72,7 +72,7 @@ export default function PlannerPage() {
     },
   })
 
-  // sesiones del grupo que solapan la semana visible (borradores + confirmadas)
+  // group sessions overlapping the visible week (drafts + confirmed)
   const { data: weekSessions } = useQuery({
     queryKey: ['week-sessions', groupId, monday.toISOString()],
     queryFn: async () => {
@@ -88,7 +88,7 @@ export default function PlannerPage() {
     },
   })
 
-  // abrir edición directamente desde un enlace ?edit=<sessionId>
+  // open editing directly from a ?edit=<sessionId> link
   const editId = params.get('edit')
   useEffect(() => {
     if (editId && weekSessions) {
@@ -98,7 +98,7 @@ export default function PlannerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, weekSessions])
 
-  // mapa [día][slot] → sesión que lo cubre (para pintar overlay en el grid)
+  // map [day][slot] → session covering it (to paint an overlay on the grid)
   const sessionCells = useMemo(() => {
     const map = new Map<string, SessionWithParticipants>()
     for (const s of weekSessions ?? []) {
@@ -150,7 +150,7 @@ export default function PlannerPage() {
         <h1 className="text-xl font-bold">{t('planner.title')}</h1>
       </header>
 
-      {/* selector de personas */}
+      {/* people selector */}
       <div className="flex flex-wrap gap-1.5">
         <button
           onClick={() => setSelected(null)}
@@ -167,7 +167,7 @@ export default function PlannerPage() {
                 setSelected((prev) => {
                   const next = new Set(prev ?? memberIds)
                   if (prev === null) {
-                    next.delete(m.user_id) // desde "todos": primer clic excluye
+                    next.delete(m.user_id) // from "all": first click excludes
                   } else if (next.has(m.user_id)) {
                     next.delete(m.user_id)
                   } else {
@@ -210,7 +210,7 @@ export default function PlannerPage() {
             const selected =
               selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
             const ses = sessionCells.get(`${day}:${slot}`)
-            // fondo distinto para ensayos: violeta=programado, ámbar=borrador
+            // different background for rehearsals: violet=scheduled, amber=draft
             const sesBg = ses
               ? ses.status === 'CONFIRMED'
                 ? 'bg-violet-300 border-l-4 border-l-violet-700'
@@ -223,7 +223,7 @@ export default function PlannerPage() {
           renderCell={({ day, slot }) => {
             const ses = sessionCells.get(`${day}:${slot}`)
             if (ses) {
-              // primer slot de la sesión muestra su título abreviado
+              // first slot of the session shows its abbreviated title
               const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
               return firstSlot ? (
                 <span
@@ -246,7 +246,7 @@ export default function PlannerPage() {
             setSel({ day: pos.day, a: pos.slot, b: pos.slot })
           }}
           onPaintMove={(pos) =>
-            // extender solo dentro del mismo día del ancla
+            // extend only within the anchor's same day
             setSel((prev) => (prev && pos.day === prev.day ? { ...prev, b: pos.slot } : prev))
           }
           onPaintEnd={() => setDragging(false)}
@@ -255,7 +255,7 @@ export default function PlannerPage() {
 
       <p className="text-xs text-gray-500">{t('planner.legendDrag')}</p>
 
-      {/* detalle de la franja seleccionada (agregado del rango) */}
+      {/* details of the selected slot (range aggregate) */}
       {sel && selRange && grid && !dragging && (
         <div className="rounded-xl border bg-white p-4 shadow">
           <div className="mb-2 flex items-center justify-between">
@@ -279,7 +279,7 @@ export default function PlannerPage() {
         </div>
       )}
 
-      {/* lista de ensayos de la semana (editable) */}
+      {/* list of the week's rehearsals (editable) */}
       {(weekSessions?.length ?? 0) > 0 && (
         <section>
           <h2 className="mb-2 text-sm font-semibold text-gray-700">{t('planner.weekSessions')}</h2>
@@ -355,8 +355,8 @@ const chip = (active: boolean) =>
     active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500 line-through'
   }`
 
-/** Agrega los slots lo..hi de un día en una celda: disponible = quien lo está
- *  en TODOS los slots (puede hacer la sesión entera); ocupado = unión. */
+/** Aggregates slots lo..hi of a day into one cell: available = whoever is
+ *  available in ALL slots (can attend the whole session); busy = union. */
 function mergeCells(day: HeatCell[], lo: number, hi: number): HeatCell {
   let available = day[lo].available
   const busy = new Set<string>()

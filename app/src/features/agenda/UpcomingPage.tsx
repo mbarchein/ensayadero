@@ -1,5 +1,5 @@
-// "Próximos": lista ordenada de mis ensayos futuros (todos los grupos),
-// con flujo de confirmación inline.
+// "Upcoming": ordered list of my future rehearsals (all groups),
+// with an inline confirmation flow.
 
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'

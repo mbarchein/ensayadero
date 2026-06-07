@@ -1,4 +1,4 @@
-// Editar nombre del grupo y regenerar su avatar (solo director).
+// Edit the group name and regenerate its avatar (instructor only).
 
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -13,7 +13,7 @@ export default function EditGroupModal({ group, onClose }: { group: Group; onClo
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [name, setName] = useState(group.name)
-  // semilla local; "regenerar" pone una nueva aleatoria, se persiste al guardar
+  // local seed; "regenerate" sets a new random one, persisted on save
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
 
   const save = useMutation({

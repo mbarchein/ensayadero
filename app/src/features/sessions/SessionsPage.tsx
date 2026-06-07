@@ -41,7 +41,7 @@ export default function SessionsPage() {
     },
   })
 
-  // ids de sesiones archivadas por el usuario actual (oculto solo para mí)
+  // ids of sessions archived by the current user (hidden only for me)
   const { data: archivedIds } = useQuery({
     queryKey: ['session-archives'],
     queryFn: async () => {
@@ -68,7 +68,7 @@ export default function SessionsPage() {
   const visible = (sessions ?? []).filter((s) => !hidden.has(s.id))
   const upcoming = visible.filter((s) => parseRange(s.time_range).end >= now && s.status !== 'CANCELLED')
   const past = visible.filter((s) => parseRange(s.time_range).end < now || s.status === 'CANCELLED')
-  // archivable: cancelado o ya pasado
+  // archivable: cancelled or already past
   const canArchive = (s: SessionWithParticipants) =>
     s.status === 'CANCELLED' || parseRange(s.time_range).end < now
 

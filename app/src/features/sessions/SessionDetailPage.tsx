@@ -15,7 +15,7 @@ import { roleLabel } from '../../lib/roleLabel'
 import { Badge, Button, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
-/** Sub-intervalos disponibles (pintados) de un usuario dentro del rango `r`, fusionados. */
+/** A user's available (painted) sub-intervals within range `r`, merged. */
 function availableWithin(avails: Availability[], r: TimeRange): TimeRange[] {
   const clamped: TimeRange[] = []
   for (const a of avails) {
@@ -63,7 +63,7 @@ export default function SessionDetailPage() {
     },
   })
 
-  // disponibilidad de los participantes (para detectar disponibilidad parcial)
+  // participants' availability (to detect partial availability)
   const participantIds = session?.session_participants.map((p) => p.user_id) ?? []
   const { data: avails } = useQuery({
     queryKey: ['session-avail', sessionId, participantIds.join(',')],
@@ -100,7 +100,7 @@ export default function SessionDetailPage() {
     mutationFn: async (status: 'CONFIRMED' | 'CANCELLED') => {
       const { error } = await supabase.from('sessions').update({ status }).eq('id', sessionId!)
       if (error) throw error
-      // dispara entrega inmediata (el trigger ya creó las notifications)
+      // triggers immediate delivery (the trigger already created the notifications)
       supabase.functions.invoke('send-notifications', { body: {} }).catch(() => {})
     },
     onSuccess: invalidate,
@@ -121,7 +121,7 @@ export default function SessionDetailPage() {
   const required = session.session_participants.filter((p) => p.required)
   const optional = session.session_participants.filter((p) => !p.required)
 
-  // disponibilidad de cada participante dentro del rango de la sesión
+  // each participant's availability within the session's range
   const availInfo = new Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>()
   for (const p of session.session_participants) {
     const intervals = availableWithin(

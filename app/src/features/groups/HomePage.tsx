@@ -23,13 +23,13 @@ export default function HomePage() {
   const [groupName, setGroupName] = useState('')
   const [placeholder, setPlaceholder] = useState(randomPlay)
   const openNewGroup = () => {
-    setPlaceholder(randomPlay()) // obra famosa aleatoria cada apertura
+    setPlaceholder(randomPlay()) // random famous play each time it opens
     setNewGroupOpen(true)
   }
 
   const createGroup = useMutation({
     mutationFn: async () => {
-      // created_by por defecto = auth.uid(); trigger añade al creador como director
+      // created_by defaults to auth.uid(); trigger adds the creator as director
       const { error } = await supabase.from('groups').insert({ name: groupName.trim() })
       if (error) throw error
     },
