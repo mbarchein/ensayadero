@@ -29,16 +29,18 @@ node >= 22
 npm install -g supabase            # or: brew install supabase/tap/supabase
 ```
 
-Without them, run through Docker instead:
+Without them, run through Docker instead — or define these aliases once and use
+`node` / `npx` / `supabase` verbatim in every command below:
 
 ```bash
-# node
-docker run --rm node:22-alpine node ...
-# npx
-docker run --rm node:22-alpine npx -y <pkg> ...
-# supabase CLI (pass your access token, same as supabase_access_token in tfvars)
-docker run --rm -e SUPABASE_ACCESS_TOKEN=<token> node:22-alpine npx -y supabase <command>
+alias node='docker run --rm -v "$PWD:/w" -w /w node:22-alpine node'
+alias npx='docker run --rm -v "$PWD:/w" -w /w node:22-alpine npx -y'
+alias supabase='docker run --rm -e SUPABASE_ACCESS_TOKEN node:22-alpine npx -y supabase'
 ```
+
+(The `-v "$PWD:/w" -w /w` mounts the current directory so the containers can read
+local files; `supabase` reads the token from your shell's `SUPABASE_ACCESS_TOKEN`,
+so `export` it first.)
 
 ## 1. Required accounts (create if they don't exist)
 
