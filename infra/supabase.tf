@@ -16,7 +16,7 @@ resource "supabase_project" "main" {
   region            = var.supabase_region
 
   lifecycle {
-    # Evita recreación del proyecto por cambio de password
+    # Avoid recreating the project when the password changes
     ignore_changes = [database_password]
   }
 }
@@ -35,28 +35,28 @@ resource "supabase_settings" "main" {
     additional_redirect_urls = [
       "${local.app_url}/auth/callback",
       "${local.app_url}/reset-password",
-      "http://localhost:5173/auth/callback", # dev local
+      "http://localhost:5173/auth/callback", # local dev
       "http://localhost:5173/reset-password",
     ]
 
-    # Registro abierto: cualquiera puede crear cuenta (Google/email).
-    # El acceso a grupos se controla por código/enlace de grupo e invitaciones
-    # por email (auto-aceptadas en el trigger handle_new_user).
+    # Open registration: anyone can create an account (Google/email).
+    # Group access is controlled by the group join code/link and email
+    # invitations (auto-accepted in the handle_new_user trigger).
     disable_signup = false
 
     external_google_enabled   = true
     external_google_client_id = var.google_oauth_client_id
     external_google_secret    = var.google_oauth_client_secret
 
-    # Meta/Facebook (camino soportado para login con cuentas Instagram).
-    # Habilitado solo si se han rellenado las credenciales de la app de Meta.
+    # Meta/Facebook (supported path for login with Instagram accounts).
+    # Enabled only if the Meta app credentials have been filled in.
     external_facebook_enabled   = var.facebook_oauth_client_id != ""
     external_facebook_client_id = var.facebook_oauth_client_id
     external_facebook_secret    = var.facebook_oauth_client_secret
 
-    # Email+password con activación obligatoria (mailer_autoconfirm=false).
-    # SMTP vía Resend (mismo API key que las notificaciones). Si resend_api_key
-    # está vacío, los correos de activación/recuperación no se enviarán.
+    # Email+password with mandatory activation (mailer_autoconfirm=false).
+    # SMTP via Resend (same API key as the notifications). If resend_api_key
+    # is empty, the activation/recovery emails won't be sent.
     mailer_autoconfirm                 = false
     mailer_secure_email_change_enabled = true
     smtp_admin_email                   = "noreply@${var.domain}"
@@ -66,14 +66,18 @@ resource "supabase_settings" "main" {
     smtp_pass                          = var.resend_api_key
     smtp_sender_name                   = "Ensayo"
 
-    # --- Endurecimiento de formularios de auth ---
-    # Enlaces de activación/recuperación: caducan a los 15 min, un solo uso.
+    # --- Auth form hardening ---
+    # Activation/recovery links: expire after 15 min, single-use.
     mailer_otp_exp = 900
-    # Política de contraseñas: longitud mínima + (opcional) HIBP filtradas.
+    # Password policy: minimum length + (optional) HIBP leaked check.
     password_min_length   = 8
     password_hibp_enabled = var.password_hibp_enabled
-    # Anti email-bombing / enumeración por volumen.
+    # Anti email-bombing / volume-based enumeration.
     rate_limit_email_sent          = 10
     rate_limit_token_verifications = 30
+    # Turnstile CAPTCHA (anti-bot). Active only if a secret is set.
+    security_captcha_enabled  = var.turnstile_secret_key != ""
+    security_captcha_provider = "turnstile"
+    security_captcha_secret   = var.turnstile_secret_key
   })
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MailCheck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import Turnstile, { captchaEnabled } from './Turnstile'
 
 export default function SignupPage() {
   const { t } = useTranslation()
@@ -12,10 +13,16 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaKey, setCaptchaKey] = useState(0)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    if (captchaEnabled && !captchaToken) {
+      setError(t('signup.captchaRequired'))
+      return
+    }
     setLoading(true)
     const { error } = await supabase.auth.signUp({
       email,
@@ -23,11 +30,15 @@ export default function SignupPage() {
       options: {
         data: { full_name: name },
         emailRedirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback`,
+        captchaToken: captchaToken ?? undefined,
       },
     })
     setLoading(false)
-    if (error) setError(error.message)
-    else setSent(true)
+    if (error) {
+      setError(error.message)
+      setCaptchaToken(null)
+      setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
+    } else setSent(true)
   }
 
   if (sent) {
@@ -78,6 +89,7 @@ export default function SignupPage() {
           minLength={8}
           required
         />
+        <Turnstile key={captchaKey} onToken={setCaptchaToken} />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"

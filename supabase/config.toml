@@ -28,23 +28,30 @@ minimum_password_length = 8
 
 [auth.email]
 enable_signup = true
-# Exige activación por email antes de poder entrar.
+# Require email activation before sign-in is allowed.
 enable_confirmations = true
 double_confirm_changes = true
+
+# Cloudflare Turnstile CAPTCHA (the docker stack enables it via env). Kept here
+# documented for `supabase start`; enabling requires the secret.
+[auth.captcha]
+enabled = false
+provider = "turnstile"
+secret = "env(TURNSTILE_SECRET)"
 
 [auth.external.google]
 enabled = true
 client_id = "env(GOOGLE_OAUTH_CLIENT_ID)"
 secret = "env(GOOGLE_OAUTH_CLIENT_SECRET)"
 
-# Meta/Facebook: camino soportado para login con cuentas Instagram vinculadas
-# (Supabase no tiene provider Instagram nativo).
+# Meta/Facebook: supported path for login with linked Instagram accounts
+# (Supabase has no native Instagram provider).
 [auth.external.facebook]
 enabled = true
 client_id = "env(FACEBOOK_OAUTH_CLIENT_ID)"
 secret = "env(FACEBOOK_OAUTH_CLIENT_SECRET)"
 
-# Capturador de correo para `supabase start` (el stack docker usa mailpit).
+# Mail catcher for `supabase start` (the docker stack uses mailpit).
 [inbucket]
 enabled = true
 port = 54324

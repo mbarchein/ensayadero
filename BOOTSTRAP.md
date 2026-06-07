@@ -127,11 +127,14 @@ external accounts:
 Recommended manual steps (need an account/plan):
 
 1. **CAPTCHA (Cloudflare Turnstile)** — the best defense against bots and
-   volume-based enumeration. Create a widget at
-   https://dash.cloudflare.com/?to=/:account/turnstile, then in the Supabase
-   dashboard → Authentication → Attack Protection → enable CAPTCHA (provider
-   *Turnstile*, paste the *secret*). Then pass the token in the frontend
-   (`options.captchaToken` in `signUp`/`signInWithPassword`/`resetPasswordForEmail`).
+   volume-based enumeration. The frontend is **already wired** (Turnstile widget
+   on login/signup/recovery, `options.captchaToken` passed through); it stays off
+   until you provide keys:
+   - Create a widget at https://dash.cloudflare.com/?to=/:account/turnstile.
+   - **Secret key** → `turnstile_secret_key` in `terraform.tfvars` → `terraform
+     apply` (Terraform enables `security_captcha_enabled` automatically when set).
+   - **Site key** (public) → GitHub → Actions **Variables** →
+     `VITE_TURNSTILE_SITE_KEY`. (Locally: `TURNSTILE_*` in `.env`, see `.env.example`.)
 2. **Leaked passwords (HIBP)** — `password_hibp_enabled=true` in `terraform.tfvars`.
    Requires the Supabase **Pro plan**.
 

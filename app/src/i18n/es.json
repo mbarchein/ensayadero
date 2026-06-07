@@ -57,6 +57,7 @@
     "signingIn": "Entrando…",
     "signupLink": "Crear cuenta",
     "forgotLink": "¿Olvidaste tu contraseña?",
+    "captchaRequired": "Completa la verificación anti-bot.",
     "entering": "Entrando…",
     "noProfile": "Tu cuenta aún no está lista. Recarga la página; si persiste, contacta con soporte."
   },
@@ -67,6 +68,7 @@
     "passwordPlaceholder": "Contraseña (mín. 8 caracteres)",
     "createButton": "Crear cuenta",
     "creating": "Creando…",
+    "captchaRequired": "Completa la verificación anti-bot.",
     "haveAccount": "Ya tengo cuenta",
     "checkEmailTitle": "Revisa tu correo",
     "checkEmailBody": "Te hemos enviado un enlace de activación a {{email}}. Ábrelo para activar tu cuenta.",
@@ -78,6 +80,7 @@
     "emailPlaceholder": "Email",
     "sendButton": "Enviar enlace",
     "sending": "Enviando…",
+    "captchaRequired": "Completa la verificación anti-bot.",
     "sentTitle": "Revisa tu correo",
     "sentBody": "Si existe una cuenta para {{email}}, te hemos enviado un enlace para restablecer la contraseña.",
     "backToLogin": "Volver al inicio de sesión"

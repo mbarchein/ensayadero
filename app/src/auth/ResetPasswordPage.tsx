@@ -12,8 +12,8 @@ export default function ResetPasswordPage() {
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // supabase-js procesa el token de recuperación del hash al cargar y emite
-  // PASSWORD_RECOVERY; también puede haber sesión ya establecida.
+  // supabase-js processes the recovery token from the URL hash on load and emits
+  // PASSWORD_RECOVERY; a session may also already be established.
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true)

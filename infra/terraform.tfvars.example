@@ -1,36 +1,41 @@
-# Copiar a terraform.tfvars y rellenar. NUNCA commitear terraform.tfvars.
+# Copy to terraform.tfvars and fill in. NEVER commit terraform.tfvars.
 
 project_name = "ensayo"
 environment  = "prod"
 
 # Supabase — token: https://supabase.com/dashboard/account/tokens
 supabase_access_token = "sbp_xxx"
-supabase_org_id       = "tu-org-slug"
+supabase_org_id       = "your-org-slug"
 supabase_region       = "eu-west-3"
-# supabase_db_password = null  # se genera si se omite
+# supabase_db_password = null  # generated if omitted
 
-# Google OAuth — crear manual en https://console.cloud.google.com/apis/credentials
-# Redirect URI: ver output google_oauth_redirect_uri tras primer apply
+# Google OAuth — create manually at https://console.cloud.google.com/apis/credentials
+# Redirect URI: see the google_oauth_redirect_uri output after the first apply
 google_oauth_client_id     = "xxx.apps.googleusercontent.com"
 google_oauth_client_secret = "GOCSPX-xxx"
 
-# Meta/Facebook OAuth (login con cuentas Instagram vinculadas) — OPCIONAL.
-# Crear app en https://developers.facebook.com (ver BOOTSTRAP). Dejar vacío
-# para deshabilitar el provider.
+# Meta/Facebook OAuth (login with linked Instagram accounts) — OPTIONAL.
+# Create the app at https://developers.facebook.com (see BOOTSTRAP). Leave empty
+# to disable the provider.
 facebook_oauth_client_id     = ""
 facebook_oauth_client_secret = ""
 
-# Seguridad de contraseñas: comprobación de filtradas (HaveIBeenPwned).
-# Requiere plan Pro de Supabase. Dejar en false en free tier.
+# Password security: leaked-password check (HaveIBeenPwned).
+# Requires the Supabase Pro plan. Keep false on free tier.
 password_hibp_enabled = false
 
-# Cloudflare — token con Pages:Edit, DNS:Edit, Zone:Read
+# Cloudflare Turnstile CAPTCHA (anti-bot on auth forms) — OPTIONAL.
+# Empty = disabled. The site key (public) goes to GitHub vars as
+# VITE_TURNSTILE_SITE_KEY.
+turnstile_secret_key = ""
+
+# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"
 domain                = "ensayoapp.es"
 app_subdomain         = "app"
 
-# Resend — añadir dominio en https://resend.com/domains y copiar records aquí
+# Resend — add the domain at https://resend.com/domains and copy the records here
 resend_api_key      = "re_xxx"
 resend_dkim_records = [
   # { name = "resend._domainkey", type = "TXT", content = "p=MIGf..." },
@@ -38,7 +43,7 @@ resend_dkim_records = [
   # { name = "send", type = "TXT", content = "v=spf1 include:amazonses.com ~all" },
 ]
 
-# GitHub — token con repo + secrets
+# GitHub — token with repo + secrets
 github_token = "ghp_xxx"
-github_owner = "tu-usuario"
+github_owner = "your-username"
 github_repo  = "ensayo"

@@ -57,6 +57,7 @@
     "signingIn": "Signing in…",
     "signupLink": "Create account",
     "forgotLink": "Forgot your password?",
+    "captchaRequired": "Complete the anti-bot check.",
     "entering": "Signing in…",
     "noProfile": "Your account isn't ready yet. Reload the page; if it persists, contact support."
   },
@@ -67,6 +68,7 @@
     "passwordPlaceholder": "Password (min. 8 characters)",
     "createButton": "Create account",
     "creating": "Creating…",
+    "captchaRequired": "Complete the anti-bot check.",
     "haveAccount": "I already have an account",
     "checkEmailTitle": "Check your email",
     "checkEmailBody": "We've sent an activation link to {{email}}. Open it to activate your account.",
@@ -78,6 +80,7 @@
     "emailPlaceholder": "Email",
     "sendButton": "Send link",
     "sending": "Sending…",
+    "captchaRequired": "Complete the anti-bot check.",
     "sentTitle": "Check your email",
     "sentBody": "If an account exists for {{email}}, we've sent a link to reset the password.",
     "backToLogin": "Back to sign in"

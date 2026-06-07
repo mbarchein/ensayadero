@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import Turnstile, { captchaEnabled } from './Turnstile'
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -19,14 +20,27 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaKey, setCaptchaKey] = useState(0)
   const signInWithPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    if (captchaEnabled && !captchaToken) {
+      setError(t('login.captchaRequired'))
+      return
+    }
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken: captchaToken ?? undefined },
+    })
     setLoading(false)
-    if (error) setError(error.message)
-    else navigate('/', { replace: true })
+    if (error) {
+      setError(error.message)
+      setCaptchaToken(null)
+      setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
+    } else navigate('/', { replace: true })
   }
 
   return (
@@ -85,6 +99,7 @@ export default function LoginPage() {
           autoComplete="current-password"
           required
         />
+        <Turnstile key={captchaKey} onToken={setCaptchaToken} />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"

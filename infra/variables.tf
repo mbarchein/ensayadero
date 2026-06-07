@@ -1,102 +1,111 @@
 variable "project_name" {
-  description = "Nombre base del proyecto"
+  description = "Base project name"
   type        = string
   default     = "ensayo"
 }
 
 variable "environment" {
-  description = "Entorno (prod, staging)"
+  description = "Environment (prod, staging)"
   type        = string
   default     = "prod"
 }
 
 # ── Supabase ────────────────────────────────────────────────
 variable "supabase_access_token" {
-  description = "Personal access token de Supabase (https://supabase.com/dashboard/account/tokens)"
+  description = "Supabase personal access token (https://supabase.com/dashboard/account/tokens)"
   type        = string
   sensitive   = true
 }
 
 variable "supabase_org_id" {
-  description = "ID de la organización Supabase (slug en dashboard)"
+  description = "Supabase organization ID (slug in the dashboard)"
   type        = string
 }
 
 variable "supabase_db_password" {
-  description = "Password de la DB del proyecto Supabase. Si se omite, se genera."
+  description = "Supabase project DB password. If omitted, one is generated."
   type        = string
   sensitive   = true
   default     = null
 }
 
 variable "supabase_region" {
-  description = "Región del proyecto Supabase"
+  description = "Supabase project region"
   type        = string
-  default     = "eu-west-3" # París, cercana a España
+  default     = "eu-west-3" # Paris, close to Spain
 }
 
-# ── OAuth (clients creados manualmente) ─────────────────────
+# ── OAuth (clients created manually) ────────────────────────
 variable "google_oauth_client_id" {
-  description = "Client ID OAuth de Google (creado manual en Google Cloud Console)"
+  description = "Google OAuth Client ID (created manually in Google Cloud Console)"
   type        = string
 }
 
 variable "google_oauth_client_secret" {
-  description = "Client secret OAuth de Google"
+  description = "Google OAuth Client secret"
   type        = string
   sensitive   = true
 }
 
-# Facebook/Meta OAuth — vía login de Meta (cubre cuentas Instagram vinculadas).
-# Supabase no tiene provider Instagram nativo; este es el camino soportado.
-# Opcional: si se deja vacío, el provider queda deshabilitado.
+# Facebook/Meta OAuth — via Meta login (covers linked Instagram accounts).
+# Supabase has no native Instagram provider; this is the supported path.
+# Optional: if left empty, the provider stays disabled.
 variable "facebook_oauth_client_id" {
-  description = "App ID de Meta (Facebook Login). Vacío = provider deshabilitado."
+  description = "Meta App ID (Facebook Login). Empty = provider disabled."
   type        = string
   default     = ""
 }
 
 variable "facebook_oauth_client_secret" {
-  description = "App Secret de Meta (Facebook Login)"
+  description = "Meta App Secret (Facebook Login)"
   type        = string
   sensitive   = true
   default     = ""
 }
 
-# Protección de contraseñas filtradas (HaveIBeenPwned). En Supabase hosted
-# requiere plan Pro o superior; dejar en false en free tier para no romper apply.
+# Leaked-password protection (HaveIBeenPwned). On hosted Supabase it requires
+# the Pro plan or higher; keep false on free tier so apply doesn't break.
 variable "password_hibp_enabled" {
-  description = "Activar comprobación HIBP de contraseñas filtradas (requiere plan Pro)"
+  description = "Enable HIBP leaked-password check (requires Pro plan)"
   type        = bool
   default     = false
 }
 
+# Cloudflare Turnstile CAPTCHA. Empty secret = provider disabled. The site key
+# (public) goes to the frontend as VITE_TURNSTILE_SITE_KEY (GitHub vars).
+variable "turnstile_secret_key" {
+  description = "Cloudflare Turnstile secret for auth CAPTCHA. Empty = disabled."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
-  description = "API token Cloudflare con permisos Pages:Edit, DNS:Edit, Zone:Read"
+  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read permissions"
   type        = string
   sensitive   = true
 }
 
 variable "cloudflare_account_id" {
-  description = "Account ID de Cloudflare"
+  description = "Cloudflare Account ID"
   type        = string
 }
 
 variable "domain" {
-  description = "Dominio raíz gestionado en Cloudflare (ej: ensayoapp.es)"
+  description = "Root domain managed in Cloudflare (e.g. ensayoapp.es)"
   type        = string
 }
 
 variable "app_subdomain" {
-  description = "Subdominio de la app. Vacío = dominio raíz."
+  description = "App subdomain. Empty = root domain."
   type        = string
   default     = "app"
 }
 
-# ── Resend (DNS de verificación; API key se crea manual) ────
+# ── Resend (verification DNS; API key created manually) ─────
 variable "resend_dkim_records" {
-  description = "Records DKIM/SPF que Resend pide al verificar dominio. Rellenar tras añadir dominio en dashboard Resend."
+  description = "DKIM/SPF records Resend asks for when verifying the domain. Fill in after adding the domain in the Resend dashboard."
   type = list(object({
     name     = string
     type     = string # TXT | MX | CNAME
@@ -108,24 +117,24 @@ variable "resend_dkim_records" {
 
 # ── GitHub (CI/CD) ──────────────────────────────────────────
 variable "github_token" {
-  description = "Token GitHub con repo + secrets scope"
+  description = "GitHub token with repo + secrets scope"
   type        = string
   sensitive   = true
 }
 
 variable "github_owner" {
-  description = "Usuario u organización GitHub"
+  description = "GitHub user or organization"
   type        = string
 }
 
 variable "github_repo" {
-  description = "Nombre del repositorio"
+  description = "Repository name"
   type        = string
   default     = "ensayo"
 }
 
 variable "resend_api_key" {
-  description = "API key de Resend (manual, dashboard). Se inyecta como secret de Edge Functions y de CI."
+  description = "Resend API key (manual, dashboard). Injected as an Edge Functions and CI secret."
   type        = string
   sensitive   = true
   default     = ""

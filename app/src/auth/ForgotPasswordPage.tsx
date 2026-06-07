@@ -3,22 +3,32 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MailCheck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import Turnstile, { captchaEnabled } from './Turnstile'
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  // Only for the captcha gate (does not leak account existence).
+  const [captchaError, setCaptchaError] = useState<string | null>(null)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (captchaEnabled && !captchaToken) {
+      setCaptchaError(t('forgot.captchaRequired'))
+      return
+    }
+    setCaptchaError(null)
     setLoading(true)
-    // Resistencia a enumeración: NO ramificamos la UI según exista o no la
-    // cuenta ni mostramos el error del backend. GoTrue ya responde igual en
-    // ambos casos; aquí mostramos siempre la misma pantalla neutra. Los
-    // errores reales (rate limit) se silencian a propósito para no filtrar.
+    // Enumeration resistance: we do NOT branch the UI on whether the account
+    // exists, nor surface the backend error. GoTrue already responds identically
+    // in both cases; here we always show the same neutral screen. Real errors
+    // (rate limit) are intentionally swallowed so nothing leaks.
     await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${import.meta.env.VITE_APP_URL}/reset-password`,
+      captchaToken: captchaToken ?? undefined,
     })
     setLoading(false)
     setSent(true)
@@ -53,6 +63,8 @@ export default function ForgotPasswordPage() {
           autoComplete="email"
           required
         />
+        <Turnstile onToken={setCaptchaToken} />
+        {captchaError && <p className="text-sm text-red-600">{captchaError}</p>}
         <button
           type="submit"
           disabled={loading}
