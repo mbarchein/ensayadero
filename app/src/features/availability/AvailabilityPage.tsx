@@ -128,10 +128,13 @@ export default function AvailabilityPage() {
       const seqAtFire = editSeq.current
       if (!draftRef.current || seqAtFire === savedSeq.current) return
       save.mutate(draftRef.current, {
-        onSuccess: () => {
+        onSuccess: async () => {
           savedSeq.current = seqAtFire
           if (editSeq.current === seqAtFire) {
-            setDraft(null) // no new edits: the server already reflects the grid
+            // Wait for the refetched server grid before dropping the draft, so
+            // the slots switch straight from "pending" to final with no flicker.
+            await qc.refetchQueries({ queryKey: ['availabilities', profile?.id] })
+            if (editSeq.current === seqAtFire) setDraft(null)
           } else {
             scheduleSave() // there were strokes during the save: persist again
           }
@@ -172,7 +175,8 @@ export default function AvailabilityPage() {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['availabilities'] })
+      // the refetch is awaited in scheduleSave's onSuccess before clearing the
+      // draft; here we only flash the saved indicator
       if (okTimer.current) clearTimeout(okTimer.current)
       setShowOk(true)
       okTimer.current = setTimeout(() => setShowOk(false), 2000)
@@ -383,7 +387,13 @@ export default function AvailabilityPage() {
                 ? 'ring-2 ring-inset ring-red-500'
                 : 'ring-2 ring-inset ring-amber-500'
             : ''
-          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring}`
+          // unsaved edits (additions and deletions): dashed outline until the
+          // save confirms, then it switches to the final style
+          const pending =
+            draft && serverGrid && grid[day][slot] !== serverGrid[day][slot]
+              ? 'outline-dashed outline-2 -outline-offset-2 outline-violet-500'
+              : ''
+          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring} ${pending}`
         }}
         renderCell={({ day, slot }) => {
           const p = sessionCells.get(`${day}:${slot}`)
