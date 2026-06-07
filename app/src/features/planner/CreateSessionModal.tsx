@@ -5,6 +5,7 @@
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Trash2 } from 'lucide-react'
 import { format, isSameDay } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -409,14 +410,15 @@ export default function CreateSessionModal({
         {editing && (
           <Button
             type="button"
-            variant="ghost"
-            className="w-full text-red-600"
+            variant="warning"
+            className="inline-flex w-full items-center justify-center gap-1.5"
             disabled={cancel.isPending}
             onClick={() => {
               if (confirm(t(session!.status === 'CONFIRMED' ? 'planner.cancelConfirm' : 'planner.deleteDraftConfirm')))
                 cancel.mutate()
             }}
           >
+            <Trash2 size={16} />
             {session!.status === 'CONFIRMED' ? t('planner.cancelSession') : t('sessions.deleteDraft')}
           </Button>
         )}

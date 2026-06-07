@@ -5,11 +5,14 @@ export function Button({
   variant = 'primary',
   className = '',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'ghost'
+}) {
   const styles = {
     primary: 'bg-violet-600 text-white hover:bg-violet-700 disabled:bg-violet-300',
     secondary: 'bg-violet-100 text-violet-800 hover:bg-violet-200',
     danger: 'bg-red-600 text-white hover:bg-red-700',
+    warning: 'bg-amber-500 text-white hover:bg-amber-600 disabled:bg-amber-300',
     ghost: 'text-violet-700 hover:bg-violet-50',
   }
   return (
