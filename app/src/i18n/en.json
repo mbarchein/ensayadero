@@ -64,6 +64,9 @@
     "signupLink": "Create account",
     "forgotLink": "Forgot your password?",
     "captchaRequired": "Complete the anti-bot check.",
+    "errInvalidCredentials": "Wrong email or password.",
+    "errEmailNotConfirmed": "Confirm your email before signing in. Check your inbox.",
+    "errRateLimit": "Too many attempts. Wait a moment and try again.",
     "entering": "Signing in…",
     "noProfile": "Your account isn't ready yet. Reload the page; if it persists, contact support."
   },

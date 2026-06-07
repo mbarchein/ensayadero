@@ -9,12 +9,21 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 
+  // Map GoTrue's English error strings to localized, friendly messages.
+  const errorText = (msg: string) => {
+    const m = msg.toLowerCase()
+    if (m.includes('invalid login credentials')) return t('login.errInvalidCredentials')
+    if (m.includes('email not confirmed')) return t('login.errEmailNotConfirmed')
+    if (m.includes('rate limit')) return t('login.errRateLimit')
+    return msg
+  }
+
   const signInWithProvider = async (provider: 'google' | 'facebook') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback` },
     })
-    if (error) setError(error.message)
+    if (error) setError(errorText(error.message))
   }
 
   const [email, setEmail] = useState('')
@@ -37,7 +46,7 @@ export default function LoginPage() {
     })
     setLoading(false)
     if (error) {
-      setError(error.message)
+      setError(errorText(error.message))
       setCaptchaToken(null)
       setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
     } else navigate('/', { replace: true })
@@ -100,7 +109,14 @@ export default function LoginPage() {
           required
         />
         <Turnstile key={captchaKey} onToken={setCaptchaToken} />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-center text-sm font-medium text-red-700"
+          >
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={loading}

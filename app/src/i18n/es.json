@@ -64,6 +64,9 @@
     "signupLink": "Crear cuenta",
     "forgotLink": "¿Olvidaste tu contraseña?",
     "captchaRequired": "Completa la verificación anti-bot.",
+    "errInvalidCredentials": "Email o contraseña incorrectos.",
+    "errEmailNotConfirmed": "Confirma tu email antes de entrar. Revisa tu correo.",
+    "errRateLimit": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
     "entering": "Entrando…",
     "noProfile": "Tu cuenta aún no está lista. Recarga la página; si persiste, contacta con soporte."
   },
