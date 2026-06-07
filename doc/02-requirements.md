@@ -5,9 +5,15 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
 ## Functional
 
 ### Authentication and access
-- ✅ FR1. OAuth login with Google (GoTrue). Other providers prepared.
-- 🟡 FR2. Invitation: by email, by reusable **group code**, link and QR.
-  *Note:* registration became **open** (D5'); the invitation adds you to a group.
+- ✅ FR1. **Open** sign-up (revised D5'). Auth via GoTrue: Google OAuth,
+  Meta/Facebook OAuth (the supported path for "Instagram" login — Supabase has no
+  native Instagram provider), and email + password with **email activation**
+  (confirmation required) and **password recovery**. Hardened: GoTrue rate limits,
+  password min length + HIBP leaked-password check, single-use 15-min OTP links,
+  enumeration-resistant recovery, optional Cloudflare Turnstile CAPTCHA.
+- 🟡 FR2. Group access: by reusable **group code** (link + QR) and by **email
+  invitation** (auto-accepted on sign-up). Registration is open; the invitation/
+  code only adds you to a group.
 - ✅ FR3. Role per membership (INSTRUCTOR/ACTOR); implicit per-group selection.
 - ✅ FR4. A user in several groups, with a different role in each.
 
@@ -47,7 +53,9 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
 - ✅ NFR2. Mobile-first (bottom nav, touch gestures, 44px targets).
 - ✅ NFR3. i18n (es default, en).
 - ✅ NFR4. Time zones: stored in UTC (`tstzrange`), shown in local time.
-- ✅ NFR5. GDPR: own account deletion (cascade), minimal data.
+- ✅ NFR5. GDPR: own account deletion via `delete_my_account` RPC (cascade; FK
+  rules in `20260607000014` keep authored rows by nulling creator/actor), minimal
+  data.
 - 🟡 NFR6. Accessibility: states don't rely on color alone (icons/borders); full
   WCAG audit pending.
 

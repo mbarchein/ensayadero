@@ -6,9 +6,10 @@
 ┌──────────────────────────┐        ┌─────────────────────────────┐
 │  PWA (React+Vite+TS)      │  HTTPS │  Supabase                   │
 │  - Tailwind, lucide       │───────▶│  - GoTrue (Auth/OAuth)      │
-│  - @tanstack/react-query  │        │  - PostgREST (REST + RLS)   │
-│  - Workbox SW + Web Push  │        │  - Postgres (pg_cron/pg_net)│
-│  - i18next (es/en)        │        │  - Edge Functions (Deno)    │
+│  - @tanstack/react-query  │   WS   │  - PostgREST (REST + RLS)   │
+│  - Workbox SW + Web Push  │◀──────▶│  - Realtime (websockets)    │
+│  - i18next (es/en)        │        │  - Postgres (pg_cron/pg_net)│
+│  - Realtime (useRealtime) │        │  - Edge Functions (Deno)    │
 └──────────────────────────┘        └─────────────────────────────┘
         │                                   │            │
    Cloudflare Pages                    Resend (email)  Web Push (VAPID)
@@ -24,15 +25,16 @@
 | State/data | @tanstack/react-query; no global store |
 | Routing | react-router-dom 6 |
 | PWA | vite-plugin-pwa (injectManifest), Workbox, own SW (`src/sw.ts`) |
-| Auth | Supabase GoTrue, Google OAuth (password only in dev) |
+| Auth | Supabase GoTrue: Google OAuth, Meta/Facebook OAuth, email+password (activation + recovery); optional Turnstile CAPTCHA |
 | API | PostgREST with Row Level Security |
+| Realtime | Supabase Realtime websockets (`useRealtime` hook) |
 | DB | PostgreSQL 15 (supabase image: `btree_gist`, `pg_cron`, `pg_net`) |
 | Jobs | pg_cron (reminders) → pg_net → Edge Function |
 | Email | Resend (Edge Function) |
 | Push | Standard Web Push (VAPID), no Firebase |
 | Avatars | DiceBear "shapes" (client) |
 | QR | qrcode (client) |
-| Infra | Terraform; Cloudflare Pages; GitHub Actions |
+| Infra | Managed: Terraform + Cloudflare Pages + GitHub Actions. Self-hosted: Docker Swarm (`docker-stack.yml`) |
 
 ## Data model (core)
 
@@ -95,11 +97,13 @@ role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
    after confirm/cancel) delivers email (Resend) and Web Push (VAPID) per
    `notification_preferences`, and stamps `sent_email_at`/`sent_push_at`.
 
-## Data freshness (no realtime)
-No Supabase Realtime. react-query refetches on window focus and invalidates
-caches after your own mutations; the unread badge polls every 60s. Other users'
-changes (availability, new rehearsals) appear on refocus/navigation, not live.
-Web Push delivers session changes as OS notifications regardless.
+## Data freshness (realtime)
+Supabase **Realtime** websockets push changes on `sessions`,
+`session_participants`, `availabilities`, `notifications` and `memberships`. The
+`useRealtime` hook (mounted in `Layout`) invalidates the affected react-query
+keys, so other users' changes appear live; delivery is filtered by RLS via the
+user's JWT. react-query also refetches on window focus and after your own
+mutations. Web Push delivers session changes as OS notifications regardless.
 
 ## Time zones
 Everything in UTC in the DB (`tstzrange`/`timestamptz`). The client formats in

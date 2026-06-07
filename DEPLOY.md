@@ -74,12 +74,25 @@ openssl rand -hex 8           # → REALTIME_ENC_KEY (must be 16 chars)
 
 # API keys derived from JWT_SECRET (paste JWT_SECRET as the argument)
 node docker/gen-keys.mjs "<JWT_SECRET>"     # prints ANON_KEY and SERVICE_ROLE_KEY
-# no local node? →
-# docker run --rm -v "$PWD/docker:/d" node:22-alpine node /d/gen-keys.mjs "<JWT_SECRET>"
 
 # Web Push
 npx web-push generate-vapid-keys            # → VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY
 ```
+
+> **No Node.js on the host?** Run `node`/`npx` through Docker (the swarm host
+> already has Docker):
+> ```bash
+> # node — gen-keys (mounts the docker/ folder so the script is reachable)
+> docker run --rm -v "$PWD/docker:/d" node:22-alpine node /d/gen-keys.mjs "<JWT_SECRET>"
+>
+> # npx — VAPID keys
+> docker run --rm node:22-alpine npx -y web-push generate-vapid-keys
+>
+> # realtime tenant secret (§5) without local node
+> docker run --rm -e REALTIME_ENC_KEY -e JWT_SECRET node:22-alpine \
+>   node -e 'const c=require("crypto").createCipheriv("aes-128-ecb",Buffer.from(process.env.REALTIME_ENC_KEY),null);process.stdout.write(c.update(process.env.JWT_SECRET,"utf8","base64")+c.final("base64"))'
+> ```
+> (For the last one, `set -a; source prod.env; set +a` first so the env vars pass through.)
 
 Also set `PUBLIC_APP_URL`, `PUBLIC_API_URL`, the SMTP block (e.g. Resend), and any
 optional OAuth / Turnstile values. See `prod.env.example` for the full list.

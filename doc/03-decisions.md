@@ -33,15 +33,30 @@ another. Only crossing: the availability discount from D1.
 - D5 (initial): sign-up required a pending email invitation (gate in the
   `handle_new_user` trigger).
 - **D5' (current)**: once anyone could create groups and join by code, the gate
-  no longer made sense. **Open** registration with Google; pending email
-  invitations are auto-accepted on sign-in. Migration `20260607000005`.
+  no longer made sense. **Open** registration; pending email invitations are
+  auto-accepted on sign-up (`handle_new_user`). Migration `20260607000005`.
+  Group access is now controlled by the reusable join code/link/QR and by email
+  invitations, not by a signup gate.
+
+### D-auth — Auth methods and hardening
+GoTrue with **Google OAuth**, **Meta/Facebook OAuth** (the supported route for
+"Instagram" login — Supabase has no native Instagram provider) and **email +
+password** with **email activation** (confirmation required) and **password
+recovery**. Hardening: rate limits, password min length + HIBP leaked-password
+check, single-use 15-min OTP links, neutral enumeration-resistant recovery
+responses, and an optional **Cloudflare Turnstile** CAPTCHA (enabled when a site
+key is configured). Account self-deletion via `delete_my_account` (GDPR).
 
 ## Infrastructure
 
-### D-stack — Supabase free tier (revised from VPS)
-A self-hosted VPS (~€5/mo) vs free tier was evaluated. Chosen **free tier**:
-Supabase (DB+Auth+RLS+Edge) + Cloudflare Pages + Resend + Web Push. ~€0 cost.
-Limitations assumed (pause on inactivity, 500MB).
+### D-stack — Two deployment paths
+Two supported paths (see `08-deployment.md`):
+- **Managed (free tier)**: Supabase (DB+Auth+RLS+Edge) + Cloudflare Pages +
+  Resend + Web Push, provisioned by Terraform in `infra/` (`BOOTSTRAP.md`). ~€0
+  cost; free-tier limits assumed (pause on inactivity, 500MB).
+- **Self-hosted on Docker Swarm**: the whole backend (Postgres, GoTrue,
+  PostgREST, Realtime, Deno edge function, nginx gateway) plus the built PWA via
+  `docker-stack.yml` + `docker/*.Dockerfile` (`DEPLOY.md`).
 
 ### D-iac — All infra with Terraform
 `infra/` provisions Supabase, Cloudflare Pages+DNS and GitHub secrets.
@@ -49,9 +64,17 @@ Non-automatable steps (OAuth client, tokens, Resend domain, VAPID) in
 `BOOTSTRAP.md`.
 
 ### D-local — Full local stack in docker-compose (no Supabase CLI)
-Postgres (supabase image with pg_cron/pg_net), GoTrue, PostgREST, nginx gateway
-(emulates Kong), Edge Function in Deno, migration runner, Vite frontend. Password
-login only in the development build.
+Postgres (supabase image with pg_cron/pg_net), GoTrue, PostgREST, Realtime, nginx
+gateway (emulates Kong), Edge Function in Deno, mailpit (mail catcher), migration
+runner, Vite frontend. All auth methods work locally; emails (activation,
+recovery, notifications) are caught by mailpit at `:54324`.
+
+### D-realtime — Live updates via Supabase Realtime
+Supabase **Realtime** websockets push table changes (`sessions`,
+`session_participants`, `availabilities`, `notifications`, `memberships`) to
+clients; the `useRealtime` hook invalidates the affected react-query keys.
+Delivery respects RLS (each client only receives rows it can read). Replaces the
+earlier focus-refetch-only approach.
 
 ## Product / UX (evolution)
 

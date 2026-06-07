@@ -3,7 +3,9 @@
 ## Structure of `app/src`
 
 ```
-auth/          AuthContext (session + profile + refreshProfile), LoginPage, AuthCallback
+auth/          AuthContext (session + profile + refreshProfile), LoginPage
+               (Google/Facebook/password), SignupPage, ForgotPasswordPage,
+               ResetPasswordPage, GoodbyePage, AuthCallback, Turnstile
 components/    Layout (bottom nav), ui.tsx (Button/Badge/Modal/Spinner/EmptyState)
 features/
   groups/      HomePage, JoinPage, MembersPage, InvitePanel, EditGroupModal,
@@ -15,15 +17,30 @@ features/
   notifications/ NotificationsPage
   profile/     ProfilePage
   admin/       AdminPage (superadmin)
-lib/           supabase, types, ranges, slots, push, roleLabel, dateLocale, plays
+lib/           supabase, types, ranges, slots, push, roleLabel, dateLocale,
+               plays, useRealtime (live updates → react-query invalidation)
 i18n/          index.ts + es.json/en.json
 sw.ts          service worker (precache + runtime cache + Web Push)
 ```
 
 Data pattern: `react-query` with per-entity keys (`['session', id]`,
 `['my-agenda']`, `['group-members', gid]`…); mutations invalidate the affected
-keys. No custom global state. No realtime; updates land on refetch (window focus)
-or after your own mutations.
+keys. No custom global state. Live updates via Supabase **Realtime**
+(`useRealtime`, mounted in `Layout`): table changes invalidate the matching keys;
+react-query also refetches on window focus and after your own mutations.
+
+## Auth (`auth/`)
+- `LoginPage`: Google + Meta/Facebook OAuth buttons (`signInWithOAuth`) and an
+  email+password form (`signInWithPassword`); friendly localized errors for
+  invalid credentials / email-not-confirmed / rate limit.
+- `SignupPage`: open sign-up (`signUp`) with email activation; shows a
+  "check your email" screen.
+- `ForgotPasswordPage` / `ResetPasswordPage`: recovery. Forgot is
+  enumeration-resistant (same neutral screen regardless of account existence,
+  errors swallowed); Reset listens for `PASSWORD_RECOVERY` and `updateUser`.
+- `Turnstile`: optional Cloudflare CAPTCHA, gated on `VITE_TURNSTILE_SITE_KEY`
+  (`captchaEnabled`). Single-use token refreshed by remounting with a `key`.
+- `GoodbyePage`: shown after account self-deletion.
 
 ## Core logic (tested)
 

@@ -39,8 +39,9 @@ have several directors.
 
 ## Typical walkthrough
 
-1. **Sign-up**: anyone signs in with Google (open registration, revised D5'); or
-   arrives via an invitation link/code to a group.
+1. **Sign-up**: open registration (revised D5'). Anyone signs up with Google,
+   Meta/Facebook, or email + password (with email activation); or arrives via an
+   invitation link/code to a group.
 2. **Create group**: any user creates a group and becomes its director.
 3. **Invite**: the director shares a code/link/QR or invites by email (bulk).
 4. **Availability**: each member paints their weekly availability (autosave).
@@ -56,7 +57,10 @@ have several directors.
 
 | Route | Screen |
 |-------|--------|
-| `/login`, `/auth/callback` | Sign in (Google; password only in dev) |
+| `/login`, `/auth/callback` | Sign in (Google, Meta/Facebook, email+password) |
+| `/signup` | Create account (email + password, email activation) |
+| `/forgot-password`, `/reset-password` | Password recovery |
+| `/goodbye` | Confirmation after self-deleting the account |
 | `/` | Home: my groups (avatar+role), pending, create/join group |
 | `/availability` | My schedule: availability calendar + overlaid rehearsals |
 | `/upcoming` | Upcoming rehearsals (all groups) + confirmation |

@@ -17,9 +17,10 @@ make help         # other commands
 | app (Vite) | 5173 | Dev frontend |
 | gateway (nginx) | 54321 | Emulates Kong: `/auth/v1`, `/rest/v1`, `/functions/v1` (+ CORS) |
 | db (supabase/postgres) | 54322 | Postgres with pg_cron/pg_net |
-| auth (GoTrue) | — | Auth; email+password enabled only locally |
+| auth (GoTrue) | — | Auth: email+password, Google/Facebook OAuth, activation + recovery, optional Turnstile |
 | rest (PostgREST) | — | API with RLS |
 | functions (Deno) | — | `send-notifications` |
+| mailpit | 54324 | Mail catcher (activation/recovery/notification emails); web UI |
 | realtime (supabase/realtime) | — | WebSockets (Postgres changes). Tenant `realtime-dev` |
 | migrate | — | Applies `supabase/migrations/*` (`_migrations` table) + `seed.sql` |
 
@@ -47,10 +48,20 @@ The seed creates invitations before each user; sign-up auto-accepts them and
 creates the memberships. `seed-users.sh` recreates deleted users (filters by
 pending invitation and existing profile).
 
-## Dev login
-The UI shows a **"dev login"** box (only `import.meta.env.DEV`, absent in
-production) to sign in with email+password. Google optional locally by exporting
-`GOOGLE_OAUTH_ENABLED=true` + client id/secret in `.env`.
+## Login locally
+The login screen offers Google, Meta/Facebook and email+password (the same as
+production). The seed creates password users, so no OAuth setup is needed to log
+in. Activation and recovery emails land in **mailpit** (`:54324`), where you open
+the link.
+
+Optional `.env` / `.env.example` settings (everything works without them):
+- `DEV_HOST` — set to your machine's LAN IP to test from a phone on the same
+  Wi-Fi (open `http://<ip>:5173`).
+- `GOOGLE_OAUTH_ENABLED` + client id/secret — enable Google locally.
+- `FACEBOOK_OAUTH_ENABLED` + client id/secret — enable Meta/Facebook locally.
+- `TURNSTILE_CAPTCHA_ENABLED` + `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET` — enable
+  the CAPTCHA (Cloudflare publishes always-pass test keys).
+- `RESEND_API_KEY`/`EMAIL_FROM` (real email) and `VAPID_*` (Web Push) — optional.
 
 ## Useful commands
 ```bash
