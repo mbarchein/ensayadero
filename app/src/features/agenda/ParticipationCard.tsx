@@ -6,6 +6,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { Check, X, Clock } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
 import { Badge, Button } from '../../components/ui'
+import { celebrate } from '../../lib/confetti'
 import type { ParticipantResponse } from '../../lib/types'
 import { tallyResponses, type MyParticipation } from './useMyAgenda'
 
@@ -77,7 +78,10 @@ export default function ParticipationCard({
           <Button
             variant={p.response === 'ACCEPTED' ? 'primary' : 'secondary'}
             disabled={pending}
-            onClick={() => onRespond('ACCEPTED')}
+            onClick={() => {
+              if (p.response !== 'ACCEPTED') celebrate()
+              onRespond('ACCEPTED')
+            }}
           >
             {t('sessions.goingBtn')}
           </Button>

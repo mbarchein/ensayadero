@@ -12,6 +12,7 @@ import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { roleLabel } from '../../lib/roleLabel'
+import { celebrate } from '../../lib/confetti'
 import { Badge, Button, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
@@ -206,7 +207,10 @@ export default function SessionDetailPage() {
           <div className="flex gap-2">
             <Button
               variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
-              onClick={() => respond.mutate('ACCEPTED')}
+              onClick={() => {
+                if (mine.response !== 'ACCEPTED') celebrate()
+                respond.mutate('ACCEPTED')
+              }}
             >
               {t('sessions.goingBtn')}
             </Button>
