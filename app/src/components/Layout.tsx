@@ -33,6 +33,23 @@ export default function Layout() {
     refetchInterval: 60_000,
   })
 
+  // confirmed rehearsals I haven't answered yet (attendance pending) → alert badge
+  const { data: pendingAttendance } = useQuery({
+    queryKey: ['pending-attendance'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('session_participants')
+        .select('session_id, sessions!inner(status, time_range)', { count: 'exact', head: true })
+        .eq('user_id', profile!.id)
+        .eq('response', 'PENDING')
+        .eq('sessions.status', 'CONFIRMED')
+        .filter('sessions.time_range', 'ov', `[${new Date().toISOString()},)`)
+      return count ?? 0
+    },
+    enabled: !!session && !!profile,
+    refetchInterval: 60_000,
+  })
+
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
   if (!profile) {
@@ -66,6 +83,11 @@ export default function Layout() {
               {t2.to === '/notifications' && (unread ?? 0) > 0 && (
                 <span className="absolute right-1/4 top-1 rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white">
                   {unread}
+                </span>
+              )}
+              {t2.to === '/upcoming' && (pendingAttendance ?? 0) > 0 && (
+                <span className="absolute right-1/4 top-1 rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                  {pendingAttendance}
                 </span>
               )}
             </NavLink>
