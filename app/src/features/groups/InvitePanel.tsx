@@ -18,6 +18,7 @@ export default function InvitePanel({ group }: { group: Group }) {
   const qc = useQueryClient()
   const [qrOpen, setQrOpen] = useState(false)
   const [disableOpen, setDisableOpen] = useState(false)
+  const [enableOpen, setEnableOpen] = useState(false)
   const [emailsOpen, setEmailsOpen] = useState(false)
   const [emails, setEmails] = useState('')
   const [role, setRole] = useState<GroupRole>('ACTOR')
@@ -167,7 +168,7 @@ export default function InvitePanel({ group }: { group: Group }) {
             title={t('invite.enable')}
             aria-label={t('invite.enable')}
             disabled={toggleEnabled.isPending}
-            onClick={() => toggleEnabled.mutate()}
+            onClick={() => setEnableOpen(true)}
           >
             <Power size={18} />
           </Button>
@@ -175,6 +176,27 @@ export default function InvitePanel({ group }: { group: Group }) {
       )}
 
       {qrOpen && <QrModal link={link} code={group.join_code} onClose={() => setQrOpen(false)} />}
+
+      <Modal open={enableOpen} onClose={() => setEnableOpen(false)} title={t('invite.enable')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('invite.enableConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setEnableOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={toggleEnabled.isPending}
+              onClick={() => {
+                toggleEnabled.mutate()
+                setEnableOpen(false)
+              }}
+            >
+              <Power size={16} /> {t('invite.enable')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={disableOpen} onClose={() => setDisableOpen(false)} title={t('invite.disable')}>
         <div className="space-y-4">
