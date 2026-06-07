@@ -142,6 +142,8 @@ Recommended manual steps (need an account/plan):
 
 ```bash
 npx web-push generate-vapid-keys
+# no local Node.js? run it through Docker:
+# docker run --rm node:22-alpine npx -y web-push generate-vapid-keys
 ```
 
 - **Public** → GitHub → repo → Settings → Secrets and variables → Actions →
