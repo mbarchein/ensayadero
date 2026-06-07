@@ -101,44 +101,44 @@ export default function InvitePanel({ group }: { group: Group }) {
     <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-violet-900">{t('invite.title')}</h2>
-        <div className="flex items-center gap-1">
-          {group.join_enabled && (
-            <Button variant="ghost" className="p-2" title={t('invite.share')} aria-label={t('invite.share')} onClick={share}>
-              <Share2 size={18} />
-            </Button>
-          )}
-          {group.join_enabled && (
-            <Button
-              variant="ghost"
-              className="p-2"
-              title={t('invite.regenerate')}
-              aria-label={t('invite.regenerate')}
-              disabled={regenerate.isPending}
-              onClick={() => regenerate.mutate()}
-            >
-              <RefreshCw size={18} />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            className={`p-2 ${group.join_enabled ? '' : 'text-gray-400'}`}
-            title={group.join_enabled ? t('invite.disable') : t('invite.enable')}
-            aria-label={group.join_enabled ? t('invite.disable') : t('invite.enable')}
-            disabled={toggleEnabled.isPending}
-            onClick={() => (group.join_enabled ? setDisableOpen(true) : toggleEnabled.mutate())}
-          >
-            <Power size={18} />
+        {group.join_enabled && (
+          <Button variant="primary" className="p-2" title={t('invite.share')} aria-label={t('invite.share')} onClick={share}>
+            <Share2 size={18} />
           </Button>
-        </div>
+        )}
       </div>
 
       {group.join_enabled ? (
         <>
-          <div>
-            <p className="text-xs text-violet-700">{t('invite.code')}</p>
-            <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">
-              {group.join_code}
-            </p>
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-xs text-violet-700">{t('invite.code')}</p>
+              <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">
+                {group.join_code}
+              </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                className="p-2"
+                title={t('invite.regenerate')}
+                aria-label={t('invite.regenerate')}
+                disabled={regenerate.isPending}
+                onClick={() => regenerate.mutate()}
+              >
+                <RefreshCw size={18} />
+              </Button>
+              <Button
+                variant="ghost"
+                className="p-2"
+                title={t('invite.disable')}
+                aria-label={t('invite.disable')}
+                disabled={toggleEnabled.isPending}
+                onClick={() => setDisableOpen(true)}
+              >
+                <Power size={18} />
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -159,7 +159,17 @@ export default function InvitePanel({ group }: { group: Group }) {
           )}
         </>
       ) : (
-        <p className="text-sm text-gray-600">{t('invite.disabledNote')}</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm text-gray-600">{t('invite.disabledNote')}</p>
+          <Button
+            variant="secondary"
+            className="inline-flex items-center gap-1.5"
+            disabled={toggleEnabled.isPending}
+            onClick={() => toggleEnabled.mutate()}
+          >
+            <Power size={16} /> {t('invite.enable')}
+          </Button>
+        </div>
       )}
 
       {qrOpen && <QrModal link={link} code={group.join_code} onClose={() => setQrOpen(false)} />}
