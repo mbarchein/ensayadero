@@ -76,6 +76,20 @@ export default function AvailabilityPage() {
     return map
   }, [agenda.data, monday])
 
+  // confirmed rehearsals in the visible week — clearing the week wipes the
+  // availability that overlaps them, so we list them in the confirm modal.
+  const weekScheduled = useMemo(() => {
+    const seen = new Map<string, MyParticipation>()
+    for (const p of sessionCells.values()) {
+      if (p.sessions.status === 'CONFIRMED') seen.set(p.session_id, p)
+    }
+    return [...seen.values()].sort(
+      (a, b) =>
+        parseRange(a.sessions.time_range).start.getTime() -
+        parseRange(b.sessions.time_range).start.getTime(),
+    )
+  }, [sessionCells])
+
   // list (with accept/decline) of the visible week's rehearsals
   const { data: availabilities, isLoading } = useQuery({
     queryKey: ['availabilities', profile?.id],
@@ -425,6 +439,21 @@ export default function AvailabilityPage() {
       <Modal open={clearOpen} onClose={() => setClearOpen(false)} title={t('availability.clearWeekTitle')}>
         <div className="space-y-4">
           <p className="text-sm text-gray-600">{t('availability.clearWeekConfirm')}</p>
+          {weekScheduled.length > 0 && (
+            <div className="rounded-lg bg-amber-50 p-3 text-sm">
+              <p className="font-medium text-amber-800">{t('availability.clearAffects')}</p>
+              <ul className="mt-1 space-y-0.5 text-amber-700">
+                {weekScheduled.map((p) => {
+                  const r = parseRange(p.sessions.time_range)
+                  return (
+                    <li key={p.session_id}>
+                      {p.sessions.title} — {format(r.start, 'EEE d · HH:mm', { locale: dateLocale() })}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={() => setClearOpen(false)}>
               {t('common.cancel')}

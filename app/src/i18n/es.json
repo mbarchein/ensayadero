@@ -141,6 +141,7 @@
     "clearWeek": "Borrar semana",
     "clearWeekTitle": "Borrar disponibilidad de la semana",
     "clearWeekConfirm": "Se borrará toda tu disponibilidad marcada en esta semana. Esta acción no se puede deshacer.",
+    "clearAffects": "También quita tu disponibilidad en estos ensayos programados:",
     "saveError": "Error al guardar: {{message}}",
     "gridFooter": "Franjas de {{minutes}} min · {{start}}:00–{{end}}:00"
   },

@@ -141,6 +141,7 @@
     "clearWeek": "Clear week",
     "clearWeekTitle": "Clear this week's availability",
     "clearWeekConfirm": "All the availability you marked this week will be removed. This can't be undone.",
+    "clearAffects": "This also removes your availability for these scheduled rehearsals:",
     "saveError": "Error saving: {{message}}",
     "gridFooter": "{{minutes}} min slots · {{start}}:00–{{end}}:00"
   },
