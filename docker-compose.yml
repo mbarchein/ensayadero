@@ -62,7 +62,7 @@ services:
       GOTRUE_SMTP_USER: ""
       GOTRUE_SMTP_PASS: ""
       GOTRUE_SMTP_ADMIN_EMAIL: noreply@ensayo.local
-      GOTRUE_SMTP_SENDER_NAME: Ensayo
+      GOTRUE_SMTP_SENDER_NAME: Ensayadero
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/callback
       GOTRUE_MAILER_URLPATHS_RECOVERY: /reset-password
       GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/callback
@@ -176,7 +176,7 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: *service-key
       APP_URL: http://localhost:5173
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      EMAIL_FROM: ${EMAIL_FROM:-Ensayo <dev@localhost>}
+      EMAIL_FROM: ${EMAIL_FROM:-Ensayadero <dev@localhost>}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:dev@localhost}

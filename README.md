@@ -1,4 +1,4 @@
-# Ensayo — Theatre rehearsal planner
+# Ensayadero — Theatre rehearsal planner
 
 PWA for planning rehearsals around the group's availability. Each member paints their
 availability on a calendar; the instructor sees the combined heatmap and schedules

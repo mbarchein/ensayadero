@@ -175,7 +175,7 @@
     "byEmailTitle": "Invitar por email",
     "emailsLabel": "Emails (separados por coma, espacio o salto de línea)",
     "sendEmails": "Enviar invitaciones",
-    "shareText": "Únete a «{{group}}» en Ensayo",
+    "shareText": "Únete a «{{group}}» en Ensayadero",
     "regenerate": "Regenerar código",
     "enable": "Activar código",
     "disable": "Desactivar código",

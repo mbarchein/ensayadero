@@ -1,4 +1,4 @@
-# Documentation — Ensayo
+# Documentation — Ensayadero
 
 PWA to plan a theatre group's rehearsals based on members' availability. Each
 member paints their availability; the director sees the combined heatmap and

@@ -12,7 +12,7 @@ const supabase = createClient(
 )
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'Ensayo <onboarding@resend.dev>'
+const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'Ensayadero <onboarding@resend.dev>'
 const APP_URL = Deno.env.get('APP_URL') ?? ''
 
 const VAPID_PUBLIC = Deno.env.get('VAPID_PUBLIC_KEY')
@@ -111,7 +111,7 @@ async function processInvitation(invitationId: string): Promise<void> {
   const groupName = (inv.groups as unknown as { name: string })?.name ?? 'un grupo'
   await sendEmail(
     inv.email,
-    `🎭 Invitación a "${groupName}" en Ensayo`,
+    `🎭 Invitación a "${groupName}" en Ensayadero`,
     `<h2 style="color:#7c3aed">Te han invitado a "${groupName}"</h2>
      <p>Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
      <p>Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>

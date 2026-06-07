@@ -47,7 +47,7 @@ export default function LoginPage() {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-violet-50 p-6">
       <div className="flex flex-col items-center gap-2">
         <img src="/icons/icon-192.png" alt="" className="h-20 w-20 rounded-2xl shadow-lg" />
-        <h1 className="text-3xl font-bold text-violet-900">Ensayo</h1>
+        <h1 className="text-3xl font-bold text-violet-900">Ensayadero</h1>
         <p className="text-center text-sm text-violet-700">{t('login.tagline')}</p>
       </div>
 

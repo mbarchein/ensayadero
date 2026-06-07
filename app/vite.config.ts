@@ -15,8 +15,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'Ensayo — Planificador de ensayos',
-        short_name: 'Ensayo',
+        name: 'Ensayadero — Planificador de ensayos',
+        short_name: 'Ensayadero',
         description: 'Planificación de ensayos de teatro según disponibilidad del grupo',
         lang: 'es',
         start_url: '/',

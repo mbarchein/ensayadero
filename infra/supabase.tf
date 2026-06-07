@@ -64,7 +64,7 @@ resource "supabase_settings" "main" {
     smtp_port                          = 465
     smtp_user                          = "resend"
     smtp_pass                          = var.resend_api_key
-    smtp_sender_name                   = "Ensayo"
+    smtp_sender_name                   = "Ensayadero"
 
     # --- Auth form hardening ---
     # Activation/recovery links: expire after 15 min, single-use.

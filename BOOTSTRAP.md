@@ -1,4 +1,4 @@
-# BOOTSTRAP — Manual steps to ship Ensayo to production
+# BOOTSTRAP — Manual steps to ship Ensayadero to production
 
 Everything else is automated (Terraform + GitHub Actions). These steps need human
 intervention because the providers don't expose an API/Terraform for them, or
@@ -64,7 +64,7 @@ Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect
 ## 5. Google OAuth client (manual — Google doesn't expose it via Terraform)
 
 1. https://console.cloud.google.com → create a project (or reuse one).
-2. **APIs & Services → OAuth consent screen**: type *External*, name "Ensayo",
+2. **APIs & Services → OAuth consent screen**: type *External*, name "Ensayadero",
    authorized domains: your domain. Publish (no verification needed for the basic
    email/profile scopes).
 3. **Credentials → Create credentials → OAuth client ID**: type *Web application*.
@@ -103,7 +103,7 @@ Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect
 5. Also upload it to the Edge Functions:
    ```bash
    supabase secrets set RESEND_API_KEY=re_xxx --project-ref <project-ref>
-   supabase secrets set EMAIL_FROM="Ensayo <notifications@yourdomain.es>" --project-ref <project-ref>
+   supabase secrets set EMAIL_FROM="Ensayadero <notifications@yourdomain.es>" --project-ref <project-ref>
    ```
 6. The same `resend_api_key` configures the Auth SMTP (Terraform applies it in
    `supabase_settings`): the **account activation** and **password recovery** emails
