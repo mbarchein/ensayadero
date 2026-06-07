@@ -376,7 +376,9 @@ export default function CreateSessionModal({
                     />
                     {nameOf(p.userId)}
                     {p.included && cov?.state === 'partial' && (
-                      <Badge color="amber">{t('planner.partialAvailability', { hours: cov.label })}</Badge>
+                      <span className="basis-full sm:basis-auto">
+                        <Badge color="amber">{t('planner.partialAvailability', { hours: cov.label })}</Badge>
+                      </span>
                     )}
                     {p.included && cov?.state === 'none' && (
                       <Badge color={p.required ? 'red' : 'amber'}>{t('planner.noAvailability')}</Badge>
