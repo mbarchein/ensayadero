@@ -6,6 +6,7 @@
     "create": "Create",
     "delete": "Delete",
     "back": "Back",
+    "menu": "Menu",
     "loading": "Loading…",
     "error": "Error: {{message}}",
     "optionalField": "(optional)"

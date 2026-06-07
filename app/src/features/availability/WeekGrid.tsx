@@ -19,6 +19,8 @@ interface Props {
   onPaintMove?: (pos: CellPos) => void
   onPaintEnd?: () => void
   onCellTap?: (pos: CellPos) => void
+  /** Fill the parent's height (flex child) instead of capping at 70vh. */
+  fill?: boolean
 }
 
 export default function WeekGrid({
@@ -29,6 +31,7 @@ export default function WeekGrid({
   onPaintMove,
   onPaintEnd,
   onCellTap,
+  fill = false,
 }: Props) {
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -72,10 +75,13 @@ export default function WeekGrid({
   const hours = Array.from({ length: SLOTS_PER_DAY / 2 }, (_, i) => DAY_START_HOUR + i)
 
   return (
-    <div className="select-none">
+    <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
       {/* single scroll box so the day header (sticky top) and the hour column
           (sticky left) stay visible while scrolling in either direction */}
-      <div ref={scrollRef} className="max-h-[70vh] overflow-auto overscroll-contain">
+      <div
+        ref={scrollRef}
+        className={`overflow-auto overscroll-contain ${fill ? 'min-h-0 flex-1' : 'max-h-[70vh]'}`}
+      >
         <div
           ref={gridRef}
           // touch-action none: we arbitrate scroll vs paint ourselves (see refs).

@@ -62,7 +62,7 @@ export default function Layout() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-3xl flex-col">
-      <main className="flex-1 px-4 pb-24 pt-4">
+      <main className="flex min-h-0 flex-1 flex-col px-4 pb-24 pt-4">
         <Outlet />
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-white pb-[env(safe-area-inset-bottom)]">
