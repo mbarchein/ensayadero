@@ -40,6 +40,11 @@
     "empty": "You have no upcoming rehearsals.",
     "pendingNotice_one": "You have {{count}} rehearsal to confirm.",
     "pendingNotice_other": "You have {{count}} rehearsals to confirm.",
+    "group": {
+      "thisWeek": "This week",
+      "nextWeek": "Next week",
+      "later": "Later"
+    },
     "viewInAgenda": "View in my schedule",
     "going": "Going",
     "notGoing": "Not going",

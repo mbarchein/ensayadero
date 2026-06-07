@@ -3,8 +3,9 @@
 
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { addDays } from 'date-fns'
 import { parseRange } from '../../lib/ranges'
-import { isoDay } from '../../lib/slots'
+import { isoDay, weekStart } from '../../lib/slots'
 import { EmptyState, Spinner } from '../../components/ui'
 import { useMyAgenda } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
@@ -22,6 +23,16 @@ export default function UpcomingPage() {
     (p) => p.sessions.status === 'CONFIRMED' && p.response === 'PENDING',
   ).length
 
+  // group by this week / next week / later (Monday-based weeks)
+  const nextWeek = addDays(weekStart(now), 7)
+  const weekAfter = addDays(weekStart(now), 14)
+  const startOf = (p: (typeof upcoming)[number]) => parseRange(p.sessions.time_range).start
+  const sections = [
+    { key: 'thisWeek', items: upcoming.filter((p) => startOf(p) < nextWeek) },
+    { key: 'nextWeek', items: upcoming.filter((p) => startOf(p) >= nextWeek && startOf(p) < weekAfter) },
+    { key: 'later', items: upcoming.filter((p) => startOf(p) >= weekAfter) },
+  ].filter((s) => s.items.length > 0)
+
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
@@ -35,19 +46,24 @@ export default function UpcomingPage() {
       {upcoming.length === 0 ? (
         <EmptyState message={t('upcoming.empty')} />
       ) : (
-        <ul className="space-y-3">
-          {upcoming.map((p) => (
-            <ParticipationCard
-              key={p.session_id}
-              p={p}
-              pending={respond.isPending}
-              onRespond={(response) => respond.mutate({ sessionId: p.session_id, response })}
-              onViewAgenda={() =>
-                navigate(`/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}`)
-              }
-            />
-          ))}
-        </ul>
+        sections.map((s) => (
+          <section key={s.key} className="space-y-2">
+            <h2 className="text-sm font-semibold text-gray-500">{t(`upcoming.group.${s.key}`)}</h2>
+            <ul className="space-y-3">
+              {s.items.map((p) => (
+                <ParticipationCard
+                  key={p.session_id}
+                  p={p}
+                  pending={respond.isPending}
+                  onRespond={(response) => respond.mutate({ sessionId: p.session_id, response })}
+                  onViewAgenda={() =>
+                    navigate(`/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}`)
+                  }
+                />
+              ))}
+            </ul>
+          </section>
+        ))
       )}
     </div>
   )

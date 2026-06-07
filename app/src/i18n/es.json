@@ -40,6 +40,11 @@
     "empty": "No tienes ensayos próximos.",
     "pendingNotice_one": "Tienes {{count}} ensayo por confirmar.",
     "pendingNotice_other": "Tienes {{count}} ensayos por confirmar.",
+    "group": {
+      "thisWeek": "Esta semana",
+      "nextWeek": "La semana que viene",
+      "later": "Otros"
+    },
     "viewInAgenda": "Ver en mi agenda",
     "going": "Van",
     "notGoing": "No van",
