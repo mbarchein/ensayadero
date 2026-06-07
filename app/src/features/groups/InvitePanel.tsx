@@ -162,12 +162,14 @@ export default function InvitePanel({ group }: { group: Group }) {
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-gray-600">{t('invite.disabledNote')}</p>
           <Button
-            variant="secondary"
-            className="inline-flex items-center gap-1.5"
+            variant="ghost"
+            className="p-2"
+            title={t('invite.enable')}
+            aria-label={t('invite.enable')}
             disabled={toggleEnabled.isPending}
             onClick={() => toggleEnabled.mutate()}
           >
-            <Power size={16} /> {t('invite.enable')}
+            <Power size={18} />
           </Button>
         </div>
       )}
