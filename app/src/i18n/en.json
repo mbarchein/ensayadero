@@ -138,7 +138,8 @@
     "slotsCount_one": "{{count}} 30-min slot",
     "slotsCount_other": "{{count}} 30-min slots",
     "clearWeek": "Clear week",
-    "clearWeekConfirm": "All your availability for this week will be removed (recurring blocks get an exception for this week only). Continue?",
+    "clearWeekTitle": "Clear this week's availability",
+    "clearWeekConfirm": "All the availability you marked this week will be removed. This can't be undone.",
     "saveError": "Error saving: {{message}}",
     "gridFooter": "{{minutes}} min slots · {{start}}:00–{{end}}:00"
   },

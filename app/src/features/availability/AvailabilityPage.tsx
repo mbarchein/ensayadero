@@ -54,6 +54,7 @@ export default function AvailabilityPage() {
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const [copyOpen, setCopyOpen] = useState(false)
+  const [clearOpen, setClearOpen] = useState(false)
   const [copyN, setCopyN] = useState(1)
   const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
 
@@ -316,9 +317,7 @@ export default function AvailabilityPage() {
             className="p-2 text-red-600"
             aria-label={t('availability.clearWeek')}
             title={t('availability.clearWeek')}
-            onClick={() => {
-              if (confirm(t('availability.clearWeekConfirm'))) clearWeek.mutate()
-            }}
+            onClick={() => setClearOpen(true)}
             disabled={clearWeek.isPending}
           >
             <Trash2 size={18} />
@@ -420,6 +419,28 @@ export default function AvailabilityPage() {
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
       />
+
+      <Modal open={clearOpen} onClose={() => setClearOpen(false)} title={t('availability.clearWeekTitle')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('availability.clearWeekConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setClearOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="warning"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={clearWeek.isPending}
+              onClick={() => {
+                clearWeek.mutate()
+                setClearOpen(false)
+              }}
+            >
+              <Trash2 size={16} /> {t('availability.clearWeek')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={copyOpen} onClose={() => setCopyOpen(false)} title={t('availability.copyTitle')}>
         <form

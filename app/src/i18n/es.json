@@ -138,7 +138,8 @@
     "slotsCount_one": "{{count}} tramo de 30 min",
     "slotsCount_other": "{{count}} tramos de 30 min",
     "clearWeek": "Borrar semana",
-    "clearWeekConfirm": "Se borrará toda tu disponibilidad de esta semana (los bloques recurrentes quedan como excepción solo esta semana). ¿Continuar?",
+    "clearWeekTitle": "Borrar disponibilidad de la semana",
+    "clearWeekConfirm": "Se borrará toda tu disponibilidad marcada en esta semana. Esta acción no se puede deshacer.",
     "saveError": "Error al guardar: {{message}}",
     "gridFooter": "Franjas de {{minutes}} min · {{start}}:00–{{end}}:00"
   },
