@@ -9,18 +9,19 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     setLoading(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    // Resistencia a enumeración: NO ramificamos la UI según exista o no la
+    // cuenta ni mostramos el error del backend. GoTrue ya responde igual en
+    // ambos casos; aquí mostramos siempre la misma pantalla neutra. Los
+    // errores reales (rate limit) se silencian a propósito para no filtrar.
+    await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${import.meta.env.VITE_APP_URL}/reset-password`,
     })
     setLoading(false)
-    if (error) setError(error.message)
-    else setSent(true)
+    setSent(true)
   }
 
   if (sent) {
@@ -52,7 +53,6 @@ export default function ForgotPasswordPage() {
           autoComplete="email"
           required
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={loading}

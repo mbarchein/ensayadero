@@ -66,6 +66,21 @@ services:
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/callback
       GOTRUE_MAILER_URLPATHS_RECOVERY: /reset-password
       GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/callback
+      # --- Endurecimiento de formularios de auth (registro/recuperación) ---
+      # Política de contraseña: longitud mínima + comprobación de filtradas (HIBP,
+      # k-anonymity: la contraseña nunca sale del servidor).
+      GOTRUE_PASSWORD_MIN_LENGTH: "8"
+      GOTRUE_PASSWORD_HIBP_ENABLED: "true"
+      # Enlaces de activación/recuperación: caducan a los 15 min y son de un solo uso.
+      GOTRUE_MAILER_OTP_EXP: "900"
+      GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: "true"
+      # Anti email-bombing / enumeración por volumen: correos/hora por IP.
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: "10"
+      # IP real tras el gateway nginx (si no, todas las peticiones comparten cubo).
+      GOTRUE_RATE_LIMIT_HEADER: X-Forwarded-For
+      # Frecuencia mínima entre correos por usuario (5s en local para poder probar;
+      # prod hosted usa el valor por defecto de Supabase, mayor).
+      GOTRUE_SMTP_MAX_FREQUENCY: 5s
       # Google OAuth opcional en local: GOOGLE_OAUTH_ENABLED=true + client id/secret
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_OAUTH_ENABLED:-false}
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}

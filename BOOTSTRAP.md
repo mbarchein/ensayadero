@@ -109,6 +109,32 @@ Anota outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_ur
    `supabase_settings`): correos de **activación de cuenta** y **recuperación de
    contraseña** del registro email+password. Sin ella esos correos no se envían.
 
+## 6b. Endurecimiento de los formularios de auth
+
+Terraform ya aplica (en `supabase_settings.auth`) las defensas que no necesitan
+cuentas externas:
+
+- **Anti-enumeración**: `/recover` responde igual exista o no la cuenta, y con
+  `mailer_autoconfirm=false` el registro no revela emails ya existentes. El
+  frontend muestra siempre el mismo mensaje neutro. **No actives autoconfirm.**
+- **Anti email-bombing**: `rate_limit_email_sent=10` correos/hora.
+- **Enlaces de un solo uso y caducidad corta**: `mailer_otp_exp=900` (15 min).
+- **Política de contraseñas**: `password_min_length=8`.
+- **Open redirect**: `additional_redirect_urls` con rutas exactas, **sin
+  comodines** (`*`/`**` abrirían fuga del token de recuperación). No añadas
+  comodines de host.
+
+Pasos manuales recomendados (necesitan cuenta/plan):
+
+1. **CAPTCHA (Cloudflare Turnstile)** — la mejor defensa contra bots y
+   enumeración por volumen. Crear un widget en
+   https://dash.cloudflare.com/?to=/:account/turnstile, y en Supabase dashboard
+   → Authentication → Attack Protection → activar CAPTCHA (provider *Turnstile*,
+   pegar el *secret*). Luego pasar el token en el frontend
+   (`options.captchaToken` en `signUp`/`signInWithPassword`/`resetPasswordForEmail`).
+2. **Contraseñas filtradas (HIBP)** — `password_hibp_enabled=true` en
+   `terraform.tfvars`. Requiere **plan Pro** de Supabase.
+
 ## 7. Claves VAPID (Web Push)
 
 ```bash

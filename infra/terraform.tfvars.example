@@ -20,6 +20,10 @@ google_oauth_client_secret = "GOCSPX-xxx"
 facebook_oauth_client_id     = ""
 facebook_oauth_client_secret = ""
 
+# Seguridad de contraseñas: comprobación de filtradas (HaveIBeenPwned).
+# Requiere plan Pro de Supabase. Dejar en false en free tier.
+password_hibp_enabled = false
+
 # Cloudflare — token con Pages:Edit, DNS:Edit, Zone:Read
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"

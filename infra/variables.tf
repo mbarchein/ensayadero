@@ -63,6 +63,14 @@ variable "facebook_oauth_client_secret" {
   default     = ""
 }
 
+# Protección de contraseñas filtradas (HaveIBeenPwned). En Supabase hosted
+# requiere plan Pro o superior; dejar en false en free tier para no romper apply.
+variable "password_hibp_enabled" {
+  description = "Activar comprobación HIBP de contraseñas filtradas (requiere plan Pro)"
+  type        = bool
+  default     = false
+}
+
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
   description = "API token Cloudflare con permisos Pages:Edit, DNS:Edit, Zone:Read"

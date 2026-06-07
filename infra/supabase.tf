@@ -65,5 +65,15 @@ resource "supabase_settings" "main" {
     smtp_user                          = "resend"
     smtp_pass                          = var.resend_api_key
     smtp_sender_name                   = "Ensayo"
+
+    # --- Endurecimiento de formularios de auth ---
+    # Enlaces de activación/recuperación: caducan a los 15 min, un solo uso.
+    mailer_otp_exp = 900
+    # Política de contraseñas: longitud mínima + (opcional) HIBP filtradas.
+    password_min_length   = 8
+    password_hibp_enabled = var.password_hibp_enabled
+    # Anti email-bombing / enumeración por volumen.
+    rate_limit_email_sent          = 10
+    rate_limit_token_verifications = 30
   })
 }
