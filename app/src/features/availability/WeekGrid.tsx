@@ -83,7 +83,7 @@ export default function WeekGrid({
           // touch-action none: we arbitrate scroll vs paint ourselves (see refs).
           // Mouse keeps native behaviour.
           style={{ touchAction: 'none' }}
-          className="grid min-w-[560px] grid-cols-[3rem_repeat(7,1fr)]"
+          className="grid min-w-[560px] grid-cols-[3rem_repeat(7,minmax(0,1fr))]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
             const editable = !!pos && !isPast(pos)
@@ -254,7 +254,7 @@ function Row({
             key={day}
             data-day={day}
             data-slot={slot}
-            className={`h-6 border-b border-r border-gray-100 ${
+            className={`h-6 overflow-hidden border-b border-r border-gray-100 ${
               isHourStart ? 'border-t border-t-gray-200' : ''
             } ${cellClass({ day, slot })} ${past ? 'opacity-35 grayscale' : ''}`}
           >
