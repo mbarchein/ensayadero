@@ -1,10 +1,19 @@
 # BOOTSTRAP — Manual steps to ship Ensayadero to production
 
-Everything else is automated (Terraform + GitHub Actions). These steps need human
-intervention because the providers don't expose an API/Terraform for them, or
-because they involve secrets you must generate yourself.
+This guide takes Ensayadero from an empty repo to a live production deployment on
+the **managed stack**: the frontend on Cloudflare Pages and the backend on
+Supabase (Postgres, Auth, API, Realtime, Edge Functions). The infrastructure is
+provisioned by Terraform (`infra/`) and deployed by GitHub Actions on push.
 
-Recommended order: follow the sections top to bottom.
+> Prefer to self-host the whole backend instead of using Supabase/Cloudflare?
+> See `DEPLOY.md` (Docker Swarm).
+
+Most of the setup is automated, but a handful of steps **need you to do them by
+hand** — either because the provider has no Terraform/API (creating an OAuth app,
+verifying a domain) or because they involve **secrets you must generate yourself**
+and paste into `infra/terraform.tfvars`. This document lists exactly those manual
+steps, in the order you should do them. Follow the sections top to bottom; there's
+a quick checklist at the end.
 
 ---
 
