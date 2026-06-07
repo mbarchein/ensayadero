@@ -131,10 +131,10 @@ export default function AvailabilityPage() {
         onSuccess: async () => {
           savedSeq.current = seqAtFire
           if (editSeq.current === seqAtFire) {
-            // Wait for the refetched server grid before dropping the draft, so
-            // the slots switch straight from "pending" to final with no flicker.
+            // Keep the draft as the working grid; refetch the server grid so the
+            // "pending" (dirty) styling clears once it matches. We do NOT drop
+            // the draft — the draft→server handoff was the source of the flicker.
             await qc.refetchQueries({ queryKey: ['availabilities', profile?.id] })
-            if (editSeq.current === seqAtFire) setDraft(null)
           } else {
             scheduleSave() // there were strokes during the save: persist again
           }
