@@ -25,7 +25,7 @@ export default function PlannerPage() {
   const { t } = useTranslation()
   const { groupId, group, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const initialOffset = useMemo(() => {
     const d = params.get('d')
     if (!d) return 0
@@ -129,6 +129,33 @@ export default function PlannerPage() {
       monday,
     )
   }, [availabilities, busyRows, activeIds, monday])
+
+  // Grid for the edit modal: over ALL members (so every participant's coverage
+  // is computed) and excluding the edited session's own occupation — otherwise
+  // its participants would show as "busy" in their own slot.
+  const editGrid = useMemo(() => {
+    if (!availabilities || !editSession) return null
+    const exclude = parseRange(editSession.time_range)
+    const sessionPeople = new Set(editSession.session_participants.map((p) => p.user_id))
+    const busyByUser = new Map<string, TimeRange[]>()
+    for (const row of busyRows ?? []) {
+      const iv = parseRange(row.busy)
+      // drop the edited session's slot from its own participants' busy time
+      if (sessionPeople.has(row.user_id) && overlaps(iv, exclude)) continue
+      const list = busyByUser.get(row.user_id) ?? []
+      list.push(iv)
+      busyByUser.set(row.user_id, list)
+    }
+    return heatmap(
+      memberIds.map((id) => ({
+        userId: id,
+        availabilities: availabilities.filter((a) => a.user_id === id),
+        busy: busyByUser.get(id) ?? [],
+      })),
+      monday,
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availabilities, busyRows, editSession, monday])
 
   if (loading) return <Spinner />
   if (!isInstructor) {
@@ -334,16 +361,25 @@ export default function PlannerPage() {
         />
       )}
 
-      {editSession && grid && (
+      {editSession && editGrid && (
         <CreateSessionModal
           groupId={groupId}
           members={members}
           preselectedIds={[]}
           session={editSession}
           initialRange={parseRange(editSession.time_range)}
-          grid={grid}
+          grid={editGrid}
           weekMonday={monday}
-          onClose={() => setEditSession(null)}
+          onClose={() => {
+            setEditSession(null)
+            // remove ?edit= so the open-from-link effect doesn't reopen it
+            // after the post-save refetch of week-sessions
+            if (params.get('edit')) {
+              const next = new URLSearchParams(params)
+              next.delete('edit')
+              setParams(next, { replace: true })
+            }
+          }}
         />
       )}
     </div>
