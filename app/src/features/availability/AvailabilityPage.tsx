@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Trash2, Check, X, Clock } from 'lucide-react'
+import { Trash2, Copy, Check, X, Clock } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -24,7 +24,6 @@ import WeekGrid, { type CellPos } from './WeekGrid'
 import { Button, Modal, Spinner } from '../../components/ui'
 import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
-import ParticipationCard from '../agenda/ParticipationCard'
 import type { Availability } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
@@ -77,14 +76,6 @@ export default function AvailabilityPage() {
   }, [agenda.data, monday])
 
   // list (with accept/decline) of the visible week's rehearsals
-  const weekParticipations = useMemo(() => {
-    const windowEnd = addDays(monday, 7)
-    return (agenda.data ?? []).filter((p) => {
-      const r = parseRange(p.sessions.time_range)
-      return r.start < windowEnd && r.end > monday
-    })
-  }, [agenda.data, monday])
-
   const { data: availabilities, isLoading } = useQuery({
     queryKey: ['availabilities', profile?.id],
     queryFn: async () => {
@@ -309,6 +300,30 @@ export default function AvailabilityPage() {
     <div className="space-y-4">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{t('availability.title')}</h1>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            className="p-2"
+            aria-label={t('availability.copyWeeks')}
+            title={t('availability.copyWeeks')}
+            onClick={() => setCopyOpen(true)}
+            disabled={copyWeeks.isPending}
+          >
+            <Copy size={18} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="p-2 text-red-600"
+            aria-label={t('availability.clearWeek')}
+            title={t('availability.clearWeek')}
+            onClick={() => {
+              if (confirm(t('availability.clearWeekConfirm'))) clearWeek.mutate()
+            }}
+            disabled={clearWeek.isPending}
+          >
+            <Trash2 size={18} />
+          </Button>
+        </div>
       </header>
 
       <div className="flex items-center justify-between">
@@ -327,6 +342,22 @@ export default function AvailabilityPage() {
         <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
           ›
         </Button>
+      </div>
+
+      {/* status above the grid — nothing may go below it (the grid scroll box
+          swallows touch gestures, making later content unreachable on mobile) */}
+      <div className="flex h-4 items-center justify-end text-xs" role="status">
+        {save.isError || copyWeeks.isError || clearWeek.isError ? (
+          <span className="text-red-600">
+            {t('availability.saveError', {
+              message: ((save.error || copyWeeks.error || clearWeek.error) as Error).message,
+            })}
+          </span>
+        ) : (
+          <span className={save.isPending || draft ? 'text-gray-400' : 'text-green-600'}>
+            {save.isPending || draft ? t('availability.saving') : t('availability.saved')}
+          </span>
+        )}
       </div>
 
       <WeekGrid
@@ -389,48 +420,6 @@ export default function AvailabilityPage() {
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
       />
-
-      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-green-300" /> {t('availability.available')}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded border bg-white" /> {t('availability.unmarked')}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded ring-2 ring-inset ring-indigo-500" />{' '}
-          {t('availability.rehearsal')}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <span
-          className={`flex-1 text-sm ${save.isPending || draft ? 'text-gray-400' : 'text-green-600'}`}
-          role="status"
-        >
-          {save.isPending || draft ? t('availability.saving') : t('availability.saved')}
-        </span>
-        <Button variant="secondary" onClick={() => setCopyOpen(true)} disabled={copyWeeks.isPending}>
-          {t('availability.copyWeeks')}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (confirm(t('availability.clearWeekConfirm'))) clearWeek.mutate()
-          }}
-          disabled={clearWeek.isPending}
-          className="inline-flex items-center gap-1.5"
-        >
-          <Trash2 size={15} /> {t('availability.clearWeek')}
-        </Button>
-      </div>
-      {(save.isError || copyWeeks.isError || clearWeek.isError) && (
-        <p className="text-sm text-red-600">
-          {t('availability.saveError', {
-            message: ((save.error || copyWeeks.error || clearWeek.error) as Error).message,
-          })}
-        </p>
-      )}
 
       <Modal open={copyOpen} onClose={() => setCopyOpen(false)} title={t('availability.copyTitle')}>
         <form
@@ -529,23 +518,6 @@ export default function AvailabilityPage() {
           </div>
         </div>
       </Modal>
-
-      {/* rehearsals summoned in the visible week */}
-      {weekParticipations.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-gray-700">{t('availability.weekSessions')}</h2>
-          <ul className="space-y-3">
-            {weekParticipations.map((p) => (
-              <ParticipationCard
-                key={p.session_id}
-                p={p}
-                pending={agenda.respond.isPending}
-                onRespond={(response) => agenda.respond.mutate({ sessionId: p.session_id, response })}
-              />
-            ))}
-          </ul>
-        </section>
-      )}
     </div>
   )
 }
