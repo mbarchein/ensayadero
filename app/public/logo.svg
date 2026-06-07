@@ -1,26 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Ensayadero — theatre curtain (rehearsal) + availability dots (planning).
-       The amber dot is the matched slot where everyone is free. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#8b5cf6"/>
       <stop offset="1" stop-color="#6d28d9"/>
     </linearGradient>
   </defs>
+  <!-- mark -->
   <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- curtain rod -->
   <rect x="10" y="13" width="44" height="3" rx="1.5" fill="#ede9fe"/>
-  <!-- scalloped curtain valance -->
   <path d="M11 15 H53 V24
            Q49.5 31 46 24 Q42.5 31 39 24 Q35.5 31 32 24
            Q28.5 31 25 24 Q21.5 31 18 24 Q14.5 31 11 24 Z"
         fill="#f4f1fd"/>
   <path d="M11 15 H53 V19 H11 Z" fill="#fff" opacity="0.7"/>
-  <!-- availability dots: a row of three, the middle one is the matched slot -->
   <circle cx="20" cy="44" r="4.5" fill="#c4b5fd"/>
   <circle cx="32" cy="44" r="5.5" fill="#fbbf24"/>
   <circle cx="44" cy="44" r="4.5" fill="#c4b5fd"/>
-  <!-- check inside the matched slot -->
   <path d="M29.6 44.2 L31.3 46 L34.6 42.2" fill="none" stroke="#7c3aed"
         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- wordmark -->
+  <text x="78" y="40" font-size="26" font-weight="700" fill="#4c1d95">Ensayadero</text>
+  <text x="79" y="54" font-size="9.5" font-weight="500" letter-spacing="0.5" fill="#8b5cf6">PLANIFICA TUS ENSAYOS</text>
 </svg>
