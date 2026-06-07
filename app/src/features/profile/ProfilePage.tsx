@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@tanstack/react-query'
+import { LogOut } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
@@ -52,7 +53,16 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold">{t('profile.title')}</h1>
+      <header className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">{t('profile.title')}</h1>
+        <Button
+          variant="ghost"
+          onClick={signOut}
+          className="inline-flex items-center gap-1.5 text-red-600"
+        >
+          <LogOut size={18} /> {t('profile.signOut')}
+        </Button>
+      </header>
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
         {profile?.avatar_url && <img src={profile.avatar_url} alt="" className="h-14 w-14 rounded-full" />}
         <p className="text-sm text-gray-500">{profile?.email}</p>
@@ -122,10 +132,6 @@ export default function ProfilePage() {
           <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
         )}
       </section>
-
-      <Button variant="secondary" onClick={signOut} className="w-full">
-        {t('profile.signOut')}
-      </Button>
 
       <section className="rounded-xl border border-red-200 bg-red-50 p-4">
         <h2 className="mb-2 font-semibold text-red-900">{t('profile.dangerZone')}</h2>
