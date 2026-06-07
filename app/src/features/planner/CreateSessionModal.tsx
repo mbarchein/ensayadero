@@ -82,32 +82,52 @@ export default function CreateSessionModal({
   }, [day, startMin])
   const end = useMemo(() => new Date(start.getTime() + durationMin * 60_000), [start, durationMin])
 
-  // availability of each participant in the chosen range (via the slot grid)
+  // availability of each participant in the chosen range (via the slot grid):
+  // full / partial (with the available sub-ranges) / none
+  type Coverage = { state: 'full' | 'partial' | 'none'; label: string }
   const coverage = useMemo(() => {
+    const map = new Map<string, Coverage>()
     const dayIndex = Math.round((stripTime(day).getTime() - stripTime(weekMonday).getTime()) / 86_400_000)
-    if (dayIndex < 0 || dayIndex > 6) return new Map<string, boolean>()
     const firstSlot = Math.floor((startMin - DAY_START_HOUR * 60) / SLOT_MINUTES)
     const lastSlot = Math.ceil((startMin + durationMin - DAY_START_HOUR * 60) / SLOT_MINUTES) - 1
-    const map = new Map<string, boolean>()
+    const inBounds = dayIndex >= 0 && dayIndex <= 6 && firstSlot >= 0 && lastSlot < SLOTS_PER_DAY
     for (const p of participants) {
-      let ok = true
-      for (let s = Math.max(0, firstSlot); s <= Math.min(SLOTS_PER_DAY - 1, lastSlot); s++) {
-        if (!grid[dayIndex][s].available.includes(p.userId)) {
-          ok = false
-          break
-        }
+      if (!inBounds) {
+        map.set(p.userId, { state: 'none', label: '' })
+        continue
       }
-      if (firstSlot < 0 || lastSlot >= SLOTS_PER_DAY) ok = false
-      map.set(p.userId, ok)
+      const avail: boolean[] = []
+      for (let s = firstSlot; s <= lastSlot; s++) avail.push(grid[dayIndex][s].available.includes(p.userId))
+      const count = avail.filter(Boolean).length
+      if (count === 0) {
+        map.set(p.userId, { state: 'none', label: '' })
+      } else if (count === avail.length) {
+        map.set(p.userId, { state: 'full', label: '' })
+      } else {
+        // build the contiguous available sub-ranges as HH:MM–HH:MM
+        const runs: string[] = []
+        let runStart = -1
+        for (let i = 0; i <= avail.length; i++) {
+          if (i < avail.length && avail[i]) {
+            if (runStart < 0) runStart = i
+          } else if (runStart >= 0) {
+            const sM = DAY_START_HOUR * 60 + (firstSlot + runStart) * SLOT_MINUTES
+            const eM = DAY_START_HOUR * 60 + (firstSlot + i) * SLOT_MINUTES
+            runs.push(`${toHHMM(sM)}–${toHHMM(eM)}`)
+            runStart = -1
+          }
+        }
+        map.set(p.userId, { state: 'partial', label: runs.join(', ') })
+      }
     }
     return map
   }, [participants, day, weekMonday, startMin, durationMin, grid])
 
   const requiredOutside = participants.filter(
-    (p) => p.included && p.required && !coverage.get(p.userId),
+    (p) => p.included && p.required && coverage.get(p.userId)?.state !== 'full',
   )
   const optionalOutside = participants.filter(
-    (p) => p.included && !p.required && !coverage.get(p.userId),
+    (p) => p.included && !p.required && coverage.get(p.userId)?.state !== 'full',
   )
 
   // reconcile session_participants: delete the removed ones, upsert the included ones
@@ -324,7 +344,8 @@ export default function CreateSessionModal({
           <legend className="mb-2 text-sm font-medium">{t('planner.participants')}</legend>
           <ul className="max-h-52 space-y-1 overflow-y-auto">
             {participants.map((p, i) => {
-              const ok = coverage.get(p.userId)
+              const cov = coverage.get(p.userId)
+              const ok = cov?.state === 'full'
               return (
                 <li
                   key={p.userId}
@@ -333,12 +354,14 @@ export default function CreateSessionModal({
                       ? 'bg-gray-50 opacity-50'
                       : ok
                         ? 'bg-green-50'
-                        : p.required
-                          ? 'bg-red-50'
-                          : 'bg-amber-50'
+                        : cov?.state === 'partial'
+                          ? 'bg-amber-50'
+                          : p.required
+                            ? 'bg-red-50'
+                            : 'bg-amber-50'
                   }`}
                 >
-                  <label className="flex items-center gap-2">
+                  <label className="flex flex-wrap items-center gap-2">
                     <input
                       type="checkbox"
                       checked={p.included}
@@ -349,7 +372,10 @@ export default function CreateSessionModal({
                       }
                     />
                     {nameOf(p.userId)}
-                    {p.included && !ok && (
+                    {p.included && cov?.state === 'partial' && (
+                      <Badge color="amber">{t('planner.partialAvailability', { hours: cov.label })}</Badge>
+                    )}
+                    {p.included && cov?.state === 'none' && (
                       <Badge color={p.required ? 'red' : 'amber'}>{t('planner.noAvailability')}</Badge>
                     )}
                   </label>

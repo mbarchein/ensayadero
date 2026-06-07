@@ -260,6 +260,7 @@
     "required": "Obligatorio",
     "optional": "Opcional",
     "noAvailability": "sin disponibilidad",
+    "partialAvailability": "parcial: {{hours}}",
     "requiredOutside_one": "⚠️ {{count}} obligatorio fuera de su disponibilidad.",
     "requiredOutside_other": "⚠️ {{count}} obligatorios fuera de su disponibilidad.",
     "optionalOutside_one": "{{count}} opcional fuera de su disponibilidad.",

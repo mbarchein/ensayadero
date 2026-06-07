@@ -260,6 +260,7 @@
     "required": "Required",
     "optional": "Optional",
     "noAvailability": "no availability",
+    "partialAvailability": "partial: {{hours}}",
     "requiredOutside_one": "⚠️ {{count}} required person outside their availability.",
     "requiredOutside_other": "⚠️ {{count}} required people outside their availability.",
     "optionalOutside_one": "{{count}} optional person outside their availability.",
