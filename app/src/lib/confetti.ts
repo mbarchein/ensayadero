@@ -89,3 +89,40 @@ export function celebrate(count = 120) {
   }
   requestAnimationFrame(tick)
 }
+
+// Sad counterpart of celebrate(): sad emojis fall from the top, drifting down.
+// Used when someone marks "can't make it". Respects reduced-motion.
+export function commiserate(count = 22) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+  const EMOJIS = ['😢', '😭', '💧', '😞', '🥲']
+  const container = document.createElement('div')
+  container.style.cssText =
+    'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden'
+  document.body.appendChild(container)
+
+  const w = window.innerWidth
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div')
+    el.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+    const left = Math.random() * w
+    const size = 18 + Math.random() * 22
+    const delay = Math.random() * 600
+    const duration = 1600 + Math.random() * 1200
+    const drift = (Math.random() - 0.5) * 80
+    el.style.cssText = `position:absolute;top:-40px;left:${left}px;font-size:${size}px;opacity:0;will-change:transform,opacity`
+    el.animate(
+      [
+        { transform: 'translate(0,0)', opacity: 0, offset: 0 },
+        { opacity: 1, offset: 0.1 },
+        { opacity: 1, offset: 0.8 },
+        { transform: `translate(${drift}px, ${window.innerHeight + 80}px)`, opacity: 0, offset: 1 },
+      ],
+      { duration, delay, easing: 'cubic-bezier(0.4,0,0.7,1)', fill: 'forwards' },
+    )
+    container.appendChild(el)
+  }
+
+  setTimeout(() => container.remove(), 3200)
+}

@@ -205,8 +205,8 @@
       "optional": "Tu asistencia es opcional."
     },
     "areYouGoing": "¿Vas a ir?",
-    "goingBtn": "✓ Voy",
-    "cantGoBtn": "✗ No puedo",
+    "goingBtn": "Voy",
+    "cantGoBtn": "No puedo",
     "requiredList": "Obligatorios",
     "optionalList": "Opcionales",
     "partialAvailability": "Disponibilidad parcial: {{hours}}",

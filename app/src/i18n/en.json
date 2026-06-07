@@ -205,8 +205,8 @@
       "optional": "Your attendance is optional."
     },
     "areYouGoing": "Are you going?",
-    "goingBtn": "✓ Going",
-    "cantGoBtn": "✗ Can't make it",
+    "goingBtn": "Going",
+    "cantGoBtn": "Can't make it",
     "requiredList": "Required",
     "optionalList": "Optional",
     "partialAvailability": "Partial availability: {{hours}}",

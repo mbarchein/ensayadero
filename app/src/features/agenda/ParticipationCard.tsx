@@ -6,7 +6,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { Check, X, Clock } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
 import { Badge, Button } from '../../components/ui'
-import { celebrate } from '../../lib/confetti'
+import { celebrate, commiserate } from '../../lib/confetti'
 import type { ParticipantResponse } from '../../lib/types'
 import { tallyResponses, type MyParticipation } from './useMyAgenda'
 
@@ -77,20 +77,25 @@ export default function ParticipationCard({
         <div className="mt-3 flex items-center gap-2">
           <Button
             variant={p.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+            className="inline-flex items-center gap-1.5"
             disabled={pending}
             onClick={() => {
               if (p.response !== 'ACCEPTED') celebrate()
               onRespond('ACCEPTED')
             }}
           >
-            {t('sessions.goingBtn')}
+            <Check size={16} /> {t('sessions.goingBtn')}
           </Button>
           <Button
             variant={p.response === 'DECLINED' ? 'danger' : 'secondary'}
+            className="inline-flex items-center gap-1.5"
             disabled={pending}
-            onClick={() => onRespond('DECLINED')}
+            onClick={() => {
+              if (p.response !== 'DECLINED') commiserate()
+              onRespond('DECLINED')
+            }}
           >
-            {t('sessions.cantGoBtn')}
+            <X size={16} /> {t('sessions.cantGoBtn')}
           </Button>
           {p.response === 'PENDING' && (
             <span className="text-xs font-medium text-amber-600">{t('sessions.response.pendingShort')}</span>

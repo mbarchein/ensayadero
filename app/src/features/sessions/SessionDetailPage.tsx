@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { MapPin, Share2 } from 'lucide-react'
+import { MapPin, Share2, Check, X } from 'lucide-react'
 import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +12,7 @@ import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { roleLabel } from '../../lib/roleLabel'
-import { celebrate } from '../../lib/confetti'
+import { celebrate, commiserate } from '../../lib/confetti'
 import { Badge, Button, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
@@ -207,18 +207,23 @@ export default function SessionDetailPage() {
           <div className="flex gap-2">
             <Button
               variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+              className="inline-flex items-center gap-1.5"
               onClick={() => {
                 if (mine.response !== 'ACCEPTED') celebrate()
                 respond.mutate('ACCEPTED')
               }}
             >
-              {t('sessions.goingBtn')}
+              <Check size={16} /> {t('sessions.goingBtn')}
             </Button>
             <Button
               variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
-              onClick={() => respond.mutate('DECLINED')}
+              className="inline-flex items-center gap-1.5"
+              onClick={() => {
+                if (mine.response !== 'DECLINED') commiserate()
+                respond.mutate('DECLINED')
+              }}
             >
-              {t('sessions.cantGoBtn')}
+              <X size={16} /> {t('sessions.cantGoBtn')}
             </Button>
           </div>
         </section>
