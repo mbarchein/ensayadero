@@ -209,6 +209,13 @@ export default function AvailabilityPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['availabilities'] })
       setDraft(null)
+      // clearing the week removes all availability → not attending any of its
+      // scheduled rehearsals
+      for (const p of weekScheduled) {
+        if (p.response !== 'DECLINED') {
+          agenda.respond.mutate({ sessionId: p.session_id, response: 'DECLINED' })
+        }
+      }
     },
   })
 
@@ -251,6 +258,16 @@ export default function AvailabilityPage() {
   const hasConfirmed = (pos: CellPos) => {
     const p = sessionCells.get(`${pos.day}:${pos.slot}`)
     return !!p && p.sessions.status === 'CONFIRMED'
+  }
+
+  // does the given grid leave ANY availability overlapping the session?
+  const coversSession = (g: SlotState[][], sessionId: string) => {
+    for (const [key, p] of sessionCells) {
+      if (p.session_id !== sessionId) continue
+      const [day, slot] = key.split(':').map(Number)
+      if (g[day][slot] !== 'NONE') return true
+    }
+    return false
   }
 
   const applyCell = (pos: CellPos, value: SlotState) => {
@@ -296,26 +313,28 @@ export default function AvailabilityPage() {
       scheduleSave()
       return
     }
+    const base = (draftRef.current ?? serverGrid).map((col) => [...col])
     if (choice === 'cancel') {
-      setDraft((prev) => {
-        const base = (prev ?? serverGrid).map((col) => [...col])
-        for (const p of prompt.reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
-        return base
-      })
+      for (const p of prompt.reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
     } else if (choice === 'full') {
       // remove availability from ALL slots of those rehearsals this week
-      setDraft((prev) => {
-        const base = (prev ?? serverGrid).map((col) => [...col])
-        for (const [key, p] of sessionCells) {
-          if (prompt.sessionIds.includes(p.session_id)) {
-            const [day, slot] = key.split(':').map(Number)
-            base[day][slot] = 'NONE'
-          }
+      for (const [key, p] of sessionCells) {
+        if (prompt.sessionIds.includes(p.session_id)) {
+          const [day, slot] = key.split(':').map(Number)
+          base[day][slot] = 'NONE'
         }
-        return base
-      })
+      }
     }
-    // 'selected' → leave as is
+    // 'selected' → base already reflects the painted removal
+    setDraft(base)
+    // a rehearsal left with no availability → mark the user as not attending
+    if (choice !== 'cancel') {
+      for (const sid of prompt.sessionIds) {
+        if (!coversSession(base, sid)) {
+          agenda.respond.mutate({ sessionId: sid, response: 'DECLINED' })
+        }
+      }
+    }
     editSeq.current++
     scheduleSave()
   }
