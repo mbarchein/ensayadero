@@ -114,6 +114,10 @@ export default function AvailabilityPage() {
   const [draft, setDraft] = useState<SlotState[][] | null>(null)
   const [paintValue, setPaintValue] = useState<SlotState>('AVAILABLE')
   const grid = draft ?? serverGrid
+  // the draft is kept after save (to avoid flicker); "unsaved" means it still
+  // differs from the server grid — drives the pending styling and save spinner
+  const hasUnsaved =
+    !!draft && !!serverGrid && draft.some((col, d) => col.some((v, s) => v !== serverGrid[d][s]))
 
   // ── Autosave: debounce after each gesture; retry if there were in-flight edits ──
   const editSeq = useRef(0) // current edit number
@@ -346,7 +350,7 @@ export default function AvailabilityPage() {
         <h1 className="text-xl font-bold">{t('availability.title')}</h1>
         <div className="flex items-center gap-1">
           <span className="mr-1 flex w-5 justify-center" role="status">
-            {save.isPending || draft ? (
+            {save.isPending || hasUnsaved ? (
               <Loader2 size={18} className="animate-spin text-gray-400" aria-label={t('availability.saving')} />
             ) : save.isError || copyWeeks.isError || clearWeek.isError ? (
               <AlertCircle size={18} className="text-red-600" aria-label={t('common.error', { message: '' })} />
@@ -409,7 +413,7 @@ export default function AvailabilityPage() {
           // unsaved edits (additions and deletions): dashed outline until the
           // save confirms, then it switches to the final style
           const pending =
-            draft && serverGrid && grid[day][slot] !== serverGrid[day][slot]
+            hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
           return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring} ${pending}`
