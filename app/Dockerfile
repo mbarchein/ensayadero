@@ -1,6 +1,6 @@
-# Build estático de la PWA. Producción real = Cloudflare Pages (sin Docker).
-# Este Dockerfile sirve para: preview local, CI builds reproducibles,
-# y fallback self-host si algún día se abandona free tier.
+# Static PWA build served by nginx. Used for the local preview, CI builds,
+# and the self-hosted Swarm production image (see DEPLOY.md). The VITE_* args
+# are baked in at build time.
 
 FROM node:22-alpine AS build
 WORKDIR /app
@@ -11,6 +11,7 @@ ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 ARG VITE_APP_URL
 ARG VITE_VAPID_PUBLIC_KEY
+ARG VITE_TURNSTILE_SITE_KEY
 RUN npm run build
 
 FROM nginx:alpine

@@ -29,3 +29,6 @@ coverage/
 # PWA artefactos generados
 dev-dist/
 *.tsbuildinfo
+
+# Production secrets for the Swarm deploy
+prod.env
