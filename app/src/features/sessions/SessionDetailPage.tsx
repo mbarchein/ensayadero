@@ -1,7 +1,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { MapPin } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Share2 } from 'lucide-react'
 import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -46,6 +47,8 @@ export default function SessionDetailPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  const [shareCopied, setShareCopied] = useState(false)
+  const [shareError, setShareError] = useState<string | null>(null)
 
   const { data: session, isLoading } = useQuery({
     queryKey: ['session', sessionId],
@@ -136,6 +139,35 @@ export default function SessionDetailPage() {
 
   const roleOf = (userId: string) => members.find((m) => m.user_id === userId)?.role ?? null
 
+  // Share a scheduled rehearsal (instructors only): Web Share API with a
+  // clipboard fallback, mirroring the group invite share.
+  const shareUrl = `${import.meta.env.VITE_APP_URL}/g/${groupId}/sessions/${session.id}`
+  const shareSession = async () => {
+    setShareError(null)
+    const when = `${format(r.start, 'EEEE d MMMM, HH:mm', { locale: dateLocale() })}–${format(r.end, 'HH:mm')}`
+    const lines = [
+      t('sessions.shareText', { title: session.title }),
+      when,
+      session.location || null,
+    ].filter(Boolean) as string[]
+    const text = lines.join('\n')
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: session.title, text, url: shareUrl })
+      } catch {
+        /* cancelled by the user */
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${text}\n${shareUrl}`)
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2000)
+      } catch {
+        setShareError(shareUrl)
+      }
+    }
+  }
+
   return (
     <div className="space-y-5">
       <header className="space-y-1">
@@ -195,6 +227,22 @@ export default function SessionDetailPage() {
 
       {isInstructor && (
         <section className="space-y-2 border-t pt-4">
+          {session.status === 'CONFIRMED' && (
+            <>
+              <Button
+                variant="secondary"
+                className="inline-flex w-full items-center justify-center gap-1.5"
+                onClick={shareSession}
+              >
+                <Share2 size={16} /> {shareCopied ? t('sessions.shareCopied') : t('sessions.share')}
+              </Button>
+              {shareError && (
+                <p className="break-all text-xs text-gray-600">
+                  {t('invite.copyManually')}: {shareError}
+                </p>
+              )}
+            </>
+          )}
           {session.status !== 'CANCELLED' && (
             <Button
               variant="secondary"

@@ -216,7 +216,10 @@
     "cancelConfirm": "¿Cancelar este ensayo? Se notificará a todos los participantes.",
     "deleteDraft": "Eliminar borrador",
     "deleteDraftConfirm": "¿Eliminar este borrador?",
-    "editBtn": "Editar ensayo"
+    "editBtn": "Editar ensayo",
+    "share": "Compartir",
+    "shareCopied": "✓ Copiado",
+    "shareText": "Ensayo: {{title}}"
   },
   "planner": {
     "title": "Programar ensayo",

@@ -216,7 +216,10 @@
     "cancelConfirm": "Cancel this rehearsal? All participants will be notified.",
     "deleteDraft": "Delete draft",
     "deleteDraftConfirm": "Delete this draft?",
-    "editBtn": "Edit rehearsal"
+    "editBtn": "Edit rehearsal",
+    "share": "Share",
+    "shareCopied": "✓ Copied",
+    "shareText": "Rehearsal: {{title}}"
   },
   "planner": {
     "title": "Plan rehearsal",
