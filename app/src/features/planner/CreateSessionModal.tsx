@@ -52,8 +52,10 @@ export default function CreateSessionModal({
   const qc = useQueryClient()
   const navigate = useNavigate()
   const editing = !!session
-  // default title: "<group> d-M" (e.g. "La Tempestad 7-6")
-  const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd-M')}`
+  // default title: "<group> d-MMM" (e.g. "La Tempestad 7-jun")
+  const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd', {
+    locale: dateLocale(),
+  })}-${format(initialRange.start, 'MMM', { locale: dateLocale() })}`
   const [title, setTitle] = useState(() => session?.title ?? defaultTitle)
   const [scene, setScene] = useState(session?.scene ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
