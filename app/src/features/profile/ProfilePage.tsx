@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@tanstack/react-query'
-import { LogOut } from 'lucide-react'
+import { LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
-import { Button } from '../../components/ui'
+import { Button, Modal } from '../../components/ui'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
@@ -47,6 +47,8 @@ export default function ProfilePage() {
       await signOut()
     },
   })
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>(
     typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'ok' : 'idle',
   )
@@ -138,19 +140,54 @@ export default function ProfilePage() {
         <p className="mb-3 text-sm text-red-800">{t('profile.deleteDescription')}</p>
         <Button
           variant="danger"
+          className="inline-flex items-center gap-1.5"
           disabled={deleteAccount.isPending}
           onClick={() => {
-            const word = t('profile.deleteKeyword')
-            const typed = prompt(t('profile.deleteConfirm', { keyword: word }))
-            if (typed?.trim().toUpperCase() === word.toUpperCase()) deleteAccount.mutate()
+            setDeleteText('')
+            setDeleteOpen(true)
           }}
         >
-          {deleteAccount.isPending ? t('profile.deleting') : t('profile.deleteAccount')}
+          <Trash2 size={16} /> {t('profile.deleteAccount')}
         </Button>
         {deleteAccount.isError && (
           <p className="mt-2 text-sm text-red-700">{(deleteAccount.error as Error).message}</p>
         )}
       </section>
+
+      <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t('profile.deleteAccount')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('profile.deleteDescription')}</p>
+          <label className="block text-sm">
+            {t('profile.deleteConfirm', { keyword: t('profile.deleteKeyword') })}
+            <input
+              value={deleteText}
+              onChange={(e) => setDeleteText(e.target.value)}
+              className="mt-1 w-full rounded-lg border px-3 py-2"
+              placeholder={t('profile.deleteKeyword')}
+              autoComplete="off"
+            />
+          </label>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setDeleteOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={
+                deleteAccount.isPending ||
+                deleteText.trim().toUpperCase() !== t('profile.deleteKeyword').toUpperCase()
+              }
+              onClick={() => {
+                deleteAccount.mutate()
+                setDeleteOpen(false)
+              }}
+            >
+              <Trash2 size={16} /> {deleteAccount.isPending ? t('profile.deleting') : t('profile.deleteAccount')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
