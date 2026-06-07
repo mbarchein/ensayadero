@@ -4,8 +4,7 @@
 import { useRef, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
-import { useTranslation } from 'react-i18next'
-import { DAY_END_HOUR, DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
+import { DAY_START_HOUR, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
 export interface CellPos {
   day: number
@@ -31,7 +30,6 @@ export default function WeekGrid({
   onPaintEnd,
   onCellTap,
 }: Props) {
-  const { t } = useTranslation()
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   // refs, not state: pointermove runs synchronously after pointerdown and a
@@ -221,9 +219,6 @@ export default function WeekGrid({
           ))}
         </div>
       </div>
-      <p className="mt-1 text-center text-[10px] text-gray-400">
-        {t('availability.gridFooter', { minutes: SLOT_MINUTES, start: DAY_START_HOUR, end: DAY_END_HOUR })}
-      </p>
     </div>
   )
 }
