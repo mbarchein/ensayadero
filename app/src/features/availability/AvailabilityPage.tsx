@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Trash2, Copy, Check, X, Clock, MoreVertical } from 'lucide-react'
+import { Trash2, Copy, Check, X, Clock } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -55,7 +55,6 @@ export default function AvailabilityPage() {
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const [copyOpen, setCopyOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [copyN, setCopyN] = useState(1)
   const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
 
@@ -303,42 +302,27 @@ export default function AvailabilityPage() {
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{t('availability.title')}</h1>
-        <div className="relative">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             className="p-2"
-            aria-label={t('common.menu')}
-            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={t('availability.copyWeeks')}
+            title={t('availability.copyWeeks')}
+            onClick={() => setCopyOpen(true)}
+            disabled={copyWeeks.isPending}
           >
-            <MoreVertical size={20} />
+            <Copy size={18} />
           </Button>
-          {menuOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-lg border bg-white shadow-lg">
-                <button
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm hover:bg-gray-50 disabled:opacity-50"
-                  disabled={copyWeeks.isPending}
-                  onClick={() => {
-                    setMenuOpen(false)
-                    setCopyOpen(true)
-                  }}
-                >
-                  <Copy size={16} /> {t('availability.copyWeeks')}
-                </button>
-                <button
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-red-600 hover:bg-gray-50 disabled:opacity-50"
-                  disabled={clearWeek.isPending}
-                  onClick={() => {
-                    setMenuOpen(false)
-                    setClearOpen(true)
-                  }}
-                >
-                  <Trash2 size={16} /> {t('availability.clearWeek')}
-                </button>
-              </div>
-            </>
-          )}
+          <Button
+            variant="ghost"
+            className="p-2 text-red-600"
+            aria-label={t('availability.clearWeek')}
+            title={t('availability.clearWeek')}
+            onClick={() => setClearOpen(true)}
+            disabled={clearWeek.isPending}
+          >
+            <Trash2 size={18} />
+          </Button>
         </div>
       </header>
 
