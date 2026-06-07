@@ -86,23 +86,29 @@ export default function WeekGrid({
           className="grid min-w-[560px] grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
-            if (!pos || isPast(pos)) return // the past is not editable
+            const editable = !!pos && !isPast(pos)
             movedRef.current = false
-            lastPos.current = pos
             lastClient.current = { x: e.clientX, y: e.clientY }
             if (e.pointerType !== 'touch') {
-              // mouse/pen: immediate drag-paint
-              if (onPaintStart) {
+              // mouse/pen: immediate drag-paint on editable cells
+              if (editable && onPaintStart) {
                 paintingRef.current = true
                 capture(e)
-                onPaintStart(pos)
+                onPaintStart(pos!)
               }
               return
             }
-            // touch: pending until we know if it's a swipe (paint) or hold (scroll)
-            startRef.current = { x: e.clientX, y: e.clientY, pos }
-            modeRef.current = 'pending'
+            // touch
             capture(e)
+            if (!editable) {
+              // header row, hour column or past area → scroll immediately
+              modeRef.current = 'scroll'
+              return
+            }
+            // editable cell: pending until we know swipe (paint) vs hold (scroll)
+            lastPos.current = pos
+            startRef.current = { x: e.clientX, y: e.clientY, pos: pos! }
+            modeRef.current = 'pending'
             lpTimer.current = setTimeout(() => {
               if (modeRef.current === 'pending') modeRef.current = 'scroll'
             }, LONG_PRESS_MS)
