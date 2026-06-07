@@ -237,6 +237,7 @@
     "legend": "El número indica cuántas personas seleccionadas están disponibles. Verde intenso = todas. Toca una franja para ver detalle y crear el ensayo.",
     "legendDrag": "El número indica cuántas personas seleccionadas están disponibles. Arrastra para seleccionar varias franjas consecutivas y crear el ensayo con esa duración.",
     "availableLabel": "Disponibles:",
+    "partialLabel": "Parcialmente disponibles:",
     "busyLabel": "Ocupados (otro ensayo):",
     "unavailableLabel": "Sin disponibilidad:",
     "createHere": "Crear ensayo en esta franja",

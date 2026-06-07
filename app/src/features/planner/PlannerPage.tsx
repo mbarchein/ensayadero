@@ -365,18 +365,29 @@ const chip = (active: boolean) =>
     active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500 line-through'
   }`
 
-/** Aggregates slots lo..hi of a day into one cell: available = whoever is
- *  available in ALL slots (can attend the whole session); busy = union. */
-function mergeCells(day: HeatCell[], lo: number, hi: number): HeatCell {
+type MergedCell = HeatCell & { partial: string[] }
+
+/** Aggregates slots lo..hi of a day: available = whoever is available in ALL
+ *  slots (can attend the whole session); partial = available in some but not
+ *  all; busy = union of busy. */
+function mergeCells(day: HeatCell[], lo: number, hi: number): MergedCell {
   let available = day[lo].available
+  const everAvailable = new Set<string>()
   const busy = new Set<string>()
   const preferred = new Set(day[lo].preferred)
   for (let s = lo; s <= hi; s++) {
     available = available.filter((id) => day[s].available.includes(id))
+    day[s].available.forEach((id) => everAvailable.add(id))
     day[s].busy.forEach((id) => busy.add(id))
     for (const id of [...preferred]) if (!day[s].preferred.includes(id)) preferred.delete(id)
   }
-  return { available, preferred: [...preferred], busy: [...busy].filter((id) => !available.includes(id)) }
+  const partial = [...everAvailable].filter((id) => !available.includes(id) && !busy.has(id))
+  return {
+    available,
+    preferred: [...preferred],
+    busy: [...busy].filter((id) => !available.includes(id)),
+    partial,
+  }
 }
 
 function heatClass(cell: HeatCell, total: number): string {
@@ -389,9 +400,18 @@ function heatClass(cell: HeatCell, total: number): string {
   return 'bg-emerald-500 ring-1 ring-inset ring-emerald-700'
 }
 
-function NameChip({ name, me, variant }: { name: string; me: boolean; variant: 'available' | 'busy' | 'unavailable' }) {
+function NameChip({
+  name,
+  me,
+  variant,
+}: {
+  name: string
+  me: boolean
+  variant: 'available' | 'partial' | 'busy' | 'unavailable'
+}) {
   const base = {
     available: 'bg-green-100 text-green-800',
+    partial: 'bg-orange-100 text-orange-800',
     busy: 'bg-amber-100 text-amber-800',
     unavailable: 'bg-gray-100 text-gray-500',
   }[variant]
@@ -413,14 +433,14 @@ function CellDetail({
   nameOf,
   meId,
 }: {
-  cell: HeatCell
+  cell: MergedCell
   activeIds: string[]
   nameOf: (id: string) => string
   meId?: string
 }) {
   const { t } = useTranslation()
   const unavailable = activeIds.filter(
-    (id) => !cell.available.includes(id) && !cell.busy.includes(id),
+    (id) => !cell.available.includes(id) && !cell.partial.includes(id) && !cell.busy.includes(id),
   )
   return (
     <div className="space-y-2 text-xs">
@@ -430,6 +450,16 @@ function CellDetail({
           <div className="mt-1 flex flex-wrap gap-1">
             {cell.available.map((id) => (
               <NameChip key={id} name={nameOf(id)} me={id === meId} variant="available" />
+            ))}
+          </div>
+        </div>
+      )}
+      {cell.partial.length > 0 && (
+        <div>
+          <span className="font-medium text-orange-700">{t('planner.partialLabel')}</span>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {cell.partial.map((id) => (
+              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="partial" />
             ))}
           </div>
         </div>

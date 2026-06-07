@@ -237,6 +237,7 @@
     "legend": "The number shows how many selected people are available. Deep green = everyone. Tap a slot to see details and create the rehearsal.",
     "legendDrag": "The number shows how many selected people are available. Drag to select several consecutive slots and create the rehearsal with that duration.",
     "availableLabel": "Available:",
+    "partialLabel": "Partially available:",
     "busyLabel": "Busy (another rehearsal):",
     "unavailableLabel": "No availability:",
     "createHere": "Create rehearsal in this slot",
