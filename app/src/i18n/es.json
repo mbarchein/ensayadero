@@ -191,7 +191,8 @@
     "regenerate": "Regenerar código",
     "enable": "Activar código",
     "disable": "Desactivar código",
-    "disabledNote": "El código está desactivado. Nadie puede unirse con él."
+    "disabledNote": "El código está desactivado. Nadie puede unirse con él.",
+    "disableConfirm": "Si apagas el código, nadie podrá unirse con él hasta que lo vuelvas a activar. ¿Apagar?"
   },
   "sessions": {
     "empty": "No hay ensayos programados.",

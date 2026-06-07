@@ -191,7 +191,8 @@
     "regenerate": "Regenerate code",
     "enable": "Enable code",
     "disable": "Disable code",
-    "disabledNote": "The code is disabled. No one can join with it."
+    "disabledNote": "The code is disabled. No one can join with it.",
+    "disableConfirm": "If you turn the code off, no one can join with it until you turn it back on. Turn off?"
   },
   "sessions": {
     "empty": "No rehearsals scheduled.",

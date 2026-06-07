@@ -17,6 +17,7 @@ export default function InvitePanel({ group }: { group: Group }) {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const [qrOpen, setQrOpen] = useState(false)
+  const [disableOpen, setDisableOpen] = useState(false)
   const [emailsOpen, setEmailsOpen] = useState(false)
   const [emails, setEmails] = useState('')
   const [role, setRole] = useState<GroupRole>('ACTOR')
@@ -98,7 +99,38 @@ export default function InvitePanel({ group }: { group: Group }) {
 
   return (
     <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
-      <h2 className="font-semibold text-violet-900">{t('invite.title')}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-violet-900">{t('invite.title')}</h2>
+        <div className="flex items-center gap-1">
+          {group.join_enabled && (
+            <Button variant="ghost" className="p-2" title={t('invite.share')} aria-label={t('invite.share')} onClick={share}>
+              <Share2 size={18} />
+            </Button>
+          )}
+          {group.join_enabled && (
+            <Button
+              variant="ghost"
+              className="p-2"
+              title={t('invite.regenerate')}
+              aria-label={t('invite.regenerate')}
+              disabled={regenerate.isPending}
+              onClick={() => regenerate.mutate()}
+            >
+              <RefreshCw size={18} />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            className={`p-2 ${group.join_enabled ? '' : 'text-gray-400'}`}
+            title={group.join_enabled ? t('invite.disable') : t('invite.enable')}
+            aria-label={group.join_enabled ? t('invite.disable') : t('invite.enable')}
+            disabled={toggleEnabled.isPending}
+            onClick={() => (group.join_enabled ? setDisableOpen(true) : toggleEnabled.mutate())}
+          >
+            <Power size={18} />
+          </Button>
+        </div>
+      </div>
 
       {group.join_enabled ? (
         <>
@@ -110,9 +142,6 @@ export default function InvitePanel({ group }: { group: Group }) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={share} className="inline-flex items-center gap-1.5">
-              <Share2 size={16} /> {t('invite.share')}
-            </Button>
             <Button variant="secondary" onClick={copy} className="inline-flex items-center gap-1.5">
               <Copy size={16} /> {copied ? t('invite.copied') : t('invite.copyLink')}
             </Button>
@@ -133,26 +162,29 @@ export default function InvitePanel({ group }: { group: Group }) {
         <p className="text-sm text-gray-600">{t('invite.disabledNote')}</p>
       )}
 
-      <div className="flex gap-4 text-xs text-violet-700">
-        {group.join_enabled && (
-          <button
-            onClick={() => regenerate.mutate()}
-            disabled={regenerate.isPending}
-            className="inline-flex items-center gap-1 hover:underline"
-          >
-            <RefreshCw size={13} /> {t('invite.regenerate')}
-          </button>
-        )}
-        <button
-          onClick={() => toggleEnabled.mutate()}
-          disabled={toggleEnabled.isPending}
-          className="inline-flex items-center gap-1 hover:underline"
-        >
-          <Power size={13} /> {group.join_enabled ? t('invite.disable') : t('invite.enable')}
-        </button>
-      </div>
-
       {qrOpen && <QrModal link={link} code={group.join_code} onClose={() => setQrOpen(false)} />}
+
+      <Modal open={disableOpen} onClose={() => setDisableOpen(false)} title={t('invite.disable')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('invite.disableConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setDisableOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="warning"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={toggleEnabled.isPending}
+              onClick={() => {
+                toggleEnabled.mutate()
+                setDisableOpen(false)
+              }}
+            >
+              <Power size={16} /> {t('invite.disable')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={emailsOpen} onClose={() => setEmailsOpen(false)} title={t('invite.byEmailTitle')}>
         <form
