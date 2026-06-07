@@ -130,6 +130,19 @@ export default function CreateSessionModal({
       )
       if (error) throw error
     }
+    // The convener is assumed to attend: when the creator adds themselves to
+    // the list, default their response to ACCEPTED. Only on first inclusion, so
+    // a later "can't go" from the creator is preserved across edits.
+    const creatorNewlyIncluded =
+      includedIds.includes(profile!.id) && !prevIds.includes(profile!.id)
+    if (creatorNewlyIncluded) {
+      const { error } = await supabase
+        .from('session_participants')
+        .update({ response: 'ACCEPTED' })
+        .eq('session_id', sessionId)
+        .eq('user_id', profile!.id)
+      if (error) throw error
+    }
   }
 
   const create = useMutation({
