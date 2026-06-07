@@ -410,7 +410,7 @@ export default function AvailabilityPage() {
           // save confirms, then it switches to the final style
           const pending =
             draft && serverGrid && grid[day][slot] !== serverGrid[day][slot]
-              ? 'outline-dashed outline-2 -outline-offset-2 outline-violet-500'
+              ? 'cell-pending'
               : ''
           return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring} ${pending}`
         }}
