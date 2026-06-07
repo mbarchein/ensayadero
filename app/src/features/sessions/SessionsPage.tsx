@@ -73,7 +73,7 @@ export default function SessionsPage() {
     s.status === 'CANCELLED' || parseRange(s.time_range).end < now
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-6">
       <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
         <Link to="/" className="text-sm text-gray-500">
           {t('group.backToGroups')}

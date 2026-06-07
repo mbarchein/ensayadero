@@ -34,7 +34,7 @@ export default function UpcomingPage() {
   ].filter((s) => s.items.length > 0)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-6">
       <h1 className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2 text-xl font-bold">{t('upcoming.title')}</h1>
 
       {pendingCount > 0 && (

@@ -49,7 +49,7 @@ export default function NotificationsPage() {
   if (isLoading) return <Spinner />
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
         <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
         {notifications?.some((n) => !n.read_at) && (

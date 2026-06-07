@@ -78,7 +78,7 @@ export default function MembersPage() {
   if (loading) return <Spinner />
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
         <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
           {t('sessions.backToSessions')}

@@ -124,7 +124,7 @@ export default function AdminPage() {
   const membersOf = (gid: string) => memberships?.filter((m) => m.group_id === gid) ?? []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
         <div>
           <Link to="/" className="text-sm text-gray-500">

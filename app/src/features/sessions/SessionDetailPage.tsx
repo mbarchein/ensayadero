@@ -171,7 +171,7 @@ export default function SessionDetailPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-6">
       <header className="space-y-1">
         <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
           {t('sessions.backToSessions')}
