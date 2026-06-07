@@ -49,6 +49,7 @@
   "login": {
     "tagline": "Planifica los ensayos de tu grupo de teatro",
     "googleButton": "Continuar con Google",
+    "facebookButton": "Continuar con Facebook",
     "or": "o",
     "emailPlaceholder": "Email",
     "passwordPlaceholder": "Contraseña",

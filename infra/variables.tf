@@ -47,6 +47,22 @@ variable "google_oauth_client_secret" {
   sensitive   = true
 }
 
+# Facebook/Meta OAuth — vía login de Meta (cubre cuentas Instagram vinculadas).
+# Supabase no tiene provider Instagram nativo; este es el camino soportado.
+# Opcional: si se deja vacío, el provider queda deshabilitado.
+variable "facebook_oauth_client_id" {
+  description = "App ID de Meta (Facebook Login). Vacío = provider deshabilitado."
+  type        = string
+  default     = ""
+}
+
+variable "facebook_oauth_client_secret" {
+  description = "App Secret de Meta (Facebook Login)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
   description = "API token Cloudflare con permisos Pages:Edit, DNS:Edit, Zone:Read"

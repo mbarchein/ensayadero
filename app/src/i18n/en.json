@@ -49,6 +49,7 @@
   "login": {
     "tagline": "Plan your theatre group's rehearsals",
     "googleButton": "Continue with Google",
+    "facebookButton": "Continue with Facebook",
     "or": "or",
     "emailPlaceholder": "Email",
     "passwordPlaceholder": "Password",

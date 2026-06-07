@@ -71,6 +71,12 @@ services:
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
       GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
       GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: http://localhost:54321/auth/v1/callback
+      # Meta/Facebook OAuth opcional en local (login con cuentas Instagram vinculadas):
+      # FACEBOOK_OAUTH_ENABLED=true + client id/secret de la app de Meta.
+      GOTRUE_EXTERNAL_FACEBOOK_ENABLED: ${FACEBOOK_OAUTH_ENABLED:-false}
+      GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID: ${FACEBOOK_OAUTH_CLIENT_ID:-}
+      GOTRUE_EXTERNAL_FACEBOOK_SECRET: ${FACEBOOK_OAUTH_CLIENT_SECRET:-}
+      GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI: http://localhost:54321/auth/v1/callback
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:9999/health"]
       interval: 3s

@@ -8,9 +8,9 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 
-  const signInWithGoogle = async () => {
+  const signInWithProvider = async (provider: 'google' | 'facebook') => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: { redirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback` },
     })
     if (error) setError(error.message)
@@ -38,7 +38,7 @@ export default function LoginPage() {
       </div>
 
       <button
-        onClick={signInWithGoogle}
+        onClick={() => signInWithProvider('google')}
         className="flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-white px-6 py-3 font-medium shadow-md transition hover:shadow-lg"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
@@ -48,6 +48,16 @@ export default function LoginPage() {
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 12 1 11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
         </svg>
         {t('login.googleButton')}
+      </button>
+
+      <button
+        onClick={() => signInWithProvider('facebook')}
+        className="flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-[#1877F2] px-6 py-3 font-medium text-white shadow-md transition hover:shadow-lg"
+      >
+        <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden>
+          <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.08 24 18.09 24 12.07z"/>
+        </svg>
+        {t('login.facebookButton')}
       </button>
 
       <div className="flex w-full max-w-xs items-center gap-3 text-xs text-violet-400">

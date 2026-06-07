@@ -48,6 +48,12 @@ resource "supabase_settings" "main" {
     external_google_client_id = var.google_oauth_client_id
     external_google_secret    = var.google_oauth_client_secret
 
+    # Meta/Facebook (camino soportado para login con cuentas Instagram).
+    # Habilitado solo si se han rellenado las credenciales de la app de Meta.
+    external_facebook_enabled   = var.facebook_oauth_client_id != ""
+    external_facebook_client_id = var.facebook_oauth_client_id
+    external_facebook_secret    = var.facebook_oauth_client_secret
+
     # Email+password con activación obligatoria (mailer_autoconfirm=false).
     # SMTP vía Resend (mismo API key que las notificaciones). Si resend_api_key
     # está vacío, los correos de activación/recuperación no se enviarán.

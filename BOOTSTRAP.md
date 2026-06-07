@@ -73,6 +73,25 @@ Anota outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_ur
      (`https://<project-ref>.supabase.co/auth/v1/callback`)
 4. Copiar Client ID y Client Secret a `terraform.tfvars` → `terraform apply` de nuevo.
 
+## 5b. Meta/Facebook OAuth — opcional (login con Instagram)
+
+> Supabase **no** tiene provider Instagram nativo. El login con cuentas de
+> Instagram se obtiene a través de **Meta** (Facebook Login): autentica cuentas
+> de Meta, cubriendo usuarios con Instagram y Facebook vinculados. Dejar las
+> variables `facebook_oauth_*` vacías deshabilita el provider.
+
+1. https://developers.facebook.com → **My Apps → Create App** → tipo *Consumer*.
+2. Añadir el producto **Facebook Login**. (Opcional: añadir también el producto
+   **Instagram** si quieres mostrar la marca/IG en la pantalla de permisos.)
+3. **Facebook Login → Settings → Valid OAuth Redirect URIs**:
+   `https://<project-ref>.supabase.co/auth/v1/callback`
+   (mismo valor que el output `google_oauth_redirect_uri`).
+4. **Settings → Basic**: copiar **App ID** y **App Secret** a `terraform.tfvars`
+   (`facebook_oauth_client_id` / `facebook_oauth_client_secret`) → `terraform apply`.
+5. Para producción Meta exige la app en modo **Live** y revisión del permiso
+   `email` (verificación de negocio). En modo *Development* solo entran los
+   usuarios con rol en la app (testers).
+
 ## 6. Resend (email)
 
 1. https://resend.com/domains → **Add domain** → tu dominio.

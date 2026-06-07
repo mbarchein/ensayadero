@@ -14,6 +14,12 @@ supabase_region       = "eu-west-3"
 google_oauth_client_id     = "xxx.apps.googleusercontent.com"
 google_oauth_client_secret = "GOCSPX-xxx"
 
+# Meta/Facebook OAuth (login con cuentas Instagram vinculadas) — OPCIONAL.
+# Crear app en https://developers.facebook.com (ver BOOTSTRAP). Dejar vacío
+# para deshabilitar el provider.
+facebook_oauth_client_id     = ""
+facebook_oauth_client_secret = ""
+
 # Cloudflare — token con Pages:Edit, DNS:Edit, Zone:Read
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"
