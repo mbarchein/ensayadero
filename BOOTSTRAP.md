@@ -10,12 +10,25 @@ Recommended order: follow the sections top to bottom.
 
 ## 0. Local prerequisites
 
+Required: **Docker** and **Terraform ≥ 1.9**. Node.js and the Supabase CLI are
+convenient but optional — every `node`/`npx`/`supabase` command below can run
+through Docker, so Docker + Terraform is enough.
+
 ```bash
-# Tools
-node >= 22, docker, terraform >= 1.9
-# Supabase CLI
-npm install -g supabase   # or brew install supabase/tap/supabase
+# With local tooling (optional):
+node >= 22
+npm install -g supabase            # or: brew install supabase/tap/supabase
+
+# Without local Node.js / Supabase CLI — run them through Docker:
+#   node:   docker run --rm node:22-alpine node ...
+#   npx:    docker run --rm node:22-alpine npx -y <pkg> ...
+#   supabase CLI (needs your access token):
+#     docker run --rm -e SUPABASE_ACCESS_TOKEN=<token> \
+#       node:22-alpine npx -y supabase <command>
 ```
+
+> Tip: for `supabase secrets set …` (steps 6–7) via Docker, pass the token with
+> `-e SUPABASE_ACCESS_TOKEN` (same token as `supabase_access_token` in tfvars).
 
 ## 1. Required accounts (create if they don't exist)
 
