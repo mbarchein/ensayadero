@@ -18,6 +18,7 @@ export default function MembersPage() {
   const qc = useQueryClient()
   const navigate = useNavigate()
   const [removeTarget, setRemoveTarget] = useState<MembershipWithProfile | null>(null)
+  const [roleTarget, setRoleTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveOpen, setLeaveOpen] = useState(false)
 
   const { data: invitations } = useQuery({
@@ -112,12 +113,7 @@ export default function MembersPage() {
                   className="p-2"
                   title={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
                   aria-label={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
-                  onClick={() =>
-                    changeRole.mutate({
-                      userId: m.user_id,
-                      newRole: m.role === 'INSTRUCTOR' ? 'ACTOR' : 'INSTRUCTOR',
-                    })
-                  }
+                  onClick={() => setRoleTarget(m)}
                 >
                   {m.role === 'INSTRUCTOR' ? <UserMinus size={18} /> : <UserCog size={18} />}
                 </Button>
@@ -167,6 +163,42 @@ export default function MembersPage() {
           <p className="text-sm text-red-600">{(leaveGroup.error as Error).message}</p>
         )}
       </div>
+
+      {/* change role */}
+      <Modal
+        open={!!roleTarget}
+        onClose={() => setRoleTarget(null)}
+        title={roleTarget?.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            {t(roleTarget?.role === 'INSTRUCTOR' ? 'group.demoteConfirm' : 'group.promoteConfirm', {
+              name: roleTarget?.profiles.name || roleTarget?.profiles.email || '',
+            })}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setRoleTarget(null)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={changeRole.isPending}
+              onClick={() => {
+                if (roleTarget) {
+                  changeRole.mutate({
+                    userId: roleTarget.user_id,
+                    newRole: roleTarget.role === 'INSTRUCTOR' ? 'ACTOR' : 'INSTRUCTOR',
+                  })
+                }
+                setRoleTarget(null)
+              }}
+            >
+              {roleTarget?.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
+              {roleTarget?.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* remove member */}
       <Modal

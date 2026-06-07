@@ -156,6 +156,8 @@
     "pendingInvites": "Invitaciones pendientes",
     "expires": "expira {{date}}",
     "remove": "Quitar",
+    "promoteConfirm": "¿Hacer director a {{name}}? Podrá programar ensayos, invitar y gestionar el grupo.",
+    "demoteConfirm": "¿Pasar a {{name}} a actor? Dejará de poder gestionar el grupo.",
     "removeTitle": "Quitar del grupo",
     "removeConfirm": "¿Quitar a {{name}} del grupo?",
     "backToGroups": "‹ Mis grupos",
