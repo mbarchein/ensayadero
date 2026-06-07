@@ -33,13 +33,36 @@ export default function WeekGrid({
 }: Props) {
   const { t } = useTranslation()
   const gridRef = useRef<HTMLDivElement>(null)
-  // ref, not state: the pointermove handler runs synchronously after
-  // pointerdown and a setState wouldn't be applied yet (stale closure).
-  const paintingRef = useRef(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  // refs, not state: pointermove runs synchronously after pointerdown and a
+  // setState wouldn't be applied yet (stale closure).
+  const paintingRef = useRef(false) // mouse/pen drag-paint
   const movedRef = useRef(false)
   const lastPos = useRef<CellPos | null>(null)
+  // Touch gesture arbitration: a quick swipe paints (multiselect), a long-press
+  // then move scrolls, a short tap cycles one cell.
+  const modeRef = useRef<'idle' | 'pending' | 'paint' | 'scroll'>('idle')
+  const startRef = useRef<{ x: number; y: number; pos: CellPos } | null>(null)
+  const lastClient = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const lpTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const LONG_PRESS_MS = 250
+  const MOVE_THRESHOLD = 8 // px before a swipe counts as painting
+
   const now = new Date()
   const isPast = (pos: CellPos) => slotRange(weekMonday, pos.day, pos.slot).end <= now
+  const sameCell = (a: CellPos | null, b: CellPos | null) =>
+    !!a && !!b && a.day === b.day && a.slot === b.slot
+  const clearLp = () => {
+    if (lpTimer.current != null) clearTimeout(lpTimer.current)
+    lpTimer.current = null
+  }
+  const capture = (e: React.PointerEvent) => {
+    try {
+      gridRef.current?.setPointerCapture(e.pointerId)
+    } catch {
+      /* not capturable in some environments; moves fall back to elementFromPoint */
+    }
+  }
 
   const posFromEvent = (e: React.PointerEvent): CellPos | null => {
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
@@ -54,62 +77,113 @@ export default function WeekGrid({
     <div className="select-none">
       {/* single scroll box so the day header (sticky top) and the hour column
           (sticky left) stay visible while scrolling in either direction */}
-      <div
-        className="max-h-[70vh] overflow-auto overscroll-contain"
-        // Allow the box to scroll on touch (pan-x/pan-y). Drag-to-paint is
-        // mouse/pen only; touch paints via tap (a drag can't both scroll+paint).
-        style={{ touchAction: 'pan-x pan-y' }}
-      >
+      <div ref={scrollRef} className="max-h-[70vh] overflow-auto overscroll-contain">
         <div
           ref={gridRef}
+          // touch-action none: we arbitrate scroll vs paint ourselves (see refs).
+          // Mouse keeps native behaviour.
+          style={{ touchAction: 'none' }}
           className="grid min-w-[560px] grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
             if (!pos || isPast(pos)) return // the past is not editable
             movedRef.current = false
             lastPos.current = pos
-            // touch is reserved for scrolling; it paints on tap (pointerup)
-            if (onPaintStart && e.pointerType !== 'touch') {
-              paintingRef.current = true
-              try {
-                gridRef.current?.setPointerCapture(e.pointerId)
-              } catch {
-                /* pointer not capturable (some environments); moves fall through via elementFromPoint */
+            lastClient.current = { x: e.clientX, y: e.clientY }
+            if (e.pointerType !== 'touch') {
+              // mouse/pen: immediate drag-paint
+              if (onPaintStart) {
+                paintingRef.current = true
+                capture(e)
+                onPaintStart(pos)
               }
-              onPaintStart(pos)
+              return
             }
+            // touch: pending until we know if it's a swipe (paint) or hold (scroll)
+            startRef.current = { x: e.clientX, y: e.clientY, pos }
+            modeRef.current = 'pending'
+            capture(e)
+            lpTimer.current = setTimeout(() => {
+              if (modeRef.current === 'pending') modeRef.current = 'scroll'
+            }, LONG_PRESS_MS)
           }}
           onPointerMove={(e) => {
-            if (!paintingRef.current) return
-            const pos = posFromEvent(e)
-            if (!pos || isPast(pos)) return
-            // ignore moves within the same cell (avoids false "moved" on taps)
-            if (lastPos.current && pos.day === lastPos.current.day && pos.slot === lastPos.current.slot)
+            // mouse/pen drag-paint
+            if (paintingRef.current) {
+              const pos = posFromEvent(e)
+              if (!pos || isPast(pos) || sameCell(pos, lastPos.current)) return
+              movedRef.current = true
+              lastPos.current = pos
+              onPaintMove?.(pos)
               return
-            movedRef.current = true
-            lastPos.current = pos
-            onPaintMove?.(pos)
+            }
+            if (e.pointerType !== 'touch' || modeRef.current === 'idle') return
+
+            if (modeRef.current === 'pending') {
+              const far =
+                Math.hypot(e.clientX - startRef.current!.x, e.clientY - startRef.current!.y) >
+                MOVE_THRESHOLD
+              if (far) {
+                // quick swipe before the long-press fired → start multiselect
+                clearLp()
+                modeRef.current = 'paint'
+                movedRef.current = true
+                onPaintStart?.(startRef.current!.pos)
+                lastPos.current = startRef.current!.pos
+              }
+              lastClient.current = { x: e.clientX, y: e.clientY }
+              return
+            }
+            if (modeRef.current === 'paint') {
+              const pos = posFromEvent(e)
+              if (pos && !isPast(pos) && !sameCell(pos, lastPos.current)) {
+                lastPos.current = pos
+                onPaintMove?.(pos)
+              }
+              lastClient.current = { x: e.clientX, y: e.clientY }
+              return
+            }
+            // scroll: pan the box manually
+            const el = scrollRef.current
+            if (el) {
+              el.scrollLeft -= e.clientX - lastClient.current.x
+              el.scrollTop -= e.clientY - lastClient.current.y
+            }
+            lastClient.current = { x: e.clientX, y: e.clientY }
           }}
           onPointerUp={(e) => {
+            clearLp()
             if (paintingRef.current) {
               paintingRef.current = false
               onPaintEnd?.()
-            }
-            // a stationary tap: cycle one cell (touch) or fire onCellTap
-            if (!movedRef.current) {
-              const pos = posFromEvent(e)
-              if (pos && !isPast(pos)) {
-                if (onCellTap) onCellTap(pos)
-                else if (e.pointerType === 'touch' && onPaintStart) {
-                  onPaintStart(pos)
-                  onPaintEnd?.()
+            } else if (e.pointerType === 'touch') {
+              if (modeRef.current === 'paint') {
+                onPaintEnd?.()
+              } else if (modeRef.current === 'pending' && !movedRef.current) {
+                // short tap → cycle one cell
+                const pos = posFromEvent(e)
+                if (pos && !isPast(pos)) {
+                  if (onCellTap) onCellTap(pos)
+                  else if (onPaintStart) {
+                    onPaintStart(pos)
+                    onPaintEnd?.()
+                  }
                 }
               }
             }
+            modeRef.current = 'idle'
+            startRef.current = null
           }}
           onPointerCancel={() => {
-            paintingRef.current = false
-            onPaintEnd?.()
+            clearLp()
+            if (paintingRef.current) {
+              paintingRef.current = false
+              onPaintEnd?.()
+            } else if (modeRef.current === 'paint') {
+              onPaintEnd?.()
+            }
+            modeRef.current = 'idle'
+            startRef.current = null
           }}
         >
           {/* corner: frozen on both axes */}
