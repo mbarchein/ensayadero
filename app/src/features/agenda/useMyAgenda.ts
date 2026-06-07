@@ -62,6 +62,7 @@ export function useMyAgenda() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['my-agenda'] })
       qc.invalidateQueries({ queryKey: ['my-pending'] })
+      qc.invalidateQueries({ queryKey: ['pending-attendance'] })
     },
   })
 

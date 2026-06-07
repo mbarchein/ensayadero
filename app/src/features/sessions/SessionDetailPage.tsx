@@ -83,6 +83,7 @@ export default function SessionDetailPage() {
     qc.invalidateQueries({ queryKey: ['session', sessionId] })
     qc.invalidateQueries({ queryKey: ['sessions', groupId] })
     qc.invalidateQueries({ queryKey: ['my-pending'] })
+    qc.invalidateQueries({ queryKey: ['pending-attendance'] })
   }
 
   const respond = useMutation({

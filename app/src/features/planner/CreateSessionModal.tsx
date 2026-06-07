@@ -220,6 +220,7 @@ export default function CreateSessionModal({
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ['sessions', groupId] })
       qc.invalidateQueries({ queryKey: ['week-sessions', groupId] })
+      qc.invalidateQueries({ queryKey: ['pending-attendance'] })
       if (editing) onClose()
       else navigate(`/g/${groupId}/sessions/${id}`)
     },
