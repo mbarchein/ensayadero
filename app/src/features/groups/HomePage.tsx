@@ -8,7 +8,6 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { randomPlay } from '../../lib/plays'
-import { LogOut } from 'lucide-react'
 import { Badge, Button, EmptyState, Modal, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import { roleLabel } from '../../lib/roleLabel'
@@ -16,7 +15,7 @@ import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib
 
 export default function HomePage() {
   const { t } = useTranslation()
-  const { profile, signOut } = useAuth()
+  const { profile } = useAuth()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [newGroupOpen, setNewGroupOpen] = useState(false)
@@ -76,20 +75,11 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold">
           {t('home.greeting', { name: profile?.name?.split(' ')[0] || '' })}
         </h1>
-        <div className="flex items-center gap-3">
-          {profile?.platform_role === 'SUPERADMIN' && (
-            <Link to="/admin" className="text-sm font-medium text-violet-700 underline">
-              {t('home.admin')}
-            </Link>
-          )}
-          <button
-            onClick={signOut}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-gray-500 hover:bg-gray-100"
-            title={t('profile.signOut')}
-          >
-            <LogOut size={15} /> {t('home.signOut')}
-          </button>
-        </div>
+        {profile?.platform_role === 'SUPERADMIN' && (
+          <Link to="/admin" className="text-sm font-medium text-violet-700 underline">
+            {t('home.admin')}
+          </Link>
+        )}
       </header>
 
       {(pending?.length ?? 0) > 0 && (
