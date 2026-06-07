@@ -50,7 +50,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
         <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
         {notifications?.some((n) => !n.read_at) && (
           <Button variant="ghost" onClick={() => markAllRead.mutate()}>

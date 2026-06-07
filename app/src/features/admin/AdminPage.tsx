@@ -125,7 +125,7 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
         <div>
           <Link to="/" className="text-sm text-gray-500">
             {t('admin.backHome')}

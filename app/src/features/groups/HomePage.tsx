@@ -72,7 +72,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
         <h1 className="text-2xl font-bold">
           {t('home.greeting', { name: profile?.name?.split(' ')[0] || '' })}
         </h1>

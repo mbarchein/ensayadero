@@ -74,7 +74,7 @@ export default function SessionsPage() {
 
   return (
     <div className="space-y-5">
-      <header>
+      <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
         <Link to="/" className="text-sm text-gray-500">
           {t('group.backToGroups')}
         </Link>

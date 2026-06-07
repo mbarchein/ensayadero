@@ -35,7 +35,7 @@ export default function UpcomingPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
+      <h1 className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2 text-xl font-bold">{t('upcoming.title')}</h1>
 
       {pendingCount > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
