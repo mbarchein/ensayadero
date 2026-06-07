@@ -51,29 +51,18 @@ export default function WeekGrid({
   const hours = Array.from({ length: SLOTS_PER_DAY / 2 }, (_, i) => DAY_START_HOUR + i)
 
   return (
-    <div className="select-none overflow-x-auto">
-      <div className="min-w-[560px]">
-        {/* days header */}
-        <div className="grid grid-cols-[3rem_repeat(7,1fr)] text-center text-xs font-medium text-gray-600">
-          <div />
-          {Array.from({ length: 7 }, (_, d) => {
-            const date = addDays(weekMonday, d)
-            const isToday = format(date, 'yyyyMMdd') === format(new Date(), 'yyyyMMdd')
-            return (
-              <div key={d} className={`py-1 ${isToday ? 'font-bold text-violet-700' : ''}`}>
-                {format(date, 'EEE d', { locale: dateLocale() })}
-              </div>
-            )
-          })}
-        </div>
-
+    <div className="select-none">
+      {/* single scroll box so the day header (sticky top) and the hour column
+          (sticky left) stay visible while scrolling in either direction */}
+      <div
+        className="max-h-[70vh] overflow-auto overscroll-contain"
+        // Allow the box to scroll on touch (pan-x/pan-y). Drag-to-paint is
+        // mouse/pen only; touch paints via tap (a drag can't both scroll+paint).
+        style={{ touchAction: 'pan-x pan-y' }}
+      >
         <div
           ref={gridRef}
-          // Allow the page (pan-y) and the wide grid wrapper (pan-x) to scroll
-          // on touch. Drag-to-paint is mouse/pen only; touch paints via tap
-          // (a single drag can't both scroll and paint).
-          style={{ touchAction: 'pan-x pan-y' }}
-          className="grid grid-cols-[3rem_repeat(7,1fr)]"
+          className="grid min-w-[560px] grid-cols-[3rem_repeat(7,1fr)]"
           onPointerDown={(e) => {
             const pos = posFromEvent(e)
             if (!pos || isPast(pos)) return // the past is not editable
@@ -123,6 +112,23 @@ export default function WeekGrid({
             onPaintEnd?.()
           }}
         >
+          {/* corner: frozen on both axes */}
+          <div className="sticky left-0 top-0 z-30 bg-white" />
+          {/* day header: frozen on vertical scroll */}
+          {Array.from({ length: 7 }, (_, d) => {
+            const date = addDays(weekMonday, d)
+            const isToday = format(date, 'yyyyMMdd') === format(new Date(), 'yyyyMMdd')
+            return (
+              <div
+                key={`h${d}`}
+                className={`sticky top-0 z-20 bg-white py-1 text-center text-xs font-medium ${
+                  isToday ? 'font-bold text-violet-700' : 'text-gray-600'
+                }`}
+              >
+                {format(date, 'EEE d', { locale: dateLocale() })}
+              </div>
+            )
+          })}
           {Array.from({ length: SLOTS_PER_DAY }, (_, s) => (
             <Row
               key={s}
@@ -158,7 +164,7 @@ function Row({
   const isHourStart = slot % 2 === 0
   return (
     <>
-      <div className="relative h-6 pr-1 text-right text-[10px] text-gray-400">
+      <div className="sticky left-0 z-10 h-6 bg-white pr-1 text-right text-[10px] text-gray-400">
         {isHourStart && <span className="absolute -top-1.5 right-1">{hours[slot / 2]}:00</span>}
       </div>
       {Array.from({ length: 7 }, (_, day) => {
