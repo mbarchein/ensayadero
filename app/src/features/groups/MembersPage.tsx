@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { LogOut, UserCog, UserMinus, UserX } from 'lucide-react'
+import { LogOut, UserCog, UserMinus, Trash2 } from 'lucide-react'
 import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import { roleLabel } from '../../lib/roleLabel'
@@ -128,7 +128,7 @@ export default function MembersPage() {
                   aria-label={t('group.remove')}
                   onClick={() => setRemoveTarget(m)}
                 >
-                  <UserX size={18} />
+                  <Trash2 size={18} />
                 </Button>
               </div>
             )}
@@ -193,7 +193,7 @@ export default function MembersPage() {
                 setRemoveTarget(null)
               }}
             >
-              <UserX size={16} /> {t('group.remove')}
+              <Trash2 size={16} /> {t('group.remove')}
             </Button>
           </div>
         </div>
