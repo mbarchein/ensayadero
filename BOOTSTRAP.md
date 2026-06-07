@@ -10,25 +10,35 @@ Recommended order: follow the sections top to bottom.
 
 ## 0. Local prerequisites
 
-Required: **Docker** and **Terraform ≥ 1.9**. Node.js and the Supabase CLI are
-convenient but optional — every `node`/`npx`/`supabase` command below can run
-through Docker, so Docker + Terraform is enough.
+### Required
 
 ```bash
-# With local tooling (optional):
-node >= 22
-npm install -g supabase            # or: brew install supabase/tap/supabase
-
-# Without local Node.js / Supabase CLI — run them through Docker:
-#   node:   docker run --rm node:22-alpine node ...
-#   npx:    docker run --rm node:22-alpine npx -y <pkg> ...
-#   supabase CLI (needs your access token):
-#     docker run --rm -e SUPABASE_ACCESS_TOKEN=<token> \
-#       node:22-alpine npx -y supabase <command>
+git
+docker
+terraform >= 1.9
 ```
 
-> Tip: for `supabase secrets set …` (steps 6–7) via Docker, pass the token with
-> `-e SUPABASE_ACCESS_TOKEN` (same token as `supabase_access_token` in tfvars).
+### Optional (convenience)
+
+Node.js and the Supabase CLI make a few commands shorter, but every
+`node`/`npx`/`supabase` command below can run through Docker — so the required
+tools above are enough.
+
+```bash
+node >= 22
+npm install -g supabase            # or: brew install supabase/tap/supabase
+```
+
+Without them, run through Docker instead:
+
+```bash
+# node
+docker run --rm node:22-alpine node ...
+# npx
+docker run --rm node:22-alpine npx -y <pkg> ...
+# supabase CLI (pass your access token, same as supabase_access_token in tfvars)
+docker run --rm -e SUPABASE_ACCESS_TOKEN=<token> node:22-alpine npx -y supabase <command>
+```
 
 ## 1. Required accounts (create if they don't exist)
 
