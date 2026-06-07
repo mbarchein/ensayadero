@@ -193,7 +193,8 @@
     "disable": "Desactivar código",
     "disabledNote": "El código está desactivado. Nadie puede unirse con él.",
     "disableConfirm": "Si apagas el código, nadie podrá unirse con él hasta que lo vuelvas a activar. ¿Apagar?",
-    "enableConfirm": "Se reactivará el código y cualquiera con él podrá volver a unirse. ¿Activar?"
+    "enableConfirm": "Se reactivará el código y cualquiera con él podrá volver a unirse. ¿Activar?",
+    "regenerateConfirm": "Se generará un código nuevo. Los enlaces y QR compartidos antes dejarán de funcionar y tendrás que volver a compartirlos. Las invitaciones por email y los miembros actuales no se ven afectados. ¿Regenerar?"
   },
   "sessions": {
     "empty": "No hay ensayos programados.",

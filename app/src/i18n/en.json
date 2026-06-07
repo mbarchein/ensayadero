@@ -193,7 +193,8 @@
     "disable": "Disable code",
     "disabledNote": "The code is disabled. No one can join with it.",
     "disableConfirm": "If you turn the code off, no one can join with it until you turn it back on. Turn off?",
-    "enableConfirm": "This re-enables the code and anyone with it can join again. Turn on?"
+    "enableConfirm": "This re-enables the code and anyone with it can join again. Turn on?",
+    "regenerateConfirm": "A new code will be generated. Previously shared links and QR codes will stop working and you'll need to share them again. Email invitations and current members are unaffected. Regenerate?"
   },
   "sessions": {
     "empty": "No rehearsals scheduled.",

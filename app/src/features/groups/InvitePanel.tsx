@@ -19,6 +19,7 @@ export default function InvitePanel({ group }: { group: Group }) {
   const [qrOpen, setQrOpen] = useState(false)
   const [disableOpen, setDisableOpen] = useState(false)
   const [enableOpen, setEnableOpen] = useState(false)
+  const [regenerateOpen, setRegenerateOpen] = useState(false)
   const [emailsOpen, setEmailsOpen] = useState(false)
   const [emails, setEmails] = useState('')
   const [role, setRole] = useState<GroupRole>('ACTOR')
@@ -125,7 +126,7 @@ export default function InvitePanel({ group }: { group: Group }) {
                 title={t('invite.regenerate')}
                 aria-label={t('invite.regenerate')}
                 disabled={regenerate.isPending}
-                onClick={() => regenerate.mutate()}
+                onClick={() => setRegenerateOpen(true)}
               >
                 <RefreshCw size={18} />
               </Button>
@@ -175,6 +176,28 @@ export default function InvitePanel({ group }: { group: Group }) {
       )}
 
       {qrOpen && <QrModal link={link} code={group.join_code} onClose={() => setQrOpen(false)} />}
+
+      <Modal open={regenerateOpen} onClose={() => setRegenerateOpen(false)} title={t('invite.regenerate')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('invite.regenerateConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setRegenerateOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="warning"
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={regenerate.isPending}
+              onClick={() => {
+                regenerate.mutate()
+                setRegenerateOpen(false)
+              }}
+            >
+              <RefreshCw size={16} /> {t('invite.regenerate')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={enableOpen} onClose={() => setEnableOpen(false)} title={t('invite.enable')}>
         <div className="space-y-4">
