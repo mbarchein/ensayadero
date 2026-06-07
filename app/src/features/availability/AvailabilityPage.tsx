@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Trash2, Copy, Check, X, Clock } from 'lucide-react'
+import { Trash2, Copy, Check, X, Clock, Loader2, AlertCircle } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -55,6 +55,8 @@ export default function AvailabilityPage() {
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
   const [copyOpen, setCopyOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
+  const [showOk, setShowOk] = useState(false) // brief "saved" tick after a save
+  const okTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [copyN, setCopyN] = useState(1)
   const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
 
@@ -171,6 +173,9 @@ export default function AvailabilityPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['availabilities'] })
+      if (okTimer.current) clearTimeout(okTimer.current)
+      setShowOk(true)
+      okTimer.current = setTimeout(() => setShowOk(false), 2000)
     },
   })
 
@@ -317,6 +322,15 @@ export default function AvailabilityPage() {
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{t('availability.title')}</h1>
         <div className="flex items-center gap-1">
+          <span className="mr-1 flex w-5 justify-center" role="status">
+            {save.isPending || draft ? (
+              <Loader2 size={18} className="animate-spin text-gray-400" aria-label={t('availability.saving')} />
+            ) : save.isError || copyWeeks.isError || clearWeek.isError ? (
+              <AlertCircle size={18} className="text-red-600" aria-label={t('common.error', { message: '' })} />
+            ) : showOk ? (
+              <Check size={18} className="text-green-600" aria-label={t('availability.saved')} />
+            ) : null}
+          </span>
           <Button
             variant="ghost"
             className="p-2"
@@ -356,22 +370,6 @@ export default function AvailabilityPage() {
         <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
           ›
         </Button>
-      </div>
-
-      {/* status above the grid — nothing may go below it (the grid scroll box
-          swallows touch gestures, making later content unreachable on mobile) */}
-      <div className="flex h-4 items-center justify-end text-xs" role="status">
-        {save.isError || copyWeeks.isError || clearWeek.isError ? (
-          <span className="text-red-600">
-            {t('availability.saveError', {
-              message: ((save.error || copyWeeks.error || clearWeek.error) as Error).message,
-            })}
-          </span>
-        ) : (
-          <span className={save.isPending || draft ? 'text-gray-400' : 'text-green-600'}>
-            {save.isPending || draft ? t('availability.saving') : t('availability.saved')}
-          </span>
-        )}
       </div>
 
       <WeekGrid
