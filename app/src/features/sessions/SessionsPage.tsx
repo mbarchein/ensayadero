@@ -79,16 +79,6 @@ export default function SessionsPage() {
           <BackButton to="/" />
           <GroupAvatar seed={group?.avatar_seed || groupId} />
           <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
-          {isInstructor && group && (
-            <Button
-              variant="secondary"
-              onClick={() => setEditOpen(true)}
-              className="inline-flex items-center gap-1.5"
-            >
-              <Pencil size={15} />
-              {t('group.editGroup')}
-            </Button>
-          )}
         </div>
       </header>
 
@@ -110,6 +100,17 @@ export default function SessionsPage() {
         >
           <Users size={16} /> {t('group.tabs.members')}
         </Button>
+        {isInstructor && group && (
+          <Button
+            variant="secondary"
+            onClick={() => setEditOpen(true)}
+            className="inline-flex items-center p-2"
+            title={t('group.editGroup')}
+            aria-label={t('group.editGroup')}
+          >
+            <Pencil size={16} />
+          </Button>
+        )}
       </div>
 
       <h2 className="text-lg font-semibold">{t('group.tabs.sessions')}</h2>
