@@ -426,7 +426,7 @@ function Row({
   const isHourStart = slot % 2 === 0
   return (
     <>
-      <div className="relative h-5 pr-1 text-right text-[10px] font-medium text-gray-900">
+      <div className="relative h-5 pr-1 text-right text-[11px] font-medium text-gray-900">
         {isHourStart && <span className="absolute top-0.5 right-1">{hours[slot / 2]}:00</span>}
       </div>
       {days.map((day) => {
