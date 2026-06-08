@@ -116,6 +116,8 @@
     "myGroups": "Mis grupos",
     "newGroup": "Crear grupo",
     "joinByCode": "Unirse con código",
+    "joinByCodeHint": "Usa el código o el enlace que te ha compartido el director de tu grupo.",
+    "newGroupExplain": "Crea un grupo nuevo: serás el director y podrás invitar a los demás.",
     "newGroupTitle": "Nuevo grupo",
     "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
     "signOut": "Salir",

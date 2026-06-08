@@ -8,7 +8,8 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { randomPlay } from '../../lib/plays'
-import { Badge, Button, EmptyState, Modal, Spinner } from '../../components/ui'
+import { KeyRound, Plus } from 'lucide-react'
+import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import { roleLabel } from '../../lib/roleLabel'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
@@ -100,42 +101,78 @@ export default function HomePage() {
         </section>
       )}
 
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{t('home.myGroups')}</h2>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => navigate('/join')}>
-              {t('home.joinByCode')}
-            </Button>
-            <Button onClick={openNewGroup}>{t('home.newGroup')}</Button>
-          </div>
-        </div>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('home.myGroups')}</h2>
+
         {memberships?.length === 0 ? (
-          <EmptyState message={t('home.noGroups')} />
-        ) : (
-          <ul className="space-y-3">
-            {memberships?.map((m) => (
-              <li key={m.group_id}>
-                <Link
-                  to={`/g/${m.group_id}`}
-                  className="flex items-center justify-between rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600">{t('home.noGroups')}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-2 rounded-xl border border-violet-200 bg-violet-50 p-4">
+                <p className="flex items-center gap-2 font-semibold text-violet-900">
+                  <KeyRound size={18} /> {t('home.joinByCode')}
+                </p>
+                <p className="flex-1 text-sm text-violet-800">{t('home.joinByCodeHint')}</p>
+                <Button
+                  variant="secondary"
+                  className="inline-flex items-center justify-center gap-1.5"
+                  onClick={() => navigate('/join')}
                 >
-                  <div className="flex items-center gap-3">
-                    <GroupAvatar seed={m.groups.avatar_seed || m.group_id} />
-                    <div>
-                      <p className="font-medium">{m.groups.name}</p>
-                      <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                        {roleLabel(t, m.role, profile?.gender)}
-                      </Badge>
+                  <KeyRound size={16} /> {t('home.joinByCode')}
+                </Button>
+              </div>
+              <div className="flex flex-col gap-2 rounded-xl border border-violet-200 bg-violet-50 p-4">
+                <p className="flex items-center gap-2 font-semibold text-violet-900">
+                  <Plus size={18} /> {t('home.newGroup')}
+                </p>
+                <p className="flex-1 text-sm text-violet-800">{t('home.newGroupExplain')}</p>
+                <Button
+                  className="inline-flex items-center justify-center gap-1.5"
+                  onClick={openNewGroup}
+                >
+                  <Plus size={16} /> {t('home.newGroup')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <ul className="space-y-3">
+              {memberships?.map((m) => (
+                <li key={m.group_id}>
+                  <Link
+                    to={`/g/${m.group_id}`}
+                    className="flex items-center justify-between rounded-xl border bg-white p-4 shadow-sm transition hover:shadow"
+                  >
+                    <div className="flex items-center gap-3">
+                      <GroupAvatar seed={m.groups.avatar_seed || m.group_id} />
+                      <div>
+                        <p className="font-medium">{m.groups.name}</p>
+                        <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                          {roleLabel(t, m.role, profile?.gender)}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                  <span aria-hidden className="text-gray-400">
-                    ›
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    <span aria-hidden className="text-gray-400">
+                      ›
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button
+                variant="secondary"
+                className="inline-flex items-center gap-1.5"
+                onClick={() => navigate('/join')}
+              >
+                <KeyRound size={16} /> {t('home.joinByCode')}
+              </Button>
+              <Button className="inline-flex items-center gap-1.5" onClick={openNewGroup}>
+                <Plus size={16} /> {t('home.newGroup')}
+              </Button>
+            </div>
+          </>
         )}
       </section>
 
