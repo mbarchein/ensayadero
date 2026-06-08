@@ -80,6 +80,14 @@ variable "turnstile_secret_key" {
   default     = ""
 }
 
+# Turnstile site key (public). Published to CI as the VITE_TURNSTILE_SITE_KEY
+# build variable. Empty = not created (build falls back to no CAPTCHA widget).
+variable "turnstile_site_key" {
+  description = "Cloudflare Turnstile site key (public, frontend). Empty = not published."
+  type        = string
+  default     = ""
+}
+
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
   description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read permissions"
@@ -137,5 +145,15 @@ variable "resend_api_key" {
   description = "Resend API key (manual, dashboard). Injected as an Edge Functions and CI secret."
   type        = string
   sensitive   = true
+  default     = ""
+}
+
+# ── Web Push (VAPID) ────────────────────────────────────────
+# Public key only — exposed to the frontend as the VITE_VAPID_PUBLIC_KEY build
+# variable. The matching private key is a Supabase Edge Function secret
+# (VAPID_PRIVATE_KEY) and is set out of band, not via Terraform.
+variable "vapid_public_key" {
+  description = "Web Push VAPID public key (base64url, public). Empty = push disabled."
+  type        = string
   default     = ""
 }

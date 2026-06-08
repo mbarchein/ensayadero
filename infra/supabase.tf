@@ -21,6 +21,13 @@ resource "supabase_project" "main" {
   }
 }
 
+# Project API keys. anon_key is the public key used by the frontend / supabase-js
+# — safe to publish as a (non-secret) GitHub Actions variable. (service_role_key
+# is also exposed here but must never leave the backend.)
+data "supabase_apikeys" "main" {
+  project_ref = supabase_project.main.id
+}
+
 resource "supabase_settings" "main" {
   project_ref = supabase_project.main.id
 

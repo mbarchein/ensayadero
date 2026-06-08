@@ -9,7 +9,7 @@ supabase_org_id       = "your-org-slug"
 supabase_region       = "eu-west-3"
 # supabase_db_password = null  # generated if omitted
 
-# Google OAuth — create manually at https://console.cloud.google.com/apis/credentials
+# Google OAuth — create manually at https://console.cloud.google.com/auth/clients
 # Redirect URI: see the google_oauth_redirect_uri output after the first apply
 google_oauth_client_id     = "xxx.apps.googleusercontent.com"
 google_oauth_client_secret = "GOCSPX-xxx"
@@ -25,9 +25,14 @@ facebook_oauth_client_secret = ""
 password_hibp_enabled = false
 
 # Cloudflare Turnstile CAPTCHA (anti-bot on auth forms) — OPTIONAL.
-# Empty = disabled. The site key (public) goes to GitHub vars as
-# VITE_TURNSTILE_SITE_KEY.
+# Empty = disabled. site_key is public (frontend build); secret_key is private.
 turnstile_secret_key = ""
+turnstile_site_key   = ""
+
+# Web Push VAPID public key (frontend). Generate the keypair with:
+#   npx web-push generate-vapid-keys   (or node crypto offline — see BOOTSTRAP)
+# Public key here; private key goes to the Edge Function secret VAPID_PRIVATE_KEY.
+vapid_public_key = ""
 
 # Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read
 cloudflare_api_token  = "xxx"

@@ -79,7 +79,7 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 | `supabase_org_id` | Dashboard → org settings → organization slug |
 | `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token with permissions: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (the domain's zone) |
 | `cloudflare_account_id` | Step 2.3 |
-| `github_token` | https://github.com/settings/tokens → classic, `repo` scopes (includes secrets) |
+| `github_token` | https://github.com/settings/tokens → classic with `repo` scope. (Fine-grained PAT instead? Grant the repo **Secrets: Read and write** + **Variables: Read and write**, or apply 403s.) |
 | `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
 | `domain` / `app_subdomain` | Your domain from step 2 |
 
@@ -170,7 +170,7 @@ external accounts:
 - **Anti email-bombing**: `rate_limit_email_sent=10` emails/hour.
 - **Single-use links with short expiry**: `mailer_otp_exp=900` (15 min).
 - **Password policy**: `password_min_length=8`.
-- **Open redirect**: `additional_redirect_urls` with exact paths, **no wildcards**
+- **Open redirect**: `uri_allow_list` with exact paths, **no wildcards**
   (`*`/`**` would open a recovery-token leak). Don't add host wildcards.
 
 Recommended manual steps (need an account/plan):
@@ -182,8 +182,9 @@ Recommended manual steps (need an account/plan):
    - Create a widget at https://dash.cloudflare.com/?to=/:account/turnstile.
    - **Secret key** → `turnstile_secret_key` in `terraform.tfvars` → `terraform
      apply` (Terraform enables `security_captcha_enabled` automatically when set).
-   - **Site key** (public) → GitHub → Actions **Variables** →
-     `VITE_TURNSTILE_SITE_KEY`. (Locally: `TURNSTILE_*` in `.env`, see `.env.example`.)
+   - **Site key** (public) → `turnstile_site_key` in `terraform.tfvars` → `terraform
+     apply` (Terraform publishes it as the `VITE_TURNSTILE_SITE_KEY` build variable).
+     (Locally: `TURNSTILE_*` in `.env`, see `.env.example`.)
 2. **Leaked passwords (HIBP)** — `password_hibp_enabled=true` in `terraform.tfvars`.
    Requires the Supabase **Pro plan**.
 
@@ -193,21 +194,30 @@ Recommended manual steps (need an account/plan):
 npx web-push generate-vapid-keys
 # no local Node.js? run it through Docker:
 # docker run --rm node:22-alpine npx -y web-push generate-vapid-keys
+# fully offline (no npm registry — e.g. behind a VPN/proxy where the container
+# can't resolve DNS): pure node crypto, no download needed:
+# node -e "const c=require('crypto');const{privateKey:k}=c.generateKeyPairSync('ec',{namedCurve:'prime256v1'});const j=k.export({format:'jwk'});console.log('Public :',Buffer.concat([Buffer.from([4]),Buffer.from(j.x,'base64url'),Buffer.from(j.y,'base64url')]).toString('base64url'));console.log('Private:',j.d);"
 ```
 
-- **Public** → GitHub → repo → Settings → Secrets and variables → Actions →
-  **Variables** → `VITE_VAPID_PUBLIC_KEY` (and to `app/.env.local` for dev).
+- **Public** → `vapid_public_key` in `terraform.tfvars` → `terraform apply`
+  (Terraform publishes it as the `VITE_VAPID_PUBLIC_KEY` build variable). Also add
+  it to `app/.env.local` for local dev.
 - **Private** → Edge Functions secrets:
   ```bash
   supabase secrets set VAPID_PRIVATE_KEY=xxx --project-ref <project-ref>
   supabase secrets set VAPID_SUBJECT=mailto:admin@yourdomain.es --project-ref <project-ref>
   ```
 
-## 8. Remaining frontend variable
+## 8. Frontend build variables — automatic
 
-GitHub → Actions Variables: `VITE_SUPABASE_ANON_KEY` = the project's anon key
-(Supabase dashboard → Settings → API). `VITE_SUPABASE_URL` and `VITE_APP_URL` were
-already created by Terraform.
+All `VITE_*` build variables are created by Terraform as GitHub Actions variables,
+nothing to do by hand:
+
+- `VITE_SUPABASE_URL`, `VITE_APP_URL` — from the project + domain.
+- `VITE_SUPABASE_ANON_KEY` — read from the project via the `supabase_apikeys`
+  data source (anon key is public).
+- `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY` — created when their
+  `terraform.tfvars` values are set (steps 6b and 7).
 
 ## 9. First deploy
 
@@ -272,8 +282,8 @@ consider upgrading to Pro ($25/month).
 - [ ] Initial `terraform apply`
 - [ ] Google OAuth client + redirect URI + re-apply
 - [ ] Resend: domain verified + API key + Edge Functions secrets
-- [ ] VAPID: public in GH vars, private in Edge Functions secrets
-- [ ] `VITE_SUPABASE_ANON_KEY` in GH vars
+- [ ] VAPID: public in tfvars (TF → GH var), private in Edge Functions secrets
+- [ ] frontend `VITE_*` vars present in GH (Terraform creates them — verify)
 - [ ] push to main → green deploy
 - [ ] own login + promotion to SUPERADMIN
 - [ ] `process-notifications` cron created

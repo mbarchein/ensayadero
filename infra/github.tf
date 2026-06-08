@@ -52,3 +52,26 @@ resource "github_actions_variable" "app_url" {
   variable_name = "VITE_APP_URL"
   value         = local.app_url
 }
+
+# Web Push public key — read by the build as VITE_VAPID_PUBLIC_KEY.
+resource "github_actions_variable" "vapid_public_key" {
+  count         = var.vapid_public_key != "" ? 1 : 0
+  repository    = var.github_repo
+  variable_name = "VITE_VAPID_PUBLIC_KEY"
+  value         = var.vapid_public_key
+}
+
+# Turnstile site key — read by the build as VITE_TURNSTILE_SITE_KEY.
+resource "github_actions_variable" "turnstile_site_key" {
+  count         = var.turnstile_site_key != "" ? 1 : 0
+  repository    = var.github_repo
+  variable_name = "VITE_TURNSTILE_SITE_KEY"
+  value         = var.turnstile_site_key
+}
+
+# Supabase anon (public) key — read by the build as VITE_SUPABASE_ANON_KEY.
+resource "github_actions_variable" "supabase_anon_key" {
+  repository    = var.github_repo
+  variable_name = "VITE_SUPABASE_ANON_KEY"
+  value         = data.supabase_apikeys.main.anon_key
+}
