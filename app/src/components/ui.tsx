@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export function Button({
   variant = 'primary',
@@ -95,5 +97,19 @@ export function EmptyState({ message, action }: { message: string; action?: Reac
       <p className="text-sm text-gray-500">{message}</p>
       {action}
     </div>
+  )
+}
+
+// Icon-only back button for the far-left of a page title bar.
+export function BackButton({ to, label }: { to: string; label?: string }) {
+  const { t } = useTranslation()
+  return (
+    <Link
+      to={to}
+      aria-label={label ?? t('common.back')}
+      className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-violet-700 transition hover:bg-violet-50"
+    >
+      <ArrowLeft size={22} aria-hidden />
+    </Link>
   )
 }

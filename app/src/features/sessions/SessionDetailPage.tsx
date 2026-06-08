@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useState } from 'react'
@@ -13,7 +13,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
-import { Badge, Button, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 /** A user's available (painted) sub-intervals within range `r`, merged. */
@@ -172,31 +172,31 @@ export default function SessionDetailPage() {
 
   return (
     <div className="space-y-5 pb-6">
-      <header className="space-y-1">
-        <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
-          {t('sessions.backToSessions')}
-        </Link>
-        <div className="flex items-center gap-2">
-          <GroupAvatar seed={group?.avatar_seed || groupId} size={28} />
-          <span className="text-sm font-medium text-gray-500">{group?.name}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">{session.title}</h1>
-          <Badge
-            color={session.status === 'CONFIRMED' ? 'green' : session.status === 'CANCELLED' ? 'red' : 'gray'}
-          >
-            {t(`sessions.status.${session.status}`)}
-          </Badge>
-        </div>
-        <p className="text-gray-700">
-          {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-        </p>
-        {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
-        {session.location && (
-          <p className="flex items-center gap-1 text-sm text-gray-600">
-            <MapPin size={14} /> {session.location}
+      <header className="flex items-start gap-2">
+        <BackButton to={`/g/${groupId}`} />
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex items-center gap-2">
+            <GroupAvatar seed={group?.avatar_seed || groupId} size={28} />
+            <span className="text-sm font-medium text-gray-500">{group?.name}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">{session.title}</h1>
+            <Badge
+              color={session.status === 'CONFIRMED' ? 'green' : session.status === 'CANCELLED' ? 'red' : 'gray'}
+            >
+              {t(`sessions.status.${session.status}`)}
+            </Badge>
+          </div>
+          <p className="text-gray-700">
+            {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
           </p>
-        )}
+          {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
+          {session.location && (
+            <p className="flex items-center gap-1 text-sm text-gray-600">
+              <MapPin size={14} /> {session.location}
+            </p>
+          )}
+        </div>
       </header>
 
       {mine && session.status === 'CONFIRMED' && (

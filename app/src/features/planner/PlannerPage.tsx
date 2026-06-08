@@ -3,7 +3,6 @@
 // tap a cell → create a session with prefilled times.
 
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
@@ -16,7 +15,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { SLOTS_PER_DAY, heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
 import CreateSessionModal from './CreateSessionModal'
-import { Spinner, Button, Modal } from '../../components/ui'
+import { Spinner, Button, Modal, BackButton } from '../../components/ui'
 import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
@@ -180,10 +179,8 @@ export default function PlannerPage() {
   return (
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="-mx-4 bg-white px-4 py-2">
-        <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
-          ‹ {group?.name}
-        </Link>
+      <header className="-mx-4 flex items-center gap-2 bg-white px-4 py-2">
+        <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('planner.title')}</h1>
       </header>
 

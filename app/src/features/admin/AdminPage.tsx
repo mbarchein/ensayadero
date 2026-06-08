@@ -2,13 +2,13 @@
 // Never shows availabilities (RLS also prevents it at the data level).
 
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { randomPlay } from '../../lib/plays'
-import { Badge, Button, Modal, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import type { Group, MembershipWithProfile, Profile } from '../../lib/types'
 
 export default function AdminPage() {
@@ -126,10 +126,8 @@ export default function AdminPage() {
   return (
     <div className="space-y-6 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
-        <div>
-          <Link to="/" className="text-sm text-gray-500">
-            {t('admin.backHome')}
-          </Link>
+        <div className="flex items-center gap-2">
+          <BackButton to="/" />
           <h1 className="text-xl font-bold">{t('admin.title')}</h1>
         </div>
         <Button onClick={openNewGroup}>{t('admin.newGroup')}</Button>

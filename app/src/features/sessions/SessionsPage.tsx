@@ -9,7 +9,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { Pencil, Archive, CalendarPlus, Users } from 'lucide-react'
-import { Badge, Button, EmptyState, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
 import EditGroupModal from '../groups/EditGroupModal'
 import type { SessionWithParticipants } from '../../lib/types'
@@ -75,10 +75,8 @@ export default function SessionsPage() {
   return (
     <div className="space-y-5 pb-6">
       <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
-        <Link to="/" className="text-sm text-gray-500">
-          {t('group.backToGroups')}
-        </Link>
         <div className="flex items-center gap-3">
+          <BackButton to="/" />
           <GroupAvatar seed={group?.avatar_seed || groupId} />
           <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
           {isInstructor && group && (

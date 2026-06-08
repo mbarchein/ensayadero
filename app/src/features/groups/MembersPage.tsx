@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { LogOut, UserCog, UserMinus, Trash2 } from 'lucide-react'
-import { Badge, Button, Modal, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import { roleLabel } from '../../lib/roleLabel'
 import type { GroupRole, Invitation, MembershipWithProfile } from '../../lib/types'
@@ -79,10 +79,8 @@ export default function MembersPage() {
 
   return (
     <div className="space-y-6 pb-6">
-      <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
-        <Link to={`/g/${groupId}`} className="text-sm text-gray-500">
-          {t('sessions.backToSessions')}
-        </Link>
+      <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-white px-4 py-2">
+        <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
       </header>
 
