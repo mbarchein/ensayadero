@@ -34,7 +34,7 @@ export default function ParticipationCard({
 
   return (
     <li
-      className={`relative rounded-xl border bg-white p-4 shadow-sm ${
+      className={`rounded-xl border bg-white p-4 shadow-sm ${
         p.response === 'ACCEPTED' ? 'border-green-400' : p.response === 'DECLINED' ? 'border-red-400' : ''
       }`}
     >
@@ -105,47 +105,39 @@ export default function ParticipationCard({
           </div>
         ))}
 
-      {onViewAgenda && (
-        <button
-          onClick={onViewAgenda}
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-violet-700 hover:underline"
-        >
-          <CalendarDays size={13} /> {t('upcoming.viewInAgenda')}
-        </button>
-      )}
-
-      {confirmed && tally.total > 0 && (
-        <div className="absolute bottom-3 right-3">
-          <button
-            onClick={() => setAttendeesOpen(true)}
-            className="flex flex-col items-end gap-1 text-xs hover:opacity-80"
-          >
-            {tally.accepted > 0 && (
-              <span className="inline-flex items-center gap-1 text-green-700">
-                <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
-                {tally.accepted === tally.total && ` ${t('upcoming.all')}`}
-              </span>
-            )}
-            {tally.declined > 0 && (
-              <span className="inline-flex items-center gap-1 text-red-600">
-                <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
-                {tally.declined === tally.total && ` ${t('upcoming.all')}`}
-              </span>
-            )}
-            {tally.pending > 0 && (
-              <span className="inline-flex items-center gap-1 text-amber-600">
-                <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
-                {tally.pending === tally.total && ` ${t('upcoming.all')}`}
-              </span>
-            )}
-            <span className="mt-0.5 inline-flex items-center gap-1 font-medium text-violet-700 underline">
-              <Users size={12} /> {t('upcoming.attendeesLink')}
-            </span>
-          </button>
+      {(onViewAgenda || confirmed) && (
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-violet-700">
+          {onViewAgenda && (
+            <button onClick={onViewAgenda} className="inline-flex items-center gap-1 hover:underline">
+              <CalendarDays size={13} /> {t('upcoming.viewInAgenda')}
+            </button>
+          )}
+          {confirmed && (
+            <button onClick={() => setAttendeesOpen(true)} className="inline-flex items-center gap-1 hover:underline">
+              <Users size={13} /> {t('upcoming.attendeesLink')}
+            </button>
+          )}
         </div>
       )}
 
       <Modal open={attendeesOpen} onClose={() => setAttendeesOpen(false)} title={t('upcoming.attendeesTitle')}>
+        <div className="mb-3 flex flex-wrap gap-3 text-sm">
+          {tally.accepted > 0 && (
+            <span className="inline-flex items-center gap-1 text-green-700">
+              <Check size={14} /> {t('upcoming.going')}: {tally.accepted}
+            </span>
+          )}
+          {tally.declined > 0 && (
+            <span className="inline-flex items-center gap-1 text-red-600">
+              <X size={14} /> {t('upcoming.notGoing')}: {tally.declined}
+            </span>
+          )}
+          {tally.pending > 0 && (
+            <span className="inline-flex items-center gap-1 text-amber-600">
+              <Clock size={14} /> {t('upcoming.pending')}: {tally.pending}
+            </span>
+          )}
+        </div>
         <ul className="space-y-2">
           {[...s.session_participants]
             .sort(
