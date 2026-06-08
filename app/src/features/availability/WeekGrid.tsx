@@ -380,7 +380,7 @@ function DayStripView({
             : isToday
               ? 'font-bold text-gray-900'
               : 'text-gray-700'
-        } ${interactive ? 'transition hover:bg-gray-50' : ''}`
+        } ${interactive ? 'transition' : ''}`
         const inner = (
           <>
             <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
