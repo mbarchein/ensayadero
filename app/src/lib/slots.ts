@@ -7,8 +7,8 @@ import type { Availability, AvailabilityKind } from './types'
 import { parseRange, subtract, overlaps, type TimeRange } from './ranges'
 
 export const SLOT_MINUTES = 30
-export const DAY_START_HOUR = 8
-export const DAY_END_HOUR = 23
+export const DAY_START_HOUR = 9
+export const DAY_END_HOUR = 22
 export const SLOTS_PER_DAY = ((DAY_END_HOUR - DAY_START_HOUR) * 60) / SLOT_MINUTES
 
 export interface ExpandedInterval extends TimeRange {
