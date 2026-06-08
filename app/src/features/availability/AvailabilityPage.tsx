@@ -278,12 +278,15 @@ export default function AvailabilityPage() {
 
   const applyCell = (pos: CellPos, value: SlotState) => {
     editSeq.current++
-    setDraft((prev) => {
-      const base = prev ?? serverGrid!
-      const copy = base.map((col) => [...col])
-      copy[pos.day][pos.slot] = value
-      return copy
-    })
+    // Keep draftRef in sync synchronously: on a single tap, onPaintEnd runs right
+    // after onPaintStart, before React re-renders, so the ref must already reflect
+    // this change (otherwise the scheduled-rehearsal clear prompt is missed except
+    // on the first painted cell).
+    const base = draftRef.current ?? serverGrid!
+    const copy = base.map((col) => [...col])
+    copy[pos.day][pos.slot] = value
+    draftRef.current = copy
+    setDraft(copy)
   }
 
   // on release: if availability was removed from slots with a scheduled rehearsal,
