@@ -75,3 +75,11 @@ resource "github_actions_variable" "supabase_anon_key" {
   variable_name = "VITE_SUPABASE_ANON_KEY"
   value         = data.supabase_apikeys.main.anon_key
 }
+
+# Cloudflare Pages project name — used by the wrangler deploy step in CI, so the
+# --project-name always matches the project Terraform actually created.
+resource "github_actions_variable" "pages_project_name" {
+  repository    = var.github_repo
+  variable_name = "CLOUDFLARE_PROJECT_NAME"
+  value         = var.project_name
+}
