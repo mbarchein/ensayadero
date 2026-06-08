@@ -373,14 +373,18 @@ function DayStripView({
         const isToday = format(date, 'yyyyMMdd') === todayKey
         const isSel = interactive && selectedDay === d
         const cls = `flex flex-col items-center py-1 text-center leading-tight ${
-          isSel ? 'bg-violet-600 text-white' : isToday ? 'font-bold text-gray-900' : 'text-gray-700'
+          isSel
+            ? 'bg-violet-200 font-bold text-violet-900 ring-2 ring-inset ring-violet-600'
+            : isToday
+              ? 'font-bold text-gray-900'
+              : 'text-gray-700'
         } ${interactive ? 'transition hover:bg-gray-50' : ''}`
         const inner = (
           <>
             <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
               {letters[d]}
             </span>
-            <span className={`text-[9px] uppercase ${isSel ? 'text-violet-100' : 'text-gray-500'}`}>
+            <span className={`text-[9px] uppercase ${isSel ? 'text-violet-700' : 'text-gray-500'}`}>
               {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
             </span>
             <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>
