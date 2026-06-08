@@ -4,6 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import Turnstile, { captchaEnabled } from './Turnstile'
 
+// Facebook login is shown only when its OAuth credentials are configured.
+// Terraform sets VITE_FACEBOOK_ENABLED from facebook_oauth_client_id != "".
+const facebookEnabled = import.meta.env.VITE_FACEBOOK_ENABLED === 'true'
+
 export default function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -73,15 +77,17 @@ export default function LoginPage() {
         {t('login.googleButton')}
       </button>
 
-      <button
-        onClick={() => signInWithProvider('facebook')}
-        className="flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-[#1877F2] px-6 py-3 font-medium text-white shadow-md transition hover:shadow-lg"
-      >
-        <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden>
-          <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.08 24 18.09 24 12.07z"/>
-        </svg>
-        {t('login.facebookButton')}
-      </button>
+      {facebookEnabled && (
+        <button
+          onClick={() => signInWithProvider('facebook')}
+          className="flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-[#1877F2] px-6 py-3 font-medium text-white shadow-md transition hover:shadow-lg"
+        >
+          <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden>
+            <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.08 24 18.09 24 12.07z"/>
+          </svg>
+          {t('login.facebookButton')}
+        </button>
+      )}
 
       <div className="flex w-full max-w-xs items-center gap-3 text-xs text-violet-400">
         <span className="h-px flex-1 bg-violet-200" />

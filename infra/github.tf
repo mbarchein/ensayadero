@@ -83,3 +83,11 @@ resource "github_actions_variable" "pages_project_name" {
   variable_name = "CLOUDFLARE_PROJECT_NAME"
   value         = var.project_name
 }
+
+# Whether the frontend shows the Facebook login button — true only when the Meta
+# OAuth credentials are configured (matches external_facebook_enabled in Supabase).
+resource "github_actions_variable" "facebook_enabled" {
+  repository    = var.github_repo
+  variable_name = "VITE_FACEBOOK_ENABLED"
+  value         = tostring(var.facebook_oauth_client_id != "")
+}

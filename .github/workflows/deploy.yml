@@ -93,6 +93,7 @@ jobs:
           VITE_APP_URL: ${{ vars.VITE_APP_URL }}
           VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
           VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+          VITE_FACEBOOK_ENABLED: ${{ vars.VITE_FACEBOOK_ENABLED }}
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
