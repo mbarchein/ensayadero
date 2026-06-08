@@ -13,7 +13,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
-import { Badge, BackButton, Button, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 /** A user's available (painted) sub-intervals within range `r`, merged. */
@@ -51,6 +51,7 @@ export default function SessionDetailPage() {
   const [shareCopied, setShareCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   const [editingResp, setEditingResp] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
 
   const { data: session, isLoading } = useQuery({
     queryKey: ['session', sessionId],
@@ -294,13 +295,7 @@ export default function SessionDetailPage() {
             </Button>
           )}
           {session.status === 'CONFIRMED' && (
-            <Button
-              variant="danger"
-              onClick={() => {
-                if (confirm(t('sessions.cancelConfirm'))) setStatus.mutate('CANCELLED')
-              }}
-              className="w-full"
-            >
+            <Button variant="danger" onClick={() => setCancelOpen(true)} className="w-full">
               {t('sessions.cancelBtn')}
             </Button>
           )}
@@ -317,6 +312,28 @@ export default function SessionDetailPage() {
           )}
         </section>
       )}
+
+      <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={t('sessions.cancelBtn')}>
+        <div className="space-y-4">
+          <p className="text-sm font-bold text-red-700">{t('sessions.cancelConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setCancelOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              className="flex-1"
+              disabled={setStatus.isPending}
+              onClick={() => {
+                setStatus.mutate('CANCELLED')
+                setCancelOpen(false)
+              }}
+            >
+              {t('sessions.cancelBtn')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
