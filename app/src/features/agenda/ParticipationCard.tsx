@@ -54,9 +54,7 @@ export default function ParticipationCard({
           {s.status !== 'CONFIRMED' && (
             <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
           )}
-          <Badge color={p.required ? 'violet' : 'gray'}>
-            {p.required ? t('planner.required') : t('planner.optional')}
-          </Badge>
+          {!p.required && <Badge color="gray">{t('planner.optional')}</Badge>}
         </div>
       </div>
 
