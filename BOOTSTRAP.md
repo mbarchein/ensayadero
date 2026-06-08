@@ -77,11 +77,27 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 |----------|----------------------|
 | `supabase_access_token` | https://supabase.com/dashboard/account/tokens → "Generate new token" |
 | `supabase_org_id` | Dashboard → org settings → organization slug |
-| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token with permissions: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (the domain's zone), **Turnstile: Edit** (account, only if you enable CAPTCHA — step 6b) |
+| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → **Create Custom Token** (permissions listed below the table) |
 | `cloudflare_account_id` | Step 2.3 |
-| `github_token` | https://github.com/settings/tokens → classic with `repo` scope. (Fine-grained PAT instead? Grant the repo **Secrets: Read and write** + **Variables: Read and write**, or apply 403s.) |
+| `github_token` | https://github.com/settings/tokens (scopes/permissions listed below the table) |
 | `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
 | `domain` / `app_subdomain` | Your domain from step 2 |
+
+**`cloudflare_api_token`** — Custom Token permissions:
+
+- **Cloudflare Pages:** Edit
+- **DNS:** Edit
+- **Zone:** Read (the domain's zone)
+- **Turnstile:** Edit (account level — only if you enable CAPTCHA, step 6b)
+
+**`github_token`** — pick one:
+
+- **Classic PAT:** the `repo` scope (covers Actions secrets + variables).
+- **Fine-grained PAT**, on the repo:
+  - **Secrets:** Read and write
+  - **Variables:** Read and write
+
+  Otherwise `terraform apply` 403s on the secrets/variables endpoints.
 
 ## 4. First `terraform apply` (partial)
 
@@ -113,10 +129,14 @@ Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect
 4. **Google Auth Platform → Audience**: a new app starts in **Testing** mode, where
    only the listed test users can sign in. Click **Publish app → In production** to
    open login to everyone.
-   - The `email`/`profile`/`openid` scopes Supabase uses are **non-sensitive**, so
-     app/scope verification is **not** required — any Google user can log in with no
-     warning. Keep **Data Access** limited to those three; adding a sensitive scope
-     (Drive, Gmail, …) would force full verification.
+   - The scopes Supabase uses are **non-sensitive**, so app/scope verification is
+     **not** required — any Google user can log in with no warning. Keep **Data
+     Access** limited to these three:
+     - `openid`
+     - `userinfo.email`
+     - `userinfo.profile`
+
+     Adding a sensitive scope (Drive, Gmail, …) would force full verification.
    - Google may still show a *"your app requires verification"* banner — that is
      **brand verification** (name + logo display only) and does **not** block login.
      Ignore it, or remove the logo under **Branding** to clear it.
