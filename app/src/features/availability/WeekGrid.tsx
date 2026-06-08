@@ -1,8 +1,13 @@
-// Generic weekly grid: painting (edit mode) or display (heatmap).
-// Pointer events → works with mouse and touch (touch-action: none).
+// Weekly grid with two view modes:
+//  - Week view (default): all 7 day columns, read-only, vertical scroll only.
+//  - Day view: tap a day in the header to show only that day; editing (paint /
+//    tap) is enabled here. The corner cell holds a button back to the week view.
+// The day-selector header is always visible (7 buttons); swiping it left/right
+// moves to the next/previous week.
 
-import { useRef, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
+import { CalendarRange } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { DAY_START_HOUR, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
@@ -21,7 +26,13 @@ interface Props {
   onCellTap?: (pos: CellPos) => void
   /** Fill the parent's height (flex child) instead of capping at 70vh. */
   fill?: boolean
+  /** Horizontal swipe on the day header changes week. */
+  onPrevWeek?: () => void
+  onNextWeek?: () => void
 }
+
+const HOUR_COL = '2.25rem'
+const SWIPE_PX = 50
 
 export default function WeekGrid({
   weekMonday,
@@ -32,22 +43,30 @@ export default function WeekGrid({
   onPaintEnd,
   onCellTap,
   fill = false,
+  onPrevWeek,
+  onNextWeek,
 }: Props) {
+  // null = week view (all days, read-only); number = day view (editable).
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const editing = selectedDay != null
+  const days = editing ? [selectedDay] : [0, 1, 2, 3, 4, 5, 6]
+
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  // refs, not state: pointermove runs synchronously after pointerdown and a
-  // setState wouldn't be applied yet (stale closure).
-  const paintingRef = useRef(false) // mouse/pen drag-paint
+  // refs, not state: pointermove runs synchronously after pointerdown.
+  const paintingRef = useRef(false)
   const movedRef = useRef(false)
   const lastPos = useRef<CellPos | null>(null)
-  // Touch gesture arbitration: a quick swipe paints (multiselect), a long-press
-  // then move scrolls, a short tap cycles one cell.
   const modeRef = useRef<'idle' | 'pending' | 'paint' | 'scroll'>('idle')
   const startRef = useRef<{ x: number; y: number; pos: CellPos } | null>(null)
   const lastClient = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const lpTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const LONG_PRESS_MS = 250
-  const MOVE_THRESHOLD = 8 // px before a swipe counts as painting
+  const MOVE_THRESHOLD = 8
+
+  // header swipe (week navigation)
+  const swipeStartX = useRef<number | null>(null)
+  const swiped = useRef(false)
 
   const now = new Date()
   const isPast = (pos: CellPos) => slotRange(weekMonday, pos.day, pos.slot).end <= now
@@ -73,43 +92,106 @@ export default function WeekGrid({
   }
 
   const hours = Array.from({ length: SLOTS_PER_DAY / 2 }, (_, i) => DAY_START_HOUR + i)
+  const todayKey = format(new Date(), 'yyyyMMdd')
 
   return (
     <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
-      {/* single scroll box so the day header (sticky top) and the hour column
-          (sticky left) stay visible while scrolling in either direction */}
+      {/* day selector header — always visible; swipe to change week */}
+      <div
+        className="flex border-b border-gray-200"
+        onPointerDown={(e) => {
+          swipeStartX.current = e.clientX
+          swiped.current = false
+        }}
+        onPointerUp={(e) => {
+          if (swipeStartX.current == null) return
+          const dx = e.clientX - swipeStartX.current
+          swipeStartX.current = null
+          if (Math.abs(dx) > SWIPE_PX) {
+            swiped.current = true
+            if (dx < 0) onNextWeek?.()
+            else onPrevWeek?.()
+          }
+        }}
+      >
+        <div className="flex items-center justify-center" style={{ width: HOUR_COL }}>
+          {editing && (
+            <button
+              onClick={() => setSelectedDay(null)}
+              aria-label="Semana"
+              className="rounded p-1 text-violet-700 hover:bg-violet-50"
+            >
+              <CalendarRange size={16} />
+            </button>
+          )}
+        </div>
+        <div className="grid flex-1 grid-cols-7">
+          {Array.from({ length: 7 }, (_, d) => {
+            const date = addDays(weekMonday, d)
+            const isToday = format(date, 'yyyyMMdd') === todayKey
+            const isSel = selectedDay === d
+            return (
+              <button
+                key={`h${d}`}
+                onClick={() => {
+                  if (swiped.current) {
+                    swiped.current = false
+                    return
+                  }
+                  setSelectedDay((cur) => (cur === d ? null : d))
+                }}
+                className={`flex flex-col items-center py-1 text-center leading-tight transition ${
+                  isSel
+                    ? 'bg-violet-100 text-violet-800'
+                    : isToday
+                      ? 'text-violet-700'
+                      : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
+                  {format(date, 'EEEEE', { locale: dateLocale() })}
+                </span>
+                <span className="text-[9px] uppercase text-gray-500">
+                  {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
+                </span>
+                <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* body: vertical scroll; editing (paint) only in day view */}
       <div
         ref={scrollRef}
         className={`overflow-auto overscroll-contain ${fill ? 'min-h-0 flex-1' : 'max-h-[70vh]'}`}
       >
         <div
           ref={gridRef}
-          // touch-action none: we arbitrate scroll vs paint ourselves (see refs).
-          // Mouse keeps native behaviour.
-          style={{ touchAction: 'none' }}
-          className="grid min-w-[560px] grid-cols-[3rem_repeat(7,minmax(0,1fr))]"
+          style={{
+            touchAction: editing ? 'none' : 'auto',
+            gridTemplateColumns: `${HOUR_COL} repeat(${days.length}, minmax(0, 1fr))`,
+          }}
+          className="grid"
           onPointerDown={(e) => {
+            if (!editing) return
             const pos = posFromEvent(e)
-            const editable = !!pos && !isPast(pos)
+            const ok = !!pos && !isPast(pos)
             movedRef.current = false
             lastClient.current = { x: e.clientX, y: e.clientY }
             if (e.pointerType !== 'touch') {
-              // mouse/pen: immediate drag-paint on editable cells
-              if (editable && onPaintStart) {
+              if (ok && onPaintStart) {
                 paintingRef.current = true
                 capture(e)
                 onPaintStart(pos!)
               }
               return
             }
-            // touch
             capture(e)
-            if (!editable) {
-              // header row, hour column or past area → scroll immediately
+            if (!ok) {
               modeRef.current = 'scroll'
               return
             }
-            // editable cell: pending until we know swipe (paint) vs hold (scroll)
             lastPos.current = pos
             startRef.current = { x: e.clientX, y: e.clientY, pos: pos! }
             modeRef.current = 'pending'
@@ -118,7 +200,7 @@ export default function WeekGrid({
             }, LONG_PRESS_MS)
           }}
           onPointerMove={(e) => {
-            // mouse/pen drag-paint
+            if (!editing) return
             if (paintingRef.current) {
               const pos = posFromEvent(e)
               if (!pos || isPast(pos) || sameCell(pos, lastPos.current)) return
@@ -128,13 +210,11 @@ export default function WeekGrid({
               return
             }
             if (e.pointerType !== 'touch' || modeRef.current === 'idle') return
-
             if (modeRef.current === 'pending') {
               const far =
                 Math.hypot(e.clientX - startRef.current!.x, e.clientY - startRef.current!.y) >
                 MOVE_THRESHOLD
               if (far) {
-                // quick swipe before the long-press fired → start multiselect
                 clearLp()
                 modeRef.current = 'paint'
                 movedRef.current = true
@@ -162,6 +242,7 @@ export default function WeekGrid({
             lastClient.current = { x: e.clientX, y: e.clientY }
           }}
           onPointerUp={(e) => {
+            if (!editing) return
             clearLp()
             if (paintingRef.current) {
               paintingRef.current = false
@@ -170,7 +251,6 @@ export default function WeekGrid({
               if (modeRef.current === 'paint') {
                 onPaintEnd?.()
               } else if (modeRef.current === 'pending' && !movedRef.current) {
-                // short tap → cycle one cell
                 const pos = posFromEvent(e)
                 if (pos && !isPast(pos)) {
                   if (onCellTap) onCellTap(pos)
@@ -185,6 +265,7 @@ export default function WeekGrid({
             startRef.current = null
           }}
           onPointerCancel={() => {
+            if (!editing) return
             clearLp()
             if (paintingRef.current) {
               paintingRef.current = false
@@ -196,27 +277,11 @@ export default function WeekGrid({
             startRef.current = null
           }}
         >
-          {/* corner: frozen on both axes */}
-          <div className="sticky left-0 top-0 z-30 bg-white" />
-          {/* day header: frozen on vertical scroll */}
-          {Array.from({ length: 7 }, (_, d) => {
-            const date = addDays(weekMonday, d)
-            const isToday = format(date, 'yyyyMMdd') === format(new Date(), 'yyyyMMdd')
-            return (
-              <div
-                key={`h${d}`}
-                className={`sticky top-0 z-20 bg-white py-1 text-center text-xs font-medium ${
-                  isToday ? 'font-bold text-violet-700' : 'text-gray-600'
-                }`}
-              >
-                {format(date, 'EEE d', { locale: dateLocale() })}
-              </div>
-            )
-          })}
           {Array.from({ length: SLOTS_PER_DAY }, (_, s) => (
             <Row
               key={s}
               slot={s}
+              days={days}
               hours={hours}
               renderCell={renderCell}
               cellClass={cellClass}
@@ -231,12 +296,14 @@ export default function WeekGrid({
 
 function Row({
   slot,
+  days,
   hours,
   renderCell,
   cellClass,
   isPast,
 }: {
   slot: number
+  days: number[]
   hours: number[]
   renderCell: Props['renderCell']
   cellClass: Props['cellClass']
@@ -245,10 +312,10 @@ function Row({
   const isHourStart = slot % 2 === 0
   return (
     <>
-      <div className="sticky left-0 z-10 h-6 bg-white pr-1 text-right text-[10px] text-gray-400">
+      <div className="relative h-6 pr-1 text-right text-[10px] font-medium text-gray-900">
         {isHourStart && <span className="absolute -top-1.5 right-1">{hours[slot / 2]}:00</span>}
       </div>
-      {Array.from({ length: 7 }, (_, day) => {
+      {days.map((day) => {
         const past = isPast({ day, slot })
         return (
           <div

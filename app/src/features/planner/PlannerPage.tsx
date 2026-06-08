@@ -218,22 +218,9 @@ export default function PlannerPage() {
         })}
       </div>
 
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={() => setWeekOffset((w) => Math.max(-6, w - 1))}
-          disabled={weekOffset <= -6}
-          aria-label={t('availability.prevWeek')}
-        >
-          ‹
-        </Button>
-        <span className="text-sm font-medium">
-          {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
-        </span>
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
-          ›
-        </Button>
-      </div>
+      <p className="text-center text-sm font-medium text-gray-600">
+        {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
+      </p>
 
       {!grid ? (
         <Spinner />
@@ -284,6 +271,8 @@ export default function PlannerPage() {
             setSel((prev) => (prev && pos.day === prev.day ? { ...prev, b: pos.slot } : prev))
           }
           onPaintEnd={() => setDragging(false)}
+          onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
+          onNextWeek={() => setWeekOffset((w) => w + 1)}
           fill
         />
       )}

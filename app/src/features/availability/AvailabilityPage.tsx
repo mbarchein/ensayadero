@@ -381,23 +381,10 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={() => setWeekOffset((w) => Math.max(-6, w - 1))}
-          disabled={weekOffset <= -6}
-          aria-label={t('availability.prevWeek')}
-        >
-          ‹
-        </Button>
-        <span className="text-sm font-medium">
-          {format(monday, "d MMM", { locale: dateLocale() })} – {format(addDays(monday, 6), "d MMM yyyy", { locale: dateLocale() })}
-          {weekOffset === 0 && ` ${t('availability.thisWeek')}`}
-        </span>
-        <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('availability.nextWeek')}>
-          ›
-        </Button>
-      </div>
+      <p className="text-center text-sm font-medium text-gray-600">
+        {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
+        {weekOffset === 0 && ` · ${t('availability.thisWeek')}`}
+      </p>
 
       <WeekGrid
         weekMonday={monday}
@@ -464,6 +451,8 @@ export default function AvailabilityPage() {
         }}
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
+        onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
+        onNextWeek={() => setWeekOffset((w) => w + 1)}
         fill
       />
 
