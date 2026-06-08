@@ -27,6 +27,17 @@ locals {
   app_fqdn = var.app_subdomain != "" ? "${var.app_subdomain}.${var.domain}" : var.domain
 }
 
+# ── Turnstile CAPTCHA widget (optional) ─────────────────────
+# sitekey -> VITE_TURNSTILE_SITE_KEY (github.tf); secret -> Supabase auth
+# (supabase.tf). localhost dev uses Turnstile's built-in dummy test sitekeys.
+resource "cloudflare_turnstile_widget" "auth" {
+  count      = var.turnstile_enabled ? 1 : 0
+  account_id = var.cloudflare_account_id
+  name       = "${var.project_name} auth"
+  domains    = [local.app_fqdn]
+  mode       = "managed"
+}
+
 resource "cloudflare_dns_record" "app" {
   zone_id = data.cloudflare_zone.main.zone_id
   name    = var.app_subdomain != "" ? var.app_subdomain : "@"

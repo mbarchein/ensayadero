@@ -25,16 +25,16 @@ facebook_oauth_client_secret = ""
 password_hibp_enabled = false
 
 # Cloudflare Turnstile CAPTCHA (anti-bot on auth forms) — OPTIONAL.
-# Empty = disabled. site_key is public (frontend build); secret_key is private.
-turnstile_secret_key = ""
-turnstile_site_key   = ""
+# true = Terraform creates the widget and wires site key + secret automatically
+# (needs Turnstile:Edit on the Cloudflare token). false = no CAPTCHA.
+turnstile_enabled = false
 
 # Web Push VAPID public key (frontend). Generate the keypair with:
 #   npx web-push generate-vapid-keys   (or node crypto offline — see BOOTSTRAP)
 # Public key here; private key goes to the Edge Function secret VAPID_PRIVATE_KEY.
 vapid_public_key = ""
 
-# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read
+# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"
 domain                = "ensayoapp.es"

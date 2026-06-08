@@ -87,9 +87,9 @@ resource "supabase_settings" "main" {
     # API field is rate_limit_verify (the /verify endpoint); the name
     # rate_limit_token_verifications does not exist and would be dropped.
     rate_limit_verify = 30
-    # Turnstile CAPTCHA (anti-bot). Active only if a secret is set.
-    security_captcha_enabled  = var.turnstile_secret_key != ""
+    # Turnstile CAPTCHA (anti-bot). Widget created by Terraform when enabled.
+    security_captcha_enabled  = var.turnstile_enabled
     security_captcha_provider = "turnstile"
-    security_captcha_secret   = var.turnstile_secret_key
+    security_captcha_secret   = var.turnstile_enabled ? cloudflare_turnstile_widget.auth[0].secret : ""
   })
 }

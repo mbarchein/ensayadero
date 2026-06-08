@@ -71,26 +71,18 @@ variable "password_hibp_enabled" {
   default     = false
 }
 
-# Cloudflare Turnstile CAPTCHA. Empty secret = provider disabled. The site key
-# (public) goes to the frontend as VITE_TURNSTILE_SITE_KEY (GitHub vars).
-variable "turnstile_secret_key" {
-  description = "Cloudflare Turnstile secret for auth CAPTCHA. Empty = disabled."
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-# Turnstile site key (public). Published to CI as the VITE_TURNSTILE_SITE_KEY
-# build variable. Empty = not created (build falls back to no CAPTCHA widget).
-variable "turnstile_site_key" {
-  description = "Cloudflare Turnstile site key (public, frontend). Empty = not published."
-  type        = string
-  default     = ""
+# Cloudflare Turnstile CAPTCHA on the auth forms. When true, Terraform creates the
+# widget and derives both the site key (-> VITE_TURNSTILE_SITE_KEY build var) and
+# the secret (-> Supabase auth). Requires Turnstile:Edit on cloudflare_api_token.
+variable "turnstile_enabled" {
+  description = "Create a Cloudflare Turnstile widget + wire CAPTCHA on auth forms."
+  type        = bool
+  default     = false
 }
 
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
-  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read permissions"
+  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit permissions"
   type        = string
   sensitive   = true
 }

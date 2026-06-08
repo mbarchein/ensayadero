@@ -63,10 +63,10 @@ resource "github_actions_variable" "vapid_public_key" {
 
 # Turnstile site key — read by the build as VITE_TURNSTILE_SITE_KEY.
 resource "github_actions_variable" "turnstile_site_key" {
-  count         = var.turnstile_site_key != "" ? 1 : 0
+  count         = var.turnstile_enabled ? 1 : 0
   repository    = var.github_repo
   variable_name = "VITE_TURNSTILE_SITE_KEY"
-  value         = var.turnstile_site_key
+  value         = cloudflare_turnstile_widget.auth[0].sitekey
 }
 
 # Supabase anon (public) key — read by the build as VITE_SUPABASE_ANON_KEY.

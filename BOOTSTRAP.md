@@ -77,7 +77,7 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 |----------|----------------------|
 | `supabase_access_token` | https://supabase.com/dashboard/account/tokens → "Generate new token" |
 | `supabase_org_id` | Dashboard → org settings → organization slug |
-| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token with permissions: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (the domain's zone) |
+| `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → Custom token with permissions: **Cloudflare Pages: Edit**, **DNS: Edit**, **Zone: Read** (the domain's zone), **Turnstile: Edit** (account, only if you enable CAPTCHA — step 6b) |
 | `cloudflare_account_id` | Step 2.3 |
 | `github_token` | https://github.com/settings/tokens → classic with `repo` scope. (Fine-grained PAT instead? Grant the repo **Secrets: Read and write** + **Variables: Read and write**, or apply 403s.) |
 | `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
@@ -177,14 +177,14 @@ Recommended manual steps (need an account/plan):
 
 1. **CAPTCHA (Cloudflare Turnstile)** — the best defense against bots and
    volume-based enumeration. The frontend is **already wired** (Turnstile widget
-   on login/signup/recovery, `options.captchaToken` passed through); it stays off
-   until you provide keys:
-   - Create a widget at https://dash.cloudflare.com/?to=/:account/turnstile.
-   - **Secret key** → `turnstile_secret_key` in `terraform.tfvars` → `terraform
-     apply` (Terraform enables `security_captcha_enabled` automatically when set).
-   - **Site key** (public) → `turnstile_site_key` in `terraform.tfvars` → `terraform
-     apply` (Terraform publishes it as the `VITE_TURNSTILE_SITE_KEY` build variable).
-     (Locally: `TURNSTILE_*` in `.env`, see `.env.example`.)
+   on login/signup/recovery, `options.captchaToken` passed through). Terraform
+   creates the whole widget — no manual key handling:
+   - Set `turnstile_enabled = true` in `terraform.tfvars` → `terraform apply`.
+     Terraform creates the widget and derives the site key (→ the
+     `VITE_TURNSTILE_SITE_KEY` build variable) and the secret (→
+     `security_captcha_secret` in `supabase_settings`).
+   - The Cloudflare token needs **Turnstile: Edit** (account level) — see step 3.
+     (Locally for dev: `TURNSTILE_*` in `.env`, see `.env.example`.)
 2. **Leaked passwords (HIBP)** — `password_hibp_enabled=true` in `terraform.tfvars`.
    Requires the Supabase **Pro plan**.
 
