@@ -83,13 +83,13 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 | `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
 | `domain` / `app_subdomain` | Your domain from step 2 |
 
-**`cloudflare_api_token`** — Custom Token permissions:
+**`cloudflare_api_token`** — Custom Token permissions (each row is *scope → group → access*):
 
-- **Cloudflare Pages:** Edit
-- **DNS:** Edit
-- **Zone:** Read (the domain's zone)
-- **Turnstile:** Edit (account level — only if you enable CAPTCHA, step 6b)
-- **Dynamic Redirect:** Edit (only if `redirect_root_to_app = true` — apex → app redirect)
+- **Account** → Cloudflare Pages → **Edit**
+- **Account** → Turnstile → **Edit** (only if you enable CAPTCHA, step 6b)
+- **Zone** → DNS → **Edit**
+- **Zone** → Zone → **Read** (the domain's zone)
+- **Zone** → Dynamic URL Redirects → **Edit** (only if `redirect_root_to_app = true` — apex → app redirect)
 
 **`github_token`** — pick one:
 
