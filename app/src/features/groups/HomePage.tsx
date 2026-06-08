@@ -160,15 +160,15 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-col gap-2 pt-1">
               <Button
                 variant="secondary"
-                className="inline-flex items-center gap-1.5"
+                className="inline-flex w-full items-center justify-center gap-1.5"
                 onClick={() => navigate('/join')}
               >
                 <KeyRound size={16} /> {t('home.joinByCode')}
               </Button>
-              <Button className="inline-flex items-center gap-1.5" onClick={openNewGroup}>
+              <Button className="inline-flex w-full items-center justify-center gap-1.5" onClick={openNewGroup}>
                 <Plus size={16} /> {t('home.newGroup')}
               </Button>
             </div>
