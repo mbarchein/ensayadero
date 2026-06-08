@@ -54,7 +54,7 @@ export default function JoinPage() {
   if (loading || (codeParam && working)) return <Spinner />
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-4 p-6">
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-start gap-4 p-6 pt-12">
       <h1 className="text-center text-xl font-bold">{t('join.title')}</h1>
       <p className="text-center text-sm text-gray-600">{t('join.hint')}</p>
       <form
