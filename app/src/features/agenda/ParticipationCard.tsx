@@ -33,7 +33,7 @@ export default function ParticipationCard({
   return (
     <li
       className={`rounded-xl border bg-white p-4 shadow-sm ${
-        p.response === 'DECLINED' ? 'border-red-400' : ''
+        p.response === 'ACCEPTED' ? 'border-green-400' : p.response === 'DECLINED' ? 'border-red-400' : ''
       }`}
     >
       <div className="flex items-start justify-between gap-2">
