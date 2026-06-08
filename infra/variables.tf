@@ -82,7 +82,7 @@ variable "turnstile_enabled" {
 
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
-  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Dynamic URL Redirects:Edit permissions"
+  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Single Redirect:Edit permissions"
   type        = string
   sensitive   = true
 }

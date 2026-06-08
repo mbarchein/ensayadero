@@ -34,12 +34,12 @@ turnstile_enabled = false
 # Public key here; private key goes to the Edge Function secret VAPID_PRIVATE_KEY.
 vapid_public_key = ""
 
-# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Dynamic URL Redirects:Edit
+# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Single Redirect:Edit
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"
 domain                = "ensayoapp.es"
 app_subdomain         = "app"
-redirect_root_to_app  = true # 301 the apex domain -> app subdomain (needs Zone:Dynamic URL Redirects:Edit on the token)
+redirect_root_to_app  = true # 301 the apex domain -> app subdomain (needs Zone:Single Redirect:Edit on the token)
 
 # Resend — add the domain at https://resend.com/domains and copy the records here
 resend_api_key      = "re_xxx"
