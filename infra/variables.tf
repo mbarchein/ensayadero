@@ -82,7 +82,7 @@ variable "turnstile_enabled" {
 
 # ── Cloudflare ──────────────────────────────────────────────
 variable "cloudflare_api_token" {
-  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit permissions"
+  description = "Cloudflare API token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Dynamic Redirect:Edit permissions"
   type        = string
   sensitive   = true
 }
@@ -101,6 +101,14 @@ variable "app_subdomain" {
   description = "App subdomain. Empty = root domain."
   type        = string
   default     = "app"
+}
+
+# 301-redirect the apex (root) domain to the app subdomain via a Cloudflare
+# redirect rule. Only applies when app_subdomain is set (otherwise apex IS the app).
+variable "redirect_root_to_app" {
+  description = "Redirect the root domain to the app subdomain (Cloudflare 301)."
+  type        = bool
+  default     = true
 }
 
 # ── Resend (verification DNS; API key created manually) ─────

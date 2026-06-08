@@ -25,6 +25,8 @@ resource "cloudflare_pages_domain" "app" {
 
 locals {
   app_fqdn = var.app_subdomain != "" ? "${var.app_subdomain}.${var.domain}" : var.domain
+  # Redirect the apex only when the app lives on a subdomain (else apex IS the app).
+  redirect_root = var.redirect_root_to_app && var.app_subdomain != ""
 }
 
 # ── Turnstile CAPTCHA widget (optional) ─────────────────────
@@ -58,4 +60,41 @@ resource "cloudflare_dns_record" "resend" {
   priority = try(each.value.priority, null)
   proxied  = false
   ttl      = 1
+}
+
+# ── Redirect apex (root domain) → app subdomain ─────────────
+# A proxied apex record is required so the request reaches Cloudflare's edge; the
+# placeholder IP is never contacted — the redirect rule fires before any origin.
+resource "cloudflare_dns_record" "root_redirect" {
+  count   = local.redirect_root ? 1 : 0
+  zone_id = data.cloudflare_zone.main.zone_id
+  name    = "@"
+  type    = "A"
+  content = "192.0.2.1" # TEST-NET-1 placeholder, never reached
+  proxied = true
+  ttl     = 1
+}
+
+# 301 redirect ${var.domain}/<path>?<query> → https://${app_fqdn}/<path>?<query>
+resource "cloudflare_ruleset" "root_redirect" {
+  count   = local.redirect_root ? 1 : 0
+  zone_id = data.cloudflare_zone.main.zone_id
+  name    = "Redirect root to app"
+  kind    = "zone"
+  phase   = "http_request_dynamic_redirect"
+
+  rules = [{
+    action      = "redirect"
+    description = "Redirect ${var.domain} to ${local.app_fqdn}"
+    expression  = "(http.host eq \"${var.domain}\")"
+    action_parameters = {
+      from_value = {
+        status_code           = 301
+        preserve_query_string = true
+        target_url = {
+          expression = "concat(\"https://${local.app_fqdn}\", http.request.uri.path)"
+        }
+      }
+    }
+  }]
 }

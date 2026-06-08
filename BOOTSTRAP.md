@@ -89,6 +89,7 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 - **DNS:** Edit
 - **Zone:** Read (the domain's zone)
 - **Turnstile:** Edit (account level — only if you enable CAPTCHA, step 6b)
+- **Dynamic Redirect:** Edit (only if `redirect_root_to_app = true` — apex → app redirect)
 
 **`github_token`** — pick one:
 
