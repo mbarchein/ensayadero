@@ -50,36 +50,32 @@ export default function ParticipationCard({
             {s.location ? ` · ${s.location}` : ''}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex shrink-0 flex-col items-end gap-1 text-xs">
           {s.status !== 'CONFIRMED' && (
             <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
           )}
           {!p.required && <Badge color="gray">{t('planner.optional')}</Badge>}
-        </div>
-      </div>
-
-      {confirmed && (
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-          {tally.accepted > 0 && (
+          {confirmed && tally.accepted > 0 && (
             <span className="inline-flex items-center gap-1 text-green-700">
               <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
               {tally.accepted === tally.total && ` ${t('upcoming.all')}`}
             </span>
           )}
-          {tally.declined > 0 && (
+          {confirmed && tally.declined > 0 && (
             <span className="inline-flex items-center gap-1 text-red-600">
               <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
               {tally.declined === tally.total && ` ${t('upcoming.all')}`}
             </span>
           )}
-          {tally.pending > 0 && (
+          {confirmed && tally.pending > 0 && (
             <span className="inline-flex items-center gap-1 text-amber-600">
               <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
               {tally.pending === tally.total && ` ${t('upcoming.all')}`}
             </span>
           )}
         </div>
-      )}
+      </div>
+
 
       {confirmed &&
         (p.response !== 'PENDING' && !editing ? (
