@@ -16,8 +16,10 @@ export default function GroupAvatar({ seed, size = 44 }: { seed: string; size?: 
       alt=""
       width={size}
       height={size}
-      className="shrink-0 rounded-xl"
-      style={{ width: size, height: size }}
+      // proportional rounding (square with soft corners) at any size, instead of
+      // a fixed radius that looks circular on small avatars
+      className="shrink-0"
+      style={{ width: size, height: size, borderRadius: Math.round(size * 0.22) }}
     />
   )
 }

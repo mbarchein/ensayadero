@@ -18,7 +18,7 @@ export interface CellPos {
 
 interface Props {
   weekMonday: Date
-  renderCell: (pos: CellPos) => ReactNode
+  renderCell: (pos: CellPos, ctx: { dayView: boolean }) => ReactNode
   cellClass: (pos: CellPos) => string
   onPaintStart?: (pos: CellPos) => void
   onPaintMove?: (pos: CellPos) => void
@@ -189,22 +189,28 @@ export default function WeekGrid({
             snapBack()
           }}
         >
-          <div ref={stripRef} className="flex" style={{ transform: CENTER }}>
-            <DayStripView weekMonday={addDays(weekMonday, -7)} todayKey={todayKey} />
-            <DayStripView
-              weekMonday={weekMonday}
-              todayKey={todayKey}
-              interactive
-              selectedDay={selectedDay}
-              onSelect={(d) => {
-                if (swiped.current) {
-                  swiped.current = false
-                  return
-                }
-                setSelectedDay((cur) => (cur === d ? null : d))
-              }}
-            />
-            <DayStripView weekMonday={addDays(weekMonday, 7)} todayKey={todayKey} />
+          <div ref={stripRef} className="flex" style={{ width: '300%', transform: CENTER }}>
+            <div className="shrink-0" style={{ width: '33.3333%' }}>
+              <DayStripView weekMonday={addDays(weekMonday, -7)} todayKey={todayKey} />
+            </div>
+            <div className="shrink-0" style={{ width: '33.3333%' }}>
+              <DayStripView
+                weekMonday={weekMonday}
+                todayKey={todayKey}
+                interactive
+                selectedDay={selectedDay}
+                onSelect={(d) => {
+                  if (swiped.current) {
+                    swiped.current = false
+                    return
+                  }
+                  setSelectedDay((cur) => (cur === d ? null : d))
+                }}
+              />
+            </div>
+            <div className="shrink-0" style={{ width: '33.3333%' }}>
+              <DayStripView weekMonday={addDays(weekMonday, 7)} todayKey={todayKey} />
+            </div>
           </div>
         </div>
       </div>
@@ -330,6 +336,7 @@ export default function WeekGrid({
               key={s}
               slot={s}
               days={days}
+              dayView={editing}
               hours={hours}
               renderCell={renderCell}
               cellClass={cellClass}
@@ -355,19 +362,23 @@ function DayStripView({
   selectedDay?: number | null
   onSelect?: (day: number) => void
 }) {
+  // Fixed Monday-first weekday letters ('X' for miércoles), per language.
+  const letters = (dateLocale().code ?? 'en').startsWith('es')
+    ? ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+    : ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   return (
-    <div className="grid w-full shrink-0 grid-cols-7">
+    <div className="grid w-full grid-cols-7">
       {Array.from({ length: 7 }, (_, d) => {
         const date = addDays(weekMonday, d)
         const isToday = format(date, 'yyyyMMdd') === todayKey
         const isSel = interactive && selectedDay === d
         const cls = `flex flex-col items-center py-1 text-center leading-tight ${
-          isSel ? 'bg-violet-100 text-violet-800' : isToday ? 'font-bold text-gray-900' : 'text-gray-700'
+          isSel ? 'bg-violet-300 text-violet-900' : isToday ? 'font-bold text-gray-900' : 'text-gray-700'
         } ${interactive ? 'transition hover:bg-gray-50' : ''}`
         const inner = (
           <>
             <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
-              {format(date, 'EEEEE', { locale: dateLocale() })}
+              {letters[d]}
             </span>
             <span className={`text-[9px] uppercase ${isSel ? 'text-violet-700' : 'text-gray-500'}`}>
               {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
@@ -392,6 +403,7 @@ function DayStripView({
 function Row({
   slot,
   days,
+  dayView,
   hours,
   renderCell,
   cellClass,
@@ -399,6 +411,7 @@ function Row({
 }: {
   slot: number
   days: number[]
+  dayView: boolean
   hours: number[]
   renderCell: Props['renderCell']
   cellClass: Props['cellClass']
@@ -407,7 +420,7 @@ function Row({
   const isHourStart = slot % 2 === 0
   return (
     <>
-      <div className="relative h-6 pr-1 text-right text-[10px] font-medium text-gray-900">
+      <div className="relative h-5 pr-1 text-right text-[10px] font-medium text-gray-900">
         {isHourStart && <span className="absolute -top-1.5 right-1">{hours[slot / 2]}:00</span>}
       </div>
       {days.map((day) => {
@@ -417,11 +430,11 @@ function Row({
             key={day}
             data-day={day}
             data-slot={slot}
-            className={`h-6 overflow-hidden border-b border-r border-gray-100 ${
+            className={`h-5 overflow-hidden border-b border-r border-gray-100 ${
               isHourStart ? 'border-t border-t-gray-200' : ''
             } ${cellClass({ day, slot })} ${past ? 'opacity-35 grayscale' : ''}`}
           >
-            {renderCell({ day, slot })}
+            {renderCell({ day, slot }, { dayView })}
           </div>
         )
       })}

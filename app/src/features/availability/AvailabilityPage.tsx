@@ -24,6 +24,7 @@ import WeekGrid, { type CellPos } from './WeekGrid'
 import { Button, Modal, Spinner } from '../../components/ui'
 import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
+import GroupAvatar from '../groups/GroupAvatar'
 import type { Availability } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
@@ -400,42 +401,47 @@ export default function AvailabilityPage() {
               : ''
           return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${ring} ${pending}`
         }}
-        renderCell={({ day, slot }) => {
+        renderCell={({ day, slot }, { dayView }) => {
           const p = sessionCells.get(`${day}:${slot}`)
-          if (p) {
-            const title = `${p.sessions.title} — ${p.sessions.groups.name}`
-            const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
-            const secondSlot =
-              !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
-            if (firstSlot) {
-              // first slot: my response icon + group
-              const RespIcon =
-                p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
-              const color =
-                p.response === 'ACCEPTED'
-                  ? 'text-green-700'
-                  : p.response === 'DECLINED'
-                    ? 'text-red-600'
-                    : 'text-amber-600'
-              return (
-                <span
-                  className={`flex items-center gap-0.5 truncate px-0.5 text-[8px] font-semibold leading-6 ${color}`}
-                  title={title}
-                >
-                  <RespIcon size={9} className="shrink-0" />
-                  <span className="truncate">{p.sessions.groups.name}</span>
-                </span>
-              )
-            }
-            if (secondSlot) {
-              // second slot: rehearsal name
-              return (
-                <span className="block truncate px-0.5 text-[8px] leading-6 text-gray-500" title={title}>
-                  {p.sessions.title}
-                </span>
-              )
-            }
-            return null
+          if (!p) return null
+          const title = `${p.sessions.title} — ${p.sessions.groups.name}`
+          const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
+          // week view: the group avatar in every cell of the rehearsal (response
+          // shown by the cell ring)
+          if (!dayView) {
+            return (
+              <span className="flex h-full items-center justify-center" title={title}>
+                <GroupAvatar seed={p.sessions.groups.avatar_seed || p.sessions.group_id} size={16} />
+              </span>
+            )
+          }
+          // day view: response icon + group, then the rehearsal name
+          const secondSlot =
+            !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
+          if (firstSlot) {
+            const RespIcon = p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
+            const color =
+              p.response === 'ACCEPTED'
+                ? 'text-green-700'
+                : p.response === 'DECLINED'
+                  ? 'text-red-600'
+                  : 'text-amber-600'
+            return (
+              <span
+                className={`flex items-center gap-0.5 truncate px-0.5 text-[8px] font-semibold leading-5 ${color}`}
+                title={title}
+              >
+                <RespIcon size={9} className="shrink-0" />
+                <span className="truncate">{p.sessions.groups.name}</span>
+              </span>
+            )
+          }
+          if (secondSlot) {
+            return (
+              <span className="block truncate px-0.5 text-[8px] leading-5 text-gray-500" title={title}>
+                {p.sessions.title}
+              </span>
+            )
           }
           return null
         }}
