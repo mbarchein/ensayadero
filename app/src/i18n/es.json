@@ -127,6 +127,8 @@
   },
   "availability": {
     "title": "Mi disponibilidad",
+    "agendaTitle": "Mi agenda",
+    "editTitle": "Editar disponibilidad",
     "prevWeek": "Semana anterior",
     "nextWeek": "Semana siguiente",
     "thisWeek": "(esta semana)",

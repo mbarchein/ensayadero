@@ -54,6 +54,7 @@ export default function AvailabilityPage() {
   }, [])
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
+  const [dayView, setDayView] = useState(false)
   const [copyOpen, setCopyOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
   const [showOk, setShowOk] = useState(false) // brief "saved" tick after a save
@@ -348,7 +349,9 @@ export default function AvailabilityPage() {
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{t('availability.title')}</h1>
+        <h1 className="text-xl font-bold">
+          {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
+        </h1>
         <div className="flex items-center gap-1">
           <span className="mr-1 flex w-5 justify-center" role="status">
             {save.isPending || hasUnsaved ? (
@@ -454,6 +457,7 @@ export default function AvailabilityPage() {
         onPaintEnd={onPaintEnd}
         onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
         onNextWeek={() => setWeekOffset((w) => w + 1)}
+        onViewChange={setDayView}
         fill
       />
 

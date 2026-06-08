@@ -5,7 +5,7 @@
 // The day-selector header is always visible (7 buttons); swiping it left/right
 // moves to the next/previous week.
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
 import { CalendarRange } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
@@ -29,6 +29,8 @@ interface Props {
   /** Horizontal swipe on the day header changes week. */
   onPrevWeek?: () => void
   onNextWeek?: () => void
+  /** Notifies the parent when switching between week view and day (edit) view. */
+  onViewChange?: (dayView: boolean) => void
 }
 
 const HOUR_COL = '2.25rem'
@@ -44,6 +46,7 @@ export default function WeekGrid({
   fill = false,
   onPrevWeek,
   onNextWeek,
+  onViewChange,
 }: Props) {
   // null = week view (all days, read-only); number = day view (editable).
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
@@ -81,6 +84,10 @@ export default function WeekGrid({
       el.style.transform = CENTER
     }
   }, [weekMonday])
+
+  useEffect(() => {
+    onViewChange?.(selectedDay != null)
+  }, [selectedDay, onViewChange])
 
   const recenter = () => {
     const el = stripRef.current
@@ -374,7 +381,7 @@ function DayStripView({
         const isSel = interactive && selectedDay === d
         const cls = `flex flex-col items-center py-1 text-center leading-tight ${
           isSel
-            ? 'bg-violet-200 font-bold text-violet-900 ring-2 ring-inset ring-violet-600'
+            ? 'bg-violet-500 font-bold text-violet-900'
             : isToday
               ? 'font-bold text-gray-900'
               : 'text-gray-700'

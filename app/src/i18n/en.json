@@ -127,6 +127,8 @@
   },
   "availability": {
     "title": "My availability",
+    "agendaTitle": "My schedule",
+    "editTitle": "Edit availability",
     "prevWeek": "Previous week",
     "nextWeek": "Next week",
     "thisWeek": "(this week)",
