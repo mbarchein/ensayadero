@@ -515,15 +515,23 @@ export default function AvailabilityPage() {
           <p className="text-sm text-gray-600">{t('availability.copyHint')}</p>
           <label className="block text-sm">
             {t('availability.copyWeeksLabel')}
-            <input
-              type="number"
-              min={1}
-              max={12}
+            <select
               required
               value={copyN}
-              onChange={(e) => setCopyN(Math.min(12, Math.max(1, Number(e.target.value))))}
-              className="mt-1 w-full rounded-lg border px-3 py-2"
-            />
+              onChange={(e) => setCopyN(Number(e.target.value))}
+              className="mt-1 w-full rounded-lg border bg-white px-3 py-2"
+            >
+              {Array.from({ length: 10 }, (_, idx) => {
+                const n = idx + 1
+                const first = addWeeks(monday, 1)
+                const lastEnd = addDays(addWeeks(monday, n), 6)
+                return (
+                  <option key={n} value={n}>
+                    {n} · {format(first, 'd MMM', { locale: dateLocale() })} – {format(lastEnd, 'd MMM', { locale: dateLocale() })}
+                  </option>
+                )
+              })}
+            </select>
           </label>
           <Button type="submit" disabled={copyWeeks.isPending} className="w-full">
             {copyWeeks.isPending
