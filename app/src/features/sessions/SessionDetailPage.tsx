@@ -172,32 +172,31 @@ export default function SessionDetailPage() {
 
   return (
     <div className="space-y-5 pb-6">
-      <header className="flex items-start gap-2">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 bg-white px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <GroupAvatar seed={group?.avatar_seed || groupId} size={28} />
-            <span className="text-sm font-medium text-gray-500">{group?.name}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">{session.title}</h1>
-            {session.status !== 'CONFIRMED' && (
-              <Badge color={session.status === 'CANCELLED' ? 'red' : 'gray'}>
-                {t(`sessions.status.${session.status}`)}
-              </Badge>
-            )}
-          </div>
-          <p className="text-gray-700">
-            {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-          </p>
-          {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
-          {session.location && (
-            <p className="flex items-center gap-1 text-sm text-gray-600">
-              <MapPin size={14} /> {session.location}
-            </p>
+        <GroupAvatar seed={group?.avatar_seed || groupId} />
+        <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
+      </header>
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold">{session.title}</h2>
+          {session.status !== 'CONFIRMED' && (
+            <Badge color={session.status === 'CANCELLED' ? 'red' : 'gray'}>
+              {t(`sessions.status.${session.status}`)}
+            </Badge>
           )}
         </div>
-      </header>
+        <p className="text-gray-700">
+          {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
+        </p>
+        {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
+        {session.location && (
+          <p className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPin size={14} /> {session.location}
+          </p>
+        )}
+      </div>
 
       {mine && session.status === 'CONFIRMED' && (
         <section className="rounded-xl border border-violet-200 bg-violet-50 p-4">
