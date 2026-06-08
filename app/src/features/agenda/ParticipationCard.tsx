@@ -43,7 +43,9 @@ export default function ParticipationCard({
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
+          {s.status !== 'CONFIRMED' && (
+            <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
+          )}
           <Badge color={p.required ? 'violet' : 'gray'}>
             {p.required ? t('planner.required') : t('planner.optional')}
           </Badge>

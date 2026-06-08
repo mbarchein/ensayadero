@@ -186,7 +186,9 @@ function SessionCard({
             </p>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <Badge color={STATUS_COLOR[s.status]}>{t(`sessions.status.${s.status}`)}</Badge>
+            {s.status !== 'CONFIRMED' && (
+              <Badge color={STATUS_COLOR[s.status]}>{t(`sessions.status.${s.status}`)}</Badge>
+            )}
             {mine && s.status === 'CONFIRMED' && (
               <Badge
                 color={mine.response === 'ACCEPTED' ? 'green' : mine.response === 'DECLINED' ? 'red' : 'amber'}

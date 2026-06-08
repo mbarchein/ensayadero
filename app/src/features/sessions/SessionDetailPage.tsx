@@ -181,11 +181,11 @@ export default function SessionDetailPage() {
           </div>
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">{session.title}</h1>
-            <Badge
-              color={session.status === 'CONFIRMED' ? 'green' : session.status === 'CANCELLED' ? 'red' : 'gray'}
-            >
-              {t(`sessions.status.${session.status}`)}
-            </Badge>
+            {session.status !== 'CONFIRMED' && (
+              <Badge color={session.status === 'CANCELLED' ? 'red' : 'gray'}>
+                {t(`sessions.status.${session.status}`)}
+              </Badge>
+            )}
           </div>
           <p className="text-gray-700">
             {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
