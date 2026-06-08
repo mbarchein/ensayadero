@@ -173,7 +173,7 @@
     "regenerateAvatar": "Regenerate avatar",
     "leave": "Leave group",
     "leaveTitle": "Leave group",
-    "leaveConfirm": "Leave this group? You'll be removed from its rehearsals.",
+    "leaveConfirm": "Leave this group? You'll be removed from its rehearsals. This action cannot be undone.",
     "tabs": {
       "sessions": "Rehearsals",
       "planner": "Plan",

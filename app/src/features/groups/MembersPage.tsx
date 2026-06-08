@@ -150,7 +150,7 @@ export default function MembersPage() {
 
       <div className="border-t pt-4">
         <Button
-          variant="warning"
+          variant="danger"
           className="inline-flex items-center gap-1.5"
           disabled={leaveGroup.isPending}
           onClick={() => setLeaveOpen(true)}
@@ -232,13 +232,13 @@ export default function MembersPage() {
       {/* leave group */}
       <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('group.leaveTitle')}>
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">{t('group.leaveConfirm')}</p>
+          <p className="text-sm font-bold text-red-700">{t('group.leaveConfirm')}</p>
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={() => setLeaveOpen(false)}>
               {t('common.cancel')}
             </Button>
             <Button
-              variant="warning"
+              variant="danger"
               className="inline-flex flex-1 items-center justify-center gap-1.5"
               disabled={leaveGroup.isPending}
               onClick={() => {
