@@ -31,7 +31,11 @@ export default function ParticipationCard({
   const [editing, setEditing] = useState(false)
 
   return (
-    <li className="rounded-xl border bg-white p-4 shadow-sm">
+    <li
+      className={`rounded-xl border bg-white p-4 shadow-sm ${
+        p.response === 'DECLINED' ? 'border-red-400' : ''
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
