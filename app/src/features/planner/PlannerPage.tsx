@@ -218,10 +218,6 @@ export default function PlannerPage() {
         })}
       </div>
 
-      <p className="text-center text-sm font-medium text-gray-600">
-        {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
-      </p>
-
       {!grid ? (
         <Spinner />
       ) : (

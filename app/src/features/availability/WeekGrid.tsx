@@ -65,6 +65,7 @@ export default function WeekGrid({
   const MOVE_THRESHOLD = 8
 
   // header swipe (week navigation)
+  const headerRef = useRef<HTMLDivElement>(null)
   const swipeStartX = useRef<number | null>(null)
   const swiped = useRef(false)
 
@@ -98,10 +99,17 @@ export default function WeekGrid({
     <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
       {/* day selector header — always visible; swipe to change week */}
       <div
+        ref={headerRef}
+        style={{ touchAction: 'pan-y' }}
         className="flex border-b border-gray-200"
         onPointerDown={(e) => {
           swipeStartX.current = e.clientX
           swiped.current = false
+          try {
+            headerRef.current?.setPointerCapture(e.pointerId)
+          } catch {
+            /* not capturable in some environments */
+          }
         }}
         onPointerUp={(e) => {
           if (swipeStartX.current == null) return

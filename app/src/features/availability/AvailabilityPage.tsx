@@ -381,11 +381,6 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      <p className="text-center text-sm font-medium text-gray-600">
-        {format(monday, 'd MMM', { locale: dateLocale() })} – {format(addDays(monday, 6), 'd MMM yyyy', { locale: dateLocale() })}
-        {weekOffset === 0 && ` · ${t('availability.thisWeek')}`}
-      </p>
-
       <WeekGrid
         weekMonday={monday}
         cellClass={({ day, slot }) => {
