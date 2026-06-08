@@ -121,8 +121,15 @@ export default function SessionDetailPage() {
 
   const r = parseRange(session.time_range)
   const mine = session.session_participants.find((p) => p.user_id === profile?.id)
-  const required = session.session_participants.filter((p) => p.required)
-  const optional = session.session_participants.filter((p) => !p.required)
+  // Sort each list by response (going → not going → pending), then alphabetically.
+  const respOrder: Record<string, number> = { ACCEPTED: 0, DECLINED: 1, PENDING: 2 }
+  const partName = (p: (typeof session.session_participants)[number]) => p.profiles.name || p.profiles.email
+  const sortParticipants = (list: typeof session.session_participants) =>
+    [...list].sort(
+      (a, b) => (respOrder[a.response] ?? 9) - (respOrder[b.response] ?? 9) || partName(a).localeCompare(partName(b)),
+    )
+  const required = sortParticipants(session.session_participants.filter((p) => p.required))
+  const optional = sortParticipants(session.session_participants.filter((p) => !p.required))
 
   // each participant's availability within the session's range
   const availInfo = new Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>()
