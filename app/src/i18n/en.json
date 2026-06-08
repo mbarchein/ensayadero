@@ -47,6 +47,8 @@
       "later": "Later"
     },
     "viewInAgenda": "View in my schedule",
+    "attendeesTitle": "Summoned",
+    "attendeesLink": "View summoned",
     "going": "Going",
     "notGoing": "Not going",
     "pending": "Pending",

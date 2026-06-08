@@ -11,7 +11,7 @@ export interface MyParticipation extends SessionParticipant {
   sessions: Session & {
     groups: { name: string; avatar_seed: string | null }
     // all participants (for the going/not going/pending summary)
-    session_participants: { response: ParticipantResponse }[]
+    session_participants: { response: ParticipantResponse; profiles: { name: string | null } | null }[]
   }
 }
 
@@ -35,7 +35,7 @@ export function useMyAgenda() {
       const [parts, archives] = await Promise.all([
         supabase
           .from('session_participants')
-          .select('*, sessions!inner(*, groups(name, avatar_seed), session_participants(response))')
+          .select('*, sessions!inner(*, groups(name, avatar_seed), session_participants(response, profiles(name)))')
           .eq('user_id', profile!.id)
           .neq('sessions.status', 'CANCELLED'),
         supabase.from('session_archives').select('session_id'),

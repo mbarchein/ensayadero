@@ -4,9 +4,9 @@ import { format } from 'date-fns'
 import { CalendarDays } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { dateLocale } from '../../lib/dateLocale'
-import { Check, X, Clock, Pencil } from 'lucide-react'
+import { Check, X, Clock, Pencil, Users } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
-import { Badge, Button } from '../../components/ui'
+import { Badge, Button, Modal } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
 import { celebrate, commiserate } from '../../lib/confetti'
 import type { ParticipantResponse } from '../../lib/types'
@@ -29,6 +29,8 @@ export default function ParticipationCard({
   const confirmed = s.status === 'CONFIRMED'
   const tally = tallyResponses(p)
   const [editing, setEditing] = useState(false)
+  const [attendeesOpen, setAttendeesOpen] = useState(false)
+  const respOrder: Record<ParticipantResponse, number> = { ACCEPTED: 0, DECLINED: 1, PENDING: 2 }
 
   return (
     <li
@@ -55,24 +57,6 @@ export default function ParticipationCard({
             <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
           )}
           {!p.required && <Badge color="gray">{t('planner.optional')}</Badge>}
-          {confirmed && tally.accepted > 0 && (
-            <span className="inline-flex items-center gap-1 text-green-700">
-              <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
-              {tally.accepted === tally.total && ` ${t('upcoming.all')}`}
-            </span>
-          )}
-          {confirmed && tally.declined > 0 && (
-            <span className="inline-flex items-center gap-1 text-red-600">
-              <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
-              {tally.declined === tally.total && ` ${t('upcoming.all')}`}
-            </span>
-          )}
-          {confirmed && tally.pending > 0 && (
-            <span className="inline-flex items-center gap-1 text-amber-600">
-              <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
-              {tally.pending === tally.total && ` ${t('upcoming.all')}`}
-            </span>
-          )}
         </div>
       </div>
 
@@ -129,6 +113,60 @@ export default function ParticipationCard({
           <CalendarDays size={13} /> {t('upcoming.viewInAgenda')}
         </button>
       )}
+
+      {confirmed && tally.total > 0 && (
+        <div className="mt-3 flex justify-end">
+          <button
+            onClick={() => setAttendeesOpen(true)}
+            className="flex flex-col items-end gap-1 text-xs hover:opacity-80"
+          >
+            {tally.accepted > 0 && (
+              <span className="inline-flex items-center gap-1 text-green-700">
+                <Check size={13} /> {t('upcoming.going')}: {tally.accepted}
+                {tally.accepted === tally.total && ` ${t('upcoming.all')}`}
+              </span>
+            )}
+            {tally.declined > 0 && (
+              <span className="inline-flex items-center gap-1 text-red-600">
+                <X size={13} /> {t('upcoming.notGoing')}: {tally.declined}
+                {tally.declined === tally.total && ` ${t('upcoming.all')}`}
+              </span>
+            )}
+            {tally.pending > 0 && (
+              <span className="inline-flex items-center gap-1 text-amber-600">
+                <Clock size={13} /> {t('upcoming.pending')}: {tally.pending}
+                {tally.pending === tally.total && ` ${t('upcoming.all')}`}
+              </span>
+            )}
+            <span className="mt-0.5 inline-flex items-center gap-1 font-medium text-violet-700 underline">
+              <Users size={12} /> {t('upcoming.attendeesLink')}
+            </span>
+          </button>
+        </div>
+      )}
+
+      <Modal open={attendeesOpen} onClose={() => setAttendeesOpen(false)} title={t('upcoming.attendeesTitle')}>
+        <ul className="space-y-2">
+          {[...s.session_participants]
+            .sort(
+              (a, b) =>
+                respOrder[a.response] - respOrder[b.response] ||
+                (a.profiles?.name ?? '').localeCompare(b.profiles?.name ?? ''),
+            )
+            .map((sp, i) => (
+              <li key={i} className="flex items-center justify-between gap-2 text-sm">
+                <span className="truncate">{sp.profiles?.name || '—'}</span>
+                <Badge color={sp.response === 'ACCEPTED' ? 'green' : sp.response === 'DECLINED' ? 'red' : 'amber'}>
+                  {sp.response === 'ACCEPTED'
+                    ? t('sessions.response.going')
+                    : sp.response === 'DECLINED'
+                      ? t('sessions.response.notGoing')
+                      : t('sessions.response.pending')}
+                </Badge>
+              </li>
+            ))}
+        </ul>
+      </Modal>
     </li>
   )
 }
