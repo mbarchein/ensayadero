@@ -3,7 +3,31 @@ name: Deploy
 on:
   push:
     branches: [main]
+    # Skip the pipeline for changes that don't affect the app or backend:
+    # docs, Terraform infra (applied manually), and the self-hosted Docker path.
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+      - 'infra/**'
+      - 'docker/**'
+      - 'docker-compose.yml'
+      - 'docker-stack.yml'
+      - 'Makefile'
+      - '.gitignore'
+      - '.env.example'
+      - 'prod.env.example'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+      - 'infra/**'
+      - 'docker/**'
+      - 'docker-compose.yml'
+      - 'docker-stack.yml'
+      - 'Makefile'
+      - '.gitignore'
+      - '.env.example'
+      - 'prod.env.example'
 
 jobs:
   test:
