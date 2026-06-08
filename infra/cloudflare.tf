@@ -10,12 +10,11 @@ resource "cloudflare_pages_project" "app" {
   name              = var.project_name
   production_branch = "main"
 
-  # Deploy via GitHub Actions with wrangler (direct upload),
-  # no native Git integration — more control from CI.
-  build_config = {
-    build_command   = ""
-    destination_dir = ""
-  }
+  # Deploy via GitHub Actions with wrangler (direct upload), no native Git
+  # integration — more control from CI. No build_config block on purpose: an
+  # empty one diverges from the API's stored value (null) and trips a known
+  # cloudflare provider v5 bug ("inconsistent values for sensitive attribute")
+  # on every apply, which would block the pages_domain + DNS record below.
 }
 
 resource "cloudflare_pages_domain" "app" {
