@@ -34,7 +34,12 @@ turnstile_enabled = false
 # Public key here; private key goes to the Edge Function secret VAPID_PRIVATE_KEY.
 vapid_public_key = ""
 
-# Cloudflare — token with Pages:Edit, DNS:Edit, Zone:Read, Turnstile:Edit, Single Redirect:Edit
+# Cloudflare — Custom API token. Permissions (scope -> group -> access):
+#   Account -> Cloudflare Pages   -> Edit
+#   Account -> Turnstile          -> Edit   (only if turnstile_enabled = true)
+#   Zone    -> DNS                -> Edit
+#   Zone    -> Zone               -> Read
+#   Zone    -> Single Redirect    -> Edit   (only if redirect_root_to_app = true)
 cloudflare_api_token  = "xxx"
 cloudflare_account_id = "xxx"
 domain                = "ensayoapp.es"
