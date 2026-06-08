@@ -7,6 +7,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { Check, X, Clock, Pencil } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
 import { Badge, Button } from '../../components/ui'
+import GroupAvatar from '../groups/GroupAvatar'
 import { celebrate, commiserate } from '../../lib/confetti'
 import type { ParticipantResponse } from '../../lib/types'
 import { tallyResponses, type MyParticipation } from './useMyAgenda'
@@ -33,14 +34,15 @@ export default function ParticipationCard({
     <li className="rounded-xl border bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <GroupAvatar seed={s.groups.avatar_seed || s.group_id} size={24} />
+            <span className="truncate text-sm text-gray-600">{s.groups.name}</span>
+          </div>
           <Link to={`/g/${s.group_id}/sessions/${s.id}`} className="font-medium hover:underline">
             {s.title}
           </Link>
           <p className="text-sm text-gray-600">
             {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-          </p>
-          <p className="text-xs text-gray-500">
-            {s.groups.name}
             {s.location ? ` · ${s.location}` : ''}
           </p>
         </div>
