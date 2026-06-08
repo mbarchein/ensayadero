@@ -5,7 +5,7 @@
 // The day-selector header is always visible (7 buttons); swiping it left/right
 // moves to the next/previous week.
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
 import { CalendarRange } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
@@ -32,7 +32,6 @@ interface Props {
 }
 
 const HOUR_COL = '2.25rem'
-const SWIPE_PX = 50
 
 export default function WeekGrid({
   weekMonday,
@@ -64,10 +63,54 @@ export default function WeekGrid({
   const LONG_PRESS_MS = 250
   const MOVE_THRESHOLD = 8
 
-  // header swipe (week navigation)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const swipeStartX = useRef<number | null>(null)
+  // header week carousel: drag the day strip, snap to prev/next week.
+  const stripRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const dragStartX = useRef<number | null>(null)
   const swiped = useRef(false)
+  const weekMondayRef = useRef(weekMonday)
+  weekMondayRef.current = weekMonday
+  const CENTER = 'translateX(-33.3333%)'
+
+  // Recenter instantly whenever the week changes: the adjacent strip that was
+  // dragged into view now renders the new current week → seamless transition.
+  useLayoutEffect(() => {
+    const el = stripRef.current
+    if (el) {
+      el.style.transition = 'none'
+      el.style.transform = CENTER
+    }
+  }, [weekMonday])
+
+  const recenter = () => {
+    const el = stripRef.current
+    if (el) {
+      el.style.transition = 'none'
+      el.style.transform = CENTER
+    }
+  }
+  const snapBack = () => {
+    const el = stripRef.current
+    if (el) {
+      el.style.transition = 'transform 0.2s ease-out'
+      el.style.transform = CENTER
+    }
+  }
+  const finishSwipe = (dir: 'prev' | 'next') => {
+    const el = stripRef.current
+    if (!el) return
+    el.style.transition = 'transform 0.2s ease-out'
+    el.style.transform = dir === 'next' ? 'translateX(-66.6667%)' : 'translateX(0%)'
+    const before = weekMondayRef.current.getTime()
+    setTimeout(() => {
+      if (dir === 'next') onNextWeek?.()
+      else onPrevWeek?.()
+      // clamped (week unchanged) → snap back to center
+      setTimeout(() => {
+        if (weekMondayRef.current.getTime() === before) recenter()
+      }, 40)
+    }, 200)
+  }
 
   const now = new Date()
   const isPast = (pos: CellPos) => slotRange(weekMonday, pos.day, pos.slot).end <= now
@@ -97,32 +140,9 @@ export default function WeekGrid({
 
   return (
     <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
-      {/* day selector header — always visible; swipe to change week */}
-      <div
-        ref={headerRef}
-        style={{ touchAction: 'pan-y' }}
-        className="flex border-b border-gray-200"
-        onPointerDown={(e) => {
-          swipeStartX.current = e.clientX
-          swiped.current = false
-          try {
-            headerRef.current?.setPointerCapture(e.pointerId)
-          } catch {
-            /* not capturable in some environments */
-          }
-        }}
-        onPointerUp={(e) => {
-          if (swipeStartX.current == null) return
-          const dx = e.clientX - swipeStartX.current
-          swipeStartX.current = null
-          if (Math.abs(dx) > SWIPE_PX) {
-            swiped.current = true
-            if (dx < 0) onNextWeek?.()
-            else onPrevWeek?.()
-          }
-        }}
-      >
-        <div className="flex items-center justify-center" style={{ width: HOUR_COL }}>
+      {/* day selector header — always visible; drag to change week (carousel) */}
+      <div className="flex border-b border-gray-200">
+        <div className="flex shrink-0 items-center justify-center" style={{ width: HOUR_COL }}>
           {editing && (
             <button
               onClick={() => setSelectedDay(null)}
@@ -133,39 +153,59 @@ export default function WeekGrid({
             </button>
           )}
         </div>
-        <div className="grid flex-1 grid-cols-7">
-          {Array.from({ length: 7 }, (_, d) => {
-            const date = addDays(weekMonday, d)
-            const isToday = format(date, 'yyyyMMdd') === todayKey
-            const isSel = selectedDay === d
-            return (
-              <button
-                key={`h${d}`}
-                onClick={() => {
-                  if (swiped.current) {
-                    swiped.current = false
-                    return
-                  }
-                  setSelectedDay((cur) => (cur === d ? null : d))
-                }}
-                className={`flex flex-col items-center py-1 text-center leading-tight transition ${
-                  isSel
-                    ? 'bg-violet-100 text-violet-800'
-                    : isToday
-                      ? 'text-violet-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
-                  {format(date, 'EEEEE', { locale: dateLocale() })}
-                </span>
-                <span className="text-[9px] uppercase text-gray-500">
-                  {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
-                </span>
-                <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>
-              </button>
-            )
-          })}
+        <div
+          ref={viewportRef}
+          className="relative flex-1 overflow-hidden"
+          style={{ touchAction: 'pan-y' }}
+          onPointerDown={(e) => {
+            dragStartX.current = e.clientX
+            swiped.current = false
+            if (stripRef.current) stripRef.current.style.transition = 'none'
+            try {
+              viewportRef.current?.setPointerCapture(e.pointerId)
+            } catch {
+              /* not capturable in some environments */
+            }
+          }}
+          onPointerMove={(e) => {
+            if (dragStartX.current == null) return
+            const dx = e.clientX - dragStartX.current
+            if (Math.abs(dx) > 6) swiped.current = true
+            if (stripRef.current)
+              stripRef.current.style.transform = `translateX(calc(-33.3333% + ${dx}px))`
+          }}
+          onPointerUp={(e) => {
+            if (dragStartX.current == null) return
+            const dx = e.clientX - dragStartX.current
+            dragStartX.current = null
+            const w = viewportRef.current?.offsetWidth ?? 1
+            const th = w * 0.3
+            if (dx <= -th) finishSwipe('next')
+            else if (dx >= th) finishSwipe('prev')
+            else snapBack()
+          }}
+          onPointerCancel={() => {
+            dragStartX.current = null
+            snapBack()
+          }}
+        >
+          <div ref={stripRef} className="flex" style={{ transform: CENTER }}>
+            <DayStripView weekMonday={addDays(weekMonday, -7)} todayKey={todayKey} />
+            <DayStripView
+              weekMonday={weekMonday}
+              todayKey={todayKey}
+              interactive
+              selectedDay={selectedDay}
+              onSelect={(d) => {
+                if (swiped.current) {
+                  swiped.current = false
+                  return
+                }
+                setSelectedDay((cur) => (cur === d ? null : d))
+              }}
+            />
+            <DayStripView weekMonday={addDays(weekMonday, 7)} todayKey={todayKey} />
+          </div>
         </div>
       </div>
 
@@ -298,6 +338,53 @@ export default function WeekGrid({
           ))}
         </div>
       </div>
+    </div>
+  )
+}
+
+function DayStripView({
+  weekMonday,
+  todayKey,
+  interactive = false,
+  selectedDay = null,
+  onSelect,
+}: {
+  weekMonday: Date
+  todayKey: string
+  interactive?: boolean
+  selectedDay?: number | null
+  onSelect?: (day: number) => void
+}) {
+  return (
+    <div className="grid w-full shrink-0 grid-cols-7">
+      {Array.from({ length: 7 }, (_, d) => {
+        const date = addDays(weekMonday, d)
+        const isToday = format(date, 'yyyyMMdd') === todayKey
+        const isSel = interactive && selectedDay === d
+        const cls = `flex flex-col items-center py-1 text-center leading-tight ${
+          isSel ? 'bg-violet-100 text-violet-800' : isToday ? 'font-bold text-gray-900' : 'text-gray-700'
+        } ${interactive ? 'transition hover:bg-gray-50' : ''}`
+        const inner = (
+          <>
+            <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
+              {format(date, 'EEEEE', { locale: dateLocale() })}
+            </span>
+            <span className={`text-[9px] uppercase ${isSel ? 'text-violet-700' : 'text-gray-500'}`}>
+              {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
+            </span>
+            <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>
+          </>
+        )
+        return interactive ? (
+          <button key={d} onClick={() => onSelect?.(d)} className={cls}>
+            {inner}
+          </button>
+        ) : (
+          <div key={d} className={cls}>
+            {inner}
+          </div>
+        )
+      })}
     </div>
   )
 }
