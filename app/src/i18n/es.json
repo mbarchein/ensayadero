@@ -171,8 +171,8 @@
     "backToGroups": "‹ Mis grupos",
     "editGroup": "Editar grupo",
     "regenerateAvatar": "Regenerar avatar",
-    "leave": "Abandonar grupo",
-    "leaveTitle": "Abandonar grupo",
+    "leave": "Salir del grupo",
+    "leaveTitle": "Salir del grupo",
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos. Esta acción es irreversible.",
     "tabs": {
       "sessions": "Ensayos",
