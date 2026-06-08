@@ -34,7 +34,7 @@ export default function ParticipationCard({
 
   return (
     <li
-      className={`rounded-xl border bg-white p-4 shadow-sm ${
+      className={`relative rounded-xl border bg-white p-4 shadow-sm ${
         p.response === 'ACCEPTED' ? 'border-green-400' : p.response === 'DECLINED' ? 'border-red-400' : ''
       }`}
     >
@@ -115,7 +115,7 @@ export default function ParticipationCard({
       )}
 
       {confirmed && tally.total > 0 && (
-        <div className="mt-3 flex justify-end">
+        <div className="absolute bottom-3 right-3">
           <button
             onClick={() => setAttendeesOpen(true)}
             className="flex flex-col items-end gap-1 text-xs hover:opacity-80"
