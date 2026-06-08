@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { MapPin, Share2, Check, X } from 'lucide-react'
+import { MapPin, Share2, Check, X, Pencil } from 'lucide-react'
 import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -50,6 +50,7 @@ export default function SessionDetailPage() {
   const navigate = useNavigate()
   const [shareCopied, setShareCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
+  const [editingResp, setEditingResp] = useState(false)
 
   const { data: session, isLoading } = useQuery({
     queryKey: ['session', sessionId],
@@ -204,28 +205,45 @@ export default function SessionDetailPage() {
             {mine.required ? t('sessions.yourAttendance.required') : t('sessions.yourAttendance.optional')}{' '}
             {t('sessions.areYouGoing')}
           </p>
-          <div className="flex gap-2">
-            <Button
-              variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
-              className="inline-flex items-center gap-1.5"
-              onClick={() => {
-                if (mine.response !== 'ACCEPTED') celebrate()
-                respond.mutate('ACCEPTED')
-              }}
-            >
-              <Check size={16} /> {t('sessions.goingBtn')}
-            </Button>
-            <Button
-              variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
-              className="inline-flex items-center gap-1.5"
-              onClick={() => {
-                if (mine.response !== 'DECLINED') commiserate()
-                respond.mutate('DECLINED')
-              }}
-            >
-              <X size={16} /> {t('sessions.cantGoBtn')}
-            </Button>
-          </div>
+          {mine.response !== 'PENDING' && !editingResp ? (
+            <div className="flex items-center gap-3">
+              <Badge color={mine.response === 'ACCEPTED' ? 'green' : 'red'}>
+                {mine.response === 'ACCEPTED' ? t('sessions.response.going') : t('sessions.response.notGoing')}
+              </Badge>
+              <Button
+                variant="ghost"
+                className="inline-flex items-center gap-1.5"
+                onClick={() => setEditingResp(true)}
+              >
+                <Pencil size={15} /> {t('sessions.changeResponse')}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+                className="inline-flex items-center gap-1.5"
+                onClick={() => {
+                  if (mine.response !== 'ACCEPTED') celebrate()
+                  respond.mutate('ACCEPTED')
+                  setEditingResp(false)
+                }}
+              >
+                <Check size={16} /> {t('sessions.goingBtn')}
+              </Button>
+              <Button
+                variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
+                className="inline-flex items-center gap-1.5"
+                onClick={() => {
+                  if (mine.response !== 'DECLINED') commiserate()
+                  respond.mutate('DECLINED')
+                  setEditingResp(false)
+                }}
+              >
+                <X size={16} /> {t('sessions.cantGoBtn')}
+              </Button>
+            </div>
+          )}
         </section>
       )}
 

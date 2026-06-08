@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { CalendarDays } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { dateLocale } from '../../lib/dateLocale'
-import { Check, X, Clock } from 'lucide-react'
+import { Check, X, Clock, Pencil } from 'lucide-react'
 import { parseRange } from '../../lib/ranges'
 import { Badge, Button } from '../../components/ui'
 import { celebrate, commiserate } from '../../lib/confetti'
@@ -26,6 +27,7 @@ export default function ParticipationCard({
   const r = parseRange(s.time_range)
   const confirmed = s.status === 'CONFIRMED'
   const tally = tallyResponses(p)
+  const [editing, setEditing] = useState(false)
 
   return (
     <li className="rounded-xl border bg-white p-4 shadow-sm">
@@ -75,35 +77,49 @@ export default function ParticipationCard({
         </div>
       )}
 
-      {confirmed && (
-        <div className="mt-3 flex items-center gap-2">
-          <Button
-            variant={p.response === 'ACCEPTED' ? 'primary' : 'secondary'}
-            className="inline-flex items-center gap-1.5"
-            disabled={pending}
-            onClick={() => {
-              if (p.response !== 'ACCEPTED') celebrate()
-              onRespond('ACCEPTED')
-            }}
-          >
-            <Check size={16} /> {t('sessions.goingBtn')}
-          </Button>
-          <Button
-            variant={p.response === 'DECLINED' ? 'danger' : 'secondary'}
-            className="inline-flex items-center gap-1.5"
-            disabled={pending}
-            onClick={() => {
-              if (p.response !== 'DECLINED') commiserate()
-              onRespond('DECLINED')
-            }}
-          >
-            <X size={16} /> {t('sessions.cantGoBtn')}
-          </Button>
-          {p.response === 'PENDING' && (
-            <span className="text-xs font-medium text-amber-600">{t('sessions.response.pendingShort')}</span>
-          )}
-        </div>
-      )}
+      {confirmed &&
+        (p.response !== 'PENDING' && !editing ? (
+          <div className="mt-3 flex items-center gap-3">
+            <Badge color={p.response === 'ACCEPTED' ? 'green' : 'red'}>
+              {p.response === 'ACCEPTED' ? t('sessions.response.going') : t('sessions.response.notGoing')}
+            </Badge>
+            <Button
+              variant="ghost"
+              className="inline-flex items-center gap-1.5"
+              disabled={pending}
+              onClick={() => setEditing(true)}
+            >
+              <Pencil size={15} /> {t('sessions.changeResponse')}
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-3 flex items-center gap-2">
+            <Button
+              variant={p.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+              className="inline-flex items-center gap-1.5"
+              disabled={pending}
+              onClick={() => {
+                if (p.response !== 'ACCEPTED') celebrate()
+                onRespond('ACCEPTED')
+                setEditing(false)
+              }}
+            >
+              <Check size={16} /> {t('sessions.goingBtn')}
+            </Button>
+            <Button
+              variant={p.response === 'DECLINED' ? 'danger' : 'secondary'}
+              className="inline-flex items-center gap-1.5"
+              disabled={pending}
+              onClick={() => {
+                if (p.response !== 'DECLINED') commiserate()
+                onRespond('DECLINED')
+                setEditing(false)
+              }}
+            >
+              <X size={16} /> {t('sessions.cantGoBtn')}
+            </Button>
+          </div>
+        ))}
 
       {onViewAgenda && (
         <button

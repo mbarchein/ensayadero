@@ -230,6 +230,7 @@
     "areYouGoing": "¿Vas a ir?",
     "goingBtn": "Voy",
     "cantGoBtn": "No puedo",
+    "changeResponse": "Cambiar",
     "requiredList": "Obligatorios",
     "optionalList": "Opcionales",
     "partialAvailability": "Disponibilidad parcial: {{hours}}",

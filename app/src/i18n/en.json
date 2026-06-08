@@ -230,6 +230,7 @@
     "areYouGoing": "Are you going?",
     "goingBtn": "Going",
     "cantGoBtn": "Can't make it",
+    "changeResponse": "Change",
     "requiredList": "Required",
     "optionalList": "Optional",
     "partialAvailability": "Partial availability: {{hours}}",
