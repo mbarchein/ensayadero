@@ -316,7 +316,7 @@ function ParticipantList({
           const role = roleOf(p.user_id)
           const av = availInfo.get(p.user_id)
           return (
-            <li key={p.user_id} className="rounded-lg bg-gray-50 px-3 py-2 text-sm">
+            <li key={p.user_id} className="rounded-lg border bg-white px-3 py-2 text-sm">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
                   {p.profiles.name || p.profiles.email}
