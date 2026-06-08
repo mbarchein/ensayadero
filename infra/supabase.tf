@@ -32,12 +32,15 @@ resource "supabase_settings" "main" {
 
   auth = jsonencode({
     site_url = local.app_url
-    additional_redirect_urls = [
+    # The Management API expects uri_allow_list (a comma-separated string), NOT
+    # the CLI config's additional_redirect_urls array. An unknown key is
+    # silently dropped, which would leave OAuth/recovery redirects un-allowed.
+    uri_allow_list = join(",", [
       "${local.app_url}/auth/callback",
       "${local.app_url}/reset-password",
       "http://localhost:5173/auth/callback", # local dev
       "http://localhost:5173/reset-password",
-    ]
+    ])
 
     # Open registration: anyone can create an account (Google/email).
     # Group access is controlled by the group join code/link and email
@@ -61,7 +64,7 @@ resource "supabase_settings" "main" {
     mailer_secure_email_change_enabled = true
     smtp_admin_email                   = "noreply@${var.domain}"
     smtp_host                          = "smtp.resend.com"
-    smtp_port                          = 465
+    smtp_port                          = "465"
     smtp_user                          = "resend"
     smtp_pass                          = var.resend_api_key
     smtp_sender_name                   = "Ensayadero"
@@ -73,8 +76,10 @@ resource "supabase_settings" "main" {
     password_min_length   = 8
     password_hibp_enabled = var.password_hibp_enabled
     # Anti email-bombing / volume-based enumeration.
-    rate_limit_email_sent          = 10
-    rate_limit_token_verifications = 30
+    rate_limit_email_sent = 10
+    # API field is rate_limit_verify (the /verify endpoint); the name
+    # rate_limit_token_verifications does not exist and would be dropped.
+    rate_limit_verify = 30
     # Turnstile CAPTCHA (anti-bot). Active only if a secret is set.
     security_captcha_enabled  = var.turnstile_secret_key != ""
     security_captcha_provider = "turnstile"
