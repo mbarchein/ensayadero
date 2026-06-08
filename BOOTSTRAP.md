@@ -228,18 +228,25 @@ npx web-push generate-vapid-keys
   supabase secrets set VAPID_SUBJECT=mailto:admin@yourdomain.es --project-ref <project-ref>
   ```
 
-## 8. Frontend build variables — automatic
+## 8. GitHub Actions variables — automatic
 
-All `VITE_*` build variables are created by Terraform as GitHub Actions variables,
-nothing to do by hand:
+Terraform creates every GitHub Actions variable the pipeline needs, nothing to do
+by hand:
 
 - `VITE_SUPABASE_URL`, `VITE_APP_URL` — from the project + domain.
 - `VITE_SUPABASE_ANON_KEY` — read from the project via the `supabase_apikeys`
   data source (anon key is public).
 - `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY` — created when their
   `terraform.tfvars` values are set (steps 6b and 7).
+- `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
+  read by the wrangler deploy step so `--project-name` always matches the project
+  Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
 
 ## 9. First deploy
+
+Make sure your last `terraform apply` succeeded first — the build/deploy reads the
+GitHub Actions variables from step 8 (including `CLOUDFLARE_PROJECT_NAME`), so they
+must exist *before* the pipeline runs, or it fails.
 
 ```bash
 git remote add origin git@github.com:<owner>/<repo>.git
