@@ -97,15 +97,30 @@ Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect
 
 ## 5. Google OAuth client (manual — Google doesn't expose it via Terraform)
 
-1. https://console.cloud.google.com → create a project (or reuse one).
-2. **APIs & Services → OAuth consent screen**: type *External*, name "Ensayadero",
-   authorized domains: your domain. Publish (no verification needed for the basic
-   email/profile scopes).
-3. **Credentials → Create credentials → OAuth client ID**: type *Web application*.
+> Google moved OAuth setup out of *APIs & Services → Credentials* into the
+> **Google Auth Platform** section (2025/2026). If you can't find "Credentials",
+> that's why. Direct link: <https://console.cloud.google.com/auth/clients>
+
+1. <https://console.cloud.google.com> → create a project (or reuse one).
+2. **Google Auth Platform → Get started** (`/auth/overview`): app name "Ensayadero",
+   user support email, **Audience: External**, contact email. This replaces the old
+   "OAuth consent screen". Its sub-pages are *Branding*, *Audience*, and *Clients*.
+3. **Google Auth Platform → Clients → Create client**: type *Web application*.
    - Authorized JavaScript origins: `https://app.yourdomain.es` and `http://localhost:5173`
    - Authorized redirect URIs: **value of the `google_oauth_redirect_uri` output**
      (`https://<project-ref>.supabase.co/auth/v1/callback`)
-4. Copy the Client ID and Client Secret to `terraform.tfvars` → `terraform apply` again.
+   - The **Client secret is shown only once, at creation** — copy it immediately.
+4. **Google Auth Platform → Audience**: a new app starts in **Testing** mode, where
+   only the listed test users can sign in. Click **Publish app → In production** to
+   open login to everyone.
+   - The `email`/`profile`/`openid` scopes Supabase uses are **non-sensitive**, so
+     app/scope verification is **not** required — any Google user can log in with no
+     warning. Keep **Data Access** limited to those three; adding a sensitive scope
+     (Drive, Gmail, …) would force full verification.
+   - Google may still show a *"your app requires verification"* banner — that is
+     **brand verification** (name + logo display only) and does **not** block login.
+     Ignore it, or remove the logo under **Branding** to clear it.
+5. Copy the Client ID and Client Secret to `terraform.tfvars` → `terraform apply` again.
 
 ## 5b. Meta/Facebook OAuth — optional (Instagram login)
 

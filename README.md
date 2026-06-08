@@ -61,9 +61,11 @@ terraform init && terraform apply
 
 ### Manual steps (not automatable with TF)
 
-1. **Google OAuth client** — [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   → create OAuth client (Web). Redirect URI: output `google_oauth_redirect_uri`
+1. **Google OAuth client** — [Google Auth Platform → Clients](https://console.cloud.google.com/auth/clients)
+   (moved out of *APIs & Services → Credentials* in 2025/2026) → create OAuth client
+   (Web). Redirect URI: output `google_oauth_redirect_uri`
    (`https://<ref>.supabase.co/auth/v1/callback`). Copy id/secret to tfvars and re-apply.
+   Then **Audience → Publish app → In production** (else login is limited to test users).
 2. **Meta/Facebook OAuth** (optional, Instagram login path) — create a Meta app, add
    Facebook Login, set the same redirect URI, copy App ID/Secret to tfvars. See BOOTSTRAP.
 3. **Tokens** — Supabase access token, Cloudflare API token, GitHub token → tfvars.
