@@ -168,16 +168,11 @@ export default function WeekGrid({
             dragStartX.current = e.clientX
             swiped.current = false
             if (stripRef.current) stripRef.current.style.transition = 'none'
-            try {
-              viewportRef.current?.setPointerCapture(e.pointerId)
-            } catch {
-              /* not capturable in some environments */
-            }
           }}
           onPointerMove={(e) => {
             if (dragStartX.current == null) return
             const dx = e.clientX - dragStartX.current
-            if (Math.abs(dx) > 6) swiped.current = true
+            if (Math.abs(dx) > 10) swiped.current = true
             if (stripRef.current)
               stripRef.current.style.transform = `translateX(calc(-33.3333% + ${dx}px))`
           }}
