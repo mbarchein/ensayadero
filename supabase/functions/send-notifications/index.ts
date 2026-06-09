@@ -27,44 +27,117 @@ if (VAPID_PUBLIC && VAPID_PRIVATE) {
   )
 }
 
-const SUBJECTS: Record<string, (p: Record<string, unknown>) => string> = {
-  SESSION_CONFIRMED: (p) => `✅ Ensayo confirmado: ${p.title}`,
-  SESSION_CANCELLED: (p) => `❌ Ensayo cancelado: ${p.title}`,
-  SESSION_CHANGED: (p) => {
-    const time = !!p.old_starts_at
-    const loc = !!p.old_location
-    const what = loc && time ? 'Cambio de hora y lugar' : loc ? 'Cambio de lugar' : 'Cambio de hora'
-    return `🕐 ${what}: ${p.title}`
+type Lang = 'es' | 'en'
+
+// Email copy per language; the user's language comes from auth user_metadata.lang.
+const T: Record<Lang, Record<string, string>> = {
+  es: {
+    confirmed: 'Ensayo confirmado',
+    cancelled: 'Ensayo cancelado',
+    timeChange: 'Cambio de hora',
+    placeChange: 'Cambio de lugar',
+    timePlaceChange: 'Cambio de hora y lugar',
+    reminder: 'Recordatorio',
+    when: 'Cuándo',
+    where: 'Dónde',
+    prevTime: 'Hora anterior',
+    prevPlace: 'Lugar anterior',
+    optional: 'Tu asistencia es <strong>opcional</strong>.',
+    cta: 'Confirmar asistencia',
+    footer:
+      'Recibes este correo porque formas parte de un grupo en Ensayadero. Si no esperabas este aviso, puedes ignorarlo.',
   },
-  REMINDER: (p) => `⏰ Recordatorio: ${p.title}`,
+  en: {
+    confirmed: 'Rehearsal confirmed',
+    cancelled: 'Rehearsal cancelled',
+    timeChange: 'Time change',
+    placeChange: 'Location change',
+    timePlaceChange: 'Time and location change',
+    reminder: 'Reminder',
+    when: 'When',
+    where: 'Where',
+    prevTime: 'Previous time',
+    prevPlace: 'Previous location',
+    optional: 'Your attendance is <strong>optional</strong>.',
+    cta: 'Confirm attendance',
+    footer:
+      'You receive this email because you belong to a group on Ensayadero. If you were not expecting this notice, you can ignore it.',
+  },
 }
 
-function fmtDate(iso: unknown): string {
+const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang) => string> = {
+  SESSION_CONFIRMED: (p, l) => `✅ ${T[l].confirmed}: ${p.title}`,
+  SESSION_CANCELLED: (p, l) => `❌ ${T[l].cancelled}: ${p.title}`,
+  SESSION_CHANGED: (p, l) => {
+    const time = !!p.old_starts_at
+    const loc = !!p.old_location
+    const what = loc && time ? T[l].timePlaceChange : loc ? T[l].placeChange : T[l].timeChange
+    return `🕐 ${what}: ${p.title}`
+  },
+  REMINDER: (p, l) => `⏰ ${T[l].reminder}: ${p.title}`,
+}
+
+function fmtDate(iso: unknown, lang: Lang = 'es'): string {
   if (!iso) return ''
-  return new Date(String(iso)).toLocaleString('es-ES', {
+  return new Date(String(iso)).toLocaleString(lang === 'en' ? 'en-GB' : 'es-ES', {
     weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
     timeZone: 'Europe/Madrid',
   })
 }
 
-function emailBody(type: string, p: Record<string, unknown>): string {
-  const when = fmtDate(p.starts_at)
+// Brand wrapper shared by every outgoing email: logo + app name header, white
+// card with the content, and a small ignore-if-unexpected footer. Single
+// column, inline styles only → renders well on mobile clients.
+function layout(inner: string, lang: Lang): string {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f5f3ff;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <div style="max-width:440px;margin:0 auto;padding:24px 16px">
+    <div style="text-align:center;padding:8px 0 16px">
+      <img src="${APP_URL}/icons/icon-192.png" width="56" height="56" alt="Ensayadero" style="border-radius:14px">
+      <h1 style="color:#5b21b6;font-size:20px;margin:8px 0 0">Ensayadero</h1>
+    </div>
+    <div style="background:#ffffff;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+      ${inner}
+    </div>
+    <p style="color:#9ca3af;font-size:12px;text-align:center;line-height:1.5;margin:16px 8px">${T[lang].footer}</p>
+  </div>
+</body>
+</html>`
+}
+
+function emailBody(type: string, p: Record<string, unknown>, lang: Lang): string {
+  const t = T[lang]
+  const when = fmtDate(p.starts_at, lang)
   const lines = [
-    `<h2 style="color:#7c3aed">${SUBJECTS[type]?.(p) ?? type}</h2>`,
-    `<p><strong>Cuándo:</strong> ${when}</p>`,
-    p.location ? `<p><strong>Dónde:</strong> ${p.location}</p>` : '',
+    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">${SUBJECTS[type]?.(p, lang) ?? type}</h2>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.when}:</strong> ${when}</p>`,
+    p.location
+      ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.where}:</strong> ${p.location}</p>`
+      : '',
     type === 'SESSION_CHANGED' && p.old_starts_at
-      ? `<p>Hora anterior: <s>${fmtDate(p.old_starts_at)}</s></p>`
+      ? `<p style="color:#6b7280;font-size:14px;margin:0 0 8px">${t.prevTime}: <s>${fmtDate(p.old_starts_at, lang)}</s></p>`
       : '',
     type === 'SESSION_CHANGED' && p.old_location
-      ? `<p>Lugar anterior: <s>${p.old_location}</s></p>`
+      ? `<p style="color:#6b7280;font-size:14px;margin:0 0 8px">${t.prevPlace}: <s>${p.old_location}</s></p>`
       : '',
-    p.required === false ? '<p>Tu asistencia es <strong>opcional</strong>.</p>' : '',
+    p.required === false ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${t.optional}</p>` : '',
     type !== 'SESSION_CANCELLED' && p.session_id
-      ? `<p><a href="${APP_URL}" style="background:#7c3aed;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirmar asistencia</a></p>`
+      ? `<p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">${t.cta}</a></p>`
       : '',
   ]
   return lines.filter(Boolean).join('\n')
+}
+
+// Per-run cache of user language (auth admin lookup per user).
+const langCache = new Map<string, Lang>()
+async function userLang(userId: string): Promise<Lang> {
+  const cached = langCache.get(userId)
+  if (cached) return cached
+  const { data } = await supabase.auth.admin.getUserById(userId)
+  const lang: Lang = data?.user?.user_metadata?.lang === 'en' ? 'en' : 'es'
+  langCache.set(userId, lang)
+  return lang
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
@@ -125,14 +198,18 @@ async function processInvitation(invitationId: string): Promise<void> {
     .single()
   if (!inv) return
   const groupName = (inv.groups as unknown as { name: string })?.name ?? 'un grupo'
+  // Invitee has no account yet, so no stored language: Spanish by default.
   await sendEmail(
     inv.email,
     `🎭 Invitación a "${groupName}" en Ensayadero`,
-    `<h2 style="color:#7c3aed">Te han invitado a "${groupName}"</h2>
-     <p>Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
-     <p>Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>
-     <p><a href="${APP_URL}/login" style="background:#7c3aed;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Aceptar invitación</a></p>
-     <p style="color:#888;font-size:12px">La invitación caduca en 7 días.</p>`,
+    layout(
+      `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Te han invitado a "${groupName}"</h2>
+       <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
+       <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>
+       <p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/login" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Aceptar invitación</a></p>
+       <p style="color:#9ca3af;font-size:13px;margin:16px 0 0;text-align:center">La invitación caduca en 7 días.</p>`,
+      'es',
+    ),
   )
 }
 
@@ -147,6 +224,7 @@ Deno.serve(async (req) => {
   } catch { /* no body → process queue */ }
 
   // process the pending notifications queue
+  langCache.clear() // metadata may change between runs
   const { data: pending, error } = await supabase
     .from('notifications')
     .select('id, user_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name)')
@@ -159,7 +237,8 @@ Deno.serve(async (req) => {
   let pushes = 0
   for (const n of pending ?? []) {
     const payload = n.payload as Record<string, unknown>
-    const subject = SUBJECTS[n.type]?.(payload) ?? n.type
+    const lang = await userLang(n.user_id)
+    const subject = SUBJECTS[n.type]?.(payload, lang) ?? n.type
     const profile = n.profiles as unknown as { email: string; name: string }
     const updates: Record<string, string> = {}
 
@@ -174,13 +253,13 @@ Deno.serve(async (req) => {
 
     if (!n.sent_email_at) {
       if (channel === 'EMAIL' || channel === 'BOTH') {
-        if (await sendEmail(profile.email, subject, emailBody(n.type, payload))) emails++
+        if (await sendEmail(profile.email, subject, layout(emailBody(n.type, payload, lang), lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
     }
     if (!n.sent_push_at) {
       if (channel === 'PUSH' || channel === 'BOTH') {
-        if (await sendPush(n.user_id, subject, fmtDate(payload.starts_at))) pushes++
+        if (await sendPush(n.user_id, subject, fmtDate(payload.starts_at, lang))) pushes++
       }
       updates.sent_push_at = new Date().toISOString()
     }
