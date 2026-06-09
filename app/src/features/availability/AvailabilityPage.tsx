@@ -54,7 +54,9 @@ export default function AvailabilityPage() {
   }, [])
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
-  const [dayView, setDayView] = useState(false)
+  // null = agenda (week view); number = day being edited
+  const [editDay, setEditDay] = useState<number | null>(null)
+  const dayView = editDay != null
   const [copyOpen, setCopyOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
   const [showOk, setShowOk] = useState(false) // brief "saved" tick after a save
@@ -352,9 +354,16 @@ export default function AvailabilityPage() {
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex min-h-9 items-center justify-between">
-        <h1 className="text-xl font-bold">
-          {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
-        </h1>
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h1 className="shrink-0 text-xl font-bold">
+            {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
+          </h1>
+          {editDay != null && (
+            <span className="truncate text-xs text-gray-500">
+              {format(addDays(monday, editDay), 'EEEE, d-MMMM-yyyy', { locale: dateLocale() })}
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-1">
           <span className="mr-1 flex w-5 justify-center" role="status">
             {save.isPending || hasUnsaved ? (
@@ -388,6 +397,17 @@ export default function AvailabilityPage() {
                 <Trash2 size={18} />
               </Button>
             </>
+          )}
+          {dayView && (
+            <Button
+              variant="ghost"
+              className="p-2"
+              aria-label={t('common.close')}
+              title={t('common.close')}
+              onClick={() => setEditDay(null)}
+            >
+              <X size={20} />
+            </Button>
           )}
         </div>
       </header>
@@ -464,7 +484,8 @@ export default function AvailabilityPage() {
         onPaintEnd={onPaintEnd}
         onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
         onNextWeek={() => setWeekOffset((w) => w + 1)}
-        onViewChange={setDayView}
+        day={editDay}
+        onDayChange={setEditDay}
         fill
       />
 

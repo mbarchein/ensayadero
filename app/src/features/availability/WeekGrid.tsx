@@ -31,6 +31,10 @@ interface Props {
   onNextWeek?: () => void
   /** Notifies the parent when switching between week view and day (edit) view. */
   onViewChange?: (dayView: boolean) => void
+  /** Controlled day-view selection: when provided, the parent owns which day
+      is being edited (null = week view). */
+  day?: number | null
+  onDayChange?: (day: number | null) => void
 }
 
 const HOUR_COL = '2.25rem'
@@ -47,9 +51,18 @@ export default function WeekGrid({
   onPrevWeek,
   onNextWeek,
   onViewChange,
+  day,
+  onDayChange,
 }: Props) {
   // null = week view (all days, read-only); number = day view (editable).
-  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  // Uncontrolled by default; controlled when the parent passes `day`.
+  const [internalDay, setInternalDay] = useState<number | null>(null)
+  const selectedDay = day !== undefined ? day : internalDay
+  const setSelectedDay = (next: number | null | ((cur: number | null) => number | null)) => {
+    const value = typeof next === 'function' ? next(selectedDay) : next
+    if (day === undefined) setInternalDay(value)
+    onDayChange?.(value)
+  }
   const editing = selectedDay != null
   const days = editing ? [selectedDay] : [0, 1, 2, 3, 4, 5, 6]
 
