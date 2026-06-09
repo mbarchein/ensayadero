@@ -296,8 +296,26 @@ Verify at `https://app.yourdomain.es`.
 
 ## 11. Schedule reminders (once, SQL editor)
 
-`pg_cron` and `pg_net` are enabled by migration, but the *schedule* references the
-project URL and the service key — create it manually:
+**What this is.** Notifications (session reminders, confirmations, invitations)
+are written to a queue table; the `send-notifications` Edge Function drains that
+queue and delivers them via email (Resend) and Web Push. The app calls the
+function directly for *immediate* events, but **time-based reminders only go out
+if something invokes the function periodically** — without this step, reminders
+silently never fire.
+
+**How it works.** Supabase has no native "run this function every N minutes"
+scheduler; the standard pattern is a cron job *inside Postgres*: the `pg_cron`
+extension runs a SQL statement every minute, and that statement uses `pg_net`
+to make an HTTP POST to the Edge Function. Both extensions are already enabled
+by a migration. The *job* itself, however, can't be created by migration because
+it embeds two deployment-specific values that migrations don't know:
+
+- the **project URL** (`<project-ref>`), and
+- the **`service_role` key**, which authorizes the call (the function rejects
+  anonymous requests).
+
+Get both from the dashboard → **Settings → API**: *Project URL* (the ref is the
+subdomain) and the *service_role* secret. Then run, in the **SQL editor**, once:
 
 ```sql
 select cron.schedule(
@@ -316,7 +334,25 @@ select cron.schedule(
 );
 ```
 
-(Replace `<project-ref>` and `<SERVICE_ROLE_KEY>` — dashboard → Settings → API.)
+**Verify it's running:**
+
+```sql
+select jobname, schedule, active from cron.job;                     -- job exists
+select status, return_message, start_time
+from cron.job_run_details order by start_time desc limit 5;         -- recent runs OK
+```
+
+…and the function's **Logs** tab (dashboard → Edge Functions →
+`send-notifications`) should show one invocation per minute.
+
+**Maintenance:**
+
+- Re-create after changing it (e.g. key rotation):
+  `select cron.unschedule('process-notifications');` then `cron.schedule(...)` again.
+- The SQL text — **including the service key** — is stored in the `cron.job`
+  table, readable by the dashboard's `postgres` role. That's the accepted
+  Supabase pattern, but treat DB access accordingly, and re-create the job
+  whenever you rotate the `service_role` key.
 
 ## 12. Keep the free tier alive (optional)
 
