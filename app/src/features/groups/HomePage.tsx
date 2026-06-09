@@ -8,7 +8,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { randomPlay } from '../../lib/plays'
-import { KeyRound, Plus } from 'lucide-react'
+import { CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
 import { Badge, Button, Modal, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import { roleLabel } from '../../lib/roleLabel'
@@ -51,6 +51,32 @@ export default function HomePage() {
       return (data as MembershipWithGroup[]).filter((m) => !m.groups.archived_at)
     },
     enabled: !!profile,
+  })
+
+  // per-group counters for the cards: members and upcoming confirmed rehearsals
+  const groupIds = (memberships ?? []).map((m) => m.group_id)
+  const { data: groupStats } = useQuery({
+    queryKey: ['group-stats', groupIds],
+    queryFn: async () => {
+      const [mem, ses] = await Promise.all([
+        supabase.from('memberships').select('group_id').in('group_id', groupIds),
+        supabase
+          .from('sessions')
+          .select('group_id, time_range')
+          .eq('status', 'CONFIRMED')
+          .in('group_id', groupIds),
+      ])
+      if (mem.error) throw mem.error
+      if (ses.error) throw ses.error
+      const now = new Date()
+      const stats = new Map(groupIds.map((id) => [id, { members: 0, upcoming: 0 }]))
+      for (const r of mem.data as { group_id: string }[]) stats.get(r.group_id)!.members++
+      for (const s of ses.data as { group_id: string; time_range: string }[]) {
+        if (parseRange(s.time_range).end > now) stats.get(s.group_id)!.upcoming++
+      }
+      return stats
+    },
+    enabled: groupIds.length > 0,
   })
 
   const { data: pending } = useQuery({
@@ -147,9 +173,21 @@ export default function HomePage() {
                       <GroupAvatar seed={m.groups.avatar_seed || m.group_id} />
                       <div>
                         <p className="font-medium">{m.groups.name}</p>
-                        <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                          {roleLabel(t, m.role, profile?.gender)}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                            {roleLabel(t, m.role, profile?.gender)}
+                          </Badge>
+                          {groupStats?.has(m.group_id) && (
+                            <span className="flex items-center gap-2 text-xs text-gray-500">
+                              <span className="flex items-center gap-1" title={t('home.membersCount')}>
+                                <Users size={13} aria-hidden /> {groupStats.get(m.group_id)!.members}
+                              </span>
+                              <span className="flex items-center gap-1" title={t('home.upcomingCount')}>
+                                <CalendarDays size={13} aria-hidden /> {groupStats.get(m.group_id)!.upcoming}
+                              </span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span aria-hidden className="text-gray-400">
@@ -159,7 +197,7 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            <div className="flex flex-col gap-2 pt-1">
+            <div className="mt-2 flex flex-col gap-2 border-t border-gray-200 pt-4">
               <Button
                 className="inline-flex w-full items-center justify-center gap-1.5"
                 onClick={() => navigate('/join')}
