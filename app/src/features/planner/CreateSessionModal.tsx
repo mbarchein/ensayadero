@@ -5,7 +5,7 @@
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { ArrowLeft, Trash2 } from 'lucide-react'
 import { format, isSameDay } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -14,7 +14,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { formatRange, type TimeRange } from '../../lib/ranges'
 import { DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
-import { Badge, Button, Modal } from '../../components/ui'
+import { Badge, Button, useBackClose } from '../../components/ui'
 import type { MembershipWithProfile, SessionWithParticipants } from '../../lib/types'
 
 interface Props {
@@ -51,6 +51,8 @@ export default function CreateSessionModal({
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  // full-screen form: the device back button closes it like a page
+  useBackClose(true, onClose)
   const editing = !!session
   // default title: "<group> d-MMM" (e.g. "La Tempestad 7-jun")
   const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd', {
@@ -265,7 +267,19 @@ export default function CreateSessionModal({
     )
 
   return (
-    <Modal open onClose={onClose} title={editing ? t('planner.editSession') : t('planner.newSession')}>
+    <div className="space-y-4 pb-6">
+      <header className="flex items-center gap-3">
+        <button
+          onClick={onClose}
+          aria-label={t('common.back')}
+          className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-violet-700 transition hover:bg-violet-50"
+        >
+          <ArrowLeft size={22} aria-hidden />
+        </button>
+        <h1 className="text-xl font-bold">
+          {editing ? t('planner.editSession') : t('planner.newSession')}
+        </h1>
+      </header>
       <form
         className="space-y-4"
         onSubmit={(e) => {
@@ -455,7 +469,7 @@ export default function CreateSessionModal({
         )}
         {cancel.isError && <p className="text-sm text-red-600">{(cancel.error as Error).message}</p>}
       </form>
-    </Modal>
+    </div>
   )
 }
 

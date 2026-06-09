@@ -177,6 +177,51 @@ export default function PlannerPage() {
     return m?.profiles.name || m?.profiles.email || '?'
   }
 
+  // full-screen session form replaces the planner (no longer a modal)
+  if (createOpen && sel && selRange && grid) {
+    return (
+      <CreateSessionModal
+        groupId={groupId}
+        members={members}
+        preselectedIds={activeIds}
+        initialRange={{
+          start: slotRange(monday, sel.day, selRange.lo).start,
+          end: slotRange(monday, sel.day, selRange.hi).end,
+        }}
+        grid={grid}
+        weekMonday={monday}
+        groupName={group?.name}
+        onClose={() => {
+          setCreateOpen(false)
+          setSel(null)
+        }}
+      />
+    )
+  }
+  if (editSession && editGrid) {
+    return (
+      <CreateSessionModal
+        groupId={groupId}
+        members={members}
+        preselectedIds={[]}
+        session={editSession}
+        initialRange={parseRange(editSession.time_range)}
+        grid={editGrid}
+        weekMonday={monday}
+        onClose={() => {
+          setEditSession(null)
+          // remove ?edit= so the open-from-link effect doesn't reopen it
+          // after the post-save refetch of week-sessions
+          if (params.get('edit')) {
+            const next = new URLSearchParams(params)
+            next.delete('edit')
+            setParams(next, { replace: true })
+          }
+        }}
+      />
+    )
+  }
+
   return (
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -312,46 +357,6 @@ export default function PlannerPage() {
         )}
       </Modal>
 
-      {createOpen && sel && selRange && grid && (
-        <CreateSessionModal
-          groupId={groupId}
-          members={members}
-          preselectedIds={activeIds}
-          initialRange={{
-            start: slotRange(monday, sel.day, selRange.lo).start,
-            end: slotRange(monday, sel.day, selRange.hi).end,
-          }}
-          grid={grid}
-          weekMonday={monday}
-          groupName={group?.name}
-          onClose={() => {
-            setCreateOpen(false)
-            setSel(null)
-          }}
-        />
-      )}
-
-      {editSession && editGrid && (
-        <CreateSessionModal
-          groupId={groupId}
-          members={members}
-          preselectedIds={[]}
-          session={editSession}
-          initialRange={parseRange(editSession.time_range)}
-          grid={editGrid}
-          weekMonday={monday}
-          onClose={() => {
-            setEditSession(null)
-            // remove ?edit= so the open-from-link effect doesn't reopen it
-            // after the post-save refetch of week-sessions
-            if (params.get('edit')) {
-              const next = new URLSearchParams(params)
-              next.delete('edit')
-              setParams(next, { replace: true })
-            }
-          }}
-        />
-      )}
     </div>
   )
 }

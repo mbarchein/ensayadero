@@ -46,6 +46,46 @@ export function Badge({
   )
 }
 
+// The phone/browser back button closes an open modal/overlay: opening pushes a
+// history entry; back pops it (→ onClose); closing from the UI consumes the
+// entry — but only when it is still the top one (a navigation or another
+// overlay may already have pushed on top of it).
+let overlaySeq = 0
+export function useBackClose(active: boolean, onClose: () => void) {
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  const idRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const onPop = () => {
+      if (idRef.current != null) {
+        idRef.current = null
+        onCloseRef.current()
+      }
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  // React to open/close TRANSITIONS, with no effect cleanup: StrictMode's
+  // double-invoked effects would otherwise push+pop+push and the async pop
+  // would swallow the fresh entry, closing the overlay by itself.
+  useEffect(() => {
+    if (active && idRef.current == null) {
+      idRef.current = ++overlaySeq
+      window.history.pushState({ overlay: idRef.current }, '')
+    } else if (!active && idRef.current != null) {
+      const id = idRef.current
+      idRef.current = null
+      // consume our entry only if it is still the top one (a navigation or
+      // another overlay may have pushed on top meanwhile)
+      if ((window.history.state as { overlay?: number } | null)?.overlay === id) {
+        window.history.back()
+      }
+    }
+  }, [active])
+}
+
 export function Modal({
   open,
   onClose,
@@ -57,25 +97,7 @@ export function Modal({
   title: string
   children: ReactNode
 }) {
-  // The phone/browser back button closes an open modal: opening pushes a
-  // history entry; back pops it (→ onClose); closing from the UI consumes the
-  // entry so navigation history stays balanced.
-  const onCloseRef = useRef(onClose)
-  onCloseRef.current = onClose
-  useEffect(() => {
-    if (!open) return
-    let closedByPop = false
-    window.history.pushState({ modal: true }, '')
-    const onPop = () => {
-      closedByPop = true
-      onCloseRef.current()
-    }
-    window.addEventListener('popstate', onPop)
-    return () => {
-      window.removeEventListener('popstate', onPop)
-      if (!closedByPop) window.history.back()
-    }
-  }, [open])
+  useBackClose(open, onClose)
 
   if (!open) return null
   return (
