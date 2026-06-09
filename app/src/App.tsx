@@ -56,7 +56,7 @@ export default function App() {
         />
         <Route
           path="/cookies"
-          element={<LegalDoc ns="cookies" sections={['what', 'types', 'used', 'manage', 'changes']} />}
+          element={<LegalDoc ns="cookies" sections={['what', 'types', 'used', 'manage', 'changes']} gated={false} />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
         {/* /join/:code gestiona su propio login (enlace compartible) */}

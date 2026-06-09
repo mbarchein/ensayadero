@@ -40,7 +40,15 @@ function useLegalInfo() {
 
 // Generic legal document page: title + sections from an i18n namespace, with the
 // controller/contact fields filled at runtime (placeholder "—" until loaded).
-export default function LegalDoc({ ns, sections }: { ns: string; sections: string[] }) {
+export default function LegalDoc({
+  ns,
+  sections,
+  gated = true,
+}: {
+  ns: string
+  sections: string[]
+  gated?: boolean
+}) {
   const { t } = useTranslation()
   const { data, loaded, onToken } = useLegalInfo()
   const vars = {
@@ -60,7 +68,7 @@ export default function LegalDoc({ ns, sections }: { ns: string; sections: strin
         <p className="text-xs text-gray-500">{t(`${ns}.updated`)}</p>
       </div>
       <p className="text-sm text-gray-700">{t(`${ns}.intro`)}</p>
-      {captchaEnabled && !loaded && (
+      {gated && captchaEnabled && !loaded && (
         <div className="space-y-2 rounded-xl border border-violet-200 bg-violet-50 p-4">
           <p className="text-sm text-violet-900">{t('legalShared.captchaPrompt')}</p>
           <Turnstile onToken={onToken} />
