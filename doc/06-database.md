@@ -22,6 +22,7 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
 | `…012_profile_gender` | `profiles.gender` (`F`/`M`, check). |
 | `…013_realtime` | Creates the `supabase_realtime` publication and adds `sessions`, `session_participants`, `availabilities`, `notifications`, `memberships` (delivery respects RLS). |
 | `…014_account_deletion_fks` | FK rules so `delete_my_account` doesn't violate FKs: `invitations.created_by` → cascade; `sessions.created_by`, `audit_log.actor_id`, `groups.created_by` → set null (row kept, creator/actor cleared). |
+| `…20260609000000_session_short_code` | `sessions.short_code` (unique 6-char base62) for `/s/<code>` share links; insert trigger (`security definer` so the uniqueness probe sees all rows under RLS) + collision-safe backfill. |
 
 ## Helper functions (RLS)
 `is_superadmin(uid)`, `is_member(uid, gid)`, `is_instructor(uid, gid)` —

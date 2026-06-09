@@ -100,8 +100,12 @@ role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
    `notify_participant_added` insert rows into `notifications`.
 2. `generate_reminders` (pg_cron */15) creates 24h reminders.
 3. The Edge Function `send-notifications` (invoked by pg_cron and by the app
-   after confirm/cancel) delivers email (Resend) and Web Push (VAPID) per
-   `notification_preferences`, and stamps `sent_email_at`/`sent_push_at`.
+   after confirm/cancel) delivers email (Resend in production, mailpit locally
+   via `MAILPIT_URL`) and Web Push (VAPID) per `notification_preferences`, and
+   stamps `sent_email_at`/`sent_push_at`. Emails share a branded mobile-first
+   layout (logo, name, ignore-notice footer) in the user's language
+   (`user_metadata.lang`); REMINDER emails render the full rehearsal card
+   (group avatar/name, time, location, scene, summoned participants).
 
 ## Edge Functions
 - `send-notifications` — delivers email + Web Push (above).

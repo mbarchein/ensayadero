@@ -51,8 +51,15 @@ pending invitation and existing profile).
 ## Login locally
 The login screen offers Google, Meta/Facebook and email+password (the same as
 production). The seed creates password users, so no OAuth setup is needed to log
-in. Activation and recovery emails land in **mailpit** (`:54324`), where you open
-the link.
+in. **All** local emails land in **mailpit** (`:54324`): GoTrue's activation /
+recovery / email-change messages (SMTP) and the `send-notifications` Edge
+Function's notification and invitation emails (it posts to mailpit's HTTP API
+when `MAILPIT_URL` is set, so Resend is never hit in dev).
+
+Auth emails use the branded bilingual templates in `docker/mail-templates/`
+(served to GoTrue by the local nginx gateway). The language comes from
+`user_metadata.lang`, stored at signup and kept in sync by the app; the same
+metadata drives the language of the notification emails.
 
 Optional `.env` / `.env.example` settings (everything works without them):
 - `DEV_HOST` — set to your machine's LAN IP to test from a phone on the same
@@ -61,7 +68,9 @@ Optional `.env` / `.env.example` settings (everything works without them):
 - `FACEBOOK_OAUTH_ENABLED` + client id/secret — enable Meta/Facebook locally.
 - `TURNSTILE_CAPTCHA_ENABLED` + `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET` — enable
   the CAPTCHA (Cloudflare publishes always-pass test keys).
-- `RESEND_API_KEY`/`EMAIL_FROM` (real email) and `VAPID_*` (Web Push) — optional.
+- `RESEND_API_KEY`/`EMAIL_FROM` (real email through Resend — also remove
+  `MAILPIT_URL` from `docker-compose.yml`, otherwise mailpit wins) and
+  `VAPID_*` (Web Push) — optional.
 
 ## Useful commands
 ```bash

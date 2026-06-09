@@ -128,7 +128,10 @@ Header with group avatar+name; participants with a **role chip** (gendered) and 
 **partial availability** note (the hours they can) or no-availability, computed
 with `expandAvailability` ∩ range. The attendance buttons collapse to a "Voy/No
 voy" badge + "Change" button once answered. Director actions: edit, confirm,
-cancel (in-app modal), delete draft.
+cancel (in-app modal), delete draft. Sharing a rehearsal uses the short link
+`/s/<short_code>` (6-char code on `sessions`); `ShortLinkPage` resolves it for
+members and, if logged out, stashes the code and resumes after login (same
+pattern as `/join/:code`).
 
 ### Invite (`InvitePanel`, `JoinPage`)
 Group code, link (Web Share API + copy), QR (canvas), regenerate /

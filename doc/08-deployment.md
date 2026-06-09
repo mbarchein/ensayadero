@@ -40,7 +40,10 @@ terraform init && terraform apply
 Provisions:
 - `supabase_project` + `supabase_settings`: auth (Google + optional Meta/Facebook
   OAuth), SMTP via Resend (`smtp_port` as a string), `uri_allow_list` redirect
-  allow-list, `rate_limit_verify`, and the optional Turnstile captcha.
+  allow-list, `rate_limit_verify`, the optional Turnstile captcha, and the
+  branded bilingual email templates: subjects via `mailer_subjects_*` and the
+  `docker/mail-templates/*.html` files inlined via `mailer_templates_*_content`
+  (language selected per user from `user_metadata.lang`).
 - Cloudflare `pages_project` + custom domain + DNS (app CNAME + Resend records),
   an apex→app **301 redirect** (Single Redirect ruleset), and (optional) a
   **Turnstile widget** whose sitekey/secret are derived.

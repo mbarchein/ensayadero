@@ -11,7 +11,7 @@ Files involved:
 - `docker-stack.yml` — the Swarm stack
 - `prod.env.example` — all configuration (copy to `prod.env`)
 - `docker/migrate.Dockerfile`, `docker/functions.Dockerfile`, `app/Dockerfile` — built images
-- `docker/db-init.prod.sh`, `docker/gateway.conf` — Swarm configs
+- `docker/db-init.prod.sh`, `docker/gateway.conf`, `docker/mail-templates/*.html` — Swarm configs
 - `docker/gen-keys.mjs` — generates the API keys
 
 ---
@@ -208,9 +208,10 @@ docker stack deploy -c docker-stack.yml ensayadero --with-registry-auth
 
 - New migrations: rebuild `migrate` and redeploy — the job reruns and applies only
   the new files.
-- Edited `docker/gateway.conf` or `docker/db-init.prod.sh`: bump `CONFIG_VERSION`
-  in `prod.env` (Swarm configs are immutable) before redeploying. Note
-  `db-init.prod.sh` only runs on a **fresh** database volume.
+- Edited `docker/gateway.conf`, `docker/db-init.prod.sh` or any
+  `docker/mail-templates/*.html`: bump `CONFIG_VERSION` in `prod.env` (Swarm
+  configs are immutable) before redeploying. Note `db-init.prod.sh` only runs
+  on a **fresh** database volume.
 - Roll back a service: `docker service rollback ensayadero_<service>`.
 
 ## Backups
