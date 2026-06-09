@@ -7,6 +7,7 @@ import ResetPasswordPage from './auth/ResetPasswordPage'
 import GoodbyePage from './auth/GoodbyePage'
 import AuthCallback from './auth/AuthCallback'
 import PrivacyPage from './auth/PrivacyPage'
+import LegalDoc from './auth/LegalDoc'
 import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
 import MembersPage from './features/groups/MembersPage'
@@ -30,6 +31,14 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/goodbye" element={<GoodbyePage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route
+          path="/legal"
+          element={<LegalDoc ns="legal" sections={['identity', 'terms', 'ip', 'liability', 'links', 'law']} />}
+        />
+        <Route
+          path="/cookies"
+          element={<LegalDoc ns="cookies" sections={['what', 'types', 'used', 'manage', 'changes']} />}
+        />
         <Route path="/auth/callback" element={<AuthCallback />} />
         {/* /join/:code gestiona su propio login (enlace compartible) */}
         <Route path="/join/:code" element={<JoinPage />} />

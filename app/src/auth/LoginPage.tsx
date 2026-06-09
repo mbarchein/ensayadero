@@ -141,9 +141,17 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      <Link to="/privacy" className="text-xs text-violet-400 hover:underline">
-        {t('privacy.title')}
-      </Link>
+      <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-violet-400">
+        <Link to="/privacy" className="hover:underline">
+          {t('privacy.title')}
+        </Link>
+        <Link to="/legal" className="hover:underline">
+          {t('legal.title')}
+        </Link>
+        <Link to="/cookies" className="hover:underline">
+          {t('cookies.title')}
+        </Link>
+      </div>
     </main>
   )
 }

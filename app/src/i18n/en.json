@@ -404,5 +404,61 @@
       "title": "11. Changes",
       "body": "We may update this policy. Any change will be published on this page with its update date."
     }
+  },
+  "legal": {
+    "title": "Legal notice",
+    "back": "← Back",
+    "updated": "Last updated: June 2026",
+    "intro": "Legal notice and terms of use for Ensayadero, under Spain's Law 34/2002 (LSSI-CE).",
+    "identity": {
+      "title": "1. Owner",
+      "body": "Owner: [TO COMPLETE: legal name and tax ID].\nAddress: [TO COMPLETE].\nContact: hola@ensayadero.es."
+    },
+    "terms": {
+      "title": "2. Terms of use",
+      "body": "Accessing Ensayadero implies acceptance of this legal notice. The app lets theatre groups organise rehearsals and coordinate availability and attendance. You agree to use the service lawfully and not to harm its operation or other users' rights."
+    },
+    "ip": {
+      "title": "3. Intellectual property",
+      "body": "The software, brand, design and contents of Ensayadero belong to its owner or licensors. Reproduction or exploitation without authorisation is not allowed."
+    },
+    "liability": {
+      "title": "4. Liability",
+      "body": "The service is provided \"as is\". To the extent permitted by law, the owner does not guarantee uninterrupted availability and is not liable for damages arising from use of the service or the unavailability of external providers."
+    },
+    "links": {
+      "title": "5. Links",
+      "body": "The app may contain links to third-party sites (e.g. sign-in providers). The owner is not responsible for their content or policies."
+    },
+    "law": {
+      "title": "6. Governing law and jurisdiction",
+      "body": "This notice is governed by Spanish law. For any dispute, the parties submit to the courts of the owner's domicile, unless mandatory rules provide otherwise."
+    }
+  },
+  "cookies": {
+    "title": "Cookie policy",
+    "back": "← Back",
+    "updated": "Last updated: June 2026",
+    "intro": "Information about the use of cookies and local storage in Ensayadero.",
+    "what": {
+      "title": "1. What they are",
+      "body": "Cookies and similar technologies (such as browser local storage) are small files a site stores on your device so it can work properly."
+    },
+    "types": {
+      "title": "2. What we use",
+      "body": "Ensayadero only uses strictly necessary technical storage:\n• Session and authentication, to keep you signed in.\n• App preferences.\nWe do not use advertising or third-party tracking cookies, so no consent banner is required."
+    },
+    "used": {
+      "title": "3. Third parties",
+      "body": "The providers that run the service (Supabase for authentication and Cloudflare for security) may use technical storage necessary for the platform's operation and security."
+    },
+    "manage": {
+      "title": "4. Managing storage",
+      "body": "You can delete or block storage from your browser settings. As it is technical and necessary, blocking it may prevent sign-in and use of the app."
+    },
+    "changes": {
+      "title": "5. Changes",
+      "body": "We may update this cookie policy; changes will be published on this page."
+    }
   }
 }

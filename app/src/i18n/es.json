@@ -404,5 +404,61 @@
       "title": "11. Cambios",
       "body": "Podemos actualizar esta política. Publicaremos cualquier cambio en esta misma página, indicando la fecha de actualización."
     }
+  },
+  "legal": {
+    "title": "Aviso legal",
+    "back": "← Volver",
+    "updated": "Última actualización: junio de 2026",
+    "intro": "Aviso legal y condiciones de uso de Ensayadero, conforme a la Ley 34/2002 (LSSI-CE).",
+    "identity": {
+      "title": "1. Titular",
+      "body": "Titular: [COMPLETAR: nombre o razón social y NIF].\nDirección: [COMPLETAR].\nContacto: hola@ensayadero.es."
+    },
+    "terms": {
+      "title": "2. Condiciones de uso",
+      "body": "El acceso a Ensayadero implica la aceptación de este aviso legal. La aplicación permite a grupos teatrales organizar ensayos y coordinar disponibilidad y asistencia. Te comprometes a hacer un uso lícito del servicio y a no perjudicar su funcionamiento ni los derechos de otros usuarios."
+    },
+    "ip": {
+      "title": "3. Propiedad intelectual",
+      "body": "El software, la marca, el diseño y los contenidos de Ensayadero pertenecen a su titular o a sus licenciantes. No se permite su reproducción o explotación sin autorización."
+    },
+    "liability": {
+      "title": "4. Responsabilidad",
+      "body": "El servicio se presta «tal cual». En la medida permitida por la ley, el titular no garantiza la disponibilidad ininterrumpida ni se responsabiliza de los daños derivados del uso del servicio o de la indisponibilidad de proveedores externos."
+    },
+    "links": {
+      "title": "5. Enlaces",
+      "body": "La aplicación puede contener enlaces a sitios de terceros (por ejemplo, proveedores de acceso). El titular no se responsabiliza de sus contenidos ni de sus políticas."
+    },
+    "law": {
+      "title": "6. Legislación y jurisdicción",
+      "body": "Este aviso se rige por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales del domicilio del titular, salvo que la normativa imperativa disponga otra cosa."
+    }
+  },
+  "cookies": {
+    "title": "Política de cookies",
+    "back": "← Volver",
+    "updated": "Última actualización: junio de 2026",
+    "intro": "Información sobre el uso de cookies y almacenamiento local en Ensayadero.",
+    "what": {
+      "title": "1. Qué son",
+      "body": "Las cookies y tecnologías similares (como el almacenamiento local del navegador) son pequeños archivos que un sitio guarda en tu dispositivo para poder funcionar correctamente."
+    },
+    "types": {
+      "title": "2. Qué usamos",
+      "body": "Ensayadero solo usa almacenamiento técnico estrictamente necesario:\n• Sesión y autenticación, para mantenerte identificado.\n• Preferencias de la aplicación.\nNo usamos cookies de publicidad ni de seguimiento de terceros, por lo que no se requiere banner de consentimiento."
+    },
+    "used": {
+      "title": "3. Terceros",
+      "body": "Los proveedores que prestan el servicio (Supabase para la autenticación y Cloudflare para la seguridad) pueden usar almacenamiento técnico necesario para el funcionamiento y la seguridad de la plataforma."
+    },
+    "manage": {
+      "title": "4. Gestión",
+      "body": "Puedes borrar o bloquear el almacenamiento desde la configuración de tu navegador. Al ser técnico y necesario, bloquearlo puede impedir el inicio de sesión y el uso de la aplicación."
+    },
+    "changes": {
+      "title": "5. Cambios",
+      "body": "Podemos actualizar esta política de cookies; publicaremos los cambios en esta misma página."
+    }
   }
 }
