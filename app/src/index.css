@@ -61,3 +61,20 @@
     transition: opacity 0.3s;
   }
 }
+
+/* Hint wave over the day-strip header: each day pulses violet in sequence
+   (staggered animation-delay per column), nudging the user to tap a day to
+   edit instead of the read-only week cells. */
+.day-wave {
+  animation: day-wave 0.5s ease-in-out both;
+}
+@keyframes day-wave {
+  50% {
+    background-color: #ddd6fe; /* violet-200 */
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .day-wave {
+    animation: none;
+  }
+}

@@ -39,6 +39,10 @@ interface Props {
       is being edited (null = week view). */
   day?: number | null
   onDayChange?: (day: number | null) => void
+  /** Increment to run a violet "wave" across the day strip — a hint that
+      days are the tappable thing (e.g. after repeated taps on the
+      read-only week cells). */
+  hintPulse?: number
 }
 
 const HOUR_COL = '2.25rem'
@@ -58,6 +62,7 @@ export default function WeekGrid({
   onViewChange,
   day,
   onDayChange,
+  hintPulse = 0,
 }: Props) {
   // null = week view (all days, read-only); number = day view (editable).
   // Uncontrolled by default; controlled when the parent passes `day`.
@@ -273,6 +278,7 @@ export default function WeekGrid({
                 weekMonday={weekMonday}
                 todayKey={todayKey}
                 interactive
+                wave={hintPulse}
                 selectedDay={selectedDay}
                 onSelect={(d) => {
                   if (swiped.current) {
@@ -497,12 +503,15 @@ function DayStripView({
   weekMonday,
   todayKey,
   interactive = false,
+  wave = 0,
   selectedDay = null,
   onSelect,
 }: {
   weekMonday: Date
   todayKey: string
   interactive?: boolean
+  /** Re-runs the staggered violet pulse on every increment (key change). */
+  wave?: number
   selectedDay?: number | null
   onSelect?: (day: number) => void
 }) {
@@ -535,7 +544,13 @@ function DayStripView({
           </>
         )
         return interactive ? (
-          <button key={d} onClick={() => onSelect?.(d)} className={cls}>
+          <button
+            // wave in the key restarts the CSS animation on each pulse
+            key={`${d}:${wave}`}
+            onClick={() => onSelect?.(d)}
+            className={`${cls} ${wave > 0 ? 'day-wave' : ''}`}
+            style={wave > 0 ? { animationDelay: `${d * 70}ms` } : undefined}
+          >
             {inner}
           </button>
         ) : (

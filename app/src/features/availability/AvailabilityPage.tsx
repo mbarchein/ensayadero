@@ -77,6 +77,14 @@ export default function AvailabilityPage() {
       clearTimeout(clear)
     }
   }, [flashSession])
+  // repeated taps on week-view cells without a rehearsal (the read-only area)
+  // → pulse a color wave across the day strip to hint where to tap
+  const [hintPulse, setHintPulse] = useState(0)
+  const emptyTaps = useRef<{ count: number; last: number }>({ count: 0, last: 0 })
+  // while a wave is running, further taps must not restart it mid-flight
+  const waveBusyUntil = useRef(0)
+  // 0.5s pulse + 70ms stagger × 6 days (keep in sync with .day-wave in index.css)
+  const WAVE_MS = 500 + 70 * 6
   // null = agenda (week view); number = day being edited
   const [editDay, setEditDay] = useState<number | null>(null)
   const dayView = editDay != null
@@ -533,12 +541,28 @@ export default function AvailabilityPage() {
         onWeekCellTap={(pos) => {
           // tap on a rehearsal in the week view opens its detail
           const ses = sessionCells.get(`${pos.day}:${pos.slot}`)
-          if (ses) navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
+          if (ses) {
+            navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
+            return
+          }
+          // tap on a rehearsal-free cell does nothing here: after two quick
+          // taps, wave the day strip to point at the actual tap target
+          const now = Date.now()
+          emptyTaps.current =
+            now - emptyTaps.current.last < 2000
+              ? { count: emptyTaps.current.count + 1, last: now }
+              : { count: 1, last: now }
+          if (emptyTaps.current.count >= 2 && now >= waveBusyUntil.current) {
+            emptyTaps.current.count = 0
+            waveBusyUntil.current = now + WAVE_MS
+            setHintPulse((n) => n + 1)
+          }
         }}
         onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
         onNextWeek={() => setWeekOffset((w) => w + 1)}
         day={editDay}
         onDayChange={setEditDay}
+        hintPulse={hintPulse}
         fill
       />
 
