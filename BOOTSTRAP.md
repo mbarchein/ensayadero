@@ -247,15 +247,21 @@ in the bundle — to keep it away from scrapers it's served by the `legal-info` 
 Function only after a server-side Turnstile check. Set it as Edge Function secrets:
 
 ```bash
+cd infra
 supabase secrets set \
   LEGAL_ENTITY="Razón social S.L." LEGAL_TAX_ID="B12345678" \
   LEGAL_ADDRESS="Calle …, Ciudad" PRIVACY_EMAIL="privacidad@tudominio.es" \
-  CONTACT_EMAIL="hola@tudominio.es" TURNSTILE_SECRET_KEY="0x…" \
-  --project-ref <project-ref>
+  CONTACT_EMAIL="hola@tudominio.es" \
+  TURNSTILE_SECRET_KEY="$(terraform output -raw turnstile_secret_key)" \
+  --project-ref "$(terraform output -raw supabase_project_ref)"
 ```
 
-(`TURNSTILE_SECRET_KEY` is the same Turnstile secret; without it the gate is
-disabled. Empty fields render as "—".)
+`TURNSTILE_SECRET_KEY` is the Turnstile secret — read it straight from the
+Terraform output (`turnstile_secret_key`, marked sensitive, so use `-raw`).
+Without it the gate is disabled; empty fields render as "—". The frontend uses
+`VITE_TURNSTILE_SITE_KEY` (also a TF output, `turnstile_site_key`) for the widget.
+After setting the secrets, redeploy the function (`supabase functions deploy`,
+already in CI).
 
 ## 9. First deploy
 
