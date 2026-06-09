@@ -63,9 +63,11 @@ services:
       GOTRUE_SMTP_PASS: ""
       GOTRUE_SMTP_ADMIN_EMAIL: noreply@ensayo.local
       GOTRUE_SMTP_SENDER_NAME: Ensayadero
-      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/callback
-      GOTRUE_MAILER_URLPATHS_RECOVERY: /reset-password
-      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/callback
+      # Email links must hit GoTrue's /verify endpoint (through the gateway);
+      # GoTrue then redirects to the app's redirect_to after verifying the token.
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
       # --- Auth form hardening (registration/recovery) ---
       # Password policy: minimum length + leaked-password check (HIBP,
       # k-anonymity: the password never leaves the server).
