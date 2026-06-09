@@ -91,3 +91,34 @@ resource "github_actions_variable" "facebook_enabled" {
   variable_name = "VITE_FACEBOOK_ENABLED"
   value         = tostring(var.facebook_oauth_client_id != "")
 }
+
+# Legal document fields (public) — rendered in the privacy/legal/cookie pages.
+resource "github_actions_variable" "legal_entity" {
+  repository    = var.github_repo
+  variable_name = "VITE_LEGAL_ENTITY"
+  value         = var.legal_entity
+}
+
+resource "github_actions_variable" "legal_tax_id" {
+  repository    = var.github_repo
+  variable_name = "VITE_LEGAL_TAX_ID"
+  value         = var.legal_tax_id
+}
+
+resource "github_actions_variable" "legal_address" {
+  repository    = var.github_repo
+  variable_name = "VITE_LEGAL_ADDRESS"
+  value         = var.legal_address
+}
+
+resource "github_actions_variable" "privacy_email" {
+  repository    = var.github_repo
+  variable_name = "VITE_PRIVACY_EMAIL"
+  value         = var.privacy_email
+}
+
+resource "github_actions_variable" "contact_email" {
+  repository    = var.github_repo
+  variable_name = "VITE_CONTACT_EMAIL"
+  value         = var.contact_email
+}

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { legalVars } from './LegalDoc'
 
 // Privacy policy (GDPR / Spanish LOPDGDD). Content lives in i18n.
 const SECTIONS = [
@@ -31,7 +32,7 @@ export default function PrivacyPage() {
       {SECTIONS.map((s) => (
         <section key={s} className="space-y-1">
           <h2 className="text-lg font-semibold">{t(`privacy.${s}.title`)}</h2>
-          <p className="whitespace-pre-line text-sm text-gray-700">{t(`privacy.${s}.body`)}</p>
+          <p className="whitespace-pre-line text-sm text-gray-700">{t(`privacy.${s}.body`, legalVars)}</p>
         </section>
       ))}
     </main>

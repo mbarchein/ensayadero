@@ -2,6 +2,15 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 // Generic legal document page: renders a title + sections from an i18n namespace.
+// Values that fill the legal documents, set via env (build-time VITE_* vars).
+export const legalVars = {
+  entity: import.meta.env.VITE_LEGAL_ENTITY || '—',
+  taxId: import.meta.env.VITE_LEGAL_TAX_ID || '—',
+  address: import.meta.env.VITE_LEGAL_ADDRESS || '—',
+  privacyEmail: import.meta.env.VITE_PRIVACY_EMAIL || '—',
+  contactEmail: import.meta.env.VITE_CONTACT_EMAIL || '—',
+}
+
 export default function LegalDoc({ ns, sections }: { ns: string; sections: string[] }) {
   const { t } = useTranslation()
   return (
@@ -17,7 +26,7 @@ export default function LegalDoc({ ns, sections }: { ns: string; sections: strin
       {sections.map((s) => (
         <section key={s} className="space-y-1">
           <h2 className="text-lg font-semibold">{t(`${ns}.${s}.title`)}</h2>
-          <p className="whitespace-pre-line text-sm text-gray-700">{t(`${ns}.${s}.body`)}</p>
+          <p className="whitespace-pre-line text-sm text-gray-700">{t(`${ns}.${s}.body`, legalVars)}</p>
         </section>
       ))}
     </main>

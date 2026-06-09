@@ -157,3 +157,36 @@ variable "vapid_public_key" {
   type        = string
   default     = ""
 }
+
+# ── Legal documents (public) ────────────────────────────────
+# Fill the privacy / legal notice / cookie pages. All public (rendered in the
+# frontend), published as VITE_* GitHub Actions variables.
+variable "legal_entity" {
+  description = "Data controller / owner legal name (or trade name)."
+  type        = string
+  default     = ""
+}
+
+variable "legal_tax_id" {
+  description = "Data controller tax ID (NIF/CIF)."
+  type        = string
+  default     = ""
+}
+
+variable "legal_address" {
+  description = "Data controller postal address."
+  type        = string
+  default     = ""
+}
+
+variable "privacy_email" {
+  description = "Contact email for privacy/data-protection requests."
+  type        = string
+  default     = ""
+}
+
+variable "contact_email" {
+  description = "General contact email (legal notice)."
+  type        = string
+  default     = ""
+}

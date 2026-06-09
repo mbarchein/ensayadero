@@ -242,6 +242,10 @@ by hand:
 - `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
   read by the wrangler deploy step so `--project-name` always matches the project
   Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
+- `VITE_LEGAL_ENTITY`, `VITE_LEGAL_TAX_ID`, `VITE_LEGAL_ADDRESS`,
+  `VITE_PRIVACY_EMAIL`, `VITE_CONTACT_EMAIL` — fill the privacy / legal notice /
+  cookie pages. Set them in `terraform.tfvars` (`legal_entity`, `legal_tax_id`,
+  `legal_address`, `privacy_email`, `contact_email`); empty values render as "—".
 
 ## 9. First deploy
 

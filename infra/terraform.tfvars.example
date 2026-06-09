@@ -58,3 +58,10 @@ resend_dkim_records = [
 github_token = "ghp_xxx"
 github_owner = "your-username"
 github_repo  = "ensayo"
+
+# Legal documents (public, shown in the privacy/legal/cookie pages)
+legal_entity  = "" # nombre o razón social del responsable/titular
+legal_tax_id  = "" # NIF/CIF
+legal_address = "" # dirección postal
+privacy_email = "privacidad@ensayadero.es"
+contact_email = "hola@ensayadero.es"

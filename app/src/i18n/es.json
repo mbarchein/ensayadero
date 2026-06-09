@@ -362,7 +362,7 @@
     "intro": "Esta política explica cómo Ensayadero trata tus datos personales conforme al Reglamento (UE) 2016/679 (RGPD) y a la Ley Orgánica 3/2018 (LOPDGDD).",
     "controller": {
       "title": "1. Responsable del tratamiento",
-      "body": "Responsable: [COMPLETAR: nombre o razón social y NIF].\nDirección: [COMPLETAR].\nContacto: privacidad@ensayadero.es."
+      "body": "Responsable: {{entity}}. NIF: {{taxId}}.\nDirección: {{address}}.\nContacto: {{privacyEmail}}."
     },
     "data": {
       "title": "2. Datos que tratamos",
@@ -390,7 +390,7 @@
     },
     "rights": {
       "title": "8. Tus derechos",
-      "body": "Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a privacidad@ensayadero.es. También puedes retirar tu consentimiento en cualquier momento y presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es)."
+      "body": "Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a {{privacyEmail}}. También puedes retirar tu consentimiento en cualquier momento y presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es)."
     },
     "security": {
       "title": "9. Seguridad",
@@ -412,7 +412,7 @@
     "intro": "Aviso legal y condiciones de uso de Ensayadero, conforme a la Ley 34/2002 (LSSI-CE).",
     "identity": {
       "title": "1. Titular",
-      "body": "Titular: [COMPLETAR: nombre o razón social y NIF].\nDirección: [COMPLETAR].\nContacto: hola@ensayadero.es."
+      "body": "Titular: {{entity}}. NIF: {{taxId}}.\nDirección: {{address}}.\nContacto: {{contactEmail}}."
     },
     "terms": {
       "title": "2. Condiciones de uso",
