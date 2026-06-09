@@ -251,7 +251,8 @@
     "editBtn": "Edit rehearsal",
     "share": "Share",
     "shareCopied": "✓ Copied",
-    "shareText": "Rehearsal: {{title}}"
+    "shareText": "Rehearsal: {{title}}",
+    "shortLinkNotFound": "This rehearsal link does not exist or you are not a member of the group."
   },
   "planner": {
     "title": "Plan rehearsal",

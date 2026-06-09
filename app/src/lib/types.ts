@@ -68,6 +68,7 @@ export interface Subgroup {
 export interface Session {
   id: string
   group_id: string
+  short_code: string
   title: string
   scene: string | null
   location: string | null

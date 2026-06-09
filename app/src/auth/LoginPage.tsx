@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { PENDING_SESSION_KEY } from '../features/sessions/ShortLinkPage'
 import Turnstile, { captchaEnabled } from './Turnstile'
 
 // Facebook login is shown only when its OAuth credentials are configured.
@@ -53,7 +54,14 @@ export default function LoginPage() {
       setError(errorText(error.message))
       setCaptchaToken(null)
       setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
-    } else navigate('/', { replace: true })
+    } else {
+      // resume a shared session deep link (/s/:code) interrupted by login
+      const pendingSession = localStorage.getItem(PENDING_SESSION_KEY)
+      if (pendingSession) {
+        localStorage.removeItem(PENDING_SESSION_KEY)
+        navigate(`/s/${pendingSession}`, { replace: true })
+      } else navigate('/', { replace: true })
+    }
   }
 
   return (

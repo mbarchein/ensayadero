@@ -251,7 +251,8 @@
     "editBtn": "Editar ensayo",
     "share": "Compartir",
     "shareCopied": "✓ Copiado",
-    "shareText": "Ensayo: {{title}}"
+    "shareText": "Ensayo: {{title}}",
+    "shortLinkNotFound": "Este enlace de ensayo no existe o no perteneces al grupo."
   },
   "planner": {
     "title": "Programar ensayo",

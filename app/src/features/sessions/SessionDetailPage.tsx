@@ -152,7 +152,7 @@ export default function SessionDetailPage() {
 
   // Share a scheduled rehearsal (instructors only): Web Share API with a
   // clipboard fallback, mirroring the group invite share.
-  const shareUrl = `${import.meta.env.VITE_APP_URL}/g/${groupId}/sessions/${session.id}`
+  const shareUrl = `${import.meta.env.VITE_APP_URL}/s/${session.short_code}`
   const shareSession = async () => {
     setShareError(null)
     const when = `${format(r.start, 'EEEE d MMMM, HH:mm', { locale: dateLocale() })}–${format(r.end, 'HH:mm')}`

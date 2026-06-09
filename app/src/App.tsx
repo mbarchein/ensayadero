@@ -15,6 +15,7 @@ import AvailabilityPage from './features/availability/AvailabilityPage'
 import UpcomingPage from './features/agenda/UpcomingPage'
 import SessionsPage from './features/sessions/SessionsPage'
 import SessionDetailPage from './features/sessions/SessionDetailPage'
+import ShortLinkPage from './features/sessions/ShortLinkPage'
 import PlannerPage from './features/planner/PlannerPage'
 import NotificationsPage from './features/notifications/NotificationsPage'
 import ProfilePage from './features/profile/ProfilePage'
@@ -59,8 +60,9 @@ export default function App() {
           element={<LegalDoc ns="cookies" sections={['what', 'types', 'used', 'manage', 'changes']} gated={false} />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        {/* /join/:code gestiona su propio login (enlace compartible) */}
+        {/* /join/:code and /s/:code handle their own login (shareable links) */}
         <Route path="/join/:code" element={<JoinPage />} />
+        <Route path="/s/:code" element={<ShortLinkPage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/join" element={<JoinPage />} />

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { PENDING_JOIN_KEY } from '../features/groups/JoinPage'
+import { PENDING_SESSION_KEY } from '../features/sessions/ShortLinkPage'
 
 export default function AuthCallback() {
   const { t } = useTranslation()
@@ -24,6 +25,13 @@ export default function AuthCallback() {
       if (pending) {
         localStorage.removeItem(PENDING_JOIN_KEY)
         navigate(`/join/${pending}`, { replace: true })
+        return
+      }
+      // resume a shared session deep link (/s/:code)
+      const pendingSession = localStorage.getItem(PENDING_SESSION_KEY)
+      if (pendingSession) {
+        localStorage.removeItem(PENDING_SESSION_KEY)
+        navigate(`/s/${pendingSession}`, { replace: true })
         return
       }
       navigate('/', { replace: true })
