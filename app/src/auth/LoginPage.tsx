@@ -141,13 +141,15 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-violet-400">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-violet-400">
         <Link to="/privacy" className="hover:underline">
           {t('privacy.title')}
         </Link>
+        <span aria-hidden>·</span>
         <Link to="/legal" className="hover:underline">
           {t('legal.title')}
         </Link>
+        <span aria-hidden>·</span>
         <Link to="/cookies" className="hover:underline">
           {t('cookies.title')}
         </Link>
