@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { ArrowLeft, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 export function Button({
@@ -153,9 +153,13 @@ export function EmptyState({ message, action }: { message: string; action?: Reac
 export function BackButton({ to, label }: { to: string; label?: string }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
+  // location.key is 'default' only on the very first in-app entry (deep link /
+  // fresh tab); anything else means there is in-app history to return to.
+  // (More robust than history.state.idx, which third-party pushState entries
+  // can corrupt.)
   const goBack = () => {
-    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0
-    if (idx > 0) navigate(-1)
+    if (location.key !== 'default') navigate(-1)
     else navigate(to)
   }
   return (
