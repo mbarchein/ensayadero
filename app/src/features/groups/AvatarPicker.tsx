@@ -1,6 +1,7 @@
 // Group avatar picker: two side-by-side cards — generated avatar (left,
 // default, with a reroll button) and uploaded image (right, big camera icon;
-// tapping it starts the upload + square-crop flow). The selected card is
+// tapping it — or dropping a file on it — starts the upload + square-crop
+// flow). The selected card is
 // highlighted; the cropped image is kept in memory so the user can switch back
 // to the avatar and return to the image without re-uploading.
 
@@ -33,6 +34,7 @@ export default function AvatarPicker({
   const [zoom, setZoom] = useState(1)
   const [areaPx, setAreaPx] = useState<Area | null>(null)
   const [cropping, setCropping] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const mode: 'avatar' | 'image' = image ? 'image' : 'avatar'
 
   const cardCls = (selected: boolean) =>
@@ -68,6 +70,13 @@ export default function AvatarPicker({
   const selectImage = () => {
     if (cached) onImageChange(cached)
     else fileRef.current?.click()
+  }
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = Array.from(e.dataTransfer.files).find((f) => f.type.startsWith('image/'))
+    pickFile(file)
   }
 
   return (
@@ -106,7 +115,18 @@ export default function AvatarPicker({
           aria-pressed={mode === 'image'}
           onClick={selectImage}
           onKeyDown={(e) => e.key === 'Enter' && selectImage()}
-          className={cardCls(mode === 'image')}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragging(true)
+          }}
+          onDragLeave={(e) => {
+            // ignore leave events fired when the cursor crosses a child node
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false)
+          }}
+          onDrop={onDrop}
+          className={`${cardCls(mode === 'image')} ${
+            dragging ? 'border-dashed !border-violet-600 !bg-violet-100' : ''
+          }`}
         >
           <span className="text-xs font-semibold uppercase text-gray-500">
             {t('group.modeImage')}
