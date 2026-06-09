@@ -8,7 +8,6 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
-import { CalendarRange } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { DAY_START_HOUR, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
@@ -219,17 +218,9 @@ export default function WeekGrid({
     <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
       {/* day selector header — always visible; drag to change week (carousel) */}
       <div className="flex border-b border-gray-200">
-        <div className="flex shrink-0 items-center justify-center" style={{ width: HOUR_COL }}>
-          {editing && (
-            <button
-              onClick={() => setSelectedDay(null)}
-              aria-label="Semana"
-              className="rounded p-1 text-violet-700 hover:bg-violet-50"
-            >
-              <CalendarRange size={16} />
-            </button>
-          )}
-        </div>
+        {/* corner cell: empty — exiting day view is done from the page header
+            (X) or by tapping the selected day again in the strip */}
+        <div className="shrink-0" style={{ width: HOUR_COL }} />
         <div
           ref={viewportRef}
           className="relative flex-1 overflow-hidden"
