@@ -147,6 +147,7 @@ export default function ParticipationCard({
           {[...s.session_participants]
             .sort(
               (a, b) =>
+                Number(b.user_id === p.user_id) - Number(a.user_id === p.user_id) || // me first
                 respOrder[a.response] - respOrder[b.response] ||
                 (a.profiles?.name ?? '').localeCompare(b.profiles?.name ?? ''),
             )
