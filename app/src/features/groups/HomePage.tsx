@@ -114,7 +114,6 @@ export default function HomePage() {
                 </p>
                 <p className="flex-1 text-sm text-violet-800">{t('home.joinByCodeHint')}</p>
                 <Button
-                  variant="secondary"
                   className="inline-flex items-center justify-center gap-1.5"
                   onClick={() => navigate('/join')}
                 >
@@ -162,7 +161,6 @@ export default function HomePage() {
             </ul>
             <div className="flex flex-col gap-2 pt-1">
               <Button
-                variant="secondary"
                 className="inline-flex w-full items-center justify-center gap-1.5"
                 onClick={() => navigate('/join')}
               >
