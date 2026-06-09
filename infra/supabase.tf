@@ -7,6 +7,12 @@ resource "random_password" "db" {
 locals {
   db_password = coalesce(var.supabase_db_password, try(random_password.db[0].result, null))
   app_url     = "https://${var.app_subdomain != "" ? "${var.app_subdomain}." : ""}${var.domain}"
+
+  # Bilingual (es/en via user_metadata.lang) auth email subjects. Keep in sync
+  # with GOTRUE_MAILER_SUBJECTS_* in docker-compose.yml and docker-stack.yml.
+  mail_subject_confirmation = "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Confirm your Ensayadero account{{ else }}Confirma tu cuenta de Ensayadero{{ end }}"
+  mail_subject_recovery     = "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Reset your Ensayadero password{{ else }}Restablece tu contraseña de Ensayadero{{ end }}"
+  mail_subject_email_change = "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Confirm your new email{{ else }}Confirma tu nuevo email{{ end }}"
 }
 
 resource "supabase_project" "main" {
@@ -75,6 +81,16 @@ resource "supabase_settings" "main" {
     smtp_user                          = "resend"
     smtp_pass                          = var.resend_api_key
     smtp_sender_name                   = "Ensayadero"
+
+    # Branded bilingual mobile-friendly email templates: the same files the
+    # local stack serves to GoTrue (docker/mail-templates/). Hosted GoTrue
+    # renders them with the user's language from user_metadata.lang.
+    mailer_subjects_confirmation          = local.mail_subject_confirmation
+    mailer_subjects_recovery              = local.mail_subject_recovery
+    mailer_subjects_email_change          = local.mail_subject_email_change
+    mailer_templates_confirmation_content = file("${path.module}/../docker/mail-templates/confirmation.html")
+    mailer_templates_recovery_content     = file("${path.module}/../docker/mail-templates/recovery.html")
+    mailer_templates_email_change_content = file("${path.module}/../docker/mail-templates/email-change.html")
 
     # --- Auth form hardening ---
     # Activation/recovery links: expire after 15 min, single-use.

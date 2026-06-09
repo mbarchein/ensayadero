@@ -67,9 +67,19 @@ services:
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
       GOTRUE_SMTP_SENDER_NAME: Ensayadero
-      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/callback
-      GOTRUE_MAILER_URLPATHS_RECOVERY: /reset-password
-      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/callback
+      # Email links must hit GoTrue's /verify endpoint (through the gateway);
+      # GoTrue then redirects to the app's redirect_to after verifying the token.
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      # Branded bilingual (es/en via user_metadata.lang) templates served by the
+      # gateway from docker/mail-templates/ (swarm configs).
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: http://gateway:8000/mail-templates/confirmation.html
+      GOTRUE_MAILER_TEMPLATES_RECOVERY: http://gateway:8000/mail-templates/recovery.html
+      GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE: http://gateway:8000/mail-templates/email-change.html
+      GOTRUE_MAILER_SUBJECTS_CONFIRMATION: '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your Ensayadero account{{ else }}Confirma tu cuenta de Ensayadero{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_RECOVERY: '{{ if eq (printf "%v" .Data.lang) "en" }}Reset your Ensayadero password{{ else }}Restablece tu contraseña de Ensayadero{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your new email{{ else }}Confirma tu nuevo email{{ end }}'
       # auth-form hardening (see docker-compose.yml for rationale)
       GOTRUE_PASSWORD_MIN_LENGTH: "8"
       GOTRUE_PASSWORD_HIBP_ENABLED: "true"
@@ -176,6 +186,13 @@ services:
     configs:
       - source: gateway_conf
         target: /etc/nginx/conf.d/default.conf
+      # GoTrue fetches the custom email templates from the gateway at send time
+      - source: mail_tpl_confirmation
+        target: /mail-templates/confirmation.html
+      - source: mail_tpl_recovery
+        target: /mail-templates/recovery.html
+      - source: mail_tpl_email_change
+        target: /mail-templates/email-change.html
     ports:
       - target: 8000
         published: ${API_PORT:-8000}
@@ -216,13 +233,22 @@ services:
 
 configs:
   # Swarm configs are immutable: bump CONFIG_VERSION in prod.env after editing
-  # either file so a new config object is created on the next deploy.
+  # any of these files so a new config object is created on the next deploy.
   gateway_conf:
     name: ensayadero_gateway_${CONFIG_VERSION:-v1}
     file: ./docker/gateway.conf
   db_init:
     name: ensayadero_dbinit_${CONFIG_VERSION:-v1}
     file: ./docker/db-init.prod.sh
+  mail_tpl_confirmation:
+    name: ensayadero_mail_confirmation_${CONFIG_VERSION:-v1}
+    file: ./docker/mail-templates/confirmation.html
+  mail_tpl_recovery:
+    name: ensayadero_mail_recovery_${CONFIG_VERSION:-v1}
+    file: ./docker/mail-templates/recovery.html
+  mail_tpl_email_change:
+    name: ensayadero_mail_email_change_${CONFIG_VERSION:-v1}
+    file: ./docker/mail-templates/email-change.html
 
 volumes:
   pgdata:
