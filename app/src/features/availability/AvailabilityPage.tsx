@@ -429,10 +429,11 @@ export default function AvailabilityPage() {
             hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
-          // scheduled rehearsals stand out in purple over the availability green
-          const bg =
-            ses?.sessions.status === 'CONFIRMED' ? 'bg-violet-300' : CELL_STYLE[grid[day][slot]]
-          return `${bg} cursor-pointer ${ring} ${pending}`
+          // scheduled rehearsals: thick violet side stripe (same language as the
+          // planner) while the background keeps showing my availability
+          const sesMark =
+            ses?.sessions.status === 'CONFIRMED' ? 'border-l-4 border-l-violet-700' : ''
+          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${sesMark} ${ring} ${pending}`
         }}
         renderCell={({ day, slot }, { dayView }) => {
           const p = sessionCells.get(`${day}:${slot}`)
