@@ -4,11 +4,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Dices } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { randomPlay } from '../../lib/plays'
 import { BackButton, Button } from '../../components/ui'
-import GroupAvatar from './GroupAvatar'
+import AvatarPicker from './AvatarPicker'
 
 export default function NewGroupPage() {
   const { t } = useTranslation()
@@ -18,6 +17,7 @@ export default function NewGroupPage() {
   const [placeholder] = useState(randomPlay) // random famous play
   // avatar follows the typed name until the user rolls a custom seed
   const [customSeed, setCustomSeed] = useState<string | null>(null)
+  const [image, setImage] = useState<string | null>(null)
   const seed = customSeed ?? (name || placeholder)
 
   const createGroup = useMutation({
@@ -25,7 +25,7 @@ export default function NewGroupPage() {
       // created_by defaults to auth.uid(); trigger adds the creator as director
       const { error } = await supabase
         .from('groups')
-        .insert({ name: name.trim(), avatar_seed: seed })
+        .insert({ name: name.trim(), avatar_seed: seed, avatar_image: image })
       if (error) throw error
     },
     onSuccess: () => {
@@ -47,16 +47,12 @@ export default function NewGroupPage() {
           createGroup.mutate()
         }}
       >
-        <div className="flex flex-col items-center gap-2">
-          <GroupAvatar seed={seed} size={72} />
-          <button
-            type="button"
-            onClick={() => setCustomSeed(`${Date.now()}-${Math.floor(Math.random() * 1e9)}`)}
-            className="inline-flex items-center gap-1 text-sm text-violet-700 hover:underline"
-          >
-            <Dices size={15} /> {t('group.regenerateAvatar')}
-          </button>
-        </div>
+        <AvatarPicker
+          seed={seed}
+          image={image}
+          onRollSeed={() => setCustomSeed(`${Date.now()}-${Math.floor(Math.random() * 1e9)}`)}
+          onImageChange={setImage}
+        />
         <label className="block text-sm">
           {t('admin.groupName')}
           <input

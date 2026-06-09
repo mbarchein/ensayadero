@@ -48,7 +48,7 @@ export default function ParticipationCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <GroupAvatar seed={s.groups.avatar_seed || s.group_id} size={40} />
+            <GroupAvatar seed={s.groups.avatar_seed || s.group_id} image={s.groups.avatar_image} size={40} />
             <span className="truncate text-base font-semibold">{s.groups.name}</span>
           </div>
           <p className="text-sm text-gray-700">{s.title}</p>

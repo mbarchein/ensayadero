@@ -22,6 +22,7 @@ export interface Group {
   join_code: string
   join_enabled: boolean
   avatar_seed: string | null
+  avatar_image: string | null
 }
 
 export interface Membership {

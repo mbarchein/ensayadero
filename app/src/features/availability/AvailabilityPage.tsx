@@ -486,7 +486,11 @@ export default function AvailabilityPage() {
           if (!dayView) {
             return (
               <span className="flex h-full items-center justify-center" title={title}>
-                <GroupAvatar seed={p.sessions.groups.avatar_seed || p.sessions.group_id} size={16} />
+                <GroupAvatar
+                  seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
+                  image={p.sessions.groups.avatar_image}
+                  size={16}
+                />
               </span>
             )
           }

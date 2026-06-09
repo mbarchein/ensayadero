@@ -1,18 +1,26 @@
-// Deterministic geometric avatar per group (DiceBear, "shapes" style).
-// Same group id → always the same avatar.
+// Group avatar: the uploaded image when the group has one, otherwise a
+// deterministic geometric avatar (DiceBear, "shapes" style) from the seed.
 
 import { useMemo } from 'react'
 import { createAvatar } from '@dicebear/core'
 import { shapes } from '@dicebear/collection'
 
-export default function GroupAvatar({ seed, size = 44 }: { seed: string; size?: number }) {
+export default function GroupAvatar({
+  seed,
+  image = null,
+  size = 44,
+}: {
+  seed: string
+  image?: string | null
+  size?: number
+}) {
   const uri = useMemo(
     () => createAvatar(shapes, { seed, size, radius: 12 }).toDataUri(),
     [seed, size],
   )
   return (
     <img
-      src={uri}
+      src={image ?? uri}
       alt=""
       width={size}
       height={size}

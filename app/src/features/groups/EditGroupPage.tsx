@@ -5,10 +5,9 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Dices } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
-import GroupAvatar from './GroupAvatar'
+import AvatarPicker from './AvatarPicker'
 import { useGroup } from './useGroup'
 import type { Group } from '../../lib/types'
 
@@ -25,8 +24,9 @@ function EditGroupForm({ group }: { group: Group }) {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [name, setName] = useState(group.name)
-  // local seed; "regenerate" sets a new random one, persisted on save
+  // local seed/image; persisted on save
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
+  const [image, setImage] = useState<string | null>(group.avatar_image)
 
   const save = useMutation({
     mutationFn: async () => {
@@ -34,6 +34,7 @@ function EditGroupForm({ group }: { group: Group }) {
         gid: group.id,
         new_name: name,
         new_seed: seed,
+        new_image: image,
       })
       if (error) throw error
     },
@@ -59,16 +60,7 @@ function EditGroupForm({ group }: { group: Group }) {
           save.mutate()
         }}
       >
-        <div className="flex flex-col items-center gap-2">
-          <GroupAvatar seed={seed} size={72} />
-          <button
-            type="button"
-            onClick={regenerate}
-            className="inline-flex items-center gap-1 text-sm text-violet-700 hover:underline"
-          >
-            <Dices size={15} /> {t('group.regenerateAvatar')}
-          </button>
-        </div>
+        <AvatarPicker seed={seed} image={image} onRollSeed={regenerate} onImageChange={setImage} />
         <label className="block text-sm">
           {t('admin.groupName')}
           <input
