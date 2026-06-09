@@ -73,7 +73,11 @@ export function useBackClose(active: boolean, onClose: () => void) {
   useEffect(() => {
     if (active && idRef.current == null) {
       idRef.current = ++overlaySeq
-      window.history.pushState({ overlay: idRef.current }, '')
+      // carry react-router's state (idx in particular) into the overlay entry:
+      // a plain state object would reset the router's history index and break
+      // the history-aware BackButton after visiting any modal
+      const cur = (window.history.state ?? {}) as { idx?: number }
+      window.history.pushState({ ...cur, idx: (cur.idx ?? 0) + 1, overlay: idRef.current }, '')
     } else if (!active && idRef.current != null) {
       const id = idRef.current
       idRef.current = null
