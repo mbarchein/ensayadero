@@ -152,7 +152,11 @@ export default function ParticipationCard({
             )
             .map((sp, i) => (
               <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                <span className="truncate">{sp.profiles?.name || '—'}</span>
+                {sp.user_id === p.user_id ? (
+                  <span className="font-bold text-violet-700">{t('upcoming.me')}</span>
+                ) : (
+                  <span className="truncate">{sp.profiles?.name || '—'}</span>
+                )}
                 <Badge color={sp.response === 'ACCEPTED' ? 'green' : sp.response === 'DECLINED' ? 'red' : 'amber'}>
                   {sp.response === 'ACCEPTED'
                     ? t('sessions.response.going')
