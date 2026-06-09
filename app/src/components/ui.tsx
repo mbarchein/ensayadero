@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { ArrowLeft, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -57,6 +57,26 @@ export function Modal({
   title: string
   children: ReactNode
 }) {
+  // The phone/browser back button closes an open modal: opening pushes a
+  // history entry; back pops it (→ onClose); closing from the UI consumes the
+  // entry so navigation history stays balanced.
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  useEffect(() => {
+    if (!open) return
+    let closedByPop = false
+    window.history.pushState({ modal: true }, '')
+    const onPop = () => {
+      closedByPop = true
+      onCloseRef.current()
+    }
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      if (!closedByPop) window.history.back()
+    }
+  }, [open])
+
   if (!open) return null
   return (
     <div
