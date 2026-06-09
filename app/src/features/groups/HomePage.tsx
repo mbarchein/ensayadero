@@ -46,11 +46,13 @@ export default function HomePage() {
       ])
       if (mem.error) throw mem.error
       if (ses.error) throw ses.error
-      const now = new Date()
+      // "upcoming" counts rehearsals from today at 00:00 onward
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
       const stats = new Map(groupIds.map((id) => [id, { members: 0, upcoming: 0 }]))
       for (const r of mem.data as { group_id: string }[]) stats.get(r.group_id)!.members++
       for (const s of ses.data as { group_id: string; time_range: string }[]) {
-        if (parseRange(s.time_range).end > now) stats.get(s.group_id)!.upcoming++
+        if (parseRange(s.time_range).start >= todayStart) stats.get(s.group_id)!.upcoming++
       }
       return stats
     },
