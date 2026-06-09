@@ -7,7 +7,7 @@ import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -21,6 +21,7 @@ import type { Availability, SessionWithParticipants } from '../../lib/types'
 export default function PlannerPage() {
   const { t } = useTranslation()
   const { groupId, group, members, isInstructor, loading } = useGroup()
+  const navigate = useNavigate()
   const { profile } = useAuth()
   const [params, setParams] = useSearchParams()
   const initialOffset = useMemo(() => {
@@ -229,12 +230,17 @@ export default function PlannerPage() {
             const selected =
               selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
             const ses = sessionCells.get(`${day}:${slot}`)
-            // different background for rehearsals: violet=scheduled, amber=draft
-            const sesBg = ses
-              ? ses.status === 'CONFIRMED'
-                ? 'bg-violet-300 border-l-4 border-l-violet-700'
-                : 'bg-amber-200 border-l-4 border-l-amber-500'
-              : heatClass(grid[day][slot], total)
+            // rehearsals as enclosed boxes (violet=scheduled, amber=draft):
+            // left stripe + right edge, top/bottom on the block boundaries
+            let sesBg = heatClass(grid[day][slot], total)
+            if (ses) {
+              const first = sessionCells.get(`${day}:${slot - 1}`) !== ses
+              const last = sessionCells.get(`${day}:${slot + 1}`) !== ses
+              sesBg =
+                ses.status === 'CONFIRMED'
+                  ? `bg-violet-300 border-l-4 border-l-violet-700 !border-r-2 !border-r-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
+                  : `bg-amber-200 border-l-4 border-l-amber-500 !border-r-2 !border-r-amber-500 ${first ? '!border-t-2 !border-t-amber-500' : ''} ${last ? '!border-b-2 !border-b-amber-500' : ''}`
+            }
             return `${sesBg} cursor-pointer ${
               selected ? 'ring-2 ring-inset ring-violet-600' : ''
             }`
@@ -270,6 +276,11 @@ export default function PlannerPage() {
             setSel((prev) => (prev && pos.day === prev.day ? { ...prev, b: pos.slot } : prev))
           }
           onPaintEnd={() => setDragging(false)}
+          onWeekCellTap={(pos) => {
+            // tap on a rehearsal in the week overview opens its detail
+            const ses = sessionCells.get(`${pos.day}:${pos.slot}`)
+            if (ses) navigate(`/g/${groupId}/sessions/${ses.id}`)
+          }}
           onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
           onNextWeek={() => setWeekOffset((w) => w + 1)}
           fill
