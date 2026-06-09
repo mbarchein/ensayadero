@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { CalendarDays } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +24,7 @@ export default function ParticipationCard({
   onViewAgenda?: () => void
 }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const s = p.sessions
   const r = parseRange(s.time_range)
   const confirmed = s.status === 'CONFIRMED'
@@ -34,7 +35,13 @@ export default function ParticipationCard({
 
   return (
     <li
-      className={`rounded-xl border bg-white p-4 shadow-sm ${
+      // the whole card opens the session detail; inner buttons/links and the
+      // attendees modal keep their own behavior
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest('button, a, [role=dialog]')) return
+        navigate(`/g/${s.group_id}/sessions/${s.id}`)
+      }}
+      className={`cursor-pointer rounded-xl border bg-white p-4 shadow-sm transition hover:shadow ${
         p.response === 'ACCEPTED' ? 'border-green-400' : p.response === 'DECLINED' ? 'border-red-400' : ''
       }`}
     >
@@ -44,12 +51,22 @@ export default function ParticipationCard({
             <GroupAvatar seed={s.groups.avatar_seed || s.group_id} size={40} />
             <span className="truncate text-base font-semibold">{s.groups.name}</span>
           </div>
-          <Link to={`/g/${s.group_id}/sessions/${s.id}`} className="text-sm text-gray-700 hover:underline">
-            {s.title}
-          </Link>
-          <p className="text-sm text-gray-600">
-            {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-            {s.location ? ` · ${s.location}` : ''}
+          <p className="text-sm text-gray-700">{s.title}</p>
+          <p className="flex items-center gap-1 text-sm text-gray-600">
+            <span>
+              {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
+              {s.location ? ` · ${s.location}` : ''}
+            </span>
+            {onViewAgenda && (
+              <button
+                onClick={onViewAgenda}
+                title={t('upcoming.viewInAgenda')}
+                aria-label={t('upcoming.viewInAgenda')}
+                className="rounded p-1 text-violet-700 hover:bg-violet-100"
+              >
+                <CalendarDays size={14} />
+              </button>
+            )}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1 text-xs">
@@ -105,18 +122,11 @@ export default function ParticipationCard({
           </div>
         ))}
 
-      {(onViewAgenda || confirmed) && (
+      {confirmed && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-violet-700">
-          {onViewAgenda && (
-            <button onClick={onViewAgenda} className="inline-flex items-center gap-1 hover:underline">
-              <CalendarDays size={13} /> {t('upcoming.viewInAgenda')}
-            </button>
-          )}
-          {confirmed && (
-            <button onClick={() => setAttendeesOpen(true)} className="inline-flex items-center gap-1 hover:underline">
-              <Users size={13} /> {t('upcoming.attendeesLink')}
-            </button>
-          )}
+          <button onClick={() => setAttendeesOpen(true)} className="inline-flex items-center gap-1 hover:underline">
+            <Users size={13} /> {t('upcoming.attendeesLink')}
+          </button>
         </div>
       )}
 
