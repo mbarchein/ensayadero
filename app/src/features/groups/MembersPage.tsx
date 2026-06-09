@@ -21,6 +21,15 @@ export default function MembersPage() {
   const [roleTarget, setRoleTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveOpen, setLeaveOpen] = useState(false)
   const [leaveText, setLeaveText] = useState('')
+  const [successor, setSuccessor] = useState<string | null>(null)
+
+  // leaving as the only director with other members left → a successor must be
+  // chosen in the leave modal (one is preselected at random)
+  const otherMembers = members.filter((m) => m.user_id !== profile?.id)
+  const needsSuccessor =
+    isInstructor &&
+    otherMembers.length > 0 &&
+    !otherMembers.some((m) => m.role === 'INSTRUCTOR')
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations', groupId],
@@ -39,6 +48,16 @@ export default function MembersPage() {
 
   const leaveGroup = useMutation({
     mutationFn: async () => {
+      // promote the chosen successor BEFORE leaving (afterwards we are no
+      // longer a director); the DB trigger covers any remaining edge case
+      if (needsSuccessor && successor) {
+        const { error } = await supabase
+          .from('memberships')
+          .update({ role: 'INSTRUCTOR' })
+          .eq('group_id', groupId)
+          .eq('user_id', successor)
+        if (error) throw error
+      }
       const { error } = await supabase
         .from('memberships')
         .delete()
@@ -156,6 +175,11 @@ export default function MembersPage() {
           disabled={leaveGroup.isPending}
           onClick={() => {
             setLeaveText('')
+            setSuccessor(
+              otherMembers.length
+                ? otherMembers[Math.floor(Math.random() * otherMembers.length)].user_id
+                : null,
+            )
             setLeaveOpen(true)
           }}
         >
@@ -237,6 +261,22 @@ export default function MembersPage() {
       <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('group.leaveTitle')}>
         <div className="space-y-4">
           <p className="text-sm font-bold text-red-700">{t('group.leaveConfirm')}</p>
+          {needsSuccessor && (
+            <label className="block text-sm">
+              {t('group.leaveSuccessor')}
+              <select
+                value={successor ?? ''}
+                onChange={(e) => setSuccessor(e.target.value)}
+                className="mt-1 w-full rounded-lg border bg-white px-3 py-2"
+              >
+                {otherMembers.map((m) => (
+                  <option key={m.user_id} value={m.user_id}>
+                    {m.profiles.name || m.profiles.email}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label className="block text-sm">
             {t('group.leaveTypePrompt', { word: t('group.leaveConfirmWord') })}
             <input
@@ -254,7 +294,11 @@ export default function MembersPage() {
             <Button
               variant="danger"
               className="inline-flex flex-1 items-center justify-center gap-1.5"
-              disabled={leaveGroup.isPending || leaveText.trim().toUpperCase() !== t('group.leaveConfirmWord')}
+              disabled={
+                leaveGroup.isPending ||
+                leaveText.trim().toUpperCase() !== t('group.leaveConfirmWord') ||
+                (needsSuccessor && !successor)
+              }
               onClick={() => {
                 leaveGroup.mutate()
                 setLeaveOpen(false)

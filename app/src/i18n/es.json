@@ -192,6 +192,7 @@
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos. Esta acción es irreversible.",
     "leaveConfirmWord": "SALIR",
     "leaveTypePrompt": "Escribe {{word}} para confirmar",
+    "leaveSuccessor": "Eres el único director: elige quién dirigirá el grupo",
     "tabs": {
       "sessions": "Ensayos",
       "planner": "Programar",

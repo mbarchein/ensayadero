@@ -192,6 +192,7 @@
     "leaveConfirm": "Leave this group? You'll be removed from its rehearsals. This action cannot be undone.",
     "leaveConfirmWord": "LEAVE",
     "leaveTypePrompt": "Type {{word}} to confirm",
+    "leaveSuccessor": "You are the only director: choose who will direct the group",
     "tabs": {
       "sessions": "Rehearsals",
       "planner": "Plan",
