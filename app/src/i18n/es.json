@@ -180,6 +180,8 @@
     "leave": "Salir del grupo",
     "leaveTitle": "Salir del grupo",
     "leaveConfirm": "¿Seguro que quieres abandonar este grupo? Saldrás de sus ensayos. Esta acción es irreversible.",
+    "leaveConfirmWord": "SALIR",
+    "leaveTypePrompt": "Escribe {{word}} para confirmar",
     "tabs": {
       "sessions": "Ensayos",
       "planner": "Programar",

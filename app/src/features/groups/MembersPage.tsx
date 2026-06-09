@@ -20,6 +20,7 @@ export default function MembersPage() {
   const [removeTarget, setRemoveTarget] = useState<MembershipWithProfile | null>(null)
   const [roleTarget, setRoleTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveOpen, setLeaveOpen] = useState(false)
+  const [leaveText, setLeaveText] = useState('')
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations', groupId],
@@ -153,7 +154,10 @@ export default function MembersPage() {
           variant="danger"
           className="inline-flex items-center gap-1.5"
           disabled={leaveGroup.isPending}
-          onClick={() => setLeaveOpen(true)}
+          onClick={() => {
+            setLeaveText('')
+            setLeaveOpen(true)
+          }}
         >
           <LogOut size={16} /> {t('group.leave')}
         </Button>
@@ -233,6 +237,16 @@ export default function MembersPage() {
       <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('group.leaveTitle')}>
         <div className="space-y-4">
           <p className="text-sm font-bold text-red-700">{t('group.leaveConfirm')}</p>
+          <label className="block text-sm">
+            {t('group.leaveTypePrompt', { word: t('group.leaveConfirmWord') })}
+            <input
+              value={leaveText}
+              onChange={(e) => setLeaveText(e.target.value)}
+              autoComplete="off"
+              placeholder={t('group.leaveConfirmWord')}
+              className="mt-1 w-full rounded-lg border px-3 py-2 uppercase"
+            />
+          </label>
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={() => setLeaveOpen(false)}>
               {t('common.cancel')}
@@ -240,7 +254,7 @@ export default function MembersPage() {
             <Button
               variant="danger"
               className="inline-flex flex-1 items-center justify-center gap-1.5"
-              disabled={leaveGroup.isPending}
+              disabled={leaveGroup.isPending || leaveText.trim().toUpperCase() !== t('group.leaveConfirmWord')}
               onClick={() => {
                 leaveGroup.mutate()
                 setLeaveOpen(false)
