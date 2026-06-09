@@ -79,6 +79,10 @@ export default function WeekGrid({
   const LONG_PRESS_MS = 250
   const MOVE_THRESHOLD = 8
 
+  // week-view swipe started on the slot cells (mirrors the day-strip carousel)
+  const weekSwipeRef = useRef<'idle' | 'pending' | 'horizontal'>('idle')
+  const weekStartRef = useRef<{ x: number; y: number } | null>(null)
+
   // header week carousel: drag the day strip, snap to prev/next week.
   const stripRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -96,17 +100,32 @@ export default function WeekGrid({
       el.style.transition = 'none'
       el.style.transform = CENTER
     }
+    if (gridRef.current) {
+      gridRef.current.style.transition = 'none'
+      gridRef.current.style.transform = ''
+    }
   }, [weekMonday])
 
   useEffect(() => {
     onViewChange?.(selectedDay != null)
   }, [selectedDay, onViewChange])
 
+  // Strip and grid translate together: the swipe can start on either and both
+  // stay in sync.
+  const setDragOffset = (dx: number) => {
+    if (stripRef.current)
+      stripRef.current.style.transform = `translateX(calc(-33.3333% + ${dx}px))`
+    if (gridRef.current) gridRef.current.style.transform = dx === 0 ? '' : `translateX(${dx}px)`
+  }
   const recenter = () => {
     const el = stripRef.current
     if (el) {
       el.style.transition = 'none'
       el.style.transform = CENTER
+    }
+    if (gridRef.current) {
+      gridRef.current.style.transition = 'none'
+      gridRef.current.style.transform = ''
     }
   }
   const snapBack = () => {
@@ -115,12 +134,21 @@ export default function WeekGrid({
       el.style.transition = 'transform 0.2s ease-out'
       el.style.transform = CENTER
     }
+    if (gridRef.current) {
+      gridRef.current.style.transition = 'transform 0.2s ease-out'
+      gridRef.current.style.transform = ''
+    }
   }
   const finishSwipe = (dir: 'prev' | 'next') => {
     const el = stripRef.current
     if (!el) return
     el.style.transition = 'transform 0.2s ease-out'
     el.style.transform = dir === 'next' ? 'translateX(-66.6667%)' : 'translateX(0%)'
+    if (gridRef.current) {
+      const w = viewportRef.current?.offsetWidth ?? 0
+      gridRef.current.style.transition = 'transform 0.2s ease-out'
+      gridRef.current.style.transform = `translateX(${dir === 'next' ? -w : w}px)`
+    }
     const before = weekMondayRef.current.getTime()
     setTimeout(() => {
       if (dir === 'next') onNextWeek?.()
@@ -181,13 +209,13 @@ export default function WeekGrid({
             dragStartX.current = e.clientX
             swiped.current = false
             if (stripRef.current) stripRef.current.style.transition = 'none'
+            if (gridRef.current) gridRef.current.style.transition = 'none'
           }}
           onPointerMove={(e) => {
             if (dragStartX.current == null) return
             const dx = e.clientX - dragStartX.current
             if (Math.abs(dx) > 10) swiped.current = true
-            if (stripRef.current)
-              stripRef.current.style.transform = `translateX(calc(-33.3333% + ${dx}px))`
+            setDragOffset(dx)
           }}
           onPointerUp={(e) => {
             if (dragStartX.current == null) return
@@ -238,12 +266,22 @@ export default function WeekGrid({
         <div
           ref={gridRef}
           style={{
-            touchAction: editing ? 'none' : 'auto',
+            // week view: pan-y keeps native vertical scroll while horizontal
+            // drags reach us to drive the week carousel
+            touchAction: editing ? 'none' : 'pan-y',
             gridTemplateColumns: `${HOUR_COL} repeat(${days.length}, minmax(0, 1fr))`,
           }}
           className="grid"
           onPointerDown={(e) => {
-            if (!editing) return
+            if (!editing) {
+              // week view: a horizontal drag on the cells swipes the week
+              if (e.pointerType === 'mouse' && e.button !== 0) return
+              weekStartRef.current = { x: e.clientX, y: e.clientY }
+              weekSwipeRef.current = 'pending'
+              if (stripRef.current) stripRef.current.style.transition = 'none'
+              if (gridRef.current) gridRef.current.style.transition = 'none'
+              return
+            }
             const pos = posFromEvent(e)
             const ok = !!pos && !isPast(pos)
             movedRef.current = false
@@ -269,7 +307,23 @@ export default function WeekGrid({
             }, LONG_PRESS_MS)
           }}
           onPointerMove={(e) => {
-            if (!editing) return
+            if (!editing) {
+              const st = weekStartRef.current
+              if (!st || weekSwipeRef.current === 'idle') return
+              const dx = e.clientX - st.x
+              const dy = e.clientY - st.y
+              if (weekSwipeRef.current === 'pending') {
+                if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+                  weekSwipeRef.current = 'horizontal'
+                  capture(e)
+                } else if (Math.abs(dy) > 10) {
+                  weekSwipeRef.current = 'idle' // vertical scroll wins
+                  return
+                } else return
+              }
+              setDragOffset(dx)
+              return
+            }
             if (paintingRef.current) {
               const pos = posFromEvent(e)
               if (!pos || isPast(pos) || sameCell(pos, lastPos.current)) return
@@ -311,7 +365,19 @@ export default function WeekGrid({
             lastClient.current = { x: e.clientX, y: e.clientY }
           }}
           onPointerUp={(e) => {
-            if (!editing) return
+            if (!editing) {
+              if (weekSwipeRef.current === 'horizontal' && weekStartRef.current) {
+                const dx = e.clientX - weekStartRef.current.x
+                const w = viewportRef.current?.offsetWidth ?? 1
+                const th = w * 0.3
+                if (dx <= -th) finishSwipe('next')
+                else if (dx >= th) finishSwipe('prev')
+                else snapBack()
+              }
+              weekSwipeRef.current = 'idle'
+              weekStartRef.current = null
+              return
+            }
             clearLp()
             if (paintingRef.current) {
               paintingRef.current = false
@@ -334,7 +400,12 @@ export default function WeekGrid({
             startRef.current = null
           }}
           onPointerCancel={() => {
-            if (!editing) return
+            if (!editing) {
+              if (weekSwipeRef.current === 'horizontal') snapBack()
+              weekSwipeRef.current = 'idle'
+              weekStartRef.current = null
+              return
+            }
             clearLp()
             if (paintingRef.current) {
               paintingRef.current = false
