@@ -174,9 +174,9 @@ function SessionCard({
     <li>
       <Link
         to={`/g/${groupId}/sessions/${s.id}`}
-        className={`block rounded-xl border bg-white p-4 shadow-sm transition hover:shadow ${
-          onArchive ? 'rounded-b-none' : ''
-        }`}
+        className={`block rounded-xl border p-4 shadow-sm transition hover:shadow ${
+          mine ? 'bg-white' : 'bg-gray-50' // muted when I'm not summoned
+        } ${onArchive ? 'rounded-b-none' : ''}`}
       >
         <div className="flex items-start justify-between gap-2">
           <div>
