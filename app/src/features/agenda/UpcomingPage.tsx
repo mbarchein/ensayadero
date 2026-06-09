@@ -57,7 +57,9 @@ export default function UpcomingPage() {
                   pending={respond.isPending}
                   onRespond={(response) => respond.mutate({ sessionId: p.session_id, response })}
                   onViewAgenda={() =>
-                    navigate(`/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}`)
+                    navigate(
+                      `/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}&s=${p.session_id}`,
+                    )
                   }
                 />
               ))}

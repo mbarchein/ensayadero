@@ -32,3 +32,32 @@
     animation: none;
   }
 }
+
+/* Attention blink for the rehearsal targeted by "view in my agenda":
+   three flashes, then the calendar goes back to normal. */
+.cell-flash {
+  position: relative;
+}
+.cell-flash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: #7c3aed;
+  opacity: 0;
+  animation: cell-flash 0.8s ease-in-out 3;
+}
+@keyframes cell-flash {
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell-flash::after {
+    /* no blinking: a brief static highlight instead */
+    animation: none;
+    opacity: 0.35;
+    transition: opacity 0.3s;
+  }
+}

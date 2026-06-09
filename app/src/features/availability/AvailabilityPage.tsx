@@ -54,6 +54,20 @@ export default function AvailabilityPage() {
   }, [])
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
+  // ?s=<session_id> (from "view in my agenda"): blink that rehearsal briefly
+  // and scroll it into view, then drop the effect.
+  const [flashSession, setFlashSession] = useState<string | null>(() => params.get('s'))
+  useEffect(() => {
+    if (!flashSession) return
+    const scroll = setTimeout(() => {
+      document.querySelector('.cell-flash')?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }, 150)
+    const clear = setTimeout(() => setFlashSession(null), 2600)
+    return () => {
+      clearTimeout(scroll)
+      clearTimeout(clear)
+    }
+  }, [flashSession])
   // null = agenda (week view); number = day being edited
   const [editDay, setEditDay] = useState<number | null>(null)
   const dayView = editDay != null
@@ -433,7 +447,8 @@ export default function AvailabilityPage() {
           // planner) while the background keeps showing my availability
           const sesMark =
             ses?.sessions.status === 'CONFIRMED' ? 'border-l-4 border-l-violet-700' : ''
-          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${sesMark} ${ring} ${pending}`
+          const flash = ses && ses.session_id === flashSession ? 'cell-flash' : ''
+          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${sesMark} ${ring} ${pending} ${flash}`
         }}
         renderCell={({ day, slot }, { dayView }) => {
           const p = sessionCells.get(`${day}:${slot}`)
