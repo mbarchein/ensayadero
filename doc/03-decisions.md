@@ -59,9 +59,42 @@ Two supported paths (see `08-deployment.md`):
   `docker-stack.yml` + `docker/*.Dockerfile` (`DEPLOY.md`).
 
 ### D-iac — All infra with Terraform
-`infra/` provisions Supabase, Cloudflare Pages+DNS and GitHub secrets.
-Non-automatable steps (OAuth client, tokens, Resend domain, VAPID) in
+`infra/` provisions everything reproducible: the Supabase project and
+`supabase_settings` (auth — SMTP via Resend with `smtp_port` as a string,
+`uri_allow_list` redirect allow-list, `rate_limit_verify`, optional Turnstile
+captcha), Cloudflare Pages project + custom domain + DNS, an apex→app **301
+redirect** (Cloudflare Single Redirect ruleset, `http_request_dynamic_redirect`),
+and an optional **Turnstile widget** (`cloudflare_turnstile_widget`) whose
+sitekey/secret are **derived** (no manual keys; TF outputs `turnstile_site_key`
+and the sensitive `turnstile_secret_key`). It also creates **all** GitHub Actions
+secrets **and** variables, including `VITE_SUPABASE_ANON_KEY` (from the
+`supabase_apikeys` data source), `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`,
+`VITE_FACEBOOK_ENABLED`, `VITE_SUPABASE_URL`, `VITE_APP_URL` and
+`CLOUDFLARE_PROJECT_NAME`. The Cloudflare API token needs Pages/DNS/Zone plus
+**Turnstile:Edit** and **Single Redirect:Edit** (Zone); the GitHub token needs
+classic `repo` or fine-grained Secrets+Variables read/write. Non-automatable steps
+(OAuth clients, tokens, Resend domain, VAPID, `legal-info` secrets) in
 `BOOTSTRAP.md`.
+
+### D-rls — Direct-to-Supabase with RLS as the trust boundary
+The frontend talks to Supabase directly with the **public anon key**; all
+authorization is enforced by Postgres **Row Level Security** keyed on `auth.uid()`
+from the signed user JWT (helpers `is_member`/`is_instructor`/`is_superadmin`).
+The `service_role` key is server-only (Edge Functions / CI). The only public
+endpoint is the `legal-info` Edge Function, which gates itself with a server-side
+Turnstile check.
+
+### D-legal — Public legal pages, contact data out of the bundle
+Public routes `/privacy`, `/legal` (aviso legal, LSSI-CE) and `/cookies`,
+rendered by a generic `LegalDoc` component (`auth/LegalDoc.tsx`) from i18n and
+linked from the login footer (middle-dot separated). The controller/contact data
+(entity, tax id, address, privacy/contact emails) is **never** in the JS bundle:
+privacy and legal notice fetch it at runtime from the **public** `legal-info`
+Edge Function (`config.toml`: `verify_jwt = false`), which verifies a Cloudflare
+Turnstile token server-side and returns the values from its **own** secrets
+(`LEGAL_ENTITY`, `LEGAL_TAX_ID`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`,
+`CONTACT_EMAIL`, `TURNSTILE_SECRET_KEY`) — anti-scraping. The cookie policy holds
+no personal data and shows no captcha.
 
 ### D-local — Full local stack in docker-compose (no Supabase CLI)
 Postgres (supabase image with pg_cron/pg_net), GoTrue, PostgREST, Realtime, nginx
@@ -99,6 +132,12 @@ earlier focus-refetch-only approach.
 | D-invite-disabled | Disabling the join code hides the code and all actions (share/copy/QR/email/regenerate); only a note and the re-enable toggle remain. |
 | D-back-consistent | The "back" link sits tight above the title inside `<header>` in every view (same spacing). |
 | D-promote-icons | Role change button with icon: `UserCog` (make director), `UserMinus` (make actor). |
+| D-agenda-views | The week grid (`WeekGrid`/`AvailabilityPage`) is **read-only** (scroll only). The day header is a **carousel of day-buttons**: tap a day to open an editable single-day view; a corner button returns to the week; horizontal swipe on the header changes week (replacing the old prev/next selector). Editing availability happens **only** in day view. Rehearsal cells in week view show the group avatar. Day hour range is **09:00–22:00** (`SLOTS_PER_DAY=26`, derived from `DAY_START_HOUR`/`DAY_END_HOUR`/`SLOT_MINUTES`). |
+| D-attendance-collapse | Once a user answers, the Going/Can't-make-it buttons collapse to a "Voy/No voy" badge + a "Change" button (session detail and the agenda `ParticipationCard`). |
+| D-upcoming-card | Upcoming card leads with group avatar+name, then title, then time; shows a going/declined/pending tally that opens a "Convocados" modal (full list, sorted by response then name); border green (attending) / red (declined). |
+| D-cancel-modal | Cancelling a rehearsal uses the in-app modal, not native `confirm()`. |
+| D-facebook-gate | The Facebook/Meta login button is hidden unless configured (`VITE_FACEBOOK_ENABLED`, set by Terraform from `facebook_oauth_client_id`). |
+| D-leave-confirm | Leave group relabeled "Salir del grupo" (WhatsApp-style `LogOut` icon), red/danger styling, bold irreversible warning, requires typing "SALIR" to confirm. |
 
 ## Relevant modeling decisions
 - Time ranges as `tstzrange` + GiST indexes; overlaps with `&&`.

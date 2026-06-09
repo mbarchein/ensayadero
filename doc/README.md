@@ -28,5 +28,8 @@ managed-deploy steps) and `DEPLOY.md` (self-hosting on Docker Swarm).
   recovery); optional Turnstile CAPTCHA. Group access via join code/link/QR + email
   invites.
 - Live updates via Supabase Realtime.
+- Public legal pages (`/privacy`, `/legal`, `/cookies`); controller/contact data
+  served by a Turnstile-gated `legal-info` Edge Function (kept out of the bundle).
+- Two Edge Functions: `send-notifications`, `legal-info`. MIT licensed.
 - 15 SQL migrations, 17 unit tests of core logic.
 - i18n es/en. Verified E2E with Playwright throughout development.

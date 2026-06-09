@@ -50,17 +50,22 @@ have several directors.
    no availability.
 6. **Confirm**: confirming the session sends push + email to the convened.
 7. **Respond**: each convened person marks "Going / Can't" (Upcoming tab, My
-   schedule, or the session detail).
-8. **Changes**: time/location changes and cancellations re-notify.
+   schedule, or the session detail). Once answered, the buttons collapse to a
+   "Going / Can't make it" badge plus a "Change" button. The Upcoming card leads
+   with the group avatar+name, shows a going/declined/pending tally that opens a
+   "Convocados" modal, and is bordered green (attending) or red (declined).
+8. **Changes**: time/location changes and cancellations re-notify (cancelling
+   uses an in-app confirmation modal).
 
 ## Screens (routes)
 
 | Route | Screen |
 |-------|--------|
-| `/login`, `/auth/callback` | Sign in (Google, Meta/Facebook, email+password) |
+| `/login`, `/auth/callback` | Sign in (Google, Meta/Facebook when configured, email+password); footer links to the legal policies |
 | `/signup` | Create account (email + password, email activation) |
 | `/forgot-password`, `/reset-password` | Password recovery |
 | `/goodbye` | Confirmation after self-deleting the account |
+| `/privacy`, `/legal`, `/cookies` | Public legal pages (privacy / aviso legal LSSI-CE / cookies) |
 | `/` | Home: my groups (avatar+role), pending, create/join group |
 | `/availability` | My schedule: availability calendar + overlaid rehearsals |
 | `/upcoming` | Upcoming rehearsals (all groups) + confirmation |

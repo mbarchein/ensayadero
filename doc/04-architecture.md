@@ -63,6 +63,12 @@ Design keys:
 
 ## Security (RLS)
 
+The frontend talks to Supabase **directly** with the public **anon key**;
+authorization is enforced server-side by Postgres **Row Level Security** keyed on
+`auth.uid()` from the signed user JWT. The `service_role` key is server-only (Edge
+Functions / CI). The only public, unauthenticated endpoint is the `legal-info`
+Edge Function, which gates itself with a server-side Turnstile check.
+
 RLS enabled on every table. Pattern: helper functions `is_member`,
 `is_instructor`, `is_superadmin` (security definer, `search_path=public`).
 
@@ -96,6 +102,14 @@ role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
 3. The Edge Function `send-notifications` (invoked by pg_cron and by the app
    after confirm/cancel) delivers email (Resend) and Web Push (VAPID) per
    `notification_preferences`, and stamps `sent_email_at`/`sent_push_at`.
+
+## Edge Functions
+- `send-notifications` — delivers email + Web Push (above).
+- `legal-info` — **public** (`config.toml`: `verify_jwt = false`); verifies a
+  Cloudflare Turnstile token server-side and returns the controller/contact data
+  from its own secrets (`LEGAL_ENTITY`, `LEGAL_TAX_ID`, `LEGAL_ADDRESS`,
+  `PRIVACY_EMAIL`, `CONTACT_EMAIL`, `TURNSTILE_SECRET_KEY`), keeping that data out
+  of the static JS bundle (anti-scraping).
 
 ## Data freshness (realtime)
 Supabase **Realtime** websockets push changes on `sessions`,

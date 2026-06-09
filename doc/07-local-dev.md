@@ -19,7 +19,7 @@ make help         # other commands
 | db (supabase/postgres) | 54322 | Postgres with pg_cron/pg_net |
 | auth (GoTrue) | — | Auth: email+password, Google/Facebook OAuth, activation + recovery, optional Turnstile |
 | rest (PostgREST) | — | API with RLS |
-| functions (Deno) | — | `send-notifications` |
+| functions (Deno) | — | Edge Functions: `send-notifications`, `legal-info` |
 | mailpit | 54324 | Mail catcher (activation/recovery/notification emails); web UI |
 | realtime (supabase/realtime) | — | WebSockets (Postgres changes). Tenant `realtime-dev` |
 | migrate | — | Applies `supabase/migrations/*` (`_migrations` table) + `seed.sql` |

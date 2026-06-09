@@ -46,7 +46,8 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
 - 🟡 FR19. Per-channel preferences: `notification_preferences` table + logic in
   the Edge Function; preferences UI pending (⬜).
 - ✅ FR20. The director sees response status (pending/going/not going) and an
-  aggregate tally.
+  aggregate tally; on the Upcoming card the tally opens a "Convocados" modal with
+  the full attendee list (sorted by response then name).
 
 ### Non-functional
 - ✅ NFR1. Installable PWA (manifest, SW, precache, push).
@@ -73,3 +74,11 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
 - ✅ FR32. Optional pronoun → gendered role label (actress/actor…).
 - ✅ FR33. Warning when removing availability over a scheduled rehearsal, with an
   option to remove only the selected part or the whole rehearsal slot.
+- ✅ FR34. Public legal pages (`/privacy`, `/legal` LSSI-CE, `/cookies`),
+  rendered by a generic `LegalDoc` component from i18n and linked from the login
+  footer. The controller/contact data is not in the JS bundle: privacy and legal
+  notice fetch it from the public `legal-info` Edge Function after a Cloudflare
+  Turnstile check (anti-scraping); the cookie policy has no personal data and no
+  captcha.
+- ✅ FR35. Leave group is a destructive, irreversible action ("Salir del grupo",
+  red styling) requiring the user to type "SALIR" to confirm.

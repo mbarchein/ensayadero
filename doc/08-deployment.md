@@ -38,19 +38,37 @@ terraform init && terraform apply
 ```
 
 Provisions:
-- `supabase_project` + `supabase_settings` (auth, Google OAuth, redirect URLs).
-- Cloudflare `pages_project` + domain + DNS (app CNAME + Resend records).
-- GitHub Actions secrets/variables (tokens, project ref, public URLs).
+- `supabase_project` + `supabase_settings`: auth (Google + optional Meta/Facebook
+  OAuth), SMTP via Resend (`smtp_port` as a string), `uri_allow_list` redirect
+  allow-list, `rate_limit_verify`, and the optional Turnstile captcha.
+- Cloudflare `pages_project` + custom domain + DNS (app CNAME + Resend records),
+  an apex→app **301 redirect** (Single Redirect ruleset), and (optional) a
+  **Turnstile widget** whose sitekey/secret are derived.
+- **All** GitHub Actions secrets **and** variables: tokens, `SUPABASE_PROJECT_REF`,
+  `VITE_SUPABASE_URL`, `VITE_APP_URL`, `VITE_SUPABASE_ANON_KEY`,
+  `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`,
+  `CLOUDFLARE_PROJECT_NAME`.
+- TF outputs include `turnstile_site_key` and the sensitive
+  `turnstile_secret_key` (used to set the `legal-info` function's
+  `TURNSTILE_SECRET_KEY` secret).
+
+The Cloudflare API token needs Pages:Edit, DNS:Edit, Zone:Read plus
+**Turnstile:Edit** and **Single Redirect:Edit** (Zone); the GitHub token needs
+classic `repo` (or fine-grained Secrets+Variables read/write).
 
 Local state by default; can be moved to HCP Terraform (commented in
 `versions.tf`).
 
 ## CI/CD (`.github/workflows/deploy.yml`)
 
-On push to `main`:
+On push to `main` (`paths-ignore` skips docs / `infra/` / Docker-only changes):
 1. **test** — typecheck + vitest.
 2. **migrate** — `supabase link` + `supabase db push` + Edge Functions deploy.
-3. **deploy-frontend** — `npm run build` + `wrangler pages deploy` to Cloudflare.
+3. **deploy-frontend** — `npm run build` + `wrangler pages deploy` to Cloudflare
+   (project name from the `CLOUDFLARE_PROJECT_NAME` variable).
+
+Runs on Node 22; actions bumped off Node 20 (`actions/checkout@v5`,
+`actions/setup-node@v5`, `supabase/setup-cli@v2`).
 
 ## Manual steps (summary of `BOOTSTRAP.md`)
 
@@ -70,6 +88,9 @@ Not automatable by Terraform:
    platform_role='SUPERADMIN' where email='…'`.
 9. **Delivery cron**: `cron.schedule('process-notifications', '* * * * *', …)`
    with `net.http_post` to the Edge Function (BOOTSTRAP §11).
+10. **legal-info secrets**: set the function's secrets (`LEGAL_ENTITY`,
+    `LEGAL_TAX_ID`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `CONTACT_EMAIL`, and
+    `TURNSTILE_SECRET_KEY` from the `turnstile_secret_key` TF output).
 
 ## Free-tier limitations (assumed)
 - Supabase free pauses the project after ~1 week of inactivity; the step-9 cron
@@ -81,8 +102,12 @@ Not automatable by Terraform:
 
 ## Auth providers
 Implemented: **Google**, **Meta/Facebook** (the supported route for "Instagram"
-login — Supabase has no native Instagram provider) and **email + password** with
-email activation and password recovery. Optional **Cloudflare Turnstile** CAPTCHA
-(set the site key + secret). Further providers (Microsoft/Discord/GitHub/Apple,
+login — Supabase has no native Instagram provider; the button is shown only when
+configured, via `VITE_FACEBOOK_ENABLED`) and **email + password** with email
+activation and password recovery. Optional **Cloudflare Turnstile** CAPTCHA — the
+widget and its site/secret keys are created by Terraform (`turnstile_enabled`), not
+entered by hand. Google's OAuth client now lives in Google's **Google Auth
+Platform** console (formerly *APIs & Services → Credentials*); the non-sensitive
+scopes (openid/email/profile) need no app verification. Further providers (Microsoft/Discord/GitHub/Apple,
 Magic Link) could be added; each social provider needs manual credentials like
 Google. Pending.

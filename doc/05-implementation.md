@@ -4,8 +4,9 @@
 
 ```
 auth/          AuthContext (session + profile + refreshProfile), LoginPage
-               (Google/Facebook/password), SignupPage, ForgotPasswordPage,
-               ResetPasswordPage, GoodbyePage, AuthCallback, Turnstile
+               (Google/Facebook/password + legal-policy footer links),
+               SignupPage, ForgotPasswordPage, ResetPasswordPage, GoodbyePage,
+               AuthCallback, Turnstile, LegalDoc (privacy/legal/cookies pages)
 components/    Layout (bottom nav), ui.tsx (Button/Badge/Modal/Spinner/EmptyState)
 features/
   groups/      HomePage, JoinPage, MembersPage, InvitePanel, EditGroupModal,
@@ -30,9 +31,11 @@ keys. No custom global state. Live updates via Supabase **Realtime**
 react-query also refetches on window focus and after your own mutations.
 
 ## Auth (`auth/`)
-- `LoginPage`: Google + Meta/Facebook OAuth buttons (`signInWithOAuth`) and an
+- `LoginPage`: Google + (when configured) Meta/Facebook OAuth buttons
+  (`signInWithOAuth`, Facebook gated on `VITE_FACEBOOK_ENABLED`) and an
   email+password form (`signInWithPassword`); friendly localized errors for
-  invalid credentials / email-not-confirmed / rate limit.
+  invalid credentials / email-not-confirmed / rate limit. Footer links to the
+  privacy / legal / cookie policies (middle-dot separated).
 - `SignupPage`: open sign-up (`signUp`) with email activation; shows a
   "check your email" screen.
 - `ForgotPasswordPage` / `ResetPasswordPage`: recovery. Forgot is
@@ -41,6 +44,10 @@ react-query also refetches on window focus and after your own mutations.
 - `Turnstile`: optional Cloudflare CAPTCHA, gated on `VITE_TURNSTILE_SITE_KEY`
   (`captchaEnabled`). Single-use token refreshed by remounting with a `key`.
 - `GoodbyePage`: shown after account self-deletion.
+- `LegalDoc`: generic legal page (privacy / aviso legal / cookies) rendered from
+  an i18n namespace. On gated pages it fetches the controller/contact data from
+  the `legal-info` Edge Function after a Turnstile check, so that data never ships
+  in the bundle; the cookie page is ungated (`gated={false}`).
 
 ## Core logic (tested)
 
@@ -49,8 +56,8 @@ Parse/serialize Postgres `tstzrange` (`["2026… +00", …)`), `overlaps`,
 `contains`, `subtract` (subtract busy ranges). Tests in `ranges.test.ts`.
 
 ### `lib/slots.ts`
-Weekly grid: 30-min slots, 08:00–23:00 (`SLOT_MINUTES`, `DAY_START_HOUR`,
-`SLOTS_PER_DAY`).
+Weekly grid: 30-min slots, 09:00–22:00 (`SLOT_MINUTES=30`, `DAY_START_HOUR=9`,
+`DAY_END_HOUR=22`, `SLOTS_PER_DAY=26` derived).
 - `expandAvailability(av, start, end)` — materializes one-off and recurring
   (RRULE) availabilities within a window, applying `exception_dates`.
 - `weekGrid(avs, monday)` — `[day][slot]` matrix of a user's state.
@@ -69,7 +76,12 @@ because the `pointermove` handler runs synchronously after `pointerdown` and a
 (`isPast`).
 
 ### Availability (`AvailabilityPage`)
-- Paint toggles available↔unmarked (preferred removed).
+- **Two view modes**: the week grid is **read-only** (scroll only); the day
+  header is a carousel of day-buttons — tap a day to open an editable **single-day
+  view**, a corner button returns to the week, and horizontal swipe on the header
+  changes week (replacing the old prev/next selector). Editing is only possible in
+  day view. Week-view rehearsal cells show the group avatar.
+- Paint (in day view) toggles available↔unmarked (preferred removed).
 - **Autosave** with 600ms debounce on gesture end; an edit counter re-saves if
   strokes arrive during an in-flight save.
 - Per-week persistence: deletes one-off availability overlapping the week and
@@ -105,14 +117,18 @@ list; collapsible past/cancelled with a per-card archive button.
 - `useMyAgenda`: my participations (non-cancelled, non-archived) with all
   participants for the tally; `respond` mutation. `tallyResponses` counts
   going/not-going/pending and total.
-- Upcoming: ordered future list, pending notice, inline confirmation, "view in
-  my schedule" (jumps to the rehearsal's week).
+- Upcoming: ordered future list; cards lead with group avatar+name, then title,
+  then time; border green (attending) / red (declined). The going/declined/pending
+  tally opens a "Convocados" modal (full list, sorted by response then name).
+  Inline confirmation that **collapses to a "Voy/No voy" badge + "Change" button**
+  once answered; "view in my schedule" jumps to the rehearsal's week.
 
 ### Session (`SessionDetailPage`)
 Header with group avatar+name; participants with a **role chip** (gendered) and a
 **partial availability** note (the hours they can) or no-availability, computed
-with `expandAvailability` ∩ range. Director actions: edit, confirm, cancel,
-delete draft.
+with `expandAvailability` ∩ range. The attendance buttons collapse to a "Voy/No
+voy" badge + "Change" button once answered. Director actions: edit, confirm,
+cancel (in-app modal), delete draft.
 
 ### Invite (`InvitePanel`, `JoinPage`)
 Group code, link (Web Share API + copy), QR (canvas), regenerate /

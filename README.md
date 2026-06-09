@@ -13,6 +13,7 @@ sessions with required/optional participants. Push + email notifications.
 | Scheduled jobs | pg_cron + Edge Functions | free |
 | Email | Resend | free (3k/month) |
 | Push | Web Push VAPID | free |
+| CAPTCHA | Cloudflare Turnstile | free |
 | Infra as code | Terraform (`infra/`) | — |
 
 Key design decisions:
@@ -23,6 +24,15 @@ Key design decisions:
 - **D4** Full isolation between groups.
 - **D5** Open registration (Google, Facebook/Meta, or email+password); access to each
   group is controlled by its join code/link and email invitations.
+- **D-rls** The frontend talks to Supabase directly with the public anon key;
+  authorization is enforced by Postgres Row Level Security (RLS) keyed on the
+  signed user's `auth.uid()`. The `service_role` key is server-only (Edge
+  Functions / CI). The only public endpoint is the `legal-info` Edge Function,
+  gated by a server-side Turnstile check.
+- **D-legal** Public legal pages (`/privacy`, `/legal`, `/cookies`). The
+  controller/contact data is never in the JS bundle: privacy and legal-notice
+  pages fetch it from the `legal-info` Edge Function only after a Turnstile check
+  (anti-scraping). MIT licensed (`LICENSE`).
 
 ## Structure
 
@@ -68,7 +78,9 @@ terraform init && terraform apply
    Then **Audience → Publish app → In production** (else login is limited to test users).
 2. **Meta/Facebook OAuth** (optional, Instagram login path) — create a Meta app, add
    Facebook Login, set the same redirect URI, copy App ID/Secret to tfvars. See BOOTSTRAP.
-3. **Tokens** — Supabase access token, Cloudflare API token, GitHub token → tfvars.
+3. **Tokens** — Supabase access token; Cloudflare API token (Pages:Edit, DNS:Edit,
+   Zone:Read, Turnstile:Edit, Single Redirect:Edit); GitHub token (classic `repo`
+   or fine-grained with Secrets+Variables read/write) → tfvars.
 4. **Resend** — add the domain in the dashboard, copy the DNS records to
    `resend_dkim_records`, re-apply, verify. Create an API key → tfvars.
 5. **VAPID keys** — `npx web-push generate-vapid-keys`; public to the
@@ -77,10 +89,20 @@ terraform init && terraform apply
 6. **Superadmin** — after the first login, in the SQL editor:
    `update profiles set platform_role='SUPERADMIN' where email='...';`
 
+Terraform also provisions a Cloudflare Turnstile widget (when `turnstile_enabled`),
+an apex→app 301 redirect (Cloudflare Single Redirect ruleset), and all GitHub
+Actions secrets **and** variables (including `VITE_SUPABASE_ANON_KEY`,
+`VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`,
+`VITE_SUPABASE_URL`, `VITE_APP_URL` and `CLOUDFLARE_PROJECT_NAME`). The Turnstile
+site/secret keys are derived from the widget (TF outputs `turnstile_site_key` and
+`turnstile_secret_key`), not entered by hand. The `turnstile_secret_key` output is
+also used to set the `legal-info` function's `TURNSTILE_SECRET_KEY` secret.
+
 ## Deploy
 
-Push to `main` → GitHub Actions: tests → migrations + Edge Functions (Supabase CLI)
-→ build → Cloudflare Pages (wrangler).
+Push to `main` → GitHub Actions (`paths-ignore` skips docs/infra/docker-only
+changes): tests → migrations + Edge Functions (Supabase CLI) → build → Cloudflare
+Pages (wrangler, project name from the `CLOUDFLARE_PROJECT_NAME` variable).
 
 ## Free tier limitations (assumed)
 
