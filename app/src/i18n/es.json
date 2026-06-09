@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "Inicio",
-    "availability": "Mi agenda",
+    "availability": "Agenda",
     "upcoming": "Próximos",
     "notifications": "Avisos",
     "profile": "Perfil"
@@ -37,7 +37,7 @@
     "invalid": "Código no válido o desactivado."
   },
   "upcoming": {
-    "title": "Próximos ensayos",
+    "title": "Mis próximos ensayos",
     "empty": "No tienes ensayos próximos.",
     "pendingNotice_one": "Tienes {{count}} ensayo por confirmar.",
     "pendingNotice_other": "Tienes {{count}} ensayos por confirmar.",
@@ -321,7 +321,7 @@
     }
   },
   "profile": {
-    "title": "Perfil",
+    "title": "Mi perfil",
     "name": "Nombre",
     "phone": "Teléfono",
     "gender": "Pronombre (opcional)",

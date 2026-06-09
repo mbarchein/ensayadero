@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "Home",
-    "availability": "My schedule",
+    "availability": "Agenda",
     "upcoming": "Upcoming",
     "notifications": "Alerts",
     "profile": "Profile"
@@ -37,7 +37,7 @@
     "invalid": "Invalid or disabled code."
   },
   "upcoming": {
-    "title": "Upcoming rehearsals",
+    "title": "My upcoming rehearsals",
     "empty": "You have no upcoming rehearsals.",
     "pendingNotice_one": "You have {{count}} rehearsal to confirm.",
     "pendingNotice_other": "You have {{count}} rehearsals to confirm.",
@@ -321,7 +321,7 @@
     }
   },
   "profile": {
-    "title": "Profile",
+    "title": "My profile",
     "name": "Name",
     "phone": "Phone",
     "gender": "Pronoun (optional)",
