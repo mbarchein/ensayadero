@@ -122,12 +122,16 @@ export default function SessionDetailPage() {
 
   const r = parseRange(session.time_range)
   const mine = session.session_participants.find((p) => p.user_id === profile?.id)
-  // Sort each list by response (going → not going → pending), then alphabetically.
+  // Sort each list: me first, then by response (going → not going → pending),
+  // then alphabetically.
   const respOrder: Record<string, number> = { ACCEPTED: 0, DECLINED: 1, PENDING: 2 }
   const partName = (p: (typeof session.session_participants)[number]) => p.profiles.name || p.profiles.email
   const sortParticipants = (list: typeof session.session_participants) =>
     [...list].sort(
-      (a, b) => (respOrder[a.response] ?? 9) - (respOrder[b.response] ?? 9) || partName(a).localeCompare(partName(b)),
+      (a, b) =>
+        Number(b.user_id === profile?.id) - Number(a.user_id === profile?.id) ||
+        (respOrder[a.response] ?? 9) - (respOrder[b.response] ?? 9) ||
+        partName(a).localeCompare(partName(b)),
     )
   const required = sortParticipants(session.session_participants.filter((p) => p.required))
   const optional = sortParticipants(session.session_participants.filter((p) => !p.required))
@@ -255,9 +259,21 @@ export default function SessionDetailPage() {
         </section>
       )}
 
-      <ParticipantList title={t('sessions.requiredList')} list={required} availInfo={availInfo} roleOf={roleOf} />
+      <ParticipantList
+        title={t('sessions.requiredList')}
+        list={required}
+        availInfo={availInfo}
+        roleOf={roleOf}
+        myId={profile?.id}
+      />
       {optional.length > 0 && (
-        <ParticipantList title={t('sessions.optionalList')} list={optional} availInfo={availInfo} roleOf={roleOf} />
+        <ParticipantList
+          title={t('sessions.optionalList')}
+          list={optional}
+          availInfo={availInfo}
+          roleOf={roleOf}
+          myId={profile?.id}
+        />
       )}
 
       {isInstructor && (
@@ -343,11 +359,13 @@ function ParticipantList({
   list,
   availInfo,
   roleOf,
+  myId,
 }: {
   title: string
   list: SessionWithParticipants['session_participants']
   availInfo: Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>
   roleOf: (userId: string) => 'INSTRUCTOR' | 'ACTOR' | null
+  myId?: string
 }) {
   const { t } = useTranslation()
   return (
@@ -361,7 +379,11 @@ function ParticipantList({
             <li key={p.user_id} className="rounded-lg border bg-white px-3 py-2 text-sm">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
-                  {p.profiles.name || p.profiles.email}
+                  {p.user_id === myId ? (
+                    <span className="font-bold text-violet-700">{t('upcoming.me')}</span>
+                  ) : (
+                    p.profiles.name || p.profiles.email
+                  )}
                   {role && (
                     <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
                       {roleLabel(t, role, p.profiles.gender)}
