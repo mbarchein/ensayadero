@@ -1,15 +1,13 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
-import { randomPlay } from '../../lib/plays'
 import { CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
-import { Badge, Button, Modal, Spinner } from '../../components/ui'
+import { Badge, Button, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import { roleLabel } from '../../lib/roleLabel'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
@@ -18,27 +16,7 @@ export default function HomePage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const navigate = useNavigate()
-  const qc = useQueryClient()
-  const [newGroupOpen, setNewGroupOpen] = useState(false)
-  const [groupName, setGroupName] = useState('')
-  const [placeholder, setPlaceholder] = useState(randomPlay)
-  const openNewGroup = () => {
-    setPlaceholder(randomPlay()) // random famous play each time it opens
-    setNewGroupOpen(true)
-  }
-
-  const createGroup = useMutation({
-    mutationFn: async () => {
-      // created_by defaults to auth.uid(); trigger adds the creator as director
-      const { error } = await supabase.from('groups').insert({ name: groupName.trim() })
-      if (error) throw error
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['my-memberships'] })
-      setNewGroupOpen(false)
-      setGroupName('')
-    },
-  })
+  const openNewGroup = () => navigate('/new-group')
 
   const { data: memberships, isLoading } = useQuery({
     queryKey: ['my-memberships'],
@@ -212,33 +190,6 @@ export default function HomePage() {
         )}
       </section>
 
-      <Modal open={newGroupOpen} onClose={() => setNewGroupOpen(false)} title={t('home.newGroupTitle')}>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault()
-            createGroup.mutate()
-          }}
-        >
-          <label className="block text-sm">
-            {t('admin.groupName')}
-            <input
-              required
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder={placeholder}
-            />
-          </label>
-          <p className="text-xs text-gray-500">{t('home.newGroupHint')}</p>
-          {createGroup.isError && (
-            <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>
-          )}
-          <Button type="submit" disabled={createGroup.isPending} className="w-full">
-            {createGroup.isPending ? t('admin.creating') : t('home.newGroup')}
-          </Button>
-        </form>
-      </Modal>
     </div>
   )
 }

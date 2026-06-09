@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -11,7 +10,6 @@ import { parseRange } from '../../lib/ranges'
 import { Pencil, Archive, CalendarPlus, Users } from 'lucide-react'
 import { Badge, BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
-import EditGroupModal from '../groups/EditGroupModal'
 import type { SessionWithParticipants } from '../../lib/types'
 
 const STATUS_COLOR = {
@@ -26,7 +24,6 @@ export default function SessionsPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
-  const [editOpen, setEditOpen] = useState(false)
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions', groupId],
@@ -82,8 +79,6 @@ export default function SessionsPage() {
         </div>
       </header>
 
-      {editOpen && group && <EditGroupModal group={group} onClose={() => setEditOpen(false)} />}
-
       <div className="flex gap-2">
         {isInstructor && (
           <Button
@@ -103,7 +98,7 @@ export default function SessionsPage() {
         {isInstructor && group && (
           <Button
             variant="secondary"
-            onClick={() => setEditOpen(true)}
+            onClick={() => navigate(`/g/${groupId}/edit`)}
             className="inline-flex items-center p-2"
             title={t('group.editGroup')}
             aria-label={t('group.editGroup')}

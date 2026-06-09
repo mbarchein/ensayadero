@@ -9,6 +9,8 @@ import AuthCallback from './auth/AuthCallback'
 import LegalDoc from './auth/LegalDoc'
 import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
+import NewGroupPage from './features/groups/NewGroupPage'
+import EditGroupPage from './features/groups/EditGroupPage'
 import MembersPage from './features/groups/MembersPage'
 import JoinPage from './features/groups/JoinPage'
 import AvailabilityPage from './features/availability/AvailabilityPage'
@@ -65,6 +67,7 @@ export default function App() {
         <Route path="/s/:code" element={<ShortLinkPage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/new-group" element={<NewGroupPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/availability" element={<AvailabilityPage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
@@ -72,6 +75,7 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/g/:groupId" element={<SessionsPage />} />
+          <Route path="/g/:groupId/edit" element={<EditGroupPage />} />
           <Route path="/g/:groupId/planner" element={<PlannerPage />} />
           <Route path="/g/:groupId/members" element={<MembersPage />} />
           <Route path="/g/:groupId/sessions/:sessionId" element={<SessionDetailPage />} />
