@@ -150,7 +150,17 @@ export function EmptyState({ message, action }: { message: string; action?: Reac
 // Returns to the previous view in the navigation history when the app has one
 // (e.g. session detail opened from the notifications list); `to` is the
 // fallback parent route for direct entries (deep link, page reload).
-export function BackButton({ to, label }: { to: string; label?: string }) {
+// `onBack` overrides navigation entirely — for in-page "views" that are local
+// state rather than history entries (e.g. the agenda's day-edit mode).
+export function BackButton({
+  to,
+  label,
+  onBack,
+}: {
+  to?: string
+  label?: string
+  onBack?: () => void
+}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -159,8 +169,9 @@ export function BackButton({ to, label }: { to: string; label?: string }) {
   // (More robust than history.state.idx, which third-party pushState entries
   // can corrupt.)
   const goBack = () => {
-    if (location.key !== 'default') navigate(-1)
-    else navigate(to)
+    if (onBack) onBack()
+    else if (location.key !== 'default') navigate(-1)
+    else navigate(to ?? '/')
   }
   return (
     <button
