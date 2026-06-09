@@ -468,10 +468,10 @@ export default function AvailabilityPage() {
             const last = cells.get(`${day}:${slot + 1}`) !== ses
             sesMark =
               ses.response === 'ACCEPTED'
-                ? `border-l-4 border-l-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
+                ? `border-l-4 border-l-violet-700 !border-r-2 !border-r-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
                 : ses.response === 'DECLINED'
-                  ? `border-l-4 border-l-red-500 ${first ? '!border-t-2 !border-t-red-500' : ''} ${last ? '!border-b-2 !border-b-red-500' : ''}`
-                  : `border-l-4 border-l-orange-500 ${first ? '!border-t-2 !border-t-orange-500' : ''} ${last ? '!border-b-2 !border-b-orange-500' : ''}`
+                  ? `border-l-4 border-l-red-500 !border-r-2 !border-r-red-500 ${first ? '!border-t-2 !border-t-red-500' : ''} ${last ? '!border-b-2 !border-b-red-500' : ''}`
+                  : `border-l-4 border-l-orange-500 !border-r-2 !border-r-orange-500 ${first ? '!border-t-2 !border-t-orange-500' : ''} ${last ? '!border-b-2 !border-b-orange-500' : ''}`
           }
           const flash = current && ses && ses.session_id === flashSession ? 'cell-flash' : ''
           const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
