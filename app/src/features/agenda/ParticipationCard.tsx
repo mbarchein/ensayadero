@@ -50,18 +50,7 @@ export default function ParticipationCard({
             <GroupAvatar seed={s.groups.avatar_seed || s.group_id} image={s.groups.avatar_image} size={40} />
             <span className="truncate text-base font-semibold">{s.groups.name}</span>
           </div>
-          <p className="flex items-center gap-2 text-sm text-gray-700">
-            <span className="truncate">{s.title}</span>
-            {confirmed && p.response !== 'PENDING' && (
-              <span className="ml-auto shrink-0">
-                <Badge color={p.response === 'ACCEPTED' ? 'green' : 'red'}>
-                  {p.response === 'ACCEPTED'
-                    ? t('sessions.response.going')
-                    : t('sessions.response.notGoing')}
-                </Badge>
-              </span>
-            )}
-          </p>
+          <p className="truncate text-sm text-gray-700">{s.title}</p>
           <p className="flex items-center gap-1 text-sm text-gray-600">
             <span>
               {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
@@ -79,11 +68,29 @@ export default function ParticipationCard({
             )}
           </p>
         </div>
+        {/* right block: status/response badge with the attendee count below */}
         <div className="flex shrink-0 flex-col items-end gap-1 text-xs">
           {s.status !== 'CONFIRMED' && (
             <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
           )}
           {!p.required && <Badge color="gray">{t('planner.optional')}</Badge>}
+          {confirmed && p.response !== 'PENDING' && (
+            <Badge color={p.response === 'ACCEPTED' ? 'green' : 'red'}>
+              {p.response === 'ACCEPTED'
+                ? t('sessions.response.going')
+                : t('sessions.response.notGoing')}
+            </Badge>
+          )}
+          {confirmed && (
+            <button
+              onClick={() => setAttendeesOpen(true)}
+              title={t('upcoming.attendeesTitle')}
+              aria-label={t('upcoming.attendeesTitle')}
+              className="inline-flex items-center gap-1 font-medium text-violet-700 hover:underline"
+            >
+              <Users size={13} /> {tally.total}
+            </button>
+          )}
         </div>
       </div>
 
@@ -113,19 +120,6 @@ export default function ParticipationCard({
           >
             <X size={16} /> {t('sessions.cantGoBtn')}
           </Button>
-        </div>
-      )}
-
-      {confirmed && (
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-violet-700">
-          <button
-            onClick={() => setAttendeesOpen(true)}
-            title={t('upcoming.attendeesTitle')}
-            aria-label={t('upcoming.attendeesTitle')}
-            className="inline-flex items-center gap-1 hover:underline"
-          >
-            <Users size={13} /> {tally.total}
-          </button>
         </div>
       )}
 
