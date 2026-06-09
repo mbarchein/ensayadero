@@ -99,11 +99,9 @@ export default function SessionsPage() {
           <Button
             variant="secondary"
             onClick={() => navigate(`/g/${groupId}/edit`)}
-            className="inline-flex items-center p-2"
-            title={t('group.editGroup')}
-            aria-label={t('group.editGroup')}
+            className="inline-flex items-center gap-1.5"
           >
-            <Pencil size={16} />
+            <Pencil size={16} /> {t('group.editGroup')}
           </Button>
         )}
       </div>
