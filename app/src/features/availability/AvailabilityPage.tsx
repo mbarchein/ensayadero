@@ -2,7 +2,7 @@
 // Paint by dragging; tap cycles NONE → AVAILABLE → PREFERRED → NONE.
 // "Repeat every week" turns the week's blocks into recurring ones.
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Trash2, Copy, Check, X, Clock, Loader2, AlertCircle } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
@@ -81,20 +81,24 @@ export default function AvailabilityPage() {
   // rehearsals I'm summoned to, overlaid on the time slots
   // of the visible week. map "day:slot" → participation.
   const agenda = useMyAgenda()
-  const sessionCells = useMemo(() => {
-    const map = new Map<string, MyParticipation>()
-    const windowEnd = addDays(monday, 7)
-    for (const p of agenda.data ?? []) {
-      const r = parseRange(p.sessions.time_range)
-      if (r.start >= windowEnd || r.end <= monday) continue
-      for (let d = 0; d < 7; d++) {
-        for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
-          if (overlaps(slotRange(monday, d, slot), r)) map.set(`${d}:${slot}`, p)
+  const buildSessionCells = useCallback(
+    (m: Date) => {
+      const map = new Map<string, MyParticipation>()
+      const windowEnd = addDays(m, 7)
+      for (const p of agenda.data ?? []) {
+        const r = parseRange(p.sessions.time_range)
+        if (r.start >= windowEnd || r.end <= m) continue
+        for (let d = 0; d < 7; d++) {
+          for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+            if (overlaps(slotRange(m, d, slot), r)) map.set(`${d}:${slot}`, p)
+          }
         }
       }
-    }
-    return map
-  }, [agenda.data, monday])
+      return map
+    },
+    [agenda.data],
+  )
+  const sessionCells = useMemo(() => buildSessionCells(monday), [buildSessionCells, monday])
 
   // confirmed rehearsals in the visible week — clearing the week wipes the
   // availability that overlaps them, so we list them in the confirm modal.
@@ -129,6 +133,20 @@ export default function AvailabilityPage() {
     () => (availabilities ? weekGrid(availabilities, monday) : null),
     [availabilities, monday],
   )
+
+  // read-only availability + rehearsal maps for the carousel's adjacent weeks,
+  // so the incoming week shows its real occupation mid-swipe
+  const adjacentWeeks = useMemo(() => {
+    const map = new Map<number, { grid: SlotState[][] | null; cells: Map<string, MyParticipation> }>()
+    for (const off of [-7, 7]) {
+      const m = addDays(monday, off)
+      map.set(m.getTime(), {
+        grid: availabilities ? weekGrid(availabilities, m) : null,
+        cells: buildSessionCells(m),
+      })
+    }
+    return map
+  }, [availabilities, buildSessionCells, monday])
   const [draft, setDraft] = useState<SlotState[][] | null>(null)
   const [paintValue, setPaintValue] = useState<SlotState>('AVAILABLE')
   const grid = draft ?? serverGrid
@@ -428,8 +446,11 @@ export default function AvailabilityPage() {
 
       <WeekGrid
         weekMonday={monday}
-        cellClass={({ day, slot }) => {
-          const ses = sessionCells.get(`${day}:${slot}`)
+        cellClass={({ day, slot }, wm) => {
+          const current = wm.getTime() === monday.getTime()
+          const week = current ? null : adjacentWeeks.get(wm.getTime())
+          const cells = current ? sessionCells : (week?.cells ?? null)
+          const ses = cells?.get(`${day}:${slot}`)
           const ring = ses
             ? ses.response === 'ACCEPTED'
               ? 'ring-2 ring-inset ring-green-500'
@@ -440,21 +461,26 @@ export default function AvailabilityPage() {
           // unsaved edits (additions and deletions): dashed outline until the
           // save confirms, then it switches to the final style
           const pending =
-            hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
+            current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
           // scheduled rehearsals: thick violet side stripe (same language as the
           // planner) while the background keeps showing my availability
           const sesMark =
             ses?.sessions.status === 'CONFIRMED' ? 'border-l-4 border-l-violet-700' : ''
-          const flash = ses && ses.session_id === flashSession ? 'cell-flash' : ''
-          return `${CELL_STYLE[grid[day][slot]]} cursor-pointer ${sesMark} ${ring} ${pending} ${flash}`
+          const flash = current && ses && ses.session_id === flashSession ? 'cell-flash' : ''
+          const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
+          return `${CELL_STYLE[state]} cursor-pointer ${sesMark} ${ring} ${pending} ${flash}`
         }}
-        renderCell={({ day, slot }, { dayView }) => {
-          const p = sessionCells.get(`${day}:${slot}`)
-          if (!p) return null
+        renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
+          const cells =
+            wm.getTime() === monday.getTime()
+              ? sessionCells
+              : adjacentWeeks.get(wm.getTime())?.cells
+          const p = cells?.get(`${day}:${slot}`)
+          if (!p || !cells) return null
           const title = `${p.sessions.title} — ${p.sessions.groups.name}`
-          const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
+          const firstSlot = !cells.get(`${day}:${slot - 1}`)
           // week view: the group avatar in every cell of the rehearsal (response
           // shown by the cell ring)
           if (!dayView) {
@@ -466,7 +492,7 @@ export default function AvailabilityPage() {
           }
           // day view: response icon + group, then the rehearsal name
           const secondSlot =
-            !firstSlot && sessionCells.get(`${day}:${slot - 1}`) === p && !sessionCells.get(`${day}:${slot - 2}`)
+            !firstSlot && cells.get(`${day}:${slot - 1}`) === p && !cells.get(`${day}:${slot - 2}`)
           if (firstSlot) {
             const RespIcon = p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
             const color =

@@ -223,7 +223,9 @@ export default function PlannerPage() {
       ) : (
         <WeekGrid
           weekMonday={monday}
-          cellClass={({ day, slot }) => {
+          cellClass={({ day, slot }, wm) => {
+            // adjacent carousel panels: neutral (heatmap data is week-bound)
+            if (wm.getTime() !== monday.getTime()) return 'bg-white'
             const selected =
               selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
             const ses = sessionCells.get(`${day}:${slot}`)
@@ -237,7 +239,8 @@ export default function PlannerPage() {
               selected ? 'ring-2 ring-inset ring-violet-600' : ''
             }`
           }}
-          renderCell={({ day, slot }) => {
+          renderCell={({ day, slot }, { weekMonday: wm }) => {
+            if (wm.getTime() !== monday.getTime()) return null
             const ses = sessionCells.get(`${day}:${slot}`)
             if (ses) {
               // first slot of the session shows its abbreviated title
