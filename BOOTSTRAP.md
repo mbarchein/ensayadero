@@ -229,19 +229,8 @@ npx web-push generate-vapid-keys
   supabase secrets set VAPID_SUBJECT=mailto:admin@yourdomain.es --project-ref <project-ref>
   ```
 
-## 8. GitHub Actions variables — automatic
+## 7b. Legal documents (Edge Function secrets)
 
-Terraform creates every GitHub Actions variable the pipeline needs, nothing to do
-by hand:
-
-- `VITE_SUPABASE_URL`, `VITE_APP_URL` — from the project + domain.
-- `VITE_SUPABASE_ANON_KEY` — read from the project via the `supabase_apikeys`
-  data source (anon key is public).
-- `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY` — created when their
-  `terraform.tfvars` values are set (steps 6b and 7).
-- `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
-  read by the wrangler deploy step so `--project-name` always matches the project
-  Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
 Legal document data (controller name, tax ID, address, contact emails) is **not**
 in the bundle — to keep it away from scrapers it's served by the `legal-info` Edge
 Function only after a server-side Turnstile check. Set it as Edge Function secrets:
@@ -262,6 +251,20 @@ Without it the gate is disabled; empty fields render as "—". The frontend uses
 `VITE_TURNSTILE_SITE_KEY` (also a TF output, `turnstile_site_key`) for the widget.
 After setting the secrets, redeploy the function (`supabase functions deploy`,
 already in CI).
+
+## 8. GitHub Actions variables — automatic
+
+Terraform creates every GitHub Actions variable the pipeline needs, nothing to do
+by hand:
+
+- `VITE_SUPABASE_URL`, `VITE_APP_URL` — from the project + domain.
+- `VITE_SUPABASE_ANON_KEY` — read from the project via the `supabase_apikeys`
+  data source (anon key is public).
+- `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY` — created when their
+  `terraform.tfvars` values are set (steps 6b and 7).
+- `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
+  read by the wrangler deploy step so `--project-name` always matches the project
+  Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
 
 ## 9. First deploy
 
