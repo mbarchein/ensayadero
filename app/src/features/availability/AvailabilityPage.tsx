@@ -45,7 +45,7 @@ export default function AvailabilityPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   // initial week: ?d=YYYY-MM-DD (from "view in my agenda"), otherwise the current one
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const initialOffset = useMemo(() => {
     const d = params.get('d')
@@ -61,6 +61,13 @@ export default function AvailabilityPage() {
   const [flashSession, setFlashSession] = useState<string | null>(() => params.get('s'))
   useEffect(() => {
     if (!flashSession) return
+    // consume the deep-link param: coming BACK to this history entry later
+    // (e.g. from the session detail) must not flash again
+    if (params.get('s')) {
+      const next = new URLSearchParams(params)
+      next.delete('s')
+      setParams(next, { replace: true })
+    }
     const scroll = setTimeout(() => {
       document.querySelector('.cell-flash')?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }, 150)
