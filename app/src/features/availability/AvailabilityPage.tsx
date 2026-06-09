@@ -351,7 +351,7 @@ export default function AvailabilityPage() {
   return (
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="flex items-center justify-between">
+      <header className="flex min-h-9 items-center justify-between">
         <h1 className="text-xl font-bold">
           {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
         </h1>
