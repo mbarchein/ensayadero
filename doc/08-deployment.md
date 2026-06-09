@@ -89,8 +89,9 @@ Not automatable by Terraform:
 7. Push to `main` → deploy.
 8. **Superadmin**: after your own login, `update profiles set
    platform_role='SUPERADMIN' where email='…'`.
-9. **Delivery cron**: `cron.schedule('process-notifications', '* * * * *', …)`
-   with `net.http_post` to the Edge Function (BOOTSTRAP §11).
+9. **Delivery cron**: created by Terraform (`infra/cron.tf`) with drift
+   detection on every plan — `cron.schedule('process-notifications',
+   '* * * * *', …)` with `net.http_post` to the Edge Function (BOOTSTRAP §11).
 10. **legal-info secrets**: set the function's secrets (`LEGAL_ENTITY`,
     `LEGAL_TAX_ID`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `CONTACT_EMAIL`, and
     `TURNSTILE_SECRET_KEY` from the `turnstile_secret_key` TF output).

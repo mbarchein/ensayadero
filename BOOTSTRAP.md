@@ -294,28 +294,36 @@ Verify at `https://app.yourdomain.es`.
    stays open; access to each group is controlled by its join code/link and email
    invitations.
 
-## 11. Schedule reminders (once, SQL editor)
+## 11. Schedule reminders (automated by Terraform)
 
 **What this is.** Notifications (session reminders, confirmations, invitations)
 are written to a queue table; the `send-notifications` Edge Function drains that
 queue and delivers them via email (Resend) and Web Push. The app calls the
 function directly for *immediate* events, but **time-based reminders only go out
-if something invokes the function periodically** — without this step, reminders
+if something invokes the function periodically** — without this job, reminders
 silently never fire.
 
 **How it works.** Supabase has no native "run this function every N minutes"
 scheduler; the standard pattern is a cron job *inside Postgres*: the `pg_cron`
 extension runs a SQL statement every minute, and that statement uses `pg_net`
-to make an HTTP POST to the Edge Function. Both extensions are already enabled
-by a migration. The *job* itself, however, can't be created by migration because
-it embeds two deployment-specific values that migrations don't know:
+to make an HTTP POST to the Edge Function. The job embeds two
+deployment-specific values: the **project URL** and the **`service_role` key**
+(the function rejects anonymous requests), which is why a plain migration can't
+create it.
 
-- the **project URL** (`<project-ref>`), and
-- the **`service_role` key**, which authorizes the call (the function rejects
-  anonymous requests).
+**Terraform creates it** (`infra/cron.tf`) — nothing to do by hand:
 
-Get both from the dashboard → **Settings → API**: *Project URL* (the ref is the
-subdomain) and the *service_role* secret. Then run, in the **SQL editor**, once:
+- `terraform apply` creates/repairs the job through a dockerized `psql`
+  (`postgres:16-alpine`) over the project's connection pooler. Docker is the
+  only local requirement.
+- **Drift detection**: every `terraform plan` re-reads the live `cron.job` row;
+  if the job was deleted or edited (e.g. from the SQL editor), the plan shows
+  `terraform_data.notifications_cron` being replaced and the next apply
+  restores it. Key rotation is also covered: the embedded `service_role` key is
+  part of the hashed definition.
+
+**Manual fallback** (non-Terraform setups, or for reference) — SQL editor, with
+`<project-ref>` and `<SERVICE_ROLE_KEY>` from dashboard → Settings → API:
 
 ```sql
 select cron.schedule(
@@ -347,12 +355,12 @@ from cron.job_run_details order by start_time desc limit 5;         -- recent ru
 
 **Maintenance:**
 
-- Re-create after changing it (e.g. key rotation):
-  `select cron.unschedule('process-notifications');` then `cron.schedule(...)` again.
 - The SQL text — **including the service key** — is stored in the `cron.job`
   table, readable by the dashboard's `postgres` role. That's the accepted
-  Supabase pattern, but treat DB access accordingly, and re-create the job
-  whenever you rotate the `service_role` key.
+  Supabase pattern, but treat DB access accordingly. After rotating the
+  `service_role` key, just `terraform apply`: the drift check spots the stale
+  key and re-creates the job (manual setups: `cron.unschedule` + `cron.schedule`
+  again).
 
 ## 12. Keep the free tier alive (optional)
 
@@ -373,4 +381,4 @@ consider upgrading to Pro ($25/month).
 - [ ] frontend `VITE_*` vars present in GH (Terraform creates them — verify)
 - [ ] push to main → green deploy
 - [ ] own login + promotion to SUPERADMIN
-- [ ] `process-notifications` cron created
+- [ ] `process-notifications` cron alive (Terraform creates it — verify per §11)

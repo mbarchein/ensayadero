@@ -54,8 +54,8 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
 ## Jobs (pg_cron)
 - `generate-reminders` (`*/15 * * * *`) → `generate_reminders()`: 24h reminders
   (avoids duplicates per session/user).
-- `process-notifications` (manual, see BOOTSTRAP §11): `net.http_post` to the
-  Edge Function `send-notifications` every minute.
+- `process-notifications` (Terraform, `infra/cron.tf` — see BOOTSTRAP §11):
+  `net.http_post` to the Edge Function `send-notifications` every minute.
 
 ## Notification types (`notifications.type`)
 `SESSION_CONFIRMED`, `SESSION_CANCELLED`, `SESSION_CHANGED`, `REMINDER`,
