@@ -3,7 +3,7 @@
 // "Repeat every week" turns the week's blocks into recurring ones.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Trash2, Copy, Check, X, Loader2, AlertCircle } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
@@ -46,6 +46,7 @@ export default function AvailabilityPage() {
   const qc = useQueryClient()
   // initial week: ?d=YYYY-MM-DD (from "view in my agenda"), otherwise the current one
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const initialOffset = useMemo(() => {
     const d = params.get('d')
     if (!d) return 0
@@ -517,6 +518,11 @@ export default function AvailabilityPage() {
         }}
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
+        onWeekCellTap={(pos) => {
+          // tap on a rehearsal in the week view opens its detail
+          const ses = sessionCells.get(`${pos.day}:${pos.slot}`)
+          if (ses) navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
+        }}
         onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
         onNextWeek={() => setWeekOffset((w) => w + 1)}
         day={editDay}

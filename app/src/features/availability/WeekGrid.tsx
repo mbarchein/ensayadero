@@ -26,6 +26,8 @@ interface Props {
   onPaintMove?: (pos: CellPos) => void
   onPaintEnd?: () => void
   onCellTap?: (pos: CellPos) => void
+  /** Tap (no swipe) on a cell in week view. */
+  onWeekCellTap?: (pos: CellPos) => void
   /** Fill the parent's height (flex child) instead of capping at 70vh. */
   fill?: boolean
   /** Horizontal swipe on the day header or the cells changes week. */
@@ -49,6 +51,7 @@ export default function WeekGrid({
   onPaintMove,
   onPaintEnd,
   onCellTap,
+  onWeekCellTap,
   fill = false,
   onPrevWeek,
   onNextWeek,
@@ -203,6 +206,16 @@ export default function WeekGrid({
         if (dx <= -th) finishSwipe('next')
         else if (dx >= th) finishSwipe('prev')
         else snapBack()
+      } else if (weekSwipeRef.current === 'pending' && weekStartRef.current) {
+        // no swipe, no scroll → a tap on a cell
+        const moved = Math.hypot(
+          e.clientX - weekStartRef.current.x,
+          e.clientY - weekStartRef.current.y,
+        )
+        if (moved < MOVE_THRESHOLD && onWeekCellTap) {
+          const pos = posFromEvent(e)
+          if (pos) onWeekCellTap(pos)
+        }
       }
       weekSwipeRef.current = 'idle'
       weekStartRef.current = null
