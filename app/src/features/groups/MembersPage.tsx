@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { LogOut, UserCog, UserMinus, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import { roleLabel } from '../../lib/roleLabel'
@@ -22,6 +22,8 @@ export default function MembersPage() {
   const [leaveOpen, setLeaveOpen] = useState(false)
   const [leaveText, setLeaveText] = useState('')
   const [successor, setSuccessor] = useState<string | null>(null)
+  // per-invitation resend feedback: id → ok/error (cleared after a few seconds)
+  const [resendState, setResendState] = useState<Record<string, 'ok' | 'error'>>({})
 
   // leaving as the only director with other members left → a successor must be
   // chosen in the leave modal (one is preselected at random)
@@ -44,6 +46,35 @@ export default function MembersPage() {
       return data as Invitation[]
     },
     enabled: isInstructor,
+  })
+
+  const flashResend = (id: string, state: 'ok' | 'error') => {
+    setResendState((s) => ({ ...s, [id]: state }))
+    setTimeout(
+      () => setResendState(({ [id]: _, ...rest }) => rest),
+      4000,
+    )
+  }
+
+  // manual re-delivery of the invitation email; unlike the best-effort send on
+  // creation, failures are surfaced to the user
+  const resendInvite = useMutation({
+    mutationFn: async (inv: Invitation) => {
+      const { error } = await supabase.functions.invoke('send-notifications', {
+        body: { invitation_id: inv.id },
+      })
+      if (error) throw error
+    },
+    onSuccess: (_, inv) => flashResend(inv.id, 'ok'),
+    onError: (_, inv) => flashResend(inv.id, 'error'),
+  })
+
+  const deleteInvite = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('invitations').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['invitations', groupId] }),
   })
 
   const leaveGroup = useMutation({
@@ -155,12 +186,45 @@ export default function MembersPage() {
           <h2 className="mb-2 font-semibold">{t('group.pendingInvites')}</h2>
           <ul className="space-y-1 text-sm text-gray-600">
             {invitations!.map((i) => (
-              <li key={i.id} className="flex justify-between rounded-lg bg-gray-50 px-3 py-2">
-                <span>
-                  {i.email} <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
+              <li key={i.id} className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2">
+                <span className="min-w-0">
+                  <span className="break-all">{i.email}</span>{' '}
+                  <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
                 </span>
-                <span className="text-xs">
-                  {t('group.expires', { date: new Date(i.expires_at).toLocaleDateString() })}
+                <span className="flex shrink-0 items-center gap-1">
+                  <span className="text-xs">
+                    {t('group.expires', { date: new Date(i.expires_at).toLocaleDateString() })}
+                  </span>
+                  {resendState[i.id] === 'ok' ? (
+                    <Check size={16} className="mx-1.5 text-green-600" aria-label={t('invite.resendOk')} />
+                  ) : resendState[i.id] === 'error' ? (
+                    <AlertCircle size={16} className="mx-1.5 text-red-600" aria-label={t('invite.resendError')} />
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      className="p-1.5"
+                      title={t('invite.resendEmail')}
+                      aria-label={t('invite.resendEmail')}
+                      disabled={resendInvite.isPending}
+                      onClick={() => resendInvite.mutate(i)}
+                    >
+                      {resendInvite.isPending && resendInvite.variables?.id === i.id ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Mail size={16} />
+                      )}
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    className="p-1.5 text-red-600"
+                    title={t('invite.deleteInvite')}
+                    aria-label={t('invite.deleteInvite')}
+                    disabled={deleteInvite.isPending}
+                    onClick={() => deleteInvite.mutate(i.id)}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
                 </span>
               </li>
             ))}
