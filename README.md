@@ -58,8 +58,9 @@ make help         # remaining commands
 Demo users: `admin@local.test` (superadmin), `directora@local.test` (instructor),
 `actor1..3@local.test`. The UI offers email/password sign-in, Google, and Facebook;
 sign in locally with the demo password (`password123`). You can enable real Google
-locally via `.env` (see `.env.example`). Activation and recovery emails are caught by
-mailpit at http://localhost:54324.
+locally via `.env` (see `.env.example`). **All** local emails (auth activation /
+recovery and the transactional notifications) are caught by mailpit at
+http://localhost:54324.
 
 ## Infra provisioning (Terraform)
 

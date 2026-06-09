@@ -32,7 +32,7 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
   pending (⬜).
 - 🟡 FR12. Slot suggestion: `fullCoverageRanges()` exists in lib; no dedicated UI
   (the heatmap already highlights coverage).
-- ✅ FR13. Create session: title, scene, location, start/end time (drag),
+- ✅ FR13. Create session: comments, location, start/end time (drag),
   required/optional per person.
 - ✅ FR14. Warning if the time falls outside a required person's availability
   (red) or optional (amber); confirmation.

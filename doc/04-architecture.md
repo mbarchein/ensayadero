@@ -32,7 +32,7 @@
 | Jobs | pg_cron (reminders) → pg_net → Edge Function |
 | Email | Resend (Edge Function) |
 | Push | Standard Web Push (VAPID), no Firebase |
-| Avatars | DiceBear "shapes" (client) |
+| Avatars | DiceBear "shapes" (client) or uploaded square-cropped image (data URL in `groups.avatar_image`; emails fall back to DiceBear's HTTP API) |
 | QR | qrcode (client) |
 | Infra | Managed: Terraform + Cloudflare Pages + GitHub Actions. Self-hosted: Docker Swarm (`docker-stack.yml`) |
 
@@ -40,12 +40,13 @@
 
 ```
 profiles(id↔auth.users, email, name, phone, gender F|M, avatar_url, platform_role)
-groups(id, name, archived_at, created_by, join_code, join_enabled, avatar_seed)
+groups(id, name, archived_at, created_by, join_code, join_enabled, avatar_seed,
+       avatar_image)
 memberships(user_id, group_id, role INSTRUCTOR|ACTOR)            PK(user,group)
 invitations(id, group_id, email, role, token, expires_at, accepted_at, created_by)
 availabilities(id, user_id, time_range tstzrange, kind, rrule, exception_dates[])
 subgroups(id, group_id, name) · subgroup_members(subgroup_id, user_id)
-sessions(id, group_id, title, scene, location, time_range tstzrange,
+sessions(id, group_id, short_code, comments, location, time_range tstzrange,
          status DRAFT|CONFIRMED|CANCELLED, created_by, updated_at)
 session_participants(session_id, user_id, required, response)    PK(session,user)
 session_archives(user_id, session_id, archived_at)               PK(user,session)
@@ -104,8 +105,9 @@ role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
    via `MAILPIT_URL`) and Web Push (VAPID) per `notification_preferences`, and
    stamps `sent_email_at`/`sent_push_at`. Emails share a branded mobile-first
    layout (logo, name, ignore-notice footer) in the user's language
-   (`user_metadata.lang`); REMINDER emails render the full rehearsal card
-   (group avatar/name, time, location, scene, summoned participants).
+   (`user_metadata.lang`); subjects label sessions as "group · short date/time"
+   (sessions have no title). REMINDER emails render the full rehearsal card
+   (group avatar/name, time, location, comments, summoned participants).
 
 ## Edge Functions
 - `send-notifications` — delivers email + Web Push (above).
