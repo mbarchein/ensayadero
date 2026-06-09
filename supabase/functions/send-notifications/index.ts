@@ -44,6 +44,9 @@ const T: Record<Lang, Record<string, string>> = {
     prevPlace: 'Lugar anterior',
     optional: 'Tu asistencia es <strong>opcional</strong>.',
     cta: 'Confirmar asistencia',
+    scene: 'Escena',
+    attendees: 'Convocados',
+    optionalTag: 'opcional',
     footer:
       'Recibes este correo porque formas parte de un grupo en Ensayadero. Si no esperabas este aviso, puedes ignorarlo.',
   },
@@ -60,6 +63,9 @@ const T: Record<Lang, Record<string, string>> = {
     prevPlace: 'Previous location',
     optional: 'Your attendance is <strong>optional</strong>.',
     cta: 'Confirm attendance',
+    scene: 'Scene',
+    attendees: 'Summoned',
+    optionalTag: 'optional',
     footer:
       'You receive this email because you belong to a group on Ensayadero. If you were not expecting this notice, you can ignore it.',
   },
@@ -127,6 +133,64 @@ function emailBody(type: string, p: Record<string, unknown>, lang: Lang): string
       : '',
   ]
   return lines.filter(Boolean).join('\n')
+}
+
+function fmtTime(iso: unknown): string {
+  if (!iso) return ''
+  return new Date(String(iso)).toLocaleTimeString('es-ES', {
+    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
+  })
+}
+
+// Full rehearsal card for REMINDER emails: group avatar + name, session details
+// and the list of summoned participants. Falls back to the generic body when
+// the session no longer exists.
+async function reminderBody(p: Record<string, unknown>, lang: Lang): Promise<string | null> {
+  const { data: s } = await supabase
+    .from('sessions')
+    .select('title, scene, location, group_id, groups(name, avatar_seed), session_participants(required, profiles(name))')
+    .eq('id', p.session_id)
+    .single()
+  if (!s) return null
+  const t = T[lang]
+  const group = s.groups as unknown as { name: string; avatar_seed: string | null }
+  // Same DiceBear style/version as the GroupAvatar component, via their image API.
+  const avatar = `https://api.dicebear.com/9.x/shapes/png?seed=${encodeURIComponent(group?.avatar_seed || String(s.group_id))}&size=96&radius=20`
+  const when = `${fmtDate(p.starts_at, lang)}${p.ends_at ? ` – ${fmtTime(p.ends_at)}` : ''}`
+  const participants = (s.session_participants as unknown as {
+    required: boolean
+    profiles: { name: string } | null
+  }[])
+    .filter((sp) => sp.profiles?.name)
+    .sort((a, b) => Number(b.required) - Number(a.required))
+  const chips = participants
+    .map(
+      (sp) =>
+        `<span style="display:inline-block;background:#f5f3ff;color:#5b21b6;font-size:13px;padding:4px 10px;border-radius:999px;margin:0 4px 6px 0">${sp.profiles!.name}${sp.required ? '' : ` · ${t.optionalTag}`}</span>`,
+    )
+    .join('')
+  return [
+    `<table role="presentation" width="100%" style="border-collapse:collapse;margin:0 0 16px"><tr>
+       <td width="48" style="vertical-align:middle"><img src="${avatar}" width="48" height="48" alt="" style="border-radius:11px;display:block"></td>
+       <td style="vertical-align:middle;padding-left:12px">
+         <p style="color:#7c3aed;font-size:13px;font-weight:600;margin:0">${group?.name ?? ''}</p>
+         <h2 style="color:#1f2937;font-size:18px;margin:2px 0 0">${s.title}</h2>
+       </td>
+     </tr></table>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.when}:</strong> ${when}</p>`,
+    s.location
+      ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.where}:</strong> ${s.location}</p>`
+      : '',
+    s.scene
+      ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.scene}:</strong> ${s.scene}</p>`
+      : '',
+    participants.length
+      ? `<p style="color:#4b5563;font-size:15px;margin:12px 0 6px"><strong>${t.attendees}</strong> (${participants.length}):</p><p style="margin:0;line-height:1.8">${chips}</p>`
+      : '',
+    `<p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">${t.cta}</a></p>`,
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 // Per-run cache of user language (auth admin lookup per user).
@@ -253,7 +317,10 @@ Deno.serve(async (req) => {
 
     if (!n.sent_email_at) {
       if (channel === 'EMAIL' || channel === 'BOTH') {
-        if (await sendEmail(profile.email, subject, layout(emailBody(n.type, payload, lang), lang))) emails++
+        const inner =
+          (n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
+          emailBody(n.type, payload, lang)
+        if (await sendEmail(profile.email, subject, layout(inner, lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
     }
