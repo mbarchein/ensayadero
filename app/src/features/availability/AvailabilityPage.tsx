@@ -485,7 +485,7 @@ export default function AvailabilityPage() {
               : adjacentWeeks.get(wm.getTime())?.cells
           const p = cells?.get(`${day}:${slot}`)
           if (!p || !cells) return null
-          const title = `${p.sessions.title} — ${p.sessions.groups.name}`
+          const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
           // week view: avatar against the side stripe + group initials
           // (response shown by the stripe color)
           if (!dayView) {
@@ -546,7 +546,7 @@ export default function AvailabilityPage() {
                   const r = parseRange(p.sessions.time_range)
                   return (
                     <li key={p.session_id}>
-                      {p.sessions.title} — {format(r.start, 'EEE d · HH:mm', { locale: dateLocale() })}
+                      {p.sessions.groups.name} — {format(r.start, 'EEE d · HH:mm', { locale: dateLocale() })}
                     </li>
                   )
                 })}
@@ -623,7 +623,7 @@ export default function AvailabilityPage() {
               const r = parseRange(p.sessions.time_range)
               return (
                 <li key={sid} className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
-                  <p className="font-medium text-indigo-900">{p.sessions.title}</p>
+                  <p className="font-medium text-indigo-900">{p.sessions.groups.name}</p>
                   <p className="text-xs text-indigo-700">
                     {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
                   </p>

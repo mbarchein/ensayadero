@@ -25,6 +25,7 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
 | `…20260609000000_session_short_code` | `sessions.short_code` (unique 6-char base62) for `/s/<code>` share links; insert trigger (`security definer` so the uniqueness probe sees all rows under RLS) + collision-safe backfill. |
 | `…20260609000001_group_avatar_image` | `groups.avatar_image` (cropped square uploaded avatar as inline data URL, <100KB check; NULL → generated avatar); `update_group_meta` gains a `new_image` param. |
 | `…20260609000002_leave_group_director_handoff` | After-delete trigger on `memberships`: if a group keeps members but no INSTRUCTOR, one is promoted at random (safety net; the UI asks the leaving director to pick a successor). |
+| `…20260610000000_drop_title_rename_scene` | Drops `sessions.title` (label = group + date/time everywhere) and renames `scene` → `comments`; notification payload builders rebuilt without `title`. |
 
 ## Helper functions (RLS)
 `is_superadmin(uid)`, `is_member(uid, gid)`, `is_instructor(uid, gid)` —
@@ -58,6 +59,6 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
 
 ## Notification types (`notifications.type`)
 `SESSION_CONFIRMED`, `SESSION_CANCELLED`, `SESSION_CHANGED`, `REMINDER`,
-`INVITATION`. The jsonb `payload` carries `session_id`, `title`, `location`,
+`INVITATION`. The jsonb `payload` carries `session_id`, `location`,
 `starts_at`, `ends_at`, `required`, and for changes `old_starts_at`/`old_location`
 (present only if that field changed → distinguishes time/location/both).

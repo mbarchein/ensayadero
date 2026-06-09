@@ -70,8 +70,7 @@ export interface Session {
   id: string
   group_id: string
   short_code: string
-  title: string
-  scene: string | null
+  comments: string | null
   location: string | null
   time_range: string
   status: SessionStatus

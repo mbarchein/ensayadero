@@ -242,7 +242,6 @@
       "pending": "Pendiente"
     },
     "backToSessions": "‹ Ensayos",
-    "scene": "Escena: {{scene}}",
     "yourAttendance": {
       "required": "Tu asistencia es obligatoria.",
       "optional": "Tu asistencia es opcional."
@@ -263,8 +262,9 @@
     "editBtn": "Editar ensayo",
     "share": "Compartir",
     "shareCopied": "✓ Copiado",
-    "shareText": "Ensayo: {{title}}",
-    "shortLinkNotFound": "Este enlace de ensayo no existe o no perteneces al grupo."
+    "shareText": "Ensayo de {{group}}",
+    "shortLinkNotFound": "Este enlace de ensayo no existe o no perteneces al grupo.",
+    "comments": "Comentarios: {{comments}}"
   },
   "planner": {
     "title": "Programar ensayo",
@@ -286,10 +286,7 @@
     "cancelSession": "Cancelar ensayo",
     "cancelConfirm": "¿Cancelar este ensayo? Se notificará a todos los convocados.",
     "deleteDraftConfirm": "¿Eliminar este borrador?",
-    "sessionTitle": "Título",
     "defaultTitle": "Ensayo",
-    "sceneField": "Escena (opcional)",
-    "scenePlaceholder": "Acto II, esc. 3",
     "locationField": "Lugar (opcional)",
     "locationPlaceholder": "Sala 2",
     "startTime": "Hora inicio",
@@ -306,19 +303,21 @@
     "requiredOutsideConfirm": "Atención: {{names}} (obligatorios) NO tienen disponibilidad en esta franja. ¿Crear igualmente?",
     "saveDraft": "Guardar borrador",
     "confirmAndNotify": "Confirmar y notificar",
-    "creating": "Creando…"
+    "creating": "Creando…",
+    "commentsField": "Comentarios (opcional)",
+    "commentsPlaceholder": "Acto II, esc. 3"
   },
   "notifications": {
     "title": "Avisos",
     "markRead": "Marcar leídos",
     "empty": "No tienes avisos.",
     "types": {
-      "SESSION_CONFIRMED": "Ensayo confirmado: {{title}}",
-      "SESSION_CANCELLED": "Ensayo cancelado: {{title}}",
-      "SESSION_CHANGED": "Cambio de hora: {{title}}",
-      "SESSION_CHANGED_LOCATION": "Cambio de lugar: {{title}}",
-      "SESSION_CHANGED_BOTH": "Cambio de hora y lugar: {{title}}",
-      "REMINDER": "Recordatorio: {{title}}"
+      "SESSION_CONFIRMED": "Ensayo confirmado",
+      "SESSION_CANCELLED": "Ensayo cancelado",
+      "SESSION_CHANGED": "Cambio de hora",
+      "SESSION_CHANGED_LOCATION": "Cambio de lugar",
+      "SESSION_CHANGED_BOTH": "Cambio de hora y lugar",
+      "REMINDER": "Recordatorio"
     }
   },
   "profile": {

@@ -84,7 +84,6 @@ export default function NotificationsPage() {
           {notifications?.map((n) => {
             const meta = TYPE_ICON[n.type]
             const Icon = meta?.Icon ?? Bell
-            const title = String(n.payload.title ?? '')
             let typeKey = n.type
             if (n.type === 'SESSION_CHANGED') {
               // distinguish time / place / both based on the payload
@@ -96,7 +95,7 @@ export default function NotificationsPage() {
                   ? 'SESSION_CHANGED_LOCATION'
                   : 'SESSION_CHANGED'
             }
-            const label = meta ? t(`notifications.types.${typeKey}`, { title }) : n.type
+            const label = meta ? t(`notifications.types.${typeKey}`) : n.type
             const starts = n.payload.starts_at ? new Date(String(n.payload.starts_at)) : null
             const inner = (
               <div

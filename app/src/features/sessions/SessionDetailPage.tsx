@@ -161,14 +161,14 @@ export default function SessionDetailPage() {
     setShareError(null)
     const when = `${format(r.start, 'EEEE d MMMM, HH:mm', { locale: dateLocale() })}–${format(r.end, 'HH:mm')}`
     const lines = [
-      t('sessions.shareText', { title: session.title }),
+      t('sessions.shareText', { group: group?.name ?? '' }),
       when,
       session.location || null,
     ].filter(Boolean) as string[]
     const text = lines.join('\n')
     if (navigator.share) {
       try {
-        await navigator.share({ title: session.title, text, url: shareUrl })
+        await navigator.share({ title: group?.name ?? '', text, url: shareUrl })
       } catch {
         /* cancelled by the user */
       }
@@ -193,17 +193,18 @@ export default function SessionDetailPage() {
 
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">{session.title}</h2>
+          <h2 className="text-lg font-semibold">
+            {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
+          </h2>
           {session.status !== 'CONFIRMED' && (
             <Badge color={session.status === 'CANCELLED' ? 'red' : 'gray'}>
               {t(`sessions.status.${session.status}`)}
             </Badge>
           )}
         </div>
-        <p className="text-gray-700">
-          {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-        </p>
-        {session.scene && <p className="text-sm text-gray-600">{t('sessions.scene', { scene: session.scene })}</p>}
+        {session.comments && (
+          <p className="text-sm text-gray-600">{t('sessions.comments', { comments: session.comments })}</p>
+        )}
         {session.location && (
           <p className="flex items-center gap-1 text-sm text-gray-600">
             <MapPin size={14} /> {session.location}

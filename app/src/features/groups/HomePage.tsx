@@ -98,7 +98,6 @@ export default function HomePage() {
             {pending!.map((p) => (
               <li key={p.session_id}>
                 <Link to={`/g/${p.sessions.group_id}/sessions/${p.session_id}`} className="text-amber-800 underline">
-                  {p.sessions.title} —{' '}
                   {format(parseRange(p.sessions.time_range).start, "EEE d MMM, HH:mm", { locale: dateLocale() })}
                 </Link>
               </li>

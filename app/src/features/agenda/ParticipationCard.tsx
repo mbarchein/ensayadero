@@ -50,7 +50,6 @@ export default function ParticipationCard({
             <GroupAvatar seed={s.groups.avatar_seed || s.group_id} image={s.groups.avatar_image} size={40} />
             <span className="truncate text-base font-semibold">{s.groups.name}</span>
           </div>
-          <p className="truncate text-sm text-gray-700">{s.title}</p>
           <p className="flex items-center gap-1 text-sm text-gray-600">
             <span>
               {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}

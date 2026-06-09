@@ -242,7 +242,6 @@
       "pending": "Pending"
     },
     "backToSessions": "‹ Rehearsals",
-    "scene": "Scene: {{scene}}",
     "yourAttendance": {
       "required": "Your attendance is required.",
       "optional": "Your attendance is optional."
@@ -263,8 +262,9 @@
     "editBtn": "Edit rehearsal",
     "share": "Share",
     "shareCopied": "✓ Copied",
-    "shareText": "Rehearsal: {{title}}",
-    "shortLinkNotFound": "This rehearsal link does not exist or you are not a member of the group."
+    "shareText": "Rehearsal of {{group}}",
+    "shortLinkNotFound": "This rehearsal link does not exist or you are not a member of the group.",
+    "comments": "Comments: {{comments}}"
   },
   "planner": {
     "title": "Plan rehearsal",
@@ -286,10 +286,7 @@
     "cancelSession": "Cancel rehearsal",
     "cancelConfirm": "Cancel this rehearsal? All convened people will be notified.",
     "deleteDraftConfirm": "Delete this draft?",
-    "sessionTitle": "Title",
     "defaultTitle": "Rehearsal",
-    "sceneField": "Scene (optional)",
-    "scenePlaceholder": "Act II, sc. 3",
     "locationField": "Location (optional)",
     "locationPlaceholder": "Room 2",
     "startTime": "Start time",
@@ -306,19 +303,21 @@
     "requiredOutsideConfirm": "Warning: {{names}} (required) have NO availability in this slot. Create anyway?",
     "saveDraft": "Save draft",
     "confirmAndNotify": "Confirm and notify",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "commentsField": "Comments (optional)",
+    "commentsPlaceholder": "Act II, sc. 3"
   },
   "notifications": {
     "title": "Alerts",
     "markRead": "Mark as read",
     "empty": "No alerts.",
     "types": {
-      "SESSION_CONFIRMED": "Rehearsal confirmed: {{title}}",
-      "SESSION_CANCELLED": "Rehearsal cancelled: {{title}}",
-      "SESSION_CHANGED": "Time change: {{title}}",
-      "SESSION_CHANGED_LOCATION": "Location change: {{title}}",
-      "SESSION_CHANGED_BOTH": "Time and location change: {{title}}",
-      "REMINDER": "Reminder: {{title}}"
+      "SESSION_CONFIRMED": "Rehearsal confirmed",
+      "SESSION_CANCELLED": "Rehearsal cancelled",
+      "SESSION_CHANGED": "Time change",
+      "SESSION_CHANGED_LOCATION": "Location change",
+      "SESSION_CHANGED_BOTH": "Time and location change",
+      "REMINDER": "Reminder"
     }
   },
   "profile": {

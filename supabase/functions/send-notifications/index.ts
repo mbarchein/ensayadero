@@ -44,7 +44,7 @@ const T: Record<Lang, Record<string, string>> = {
     prevPlace: 'Lugar anterior',
     optional: 'Tu asistencia es <strong>opcional</strong>.',
     cta: 'Confirmar asistencia',
-    scene: 'Escena',
+    comments: 'Comentarios',
     attendees: 'Convocados',
     optionalTag: 'opcional',
     footer:
@@ -63,7 +63,7 @@ const T: Record<Lang, Record<string, string>> = {
     prevPlace: 'Previous location',
     optional: 'Your attendance is <strong>optional</strong>.',
     cta: 'Confirm attendance',
-    scene: 'Scene',
+    comments: 'Comments',
     attendees: 'Summoned',
     optionalTag: 'optional',
     footer:
@@ -71,16 +71,28 @@ const T: Record<Lang, Record<string, string>> = {
   },
 }
 
-const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang) => string> = {
-  SESSION_CONFIRMED: (p, l) => `✅ ${T[l].confirmed}: ${p.title}`,
-  SESSION_CANCELLED: (p, l) => `❌ ${T[l].cancelled}: ${p.title}`,
-  SESSION_CHANGED: (p, l) => {
+// Sessions have no title: the label is "<group> · <short date/time>".
+function sessionLabel(p: Record<string, unknown>, lang: Lang, group?: string): string {
+  const en = lang === 'en'
+  const when = p.starts_at
+    ? new Date(String(p.starts_at)).toLocaleString(en ? 'en-US' : 'es-ES', {
+        weekday: 'short', day: 'numeric', month: 'short',
+        hour: en ? 'numeric' : '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
+      })
+    : ''
+  return [group, when].filter(Boolean).join(' · ')
+}
+
+const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: string) => string> = {
+  SESSION_CONFIRMED: (p, l, g) => `✅ ${T[l].confirmed}: ${sessionLabel(p, l, g)}`,
+  SESSION_CANCELLED: (p, l, g) => `❌ ${T[l].cancelled}: ${sessionLabel(p, l, g)}`,
+  SESSION_CHANGED: (p, l, g) => {
     const time = !!p.old_starts_at
     const loc = !!p.old_location
     const what = loc && time ? T[l].timePlaceChange : loc ? T[l].placeChange : T[l].timeChange
-    return `🕐 ${what}: ${p.title}`
+    return `🕐 ${what}: ${sessionLabel(p, l, g)}`
   },
-  REMINDER: (p, l) => `⏰ ${T[l].reminder}: ${p.title}`,
+  REMINDER: (p, l, g) => `⏰ ${T[l].reminder}: ${sessionLabel(p, l, g)}`,
 }
 
 function fmtDate(iso: unknown, lang: Lang = 'es'): string {
@@ -115,11 +127,11 @@ function layout(inner: string, lang: Lang): string {
 </html>`
 }
 
-function emailBody(type: string, p: Record<string, unknown>, lang: Lang): string {
+function emailBody(type: string, p: Record<string, unknown>, lang: Lang, group?: string): string {
   const t = T[lang]
   const when = fmtDate(p.starts_at, lang)
   const lines = [
-    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">${SUBJECTS[type]?.(p, lang) ?? type}</h2>`,
+    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">${SUBJECTS[type]?.(p, lang, group) ?? type}</h2>`,
     `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.when}:</strong> ${when}</p>`,
     p.location
       ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.where}:</strong> ${p.location}</p>`
@@ -152,7 +164,7 @@ function fmtTime(iso: unknown, lang: Lang = 'es'): string {
 async function reminderBody(p: Record<string, unknown>, lang: Lang): Promise<string | null> {
   const { data: s } = await supabase
     .from('sessions')
-    .select('title, scene, location, group_id, groups(name, avatar_seed), session_participants(required, profiles(name))')
+    .select('comments, location, group_id, groups(name, avatar_seed), session_participants(required, profiles(name))')
     .eq('id', p.session_id)
     .single()
   if (!s) return null
@@ -177,16 +189,16 @@ async function reminderBody(p: Record<string, unknown>, lang: Lang): Promise<str
     `<table role="presentation" width="100%" style="border-collapse:collapse;margin:0 0 16px"><tr>
        <td width="48" style="vertical-align:middle"><img src="${avatar}" width="48" height="48" alt="" style="border-radius:11px;display:block"></td>
        <td style="vertical-align:middle;padding-left:12px">
-         <p style="color:#7c3aed;font-size:13px;font-weight:600;margin:0">${group?.name ?? ''}</p>
-         <h2 style="color:#1f2937;font-size:18px;margin:2px 0 0">${s.title}</h2>
+         <p style="color:#7c3aed;font-size:13px;font-weight:600;margin:0">${t.reminder}</p>
+         <h2 style="color:#1f2937;font-size:18px;margin:2px 0 0">${group?.name ?? ''}</h2>
        </td>
      </tr></table>`,
     `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.when}:</strong> ${when}</p>`,
     s.location
       ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.where}:</strong> ${s.location}</p>`
       : '',
-    s.scene
-      ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.scene}:</strong> ${s.scene}</p>`
+    s.comments
+      ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.comments}:</strong> ${s.comments}</p>`
       : '',
     participants.length
       ? `<p style="color:#4b5563;font-size:15px;margin:12px 0 6px"><strong>${t.attendees}</strong> (${participants.length}):</p><p style="margin:0;line-height:1.8">${chips}</p>`
@@ -295,7 +307,7 @@ Deno.serve(async (req) => {
   langCache.clear() // metadata may change between runs
   const { data: pending, error } = await supabase
     .from('notifications')
-    .select('id, user_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name)')
+    .select('id, user_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name), groups(name)')
     .or('sent_email_at.is.null,sent_push_at.is.null')
     .limit(50)
 
@@ -306,7 +318,8 @@ Deno.serve(async (req) => {
   for (const n of pending ?? []) {
     const payload = n.payload as Record<string, unknown>
     const lang = await userLang(n.user_id)
-    const subject = SUBJECTS[n.type]?.(payload, lang) ?? n.type
+    const groupName = (n.groups as unknown as { name: string } | null)?.name
+    const subject = SUBJECTS[n.type]?.(payload, lang, groupName) ?? n.type
     const profile = n.profiles as unknown as { email: string; name: string }
     const updates: Record<string, string> = {}
 
@@ -323,7 +336,7 @@ Deno.serve(async (req) => {
       if (channel === 'EMAIL' || channel === 'BOTH') {
         const inner =
           (n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
-          emailBody(n.type, payload, lang)
+          emailBody(n.type, payload, lang, groupName)
         if (await sendEmail(profile.email, subject, layout(inner, lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it

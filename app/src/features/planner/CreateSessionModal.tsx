@@ -25,7 +25,6 @@ interface Props {
   grid: HeatCell[][]
   weekMonday: Date
   onClose: () => void
-  groupName?: string
   /** If provided, the modal edits that session instead of creating a new one. */
   session?: SessionWithParticipants
 }
@@ -44,7 +43,6 @@ export default function CreateSessionModal({
   grid,
   weekMonday,
   onClose,
-  groupName,
   session,
 }: Props) {
   const { t } = useTranslation()
@@ -54,12 +52,7 @@ export default function CreateSessionModal({
   // full-screen form: the device back button closes it like a page
   useBackClose(true, onClose)
   const editing = !!session
-  // default title: "<group> d-MMM" (e.g. "La Tempestad 7-jun")
-  const defaultTitle = `${groupName ? `${groupName} ` : ''}${format(initialRange.start, 'd', {
-    locale: dateLocale(),
-  })}-${format(initialRange.start, 'MMM', { locale: dateLocale() })}`
-  const [title, setTitle] = useState(() => session?.title ?? defaultTitle)
-  const [scene, setScene] = useState(session?.scene ?? '')
+  const [comments, setComments] = useState(session?.comments ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
   const [startMin, setStartMin] = useState(minutesOfDay(initialRange.start))
   // initial duration = session length / dragged slot range (min. 30 min)
@@ -179,8 +172,7 @@ export default function CreateSessionModal({
         const { error } = await supabase
           .from('sessions')
           .update({
-            title,
-            scene: scene || null,
+            comments: comments || null,
             location: location || null,
             time_range: formatRange(start, end),
             status, // keeps or promotes to CONFIRMED
@@ -198,8 +190,7 @@ export default function CreateSessionModal({
         .from('sessions')
         .insert({
           group_id: groupId,
-          title,
-          scene: scene || null,
+          comments: comments || null,
           location: location || null,
           time_range: formatRange(start, end),
           status: 'DRAFT', // always born DRAFT; confirming triggers notifications to already-inserted participants
@@ -293,24 +284,14 @@ export default function CreateSessionModal({
           {!isSameDay(day, start) && ' ⚠️'}
         </p>
 
-        <label className="block text-sm">
-          {t('planner.sessionTitle')}
-          <input
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2"
-          />
-        </label>
-
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm">
-            {t('planner.sceneField')}
+            {t('planner.commentsField')}
             <input
-              value={scene}
-              onChange={(e) => setScene(e.target.value)}
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
-              placeholder={t('planner.scenePlaceholder')}
+              placeholder={t('planner.commentsPlaceholder')}
             />
           </label>
           <label className="block text-sm">

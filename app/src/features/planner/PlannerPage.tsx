@@ -20,7 +20,7 @@ import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
-  const { groupId, group, members, isInstructor, loading } = useGroup()
+  const { groupId, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
   const { profile } = useAuth()
   const [params, setParams] = useSearchParams()
@@ -209,7 +209,6 @@ export default function PlannerPage() {
         }}
         grid={grid}
         weekMonday={monday}
-        groupName={group?.name}
         onClose={() => {
           setCreateOpen(false)
           setSel(null)
@@ -320,9 +319,8 @@ export default function PlannerPage() {
               return firstSlot ? (
                 <span
                   className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-violet-900"
-                  title={ses.title}
                 >
-                  {ses.title}
+                  {format(parseRange(ses.time_range).start, 'HH:mm', { locale: dateLocale() })}
                 </span>
               ) : null
             }

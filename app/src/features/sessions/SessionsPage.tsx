@@ -173,11 +173,10 @@ function SessionCard({
       >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="font-medium">{s.title}</p>
-            <p className="text-sm text-gray-600">
+            <p className="font-medium">
               {format(r.start, "EEEE d MMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-              {s.location && ` · ${s.location}`}
             </p>
+            {s.location && <p className="text-sm text-gray-600">{s.location}</p>}
           </div>
           <div className="flex flex-col items-end gap-1">
             {s.status !== 'CONFIRMED' && (
