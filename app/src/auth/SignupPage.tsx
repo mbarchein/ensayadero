@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 import Turnstile, { captchaEnabled } from './Turnstile'
 
 export default function SignupPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,7 +28,8 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: name },
+        // lang drives the language of auth + notification emails
+        data: { full_name: name, lang: i18n.language?.startsWith('en') ? 'en' : 'es' },
         emailRedirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback`,
         captchaToken: captchaToken ?? undefined,
       },

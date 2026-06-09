@@ -1,0 +1,32 @@
+<!-- GoTrue password recovery email (Go template, bilingual via user_metadata.lang). -->
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f5f3ff;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <div style="max-width:440px;margin:0 auto;padding:24px 16px">
+    <div style="text-align:center;padding:8px 0 16px">
+      <img src="{{ .SiteURL }}/icons/icon-192.png" width="64" height="64" alt="Ensayadero" style="border-radius:16px">
+      <h1 style="color:#5b21b6;font-size:20px;margin:8px 0 0">Ensayadero</h1>
+    </div>
+    <div style="background:#ffffff;border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+      {{ if eq (printf "%v" .Data.lang) "en" }}
+      <h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Reset your password</h2>
+      <p style="color:#4b5563;font-size:15px;line-height:1.5;margin:0 0 24px">Tap the button to choose a new password for <strong>{{ .Email }}</strong>.</p>
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Choose new password</a>
+      <p style="color:#9ca3af;font-size:13px;margin:20px 0 0">The link expires in 15 minutes and can be used once.</p>
+      {{ else }}
+      <h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Restablece tu contraseña</h2>
+      <p style="color:#4b5563;font-size:15px;line-height:1.5;margin:0 0 24px">Pulsa el botón para elegir una contraseña nueva para <strong>{{ .Email }}</strong>.</p>
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Elegir contraseña nueva</a>
+      <p style="color:#9ca3af;font-size:13px;margin:20px 0 0">El enlace caduca en 15 minutos y es de un solo uso.</p>
+      {{ end }}
+    </div>
+    <p style="color:#9ca3af;font-size:12px;text-align:center;line-height:1.5;margin:16px 8px">
+      {{ if eq (printf "%v" .Data.lang) "en" }}
+      If you didn't request this change, ignore this email — your password will stay the same.
+      {{ else }}
+      Si no has pedido este cambio, ignora este correo: tu contraseña seguirá siendo la misma.
+      {{ end }}
+    </p>
+  </div>
+</body>
+</html>

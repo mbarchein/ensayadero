@@ -75,6 +75,14 @@ services:
       GOTRUE_PASSWORD_HIBP_ENABLED: "true"
       # Activation/recovery links: expire after 15 min and are single-use.
       GOTRUE_MAILER_OTP_EXP: "900"
+      # Branded bilingual (es/en via user_metadata.lang) mobile-friendly templates,
+      # served by the gateway from docker/mail-templates/.
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: http://gateway:8000/mail-templates/confirmation.html
+      GOTRUE_MAILER_TEMPLATES_RECOVERY: http://gateway:8000/mail-templates/recovery.html
+      GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE: http://gateway:8000/mail-templates/email-change.html
+      GOTRUE_MAILER_SUBJECTS_CONFIRMATION: '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your Ensayadero account{{ else }}Confirma tu cuenta de Ensayadero{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_RECOVERY: '{{ if eq (printf "%v" .Data.lang) "en" }}Reset your Ensayadero password{{ else }}Restablece tu contraseña de Ensayadero{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your new email{{ else }}Confirma tu nuevo email{{ end }}'
       GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: "true"
       # Anti email-bombing / volume-based enumeration: emails/hour per IP.
       GOTRUE_RATE_LIMIT_EMAIL_SENT: "10"
@@ -195,6 +203,7 @@ services:
       - "54321:8000"
     volumes:
       - ./docker/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/mail-templates:/mail-templates:ro
 
   app:
     image: node:22-alpine

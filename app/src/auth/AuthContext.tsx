@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import i18n from '../i18n'
 import { supabase } from '../lib/supabase'
 import type { Profile } from '../lib/types'
 
@@ -47,6 +48,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!session) return
     loadProfile(session.user.id).then(() => setLoading(false))
+    // Keep user_metadata.lang in sync with the UI language: GoTrue templates and
+    // the send-notifications function pick the email language from it.
+    const lang = i18n.language?.startsWith('en') ? 'en' : 'es'
+    if (session.user.user_metadata?.lang !== lang) {
+      supabase.auth.updateUser({ data: { lang } })
+    }
   }, [session])
 
   const signOut = async () => {
