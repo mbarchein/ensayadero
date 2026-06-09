@@ -33,10 +33,11 @@ const CYCLE: Record<SlotState, SlotState> = {
   PREFERRED: 'NONE', // legacy state; no longer painted
 }
 
+// AVAILABLE: light violet, clearly lighter than the accepted stripe (violet-700)
 const CELL_STYLE: Record<SlotState, string> = {
   NONE: 'bg-white',
-  AVAILABLE: 'bg-green-300',
-  PREFERRED: 'bg-green-600',
+  AVAILABLE: 'bg-violet-200',
+  PREFERRED: 'bg-violet-400',
 }
 
 export default function AvailabilityPage() {
@@ -451,26 +452,25 @@ export default function AvailabilityPage() {
           const week = current ? null : adjacentWeeks.get(wm.getTime())
           const cells = current ? sessionCells : (week?.cells ?? null)
           const ses = cells?.get(`${day}:${slot}`)
-          const ring = ses
-            ? ses.response === 'ACCEPTED'
-              ? 'ring-2 ring-inset ring-green-500'
-              : ses.response === 'DECLINED'
-                ? 'ring-2 ring-inset ring-red-500'
-                : 'ring-2 ring-inset ring-amber-500'
-            : ''
           // unsaved edits (additions and deletions): dashed outline until the
           // save confirms, then it switches to the final style
           const pending =
             current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
-          // scheduled rehearsals: thick violet side stripe (same language as the
-          // planner) while the background keeps showing my availability
+          // scheduled rehearsals: thick side stripe colored by my response —
+          // violet=accepted, orange=not confirmed by me, red=declined
           const sesMark =
-            ses?.sessions.status === 'CONFIRMED' ? 'border-l-4 border-l-violet-700' : ''
+            ses?.sessions.status === 'CONFIRMED'
+              ? ses.response === 'ACCEPTED'
+                ? 'border-l-4 border-l-violet-700'
+                : ses.response === 'DECLINED'
+                  ? 'border-l-4 border-l-red-500'
+                  : 'border-l-4 border-l-orange-500'
+              : ''
           const flash = current && ses && ses.session_id === flashSession ? 'cell-flash' : ''
           const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-          return `${CELL_STYLE[state]} cursor-pointer ${sesMark} ${ring} ${pending} ${flash}`
+          return `${CELL_STYLE[state]} cursor-pointer ${sesMark} ${pending} ${flash}`
         }}
         renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
           const cells =
@@ -481,16 +481,23 @@ export default function AvailabilityPage() {
           if (!p || !cells) return null
           const title = `${p.sessions.title} — ${p.sessions.groups.name}`
           const firstSlot = !cells.get(`${day}:${slot - 1}`)
-          // week view: the group avatar in every cell of the rehearsal (response
-          // shown by the cell ring)
+          // week view: avatar against the side stripe + group initials
+          // (response shown by the stripe color)
           if (!dayView) {
+            const initials = p.sessions.groups.name
+              .split(/\s+/)
+              .map((w) => w[0])
+              .join('')
+              .slice(0, 3)
+              .toUpperCase()
             return (
-              <span className="flex h-full items-center justify-center" title={title}>
+              <span className="flex h-full items-center gap-0.5 pl-0.5" title={title}>
                 <GroupAvatar
                   seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
                   image={p.sessions.groups.avatar_image}
-                  size={16}
+                  size={14}
                 />
+                <span className="truncate text-[8px] font-semibold text-gray-700">{initials}</span>
               </span>
             )
           }
