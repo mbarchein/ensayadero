@@ -140,6 +140,10 @@ export default function LoginPage() {
           {t('login.forgotLink')}
         </Link>
       </div>
+
+      <Link to="/privacy" className="text-xs text-violet-400 hover:underline">
+        {t('privacy.title')}
+      </Link>
     </main>
   )
 }

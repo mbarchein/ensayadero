@@ -354,5 +354,55 @@
     "directorEmailHint": "Si no tiene cuenta, se le enviará invitación con rol Director.",
     "createGroup": "Crear grupo",
     "creating": "Creando…"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "back": "← Volver",
+    "updated": "Última actualización: junio de 2026",
+    "intro": "Esta política explica cómo Ensayadero trata tus datos personales conforme al Reglamento (UE) 2016/679 (RGPD) y a la Ley Orgánica 3/2018 (LOPDGDD).",
+    "controller": {
+      "title": "1. Responsable del tratamiento",
+      "body": "Responsable: [COMPLETAR: nombre o razón social y NIF].\nDirección: [COMPLETAR].\nContacto: privacidad@ensayadero.es."
+    },
+    "data": {
+      "title": "2. Datos que tratamos",
+      "body": "• Datos de cuenta: nombre, correo electrónico y, en su caso, foto e identificador del proveedor de acceso (Google/Meta).\n• Datos de uso: grupos a los que perteneces, tu disponibilidad horaria, los ensayos y tu asistencia.\n• Datos técnicos: registros de acceso y seguridad necesarios para prestar el servicio."
+    },
+    "purpose": {
+      "title": "3. Finalidad",
+      "body": "Tratamos tus datos para crear y gestionar tu cuenta, permitir la organización de ensayos y la coordinación de disponibilidad y asistencia dentro de tus grupos, y enviarte notificaciones relacionadas con el servicio."
+    },
+    "legalBasis": {
+      "title": "4. Base jurídica",
+      "body": "• Ejecución del contrato de prestación del servicio que aceptas al registrarte (art. 6.1.b RGPD).\n• Tu consentimiento para el acceso mediante proveedores externos y el envío de notificaciones (art. 6.1.a RGPD), que puedes retirar en cualquier momento.\n• Interés legítimo en garantizar la seguridad de la plataforma (art. 6.1.f RGPD)."
+    },
+    "retention": {
+      "title": "5. Conservación",
+      "body": "Conservamos tus datos mientras tu cuenta esté activa. Si eliminas tu cuenta o abandonas la plataforma, tus datos se suprimen o anonimizan, salvo obligación legal de conservarlos."
+    },
+    "recipients": {
+      "title": "6. Destinatarios y encargados del tratamiento",
+      "body": "No vendemos tus datos. Para prestar el servicio usamos proveedores que actúan como encargados del tratamiento:\n• Supabase (base de datos, autenticación y funciones).\n• Cloudflare (alojamiento del frontend y protección).\n• Resend (envío de correos).\n• Google y Meta (inicio de sesión, solo si usas esa opción)."
+    },
+    "transfers": {
+      "title": "7. Transferencias internacionales",
+      "body": "Algunos proveedores pueden tratar datos fuera del Espacio Económico Europeo. En tal caso, las transferencias se amparan en decisiones de adecuación o en las Cláusulas Contractuales Tipo de la Comisión Europea."
+    },
+    "rights": {
+      "title": "8. Tus derechos",
+      "body": "Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a privacidad@ensayadero.es. También puedes retirar tu consentimiento en cualquier momento y presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es)."
+    },
+    "security": {
+      "title": "9. Seguridad",
+      "body": "Aplicamos medidas técnicas y organizativas para proteger tus datos, incluyendo cifrado en tránsito, control de acceso por filas (RLS) y autenticación segura."
+    },
+    "storage": {
+      "title": "10. Almacenamiento local",
+      "body": "La aplicación usa el almacenamiento local del navegador para mantener tu sesión y preferencias. No utilizamos cookies de seguimiento publicitario."
+    },
+    "changes": {
+      "title": "11. Cambios",
+      "body": "Podemos actualizar esta política. Publicaremos cualquier cambio en esta misma página, indicando la fecha de actualización."
+    }
   }
 }

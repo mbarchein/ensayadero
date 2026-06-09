@@ -354,5 +354,55 @@
     "directorEmailHint": "If they don't have an account, an invitation with the Director role will be sent.",
     "createGroup": "Create group",
     "creating": "Creating…"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "back": "← Back",
+    "updated": "Last updated: June 2026",
+    "intro": "This policy explains how Ensayadero processes your personal data under Regulation (EU) 2016/679 (GDPR) and Spain's Organic Law 3/2018 (LOPDGDD).",
+    "controller": {
+      "title": "1. Data controller",
+      "body": "Controller: [TO COMPLETE: legal name and tax ID].\nAddress: [TO COMPLETE].\nContact: privacidad@ensayadero.es."
+    },
+    "data": {
+      "title": "2. Data we process",
+      "body": "• Account data: name, email and, where applicable, photo and the sign-in provider identifier (Google/Meta).\n• Usage data: the groups you belong to, your time availability, rehearsals and your attendance.\n• Technical data: access and security logs needed to run the service."
+    },
+    "purpose": {
+      "title": "3. Purpose",
+      "body": "We process your data to create and manage your account, enable rehearsal organisation and the coordination of availability and attendance within your groups, and send you service-related notifications."
+    },
+    "legalBasis": {
+      "title": "4. Legal basis",
+      "body": "• Performance of the service contract you accept on sign-up (Art. 6.1.b GDPR).\n• Your consent for sign-in via external providers and for notifications (Art. 6.1.a GDPR), which you can withdraw at any time.\n• Legitimate interest in keeping the platform secure (Art. 6.1.f GDPR)."
+    },
+    "retention": {
+      "title": "5. Retention",
+      "body": "We keep your data while your account is active. If you delete your account or leave the platform, your data is erased or anonymised, unless we are legally required to keep it."
+    },
+    "recipients": {
+      "title": "6. Recipients and processors",
+      "body": "We do not sell your data. To run the service we use providers acting as processors:\n• Supabase (database, authentication and functions).\n• Cloudflare (frontend hosting and protection).\n• Resend (email delivery).\n• Google and Meta (sign-in, only if you use that option)."
+    },
+    "transfers": {
+      "title": "7. International transfers",
+      "body": "Some providers may process data outside the European Economic Area. Where that happens, transfers rely on adequacy decisions or the European Commission's Standard Contractual Clauses."
+    },
+    "rights": {
+      "title": "8. Your rights",
+      "body": "You can exercise your rights of access, rectification, erasure, objection, restriction and portability by writing to privacidad@ensayadero.es. You can also withdraw consent at any time and lodge a complaint with the Spanish Data Protection Agency (www.aepd.es)."
+    },
+    "security": {
+      "title": "9. Security",
+      "body": "We apply technical and organisational measures to protect your data, including encryption in transit, row-level access control (RLS) and secure authentication."
+    },
+    "storage": {
+      "title": "10. Local storage",
+      "body": "The app uses browser local storage to keep your session and preferences. We do not use advertising tracking cookies."
+    },
+    "changes": {
+      "title": "11. Changes",
+      "body": "We may update this policy. Any change will be published on this page with its update date."
+    }
   }
 }
