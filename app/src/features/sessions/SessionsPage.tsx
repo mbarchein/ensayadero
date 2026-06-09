@@ -83,7 +83,7 @@ export default function SessionsPage() {
         {isInstructor && (
           <Button
             onClick={() => navigate(`/g/${groupId}/planner`)}
-            className="inline-flex items-center gap-1.5"
+            className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
           >
             <CalendarPlus size={16} /> {t('group.tabs.planner')}
           </Button>
@@ -91,7 +91,7 @@ export default function SessionsPage() {
         <Button
           variant="secondary"
           onClick={() => navigate(`/g/${groupId}/members`)}
-          className="inline-flex items-center gap-1.5"
+          className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
         >
           <Users size={16} /> {t('group.tabs.members')}
         </Button>
@@ -99,9 +99,9 @@ export default function SessionsPage() {
           <Button
             variant="secondary"
             onClick={() => navigate(`/g/${groupId}/edit`)}
-            className="inline-flex items-center gap-1.5"
+            className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
           >
-            <Pencil size={16} /> {t('group.editGroup')}
+            <Pencil size={16} /> {t('group.edit')}
           </Button>
         )}
       </div>

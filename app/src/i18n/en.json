@@ -178,6 +178,7 @@
     "removeConfirm": "Remove {{name}} from the group?",
     "backToGroups": "‹ My groups",
     "editGroup": "Edit group",
+    "edit": "Edit",
     "regenerateAvatar": "Regenerate avatar",
     "uploadImage": "Upload image",
     "modeAvatar": "Avatar",
