@@ -365,26 +365,30 @@ export default function AvailabilityPage() {
               <Check size={18} className="text-green-600" aria-label={t('availability.saved')} />
             ) : null}
           </span>
-          <Button
-            variant="ghost"
-            className="p-2"
-            aria-label={t('availability.copyWeeks')}
-            title={t('availability.copyWeeks')}
-            onClick={() => setCopyOpen(true)}
-            disabled={copyWeeks.isPending}
-          >
-            <Copy size={18} />
-          </Button>
-          <Button
-            variant="ghost"
-            className="p-2 text-red-600"
-            aria-label={t('availability.clearWeek')}
-            title={t('availability.clearWeek')}
-            onClick={() => setClearOpen(true)}
-            disabled={clearWeek.isPending}
-          >
-            <Trash2 size={18} />
-          </Button>
+          {!dayView && (
+            <>
+              <Button
+                variant="ghost"
+                className="p-2"
+                aria-label={t('availability.copyWeeks')}
+                title={t('availability.copyWeeks')}
+                onClick={() => setCopyOpen(true)}
+                disabled={copyWeeks.isPending}
+              >
+                <Copy size={18} />
+              </Button>
+              <Button
+                variant="ghost"
+                className="p-2 text-red-600"
+                aria-label={t('availability.clearWeek')}
+                title={t('availability.clearWeek')}
+                onClick={() => setClearOpen(true)}
+                disabled={clearWeek.isPending}
+              >
+                <Trash2 size={18} />
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
