@@ -12,6 +12,8 @@ const supabase = createClient(
 )
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+// Local dev only: when set, all emails go to the mailpit catcher instead of Resend.
+const MAILPIT_URL = Deno.env.get('MAILPIT_URL')
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'Ensayadero <onboarding@resend.dev>'
 const APP_URL = Deno.env.get('APP_URL') ?? ''
 
@@ -66,6 +68,20 @@ function emailBody(type: string, p: Record<string, unknown>): string {
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  if (MAILPIT_URL) {
+    const m = EMAIL_FROM.match(/^(.*?)\s*<(.+)>$/)
+    const res = await fetch(`${MAILPIT_URL}/api/v1/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        From: { Name: m?.[1] ?? '', Email: m?.[2] ?? EMAIL_FROM },
+        To: [{ Email: to }],
+        Subject: subject,
+        HTML: html,
+      }),
+    })
+    return res.ok
+  }
   if (!RESEND_API_KEY) return false
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

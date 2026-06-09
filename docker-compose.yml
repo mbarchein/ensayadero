@@ -178,6 +178,9 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: *service-key
       APP_URL: http://localhost:5173
       RESEND_API_KEY: ${RESEND_API_KEY:-}
+      # All local emails are caught by mailpit (UI at :54324); Resend is never
+      # hit in dev. Unset MAILPIT_URL to test real Resend delivery.
+      MAILPIT_URL: http://mailpit:8025
       EMAIL_FROM: ${EMAIL_FROM:-Ensayadero <dev@localhost>}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
