@@ -61,9 +61,10 @@ export default function PlannerPage() {
   const { data: busyRows } = useQuery({
     queryKey: ['group-busy', groupId, monday.toISOString()],
     queryFn: async () => {
+      // 3-week window: the carousel also shows the adjacent weeks' occupation
       const { data, error } = await supabase.rpc('group_busy_ranges', {
         gid: groupId,
-        search: `[${monday.toISOString()},${weekEnd.toISOString()})`,
+        search: `[${addDays(monday, -7).toISOString()},${addDays(weekEnd, 7).toISOString()})`,
       })
       if (error) throw error
       return data as { user_id: string; busy: string }[]
@@ -79,7 +80,11 @@ export default function PlannerPage() {
         .select('*, session_participants(*, profiles(*))')
         .eq('group_id', groupId)
         .neq('status', 'CANCELLED')
-        .filter('time_range', 'ov', `[${monday.toISOString()},${weekEnd.toISOString()})`)
+        .filter(
+          'time_range',
+          'ov',
+          `[${addDays(monday, -7).toISOString()},${addDays(weekEnd, 7).toISOString()})`,
+        )
         .order('time_range', { ascending: true })
       if (error) throw error
       return data as SessionWithParticipants[]
@@ -96,21 +101,27 @@ export default function PlannerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, weekSessions])
 
-  // map [day][slot] → session covering it (to paint an overlay on the grid)
-  const sessionCells = useMemo(() => {
-    const map = new Map<string, SessionWithParticipants>()
-    for (const s of weekSessions ?? []) {
-      const r = parseRange(s.time_range)
-      for (let d = 0; d < 7; d++) {
-        for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
-          if (overlaps(slotRange(monday, d, slot), r)) map.set(`${d}:${slot}`, s)
+  // map [day][slot] → session covering it, per carousel week (prev/current/next)
+  const sessionCellsByWeek = useMemo(() => {
+    const weeks = new Map<number, Map<string, SessionWithParticipants>>()
+    for (const off of [-7, 0, 7]) {
+      const m = addDays(monday, off)
+      const map = new Map<string, SessionWithParticipants>()
+      for (const s of weekSessions ?? []) {
+        const r = parseRange(s.time_range)
+        for (let d = 0; d < 7; d++) {
+          for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+            if (overlaps(slotRange(m, d, slot), r)) map.set(`${d}:${slot}`, s)
+          }
         }
       }
+      weeks.set(m.getTime(), map)
     }
-    return map
+    return weeks
   }, [weekSessions, monday])
+  const sessionCells = sessionCellsByWeek.get(monday.getTime())!
 
-  const grid = useMemo(() => {
+  const gridsByWeek = useMemo(() => {
     if (!availabilities) return null
     const busyByUser = new Map<string, TimeRange[]>()
     for (const row of busyRows ?? []) {
@@ -118,15 +129,23 @@ export default function PlannerPage() {
       list.push(parseRange(row.busy))
       busyByUser.set(row.user_id, list)
     }
-    return heatmap(
-      activeIds.map((id) => ({
-        userId: id,
-        availabilities: availabilities.filter((a) => a.user_id === id),
-        busy: busyByUser.get(id) ?? [],
-      })),
-      monday,
-    )
+    const people = (m: Date) =>
+      heatmap(
+        activeIds.map((id) => ({
+          userId: id,
+          availabilities: availabilities.filter((a) => a.user_id === id),
+          busy: busyByUser.get(id) ?? [],
+        })),
+        m,
+      )
+    const weeks = new Map<number, ReturnType<typeof heatmap>>()
+    for (const off of [-7, 0, 7]) {
+      const m = addDays(monday, off)
+      weeks.set(m.getTime(), people(m))
+    }
+    return weeks
   }, [availabilities, busyRows, activeIds, monday])
+  const grid = gridsByWeek?.get(monday.getTime()) ?? null
 
   // Grid for the edit modal: over ALL members (so every participant's coverage
   // is computed) and excluding the edited session's own occupation — otherwise
@@ -270,17 +289,18 @@ export default function PlannerPage() {
         <WeekGrid
           weekMonday={monday}
           cellClass={({ day, slot }, wm) => {
-            // adjacent carousel panels: neutral (heatmap data is week-bound)
-            if (wm.getTime() !== monday.getTime()) return 'bg-white'
+            const current = wm.getTime() === monday.getTime()
+            const cells = sessionCellsByWeek.get(wm.getTime()) ?? sessionCells
+            const gridW = gridsByWeek?.get(wm.getTime()) ?? grid
             const selected =
-              selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
-            const ses = sessionCells.get(`${day}:${slot}`)
+              current && selRange && sel!.day === day && slot >= selRange.lo && slot <= selRange.hi
+            const ses = cells.get(`${day}:${slot}`)
             // rehearsals as enclosed boxes (violet=scheduled, amber=draft):
             // left stripe + right edge, top/bottom on the block boundaries
-            let sesBg = heatClass(grid[day][slot], total)
+            let sesBg = heatClass(gridW[day][slot], total)
             if (ses) {
-              const first = sessionCells.get(`${day}:${slot - 1}`) !== ses
-              const last = sessionCells.get(`${day}:${slot + 1}`) !== ses
+              const first = cells.get(`${day}:${slot - 1}`) !== ses
+              const last = cells.get(`${day}:${slot + 1}`) !== ses
               sesBg =
                 ses.status === 'CONFIRMED'
                   ? `bg-violet-300 border-l-4 border-l-violet-700 !border-r-2 !border-r-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
@@ -291,11 +311,12 @@ export default function PlannerPage() {
             }`
           }}
           renderCell={({ day, slot }, { weekMonday: wm }) => {
-            if (wm.getTime() !== monday.getTime()) return null
-            const ses = sessionCells.get(`${day}:${slot}`)
+            const cells = sessionCellsByWeek.get(wm.getTime()) ?? sessionCells
+            const gridW = gridsByWeek?.get(wm.getTime()) ?? grid
+            const ses = cells.get(`${day}:${slot}`)
             if (ses) {
               // first slot of the session shows its abbreviated title
-              const firstSlot = !sessionCells.get(`${day}:${slot - 1}`)
+              const firstSlot = !cells.get(`${day}:${slot - 1}`)
               return firstSlot ? (
                 <span
                   className="block truncate px-0.5 text-[8px] font-semibold leading-6 text-violet-900"
@@ -305,7 +326,7 @@ export default function PlannerPage() {
                 </span>
               ) : null
             }
-            const c = grid[day][slot]
+            const c = gridW[day][slot]
             return c.available.length > 0 ? (
               <span className="block text-center text-[9px] leading-6 text-gray-700">
                 {c.available.length}
