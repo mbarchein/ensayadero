@@ -459,16 +459,20 @@ export default function AvailabilityPage() {
             current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
-          // scheduled rehearsals: thick side stripe colored by my response —
-          // violet=accepted, orange=not confirmed by me, red=declined
-          const sesMark =
-            ses?.sessions.status === 'CONFIRMED'
-              ? ses.response === 'ACCEPTED'
-                ? 'border-l-4 border-l-violet-700'
+          // scheduled rehearsals: thick side stripe colored by my response
+          // (violet=accepted, orange=not confirmed by me, red=declined) and
+          // top/bottom edges on the first/last cell to separate contiguous ones
+          let sesMark = ''
+          if (ses?.sessions.status === 'CONFIRMED' && cells) {
+            const first = cells.get(`${day}:${slot - 1}`) !== ses
+            const last = cells.get(`${day}:${slot + 1}`) !== ses
+            sesMark =
+              ses.response === 'ACCEPTED'
+                ? `border-l-4 border-l-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
                 : ses.response === 'DECLINED'
-                  ? 'border-l-4 border-l-red-500'
-                  : 'border-l-4 border-l-orange-500'
-              : ''
+                  ? `border-l-4 border-l-red-500 ${first ? '!border-t-2 !border-t-red-500' : ''} ${last ? '!border-b-2 !border-b-red-500' : ''}`
+                  : `border-l-4 border-l-orange-500 ${first ? '!border-t-2 !border-t-orange-500' : ''} ${last ? '!border-b-2 !border-b-orange-500' : ''}`
+          }
           const flash = current && ses && ses.session_id === flashSession ? 'cell-flash' : ''
           const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
           return `${CELL_STYLE[state]} cursor-pointer ${sesMark} ${pending} ${flash}`
