@@ -8,6 +8,8 @@ import {
   weekStart,
   SLOTS_PER_DAY,
   DAY_START_HOUR,
+  DAY_END_HOUR,
+  SLOT_MINUTES,
 } from './slots'
 import type { Availability } from './types'
 
@@ -137,7 +139,7 @@ describe('fullCoverageRanges', () => {
 })
 
 it('SLOTS_PER_DAY is consistent', () => {
-  expect(SLOTS_PER_DAY).toBe(30)
+  expect(SLOTS_PER_DAY).toBe(((DAY_END_HOUR - DAY_START_HOUR) * 60) / SLOT_MINUTES)
 })
 
 function addDays(d: Date, n: number): Date {
