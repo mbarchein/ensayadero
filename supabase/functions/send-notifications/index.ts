@@ -85,8 +85,11 @@ const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang) => strin
 
 function fmtDate(iso: unknown, lang: Lang = 'es'): string {
   if (!iso) return ''
-  return new Date(String(iso)).toLocaleString(lang === 'en' ? 'en-GB' : 'es-ES', {
-    weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+  const en = lang === 'en'
+  // en-US conventions (month-day order, 12-hour clock) vs Spanish 24-hour.
+  return new Date(String(iso)).toLocaleString(en ? 'en-US' : 'es-ES', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    hour: en ? 'numeric' : '2-digit', minute: '2-digit',
     timeZone: 'Europe/Madrid',
   })
 }
@@ -135,10 +138,11 @@ function emailBody(type: string, p: Record<string, unknown>, lang: Lang): string
   return lines.filter(Boolean).join('\n')
 }
 
-function fmtTime(iso: unknown): string {
+function fmtTime(iso: unknown, lang: Lang = 'es'): string {
   if (!iso) return ''
-  return new Date(String(iso)).toLocaleTimeString('es-ES', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
+  const en = lang === 'en'
+  return new Date(String(iso)).toLocaleTimeString(en ? 'en-US' : 'es-ES', {
+    hour: en ? 'numeric' : '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid',
   })
 }
 
@@ -156,7 +160,7 @@ async function reminderBody(p: Record<string, unknown>, lang: Lang): Promise<str
   const group = s.groups as unknown as { name: string; avatar_seed: string | null }
   // Same DiceBear style/version as the GroupAvatar component, via their image API.
   const avatar = `https://api.dicebear.com/9.x/shapes/png?seed=${encodeURIComponent(group?.avatar_seed || String(s.group_id))}&size=96&radius=20`
-  const when = `${fmtDate(p.starts_at, lang)}${p.ends_at ? ` – ${fmtTime(p.ends_at)}` : ''}`
+  const when = `${fmtDate(p.starts_at, lang)}${p.ends_at ? ` – ${fmtTime(p.ends_at, lang)}` : ''}`
   const participants = (s.session_participants as unknown as {
     required: boolean
     profiles: { name: string } | null
