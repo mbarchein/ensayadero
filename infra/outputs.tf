@@ -22,3 +22,14 @@ output "google_oauth_redirect_uri" {
   description = "Redirect URI a registrar en el OAuth client de Google Console"
   value       = "https://${supabase_project.main.id}.supabase.co/auth/v1/callback"
 }
+
+output "turnstile_site_key" {
+  description = "Cloudflare Turnstile site key (public); null if CAPTCHA disabled"
+  value       = try(cloudflare_turnstile_widget.auth[0].sitekey, null)
+}
+
+output "turnstile_secret_key" {
+  description = "Cloudflare Turnstile secret — set as the legal-info Edge Function secret TURNSTILE_SECRET_KEY"
+  value       = try(cloudflare_turnstile_widget.auth[0].secret, null)
+  sensitive   = true
+}
