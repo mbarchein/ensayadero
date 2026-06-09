@@ -220,7 +220,7 @@ export default function SessionDetailPage() {
           </p>
           {mine.response !== 'PENDING' && !editingResp ? (
             <div className="flex items-center gap-3">
-              <Badge color={mine.response === 'ACCEPTED' ? 'green' : 'red'}>
+              <Badge color={mine.response === 'ACCEPTED' ? 'violet' : 'red'}>
                 {mine.response === 'ACCEPTED' ? t('sessions.response.going') : t('sessions.response.notGoing')}
               </Badge>
               <Button
@@ -391,7 +391,7 @@ function ParticipantList({
                     </Badge>
                   )}
                 </span>
-                <Badge color={p.response === 'ACCEPTED' ? 'green' : p.response === 'DECLINED' ? 'red' : 'amber'}>
+                <Badge color={p.response === 'ACCEPTED' ? 'violet' : p.response === 'DECLINED' ? 'red' : 'amber'}>
                   {p.response === 'ACCEPTED'
                     ? t('sessions.response.going')
                     : p.response === 'DECLINED'

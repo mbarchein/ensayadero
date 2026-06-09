@@ -184,7 +184,7 @@ function SessionCard({
             )}
             {mine && s.status === 'CONFIRMED' && (
               <Badge
-                color={mine.response === 'ACCEPTED' ? 'green' : mine.response === 'DECLINED' ? 'red' : 'amber'}
+                color={mine.response === 'ACCEPTED' ? 'violet' : mine.response === 'DECLINED' ? 'red' : 'amber'}
               >
                 {mine.response === 'ACCEPTED'
                   ? t('sessions.response.going')
