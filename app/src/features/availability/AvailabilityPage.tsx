@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Trash2, Copy, Check, X, Clock, Loader2, AlertCircle } from 'lucide-react'
+import { Trash2, Copy, Check, X, Loader2, AlertCircle } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -480,7 +480,6 @@ export default function AvailabilityPage() {
           const p = cells?.get(`${day}:${slot}`)
           if (!p || !cells) return null
           const title = `${p.sessions.title} — ${p.sessions.groups.name}`
-          const firstSlot = !cells.get(`${day}:${slot - 1}`)
           // week view: avatar against the side stripe + group initials
           // (response shown by the stripe color)
           if (!dayView) {
@@ -501,35 +500,15 @@ export default function AvailabilityPage() {
               </span>
             )
           }
-          // day view: response icon + group, then the rehearsal name
-          const secondSlot =
-            !firstSlot && cells.get(`${day}:${slot - 1}`) === p && !cells.get(`${day}:${slot - 2}`)
-          if (firstSlot) {
-            const RespIcon = p.response === 'ACCEPTED' ? Check : p.response === 'DECLINED' ? X : Clock
-            const color =
-              p.response === 'ACCEPTED'
-                ? 'text-green-700'
-                : p.response === 'DECLINED'
-                  ? 'text-red-600'
-                  : 'text-amber-600'
-            return (
-              <span
-                className={`flex items-center gap-0.5 truncate px-0.5 text-[8px] font-semibold leading-5 ${color}`}
-                title={title}
-              >
-                <RespIcon size={9} className="shrink-0" />
-                <span className="truncate">{p.sessions.groups.name}</span>
-              </span>
-            )
-          }
-          if (secondSlot) {
-            return (
-              <span className="block truncate px-0.5 text-[8px] leading-5 text-gray-500" title={title}>
-                {p.sessions.title}
-              </span>
-            )
-          }
-          return null
+          // day view: the group name in every cell of the rehearsal
+          return (
+            <span
+              className="block truncate px-1 text-xs font-semibold leading-5 text-gray-900"
+              title={title}
+            >
+              {p.sessions.groups.name}
+            </span>
+          )
         }}
         onPaintStart={(pos) => {
           const next = CYCLE[grid[pos.day][pos.slot]]
