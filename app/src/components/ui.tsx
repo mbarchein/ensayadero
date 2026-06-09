@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { ArrowLeft, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 export function Button({
@@ -101,15 +101,24 @@ export function EmptyState({ message, action }: { message: string; action?: Reac
 }
 
 // Icon-only back button for the far-left of a page title bar.
+// Returns to the previous view in the navigation history when the app has one
+// (e.g. session detail opened from the notifications list); `to` is the
+// fallback parent route for direct entries (deep link, page reload).
 export function BackButton({ to, label }: { to: string; label?: string }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const goBack = () => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0
+    if (idx > 0) navigate(-1)
+    else navigate(to)
+  }
   return (
-    <Link
-      to={to}
+    <button
+      onClick={goBack}
       aria-label={label ?? t('common.back')}
       className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-violet-700 transition hover:bg-violet-50"
     >
       <ArrowLeft size={22} aria-hidden />
-    </Link>
+    </button>
   )
 }

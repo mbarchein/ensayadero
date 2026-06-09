@@ -32,6 +32,21 @@ export default function NotificationsPage() {
     },
   })
 
+  const markRead = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read_at: new Date().toISOString() })
+        .eq('id', id)
+        .is('read_at', null)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['unread-count'] })
+    },
+  })
+
   const markAllRead = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
@@ -100,12 +115,21 @@ export default function NotificationsPage() {
                 </div>
               </div>
             )
+            const readOnClick = () => {
+              if (!n.read_at) markRead.mutate(n.id)
+            }
             return (
               <li key={n.id}>
                 {n.payload.session_id && n.group_id ? (
-                  <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`}>{inner}</Link>
-                ) : (
+                  <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`} onClick={readOnClick}>
+                    {inner}
+                  </Link>
+                ) : n.read_at ? (
                   inner
+                ) : (
+                  <button type="button" className="w-full text-left" onClick={readOnClick}>
+                    {inner}
+                  </button>
                 )}
               </li>
             )
