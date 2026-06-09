@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { addDays } from 'date-fns'
 import { parseRange } from '../../lib/ranges'
 import { isoDay, weekStart } from '../../lib/slots'
-import { EmptyState, Spinner } from '../../components/ui'
+import { BackButton, EmptyState, Spinner } from '../../components/ui'
 import { useMyAgenda } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
 
@@ -35,7 +35,10 @@ export default function UpcomingPage() {
 
   return (
     <div className="space-y-4 pb-6">
-      <h1 className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2 text-xl font-bold">{t('upcoming.title')}</h1>
+      <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 bg-white px-4 py-2">
+        <BackButton to="/" />
+        <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
+      </header>
 
       {pendingCount > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">

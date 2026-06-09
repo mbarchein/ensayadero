@@ -21,7 +21,7 @@ import {
   type SlotState,
 } from '../../lib/slots'
 import WeekGrid, { type CellPos } from './WeekGrid'
-import { Button, Modal, Spinner } from '../../components/ui'
+import { BackButton, Button, Modal, Spinner } from '../../components/ui'
 import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
 import GroupAvatar from '../groups/GroupAvatar'
@@ -388,7 +388,8 @@ export default function AvailabilityPage() {
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex min-h-9 items-center justify-between">
-        <div className="flex min-w-0 items-baseline gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <BackButton to="/" />
           <h1 className="shrink-0 text-xl font-bold">
             {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
           </h1>

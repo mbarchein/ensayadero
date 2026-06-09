@@ -5,7 +5,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2, XCircle, Clock, AlarmClock, Bell, type LucideIcon } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { Button, EmptyState, Spinner } from '../../components/ui'
+import { BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import type { Notification } from '../../lib/types'
 
 const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -66,7 +66,10 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-4 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
-        <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
+        <span className="flex items-center gap-3">
+          <BackButton to="/" />
+          <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
+        </span>
         {notifications?.some((n) => !n.read_at) && (
           <Button variant="ghost" onClick={() => markAllRead.mutate()}>
             {t('notifications.markRead')}

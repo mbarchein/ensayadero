@@ -6,7 +6,7 @@ import { LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
-import { Button, Modal } from '../../components/ui'
+import { BackButton, Button, Modal } from '../../components/ui'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
@@ -62,7 +62,10 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between bg-white px-4 py-2">
-        <h1 className="text-xl font-bold">{t('profile.title')}</h1>
+        <span className="flex items-center gap-3">
+          <BackButton to="/" />
+          <h1 className="text-xl font-bold">{t('profile.title')}</h1>
+        </span>
         <Button
           variant="ghost"
           onClick={signOut}
