@@ -355,6 +355,9 @@
     "createGroup": "Crear grupo",
     "creating": "Creando…"
   },
+  "legalShared": {
+    "captchaPrompt": "Verifica que eres una persona para ver los datos de contacto."
+  },
   "privacy": {
     "title": "Política de privacidad",
     "back": "← Volver",

@@ -59,9 +59,7 @@ github_token = "ghp_xxx"
 github_owner = "your-username"
 github_repo  = "ensayo"
 
-# Legal documents (public, shown in the privacy/legal/cookie pages)
-legal_entity  = "" # nombre o razón social del responsable/titular
-legal_tax_id  = "" # NIF/CIF
-legal_address = "" # dirección postal
-privacy_email = "privacidad@ensayadero.es"
-contact_email = "hola@ensayadero.es"
+# Legal document data is NOT in Terraform: to keep it out of the bundle and
+# behind the captcha, set it as Edge Function secrets (see BOOTSTRAP):
+#   supabase secrets set LEGAL_ENTITY=... LEGAL_TAX_ID=... LEGAL_ADDRESS=... \
+#     PRIVACY_EMAIL=... CONTACT_EMAIL=... TURNSTILE_SECRET_KEY=...

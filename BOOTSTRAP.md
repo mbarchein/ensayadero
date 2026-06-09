@@ -242,10 +242,20 @@ by hand:
 - `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
   read by the wrangler deploy step so `--project-name` always matches the project
   Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
-- `VITE_LEGAL_ENTITY`, `VITE_LEGAL_TAX_ID`, `VITE_LEGAL_ADDRESS`,
-  `VITE_PRIVACY_EMAIL`, `VITE_CONTACT_EMAIL` — fill the privacy / legal notice /
-  cookie pages. Set them in `terraform.tfvars` (`legal_entity`, `legal_tax_id`,
-  `legal_address`, `privacy_email`, `contact_email`); empty values render as "—".
+Legal document data (controller name, tax ID, address, contact emails) is **not**
+in the bundle — to keep it away from scrapers it's served by the `legal-info` Edge
+Function only after a server-side Turnstile check. Set it as Edge Function secrets:
+
+```bash
+supabase secrets set \
+  LEGAL_ENTITY="Razón social S.L." LEGAL_TAX_ID="B12345678" \
+  LEGAL_ADDRESS="Calle …, Ciudad" PRIVACY_EMAIL="privacidad@tudominio.es" \
+  CONTACT_EMAIL="hola@tudominio.es" TURNSTILE_SECRET_KEY="0x…" \
+  --project-ref <project-ref>
+```
+
+(`TURNSTILE_SECRET_KEY` is the same Turnstile secret; without it the gate is
+disabled. Empty fields render as "—".)
 
 ## 9. First deploy
 

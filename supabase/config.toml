@@ -61,3 +61,8 @@ enabled = true
 
 [analytics]
 enabled = false
+
+# Public legal-info endpoint: no JWT (read from the login screen); gated by a
+# server-side Turnstile check instead.
+[functions.legal-info]
+verify_jwt = false

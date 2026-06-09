@@ -6,7 +6,6 @@ import ForgotPasswordPage from './auth/ForgotPasswordPage'
 import ResetPasswordPage from './auth/ResetPasswordPage'
 import GoodbyePage from './auth/GoodbyePage'
 import AuthCallback from './auth/AuthCallback'
-import PrivacyPage from './auth/PrivacyPage'
 import LegalDoc from './auth/LegalDoc'
 import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
@@ -30,7 +29,27 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/goodbye" element={<GoodbyePage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route
+          path="/privacy"
+          element={
+            <LegalDoc
+              ns="privacy"
+              sections={[
+                'controller',
+                'data',
+                'purpose',
+                'legalBasis',
+                'retention',
+                'recipients',
+                'transfers',
+                'rights',
+                'security',
+                'storage',
+                'changes',
+              ]}
+            />
+          }
+        />
         <Route
           path="/legal"
           element={<LegalDoc ns="legal" sections={['identity', 'terms', 'ip', 'liability', 'links', 'law']} />}

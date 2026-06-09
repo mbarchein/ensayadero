@@ -355,6 +355,9 @@
     "createGroup": "Create group",
     "creating": "Creating…"
   },
+  "legalShared": {
+    "captchaPrompt": "Verify you're human to see the contact details."
+  },
   "privacy": {
     "title": "Privacy policy",
     "back": "← Back",
