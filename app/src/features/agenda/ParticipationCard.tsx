@@ -68,8 +68,9 @@ export default function ParticipationCard({
             )}
           </p>
         </div>
-        {/* right block: status/response badge with the attendee count below */}
-        <div className="flex shrink-0 flex-col items-end gap-1 text-xs">
+        {/* right block: status/response badge with the attendee count below,
+            vertically centered against the group-name row */}
+        <div className="flex shrink-0 flex-col items-end gap-1 pt-1.5 text-xs">
           {s.status !== 'CONFIRMED' && (
             <Badge color={confirmed ? 'green' : 'gray'}>{t(`sessions.status.${s.status}`)}</Badge>
           )}
@@ -86,7 +87,8 @@ export default function ParticipationCard({
               onClick={() => setAttendeesOpen(true)}
               title={t('upcoming.attendeesTitle')}
               aria-label={t('upcoming.attendeesTitle')}
-              className="inline-flex items-center gap-1 font-medium text-violet-700 hover:underline"
+              // mr-2 matches the badge's inner padding → aligned with its text
+              className="mr-2 inline-flex items-center gap-1 font-medium text-violet-700 hover:underline"
             >
               <Users size={13} /> {tally.total}
             </button>
