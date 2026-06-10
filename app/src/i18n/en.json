@@ -344,7 +344,7 @@
     "name": "Name",
     "phone": "Phone",
     "gender": "Pronoun (optional)",
-    "genderHint": "Only used to show your role as actress/actor or director in the app.",
+    "genderHint": "Only to display your role (actress/actor, director).",
     "genderNone": "Unspecified",
     "genderF": "She",
     "genderM": "He",

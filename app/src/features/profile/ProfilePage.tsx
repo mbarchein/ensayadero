@@ -151,19 +151,37 @@ export default function ProfilePage() {
             placeholder="+34 600 000 000"
           />
         </label>
-        <label className="block text-sm">
-          {t('profile.gender')}
-          <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value as '' | 'F' | 'M')}
-            className="mt-1 w-full rounded-lg border px-3 py-2"
-          >
-            <option value="">{t('profile.genderNone')}</option>
-            <option value="F">{t('profile.genderF')}</option>
-            <option value="M">{t('profile.genderM')}</option>
-          </select>
+        <div className="text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <span>{t('profile.gender')}</span>
+            <div className="flex gap-1.5" role="radiogroup" aria-label={t('profile.gender')}>
+              {(
+                [
+                  ['', '—', t('profile.genderNone')],
+                  ['F', t('profile.genderF'), t('profile.genderF')],
+                  ['M', t('profile.genderM'), t('profile.genderM')],
+                ] as const
+              ).map(([value, label, aria]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={gender === value}
+                  aria-label={aria}
+                  onClick={() => setGender(value)}
+                  className={`rounded-full border px-3 py-1 transition ${
+                    gender === value
+                      ? 'border-violet-600 bg-violet-600 text-white'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-violet-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <span className="mt-1 block text-xs text-gray-500">{t('profile.genderHint')}</span>
-        </label>
+        </div>
         {saveDetails.isError && (
           <p className="text-sm text-red-600">{(saveDetails.error as Error).message}</p>
         )}
