@@ -13,6 +13,20 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password"
   },
+  "tips": {
+    "home": "These are your groups. Open one to see its rehearsals, or join another with a code.",
+    "upcoming": "Your upcoming rehearsals across all groups. Answer Going / Can't make it, and tap a card for the detail.",
+    "agenda": "Your weekly schedule. Tap a day in the header to paint your availability; swipe sideways to change week.",
+    "agendaEdit": "Tap or drag over the slots to mark when you're available. It saves itself.",
+    "notifications": "Alerts from your groups. Swipe one to the right to archive it (on desktop, use the hover icon).",
+    "group": "This group's rehearsals. Tap one to see the detail and confirm your attendance.",
+    "groupJoined": "You're in! Mark your availability in Agenda so you can be summoned to rehearsals.",
+    "sessionDetail": "Confirm your attendance here and see who's going. The date block jumps to that day in your schedule.",
+    "sessionShared": "Someone shared this rehearsal with you. If you're on the list, answer Going / Can't make it.",
+    "planner": "The group's availability map: greener = more people can make it. Tap a day and pick a slot to create the rehearsal.",
+    "members": "Group members. Directors can invite by email, code or QR.",
+    "profile": "Your details, email alerts and session. Changes here apply to all your groups."
+  },
   "pwa": {
     "installHint": "Install Ensayadero on your phone for quick access and notifications.",
     "installBtn": "Install",
@@ -376,6 +390,10 @@
     "detailsSaved": "✓ Saved",
     "accessVia": "Sign-in: {{methods}}",
     "accessEmail": "email & password",
+    "tipsTitle": "Tips",
+    "tipsDescription": "Show the first-visit tips again on every screen.",
+    "resetTips": "Reset tips",
+    "tipsResetDone": "✓ They will show again",
     "emailPrefsTitle": "Email alerts",
     "emailPrefsDescription": "Choose which emails you want to receive. In-app alerts are unaffected.",
     "emailPrefs": {

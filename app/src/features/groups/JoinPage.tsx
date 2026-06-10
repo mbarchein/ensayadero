@@ -32,7 +32,7 @@ export default function JoinPage() {
       return
     }
     qc.invalidateQueries({ queryKey: ['my-memberships'] })
-    navigate(`/g/${data}`, { replace: true })
+    navigate(`/g/${data}`, { replace: true, state: { justJoined: true } })
   }
 
   // with a code in the URL: if there's a session, join directly; otherwise log in and resume

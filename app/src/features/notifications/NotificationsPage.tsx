@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
+import Tip from '../../components/Tip'
 import type { Notification } from '../../lib/types'
 import quotesEs from '../../data/quotes.es.json'
 import quotesEn from '../../data/quotes.en.json'
@@ -113,6 +114,8 @@ export default function NotificationsPage() {
           </Button>
         )}
       </header>
+
+      <Tip id="notifications" />
 
       {notifications?.length === 0 ? (
         /* peaceful empty state: soft gradient backdrop with watermark art */

@@ -33,7 +33,7 @@ export default function ShortLinkPage() {
       .eq('short_code', code)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) navigate(`/g/${data.group_id}/sessions/${data.id}`, { replace: true })
+        if (data) navigate(`/g/${data.group_id}/sessions/${data.id}`, { replace: true, state: { shared: true } })
         else setNotFound(true) // nonexistent code, or RLS: not a member of the group
       })
   }, [loading, session, code, navigate])

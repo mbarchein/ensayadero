@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
 import { BackButton, Button, InitialsAvatar, Modal } from '../../components/ui'
+import Tip, { resetTips } from '../../components/Tip'
 
 // Email opt-out groups → notification event types (notification_preferences).
 // A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
@@ -85,6 +86,7 @@ export default function ProfilePage() {
   // email notification preferences (default: everything ON)
   const qc = useQueryClient()
   const [prefsSaved, setPrefsSaved] = useState(false)
+  const [tipsReset, setTipsReset] = useState(false)
   const { data: prefs } = useQuery({
     queryKey: ['notification-prefs', profile?.id],
     queryFn: async () => {
@@ -134,6 +136,7 @@ export default function ProfilePage() {
           <LogOut size={18} /> {t('profile.signOut')}
         </Button>
       </header>
+      <Tip id="profile" />
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt="" className="h-14 w-14 shrink-0 rounded-full" />
@@ -244,6 +247,17 @@ export default function ProfilePage() {
         <p aria-live="polite" className="mt-2 h-4 text-right text-sm text-green-600">
           {prefsSaved ? t('profile.detailsSaved') : ''}
         </p>
+      </section>
+
+      <section className="rounded-xl border bg-white p-4">
+        <h2 className="mb-1 font-semibold">{t('profile.tipsTitle')}</h2>
+        <p className="mb-3 text-sm text-gray-600">{t('profile.tipsDescription')}</p>
+        <div className="flex items-center gap-3">
+          <Button variant="secondary" onClick={() => { resetTips(); setTipsReset(true); setTimeout(() => setTipsReset(false), 2000) }}>
+            {t('profile.resetTips')}
+          </Button>
+          {tipsReset && <span className="text-sm text-green-600">{t('profile.tipsResetDone')}</span>}
+        </div>
       </section>
 
       {/* hidden until Web Push is configured (VAPID keys, BOOTSTRAP §7) */}

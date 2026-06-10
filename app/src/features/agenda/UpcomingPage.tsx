@@ -7,6 +7,7 @@ import { addDays } from 'date-fns'
 import { parseRange } from '../../lib/ranges'
 import { isoDay, weekStart } from '../../lib/slots'
 import { BackButton, EmptyState, Spinner } from '../../components/ui'
+import Tip from '../../components/Tip'
 import { useMyAgenda } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
 
@@ -39,6 +40,8 @@ export default function UpcomingPage() {
         <BackButton to="/" />
         <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
       </header>
+
+      <Tip id="upcoming" />
 
       {pendingCount > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">

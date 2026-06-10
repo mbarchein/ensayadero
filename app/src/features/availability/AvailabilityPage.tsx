@@ -21,6 +21,7 @@ import {
   type SlotState,
 } from '../../lib/slots'
 import WeekGrid, { type CellPos } from './WeekGrid'
+import Tip from '../../components/Tip'
 import { BackButton, Button, Modal, Spinner } from '../../components/ui'
 import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
@@ -461,6 +462,8 @@ export default function AvailabilityPage() {
           )}
         </div>
       </header>
+
+      {dayView ? <Tip id="agendaEdit" /> : <Tip id="agenda" />}
 
       <WeekGrid
         weekMonday={monday}

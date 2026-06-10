@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
@@ -10,6 +10,8 @@ import { parseRange } from '../../lib/ranges'
 import { Pencil, Archive, CalendarPlus, Users } from 'lucide-react'
 import { Badge, BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
+import Tip from '../../components/Tip'
+
 import type { SessionWithParticipants } from '../../lib/types'
 
 const STATUS_COLOR = {
@@ -24,6 +26,8 @@ export default function SessionsPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  // set by the join flow: greet freshly joined members with a tip
+  const justJoined = !!(useLocation().state as { justJoined?: boolean } | null)?.justJoined
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions', groupId],
@@ -78,6 +82,9 @@ export default function SessionsPage() {
           <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
         </div>
       </header>
+
+      {justJoined && <Tip id="groupJoined" />}
+      <Tip id="group" />
 
       <div className="flex gap-2">
         {isInstructor && (

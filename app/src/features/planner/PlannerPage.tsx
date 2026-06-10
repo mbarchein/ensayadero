@@ -15,6 +15,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { SLOTS_PER_DAY, heatmap, isoDay, slotRange, weekStart, type HeatCell } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
 import { Spinner, Button, Modal, BackButton } from '../../components/ui'
+import Tip from '../../components/Tip'
 import type { Availability, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
@@ -182,6 +183,8 @@ export default function PlannerPage() {
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('planner.title')}</h1>
       </header>
+
+      <Tip id="planner" />
 
       {/* people selector */}
       <div className="flex flex-wrap gap-1.5">

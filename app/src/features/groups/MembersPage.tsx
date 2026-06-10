@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabase'
 import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
+import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
 import type { GroupRole, Invitation, MembershipWithProfile } from '../../lib/types'
 
@@ -141,6 +142,8 @@ export default function MembersPage() {
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
       </header>
+
+      <Tip id="members" />
 
       {isInstructor && group && <InvitePanel group={group} />}
 

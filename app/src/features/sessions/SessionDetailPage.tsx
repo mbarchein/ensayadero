@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { useState } from 'react'
@@ -26,6 +26,7 @@ import { downloadIcs } from '../../lib/ics'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
+import Tip from '../../components/Tip'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 /** A user's available (painted) sub-intervals within range `r`, merged. */
@@ -60,6 +61,8 @@ export default function SessionDetailPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  // set by the short-link landing: explain what a shared rehearsal is
+  const viaShare = !!(useLocation().state as { shared?: boolean } | null)?.shared
   const [shareCopied, setShareCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
@@ -264,6 +267,9 @@ export default function SessionDetailPage() {
           </Button>
         )}
       </header>
+
+      {viaShare && <Tip id="sessionShared" />}
+      <Tip id="sessionDetail" />
 
       {shareError && (
         <p className="break-all text-xs text-gray-600">

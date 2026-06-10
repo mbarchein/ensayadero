@@ -13,6 +13,20 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña"
   },
+  "tips": {
+    "home": "Estos son tus grupos. Entra en uno para ver sus ensayos, o únete a otro con un código.",
+    "upcoming": "Tus próximos ensayos, de todos tus grupos. Responde Voy / No puedo, y toca un card para ver el detalle.",
+    "agenda": "Tu agenda semanal. Toca un día en la cabecera para pintar tu disponibilidad; desliza a los lados para cambiar de semana.",
+    "agendaEdit": "Toca o arrastra sobre las franjas para marcar cuándo puedes. Se guarda solo.",
+    "notifications": "Los avisos de tus grupos. Desliza uno a la derecha para archivarlo (en ordenador, con el icono al pasar el ratón).",
+    "group": "Los ensayos de este grupo. Toca uno para ver el detalle y confirmar tu asistencia.",
+    "groupJoined": "¡Ya estás dentro! Marca tu disponibilidad en Agenda para que te puedan convocar a los ensayos.",
+    "sessionDetail": "Confirma aquí tu asistencia y consulta quién va. El bloque de fecha te lleva a ese día en tu agenda.",
+    "sessionShared": "Te han compartido este ensayo. Si estás en la lista, responde Voy / No puedo.",
+    "planner": "Mapa de disponibilidad del grupo: más verde = más gente puede. Toca un día y elige una franja para crear el ensayo.",
+    "members": "Miembros del grupo. Los directores pueden invitar por email, código o QR.",
+    "profile": "Tus datos, tus avisos por email y tu sesión. Lo que cambies aquí aplica a todos tus grupos."
+  },
   "pwa": {
     "installHint": "Instala Ensayadero en tu móvil para acceso rápido y notificaciones.",
     "installBtn": "Instalar",
@@ -376,6 +390,10 @@
     "detailsSaved": "✓ Guardado",
     "accessVia": "Acceso: {{methods}}",
     "accessEmail": "email y contraseña",
+    "tipsTitle": "Consejos",
+    "tipsDescription": "Vuelve a mostrar los consejos de primera visita en todas las pantallas.",
+    "resetTips": "Reiniciar consejos",
+    "tipsResetDone": "✓ Se mostrarán de nuevo",
     "emailPrefsTitle": "Avisos por email",
     "emailPrefsDescription": "Elige qué emails quieres recibir. Los avisos dentro de la app no cambian.",
     "emailPrefs": {
