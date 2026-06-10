@@ -1,9 +1,10 @@
+import { useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, XCircle, Clock, AlarmClock, Bell, type LucideIcon } from 'lucide-react'
+import { Archive, CheckCircle2, XCircle, Clock, AlarmClock, Bell, type LucideIcon } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import type { Notification } from '../../lib/types'
@@ -25,6 +26,7 @@ export default function NotificationsPage() {
       const { data, error } = await supabase
         .from('notifications')
         .select('*, groups(name)')
+        .is('archived_at', null)
         .order('created_at', { ascending: false })
         .limit(50)
       if (error) throw error
@@ -39,6 +41,20 @@ export default function NotificationsPage() {
         .update({ read_at: new Date().toISOString() })
         .eq('id', id)
         .is('read_at', null)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['unread-count'] })
+    },
+  })
+
+  const archive = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ archived_at: new Date().toISOString() })
+        .eq('id', id)
       if (error) throw error
     },
     onSuccess: () => {
@@ -121,7 +137,7 @@ export default function NotificationsPage() {
               if (!n.read_at) markRead.mutate(n.id)
             }
             return (
-              <li key={n.id}>
+              <SwipeArchiveRow key={n.id} onArchive={() => archive.mutate(n.id)}>
                 {n.payload.session_id && n.group_id ? (
                   <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`} onClick={readOnClick}>
                     {inner}
@@ -133,11 +149,108 @@ export default function NotificationsPage() {
                     {inner}
                   </button>
                 )}
-              </li>
+              </SwipeArchiveRow>
             )
           })}
         </ul>
       )}
     </div>
+  )
+}
+
+// Swipe the card to the right to archive: the card follows the finger over an
+// archive backdrop; past the threshold it slides out and the gap it leaves
+// collapses (animated height) before the row is removed. Vertical drags keep
+// native scroll; a horizontal drag suppresses the row's click/navigation.
+function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; children: ReactNode }) {
+  const ref = useRef<HTMLLIElement>(null)
+  const start = useRef<{ x: number; y: number } | null>(null)
+  const swiping = useRef(false)
+  const moved = useRef(false)
+  const [dx, setDx] = useState(0)
+  const [animated, setAnimated] = useState(false) // transition on transform
+  const [height, setHeight] = useState<number | null>(null) // collapse phase
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (height !== null) return // already archiving
+    start.current = { x: e.clientX, y: e.clientY }
+    swiping.current = false
+    moved.current = false
+    setAnimated(false)
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!start.current) return
+    const ddx = e.clientX - start.current.x
+    const ddy = e.clientY - start.current.y
+    if (!swiping.current) {
+      if (Math.abs(ddx) > 10 && Math.abs(ddx) > Math.abs(ddy)) {
+        swiping.current = true
+        try {
+          ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+        } catch {
+          /* not capturable in some environments */
+        }
+      } else if (Math.abs(ddy) > 10) {
+        start.current = null // vertical scroll wins
+        return
+      } else return
+    }
+    moved.current = true
+    setDx(Math.max(0, ddx)) // only to the right
+  }
+
+  const finish = () => {
+    if (!start.current && !swiping.current) return
+    start.current = null
+    if (!swiping.current) return
+    swiping.current = false
+    const w = ref.current?.offsetWidth ?? 320
+    setAnimated(true)
+    if (dx > w * 0.35) {
+      setDx(w * 1.05) // slide the card fully out…
+      setTimeout(() => {
+        // …then collapse the gap: freeze the current height and animate to 0
+        setHeight(ref.current?.offsetHeight ?? 0)
+        requestAnimationFrame(() => requestAnimationFrame(() => setHeight(0)))
+        setTimeout(onArchive, 230)
+      }, 180)
+    } else {
+      setDx(0) // not far enough: snap back
+    }
+  }
+
+  return (
+    <li
+      ref={ref}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={finish}
+      onPointerCancel={finish}
+      onClickCapture={(e) => {
+        if (moved.current) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      }}
+      className="relative overflow-hidden"
+      style={{
+        touchAction: 'pan-y',
+        ...(height !== null ? { height, transition: 'height 0.2s ease-out' } : null),
+      }}
+    >
+      {/* archive backdrop revealed while the card slides */}
+      <div className="absolute inset-0 flex items-center rounded-xl bg-emerald-500 pl-4 text-white" aria-hidden>
+        <Archive size={20} />
+      </div>
+      <div
+        style={{
+          transform: `translateX(${dx}px)`,
+          transition: animated ? 'transform 0.18s ease-out' : 'none',
+        }}
+      >
+        {children}
+      </div>
+    </li>
   )
 }

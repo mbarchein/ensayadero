@@ -100,5 +100,7 @@ export interface Notification {
   type: string
   payload: Record<string, unknown>
   read_at: string | null
+  /** Swiped away in the UI: hidden from the list and the unread badge. */
+  archived_at: string | null
   created_at: string
 }

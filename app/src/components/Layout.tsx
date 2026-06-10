@@ -27,6 +27,7 @@ export default function Layout() {
         .from('notifications')
         .select('id', { count: 'exact', head: true })
         .is('read_at', null)
+        .is('archived_at', null)
       return count ?? 0
     },
     enabled: !!session,
