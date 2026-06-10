@@ -65,8 +65,15 @@ export default function MembersPage() {
       })
       if (error) throw error
     },
-    onSuccess: (_, inv) => flashResend(inv.id, 'ok'),
-    onError: (_, inv) => flashResend(inv.id, 'error'),
+    onSuccess: (_, inv) => {
+      flashResend(inv.id, 'ok')
+      // refresh email_sent_at / email_send_error stamped by the function
+      qc.invalidateQueries({ queryKey: ['invitations', groupId] })
+    },
+    onError: (_, inv) => {
+      flashResend(inv.id, 'error')
+      qc.invalidateQueries({ queryKey: ['invitations', groupId] })
+    },
   })
 
   const deleteInvite = useMutation({
@@ -190,6 +197,19 @@ export default function MembersPage() {
                 <span className="min-w-0">
                   <span className="break-all">{i.email}</span>{' '}
                   <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
+                  <span className="block text-xs">
+                    {i.email_send_error ? (
+                      <span className="text-red-600" title={i.email_send_error}>
+                        {t('invite.lastSendFailed')}
+                      </span>
+                    ) : i.email_sent_at ? (
+                      <span className="text-gray-400">
+                        {t('invite.sentAt', { date: new Date(i.email_sent_at).toLocaleString() })}
+                      </span>
+                    ) : (
+                      <span className="text-amber-600">{t('invite.neverSent')}</span>
+                    )}
+                  </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-1">
                   <span className="text-xs">

@@ -49,6 +49,10 @@ export interface Invitation {
   expires_at: string
   accepted_at: string | null
   created_at: string
+  /** Last successful invitation-email delivery (null = never sent). */
+  email_sent_at: string | null
+  /** Reason of the last failed delivery attempt (cleared on success). */
+  email_send_error: string | null
 }
 
 export interface Availability {
