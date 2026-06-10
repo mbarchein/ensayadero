@@ -7,7 +7,7 @@ import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -22,6 +22,10 @@ export default function PlannerPage() {
   const { t } = useTranslation()
   const { groupId, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
+  const location = useLocation()
+  // true when the edit form was opened via ?edit= (i.e. from the session
+  // detail): closing it must return there, never show the calendar
+  const cameFromLink = useRef(false)
   const { profile } = useAuth()
   const [params, setParams] = useSearchParams()
   const initialOffset = useMemo(() => {
@@ -104,15 +108,15 @@ export default function PlannerPage() {
     if (editId && weekSessions) {
       const s = weekSessions.find((x) => x.id === editId)
       if (s) {
+        cameFromLink.current = true
         setEditSession(s)
-        // consume the deep-link param right away: no history entry keeps
-        // ?edit=, so neither the post-save week-sessions refetch nor going
-        // back can reopen the form (back used to strand the user away from
-        // the session detail they came from)
-        const next = new URLSearchParams(params)
-        next.delete('edit')
-        setParams(next, { replace: true })
       }
+      // consume the deep-link param right away (found or not): no history
+      // entry keeps ?edit=, so neither the post-save week-sessions refetch
+      // nor going back can reopen the form
+      const next = new URLSearchParams(params)
+      next.delete('edit')
+      setParams(next, { replace: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, weekSessions])
@@ -205,6 +209,8 @@ export default function PlannerPage() {
   if (!isInstructor) {
     return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
   }
+  // deep-link edit still resolving: don't flash the calendar underneath
+  if (editId && !editSession) return <Spinner />
 
   const total = activeIds.length
   const nameOf = (id: string) => {
@@ -233,6 +239,7 @@ export default function PlannerPage() {
     )
   }
   if (editSession && editGrid) {
+    const sid = editSession.id
     return (
       <CreateSessionModal
         groupId={groupId}
@@ -242,7 +249,19 @@ export default function PlannerPage() {
         initialRange={parseRange(editSession.time_range)}
         grid={editGrid}
         weekMonday={monday}
-        onClose={() => setEditSession(null)}
+        onClose={() => {
+          setEditSession(null)
+          if (!cameFromLink.current) return // opened from the calendar: stay
+          cameFromLink.current = false
+          // Came from the session detail: skip the calendar on the way back.
+          // The form's useBackClose entry is consumed during unmount (UI
+          // close) or was already popped (hardware back); deferring one tick
+          // queues our extra pop after it, so both paths land on the detail.
+          setTimeout(() => {
+            if (location.key !== 'default') navigate(-1)
+            else navigate(`/g/${groupId}/sessions/${sid}`, { replace: true })
+          }, 0)
+        }}
       />
     )
   }

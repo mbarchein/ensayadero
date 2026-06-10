@@ -417,22 +417,16 @@ export default function SessionDetailPage() {
         />
       )}
 
-      {/* director's notes (the session comments) */}
-      {session.comments ? (
+      {/* director's notes (the session comments); editing them lives behind
+          the header's pencil */}
+      {session.comments && (
         <section className="rounded-xl border bg-white p-3 text-sm">
           <p className="mb-1 flex items-center gap-1.5 font-semibold text-gray-700">
             <NotebookPen size={15} /> {t('sessions.notesTitle')}
           </p>
           <p className="whitespace-pre-line text-gray-700">{session.comments}</p>
         </section>
-      ) : isInstructor && session.status !== 'CANCELLED' ? (
-        <button
-          onClick={() => navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)}
-          className="inline-flex items-center gap-1.5 text-sm text-violet-700 hover:underline"
-        >
-          <NotebookPen size={15} /> {t('sessions.addNotes')}
-        </button>
-      ) : null}
+      )}
 
       <section className="space-y-2 border-t pt-4">
         {session.status === 'CONFIRMED' && (
