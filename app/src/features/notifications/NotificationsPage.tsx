@@ -19,6 +19,8 @@ import {
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
 import type { Notification } from '../../lib/types'
+import quotesEs from '../../data/quotes.es.json'
+import quotesEn from '../../data/quotes.en.json'
 
 const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   SESSION_CONFIRMED: { Icon: CheckCircle2, color: 'text-green-600' },
@@ -28,8 +30,14 @@ const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
 }
 
 export default function NotificationsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const qc = useQueryClient()
+
+  // one random famous theatre fragment per visit, in the app's language
+  const [quote] = useState(() => {
+    const list = i18n.language?.startsWith('en') ? quotesEn : quotesEs
+    return list[Math.floor(Math.random() * list.length)]
+  })
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications'],
@@ -126,6 +134,14 @@ export default function NotificationsPage() {
             {t('notifications.emptyTitle')}
           </p>
           <p className="relative mt-1 text-sm text-violet-700">{t('notifications.empty')}</p>
+          <figure className="relative mx-auto mt-8 max-w-md">
+            <blockquote className="whitespace-pre-line font-serif text-base italic leading-relaxed text-violet-900">
+              “{quote.q}”
+            </blockquote>
+            <figcaption className="mt-2 text-xs text-violet-600">
+              — {quote.w} · {quote.a}
+            </figcaption>
+          </figure>
         </div>
       ) : (
         <ul className="space-y-2">
