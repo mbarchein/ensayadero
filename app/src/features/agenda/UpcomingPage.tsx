@@ -35,7 +35,7 @@ export default function UpcomingPage() {
 
   return (
     <div className="space-y-4 pb-6">
-      <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 bg-white px-4 py-2">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to="/" />
         <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
       </header>

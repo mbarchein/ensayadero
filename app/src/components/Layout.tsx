@@ -66,7 +66,7 @@ export default function Layout() {
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-[calc(3.5rem+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-white pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-violet-100 bg-violet-50 pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex h-14 max-w-3xl items-stretch">
           {tabs.map((t2) => (
             <NavLink

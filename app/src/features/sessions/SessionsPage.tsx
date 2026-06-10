@@ -71,7 +71,7 @@ export default function SessionsPage() {
 
   return (
     <div className="space-y-5 pb-6">
-      <header className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
+      <header className="sticky top-0 z-10 -mx-4 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <div className="flex items-center gap-3">
           <BackButton to="/" />
           <GroupAvatar seed={group?.avatar_seed || groupId} image={group?.avatar_image} />

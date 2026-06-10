@@ -250,7 +250,7 @@ export default function PlannerPage() {
   return (
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="-mx-4 flex items-center gap-2 bg-white px-4 py-2">
+      <header className="-mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('planner.title')}</h1>
       </header>

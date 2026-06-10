@@ -55,7 +55,7 @@ export default function JoinPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-start gap-4 p-6 pt-2">
-      <header className="-mx-2 flex items-center gap-3 py-2">
+      <header className="-mx-6 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-6 py-2">
         <BackButton to="/" />
         <h1 className="text-xl font-bold">{t('join.title')}</h1>
       </header>
