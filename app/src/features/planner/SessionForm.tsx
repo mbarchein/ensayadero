@@ -468,7 +468,7 @@ export default function SessionForm({
         {grid &&
           (requiredOutside.length > 0 ? (
             <p className="mb-2 text-sm font-medium text-red-700">
-              ⚠ {t('planner.requiredOutside', { count: requiredOutside.length })}
+              {t('planner.requiredOutside', { count: requiredOutside.length })}
             </p>
           ) : (
             <p className="mb-2 text-sm font-medium text-green-700">✓ {t('planner.coverageOk')}</p>
