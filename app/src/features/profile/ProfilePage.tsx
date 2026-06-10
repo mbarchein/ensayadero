@@ -10,10 +10,11 @@ import { BackButton, Button, Modal } from '../../components/ui'
 
 // Email opt-out groups → notification event types (notification_preferences).
 // A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
-// alerts unaffected either way).
+// alerts unaffected either way). Display order = key order: sessions first.
+// Reminders default OFF for new accounts (seeded by handle_new_user).
 const EMAIL_GROUPS = {
-  reminders: ['REMINDER'],
   sessions: ['SESSION_CONFIRMED', 'SESSION_CHANGED', 'SESSION_CANCELLED'],
+  reminders: ['REMINDER'],
 } as const
 type EmailGroup = keyof typeof EMAIL_GROUPS
 
