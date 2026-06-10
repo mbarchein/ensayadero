@@ -129,20 +129,23 @@ export default function ProfilePage() {
         </div>
       </form>
 
-      <section className="rounded-xl border bg-white p-4">
-        <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
-        <p className="mb-3 text-sm text-gray-600">{t('profile.pushDescription')}</p>
-        {pushState === 'ok' ? (
-          <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
-        ) : (
-          <Button onClick={async () => setPushState((await enablePush()) ? 'ok' : 'fail')}>
-            {t('profile.pushEnable')}
-          </Button>
-        )}
-        {pushState === 'fail' && (
-          <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
-        )}
-      </section>
+      {/* hidden until Web Push is configured (VAPID keys, BOOTSTRAP §7) */}
+      {!!import.meta.env.VITE_VAPID_PUBLIC_KEY && (
+        <section className="rounded-xl border bg-white p-4">
+          <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
+          <p className="mb-3 text-sm text-gray-600">{t('profile.pushDescription')}</p>
+          {pushState === 'ok' ? (
+            <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
+          ) : (
+            <Button onClick={async () => setPushState((await enablePush()) ? 'ok' : 'fail')}>
+              {t('profile.pushEnable')}
+            </Button>
+          )}
+          {pushState === 'fail' && (
+            <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
+          )}
+        </section>
+      )}
 
       <section className="rounded-xl border border-red-200 bg-red-50 p-4">
         <h2 className="mb-2 font-semibold text-red-900">{t('profile.dangerZone')}</h2>
