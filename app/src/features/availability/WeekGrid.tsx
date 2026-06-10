@@ -92,6 +92,22 @@ export default function WeekGrid({
   const weekSwipeRef = useRef<'idle' | 'pending' | 'horizontal'>('idle')
   const weekStartRef = useRef<{ x: number; y: number } | null>(null)
 
+  // Vertical swipe that can't scroll (the gesture started already at that
+  // scroll edge) → self-triggered day-strip wave, hinting that days are the
+  // tappable thing. Combined with the parent's hintPulse; a running wave
+  // always completes before another can start.
+  const [pullPulse, setPullPulse] = useState(0)
+  const pullBusyUntil = useRef(0)
+  const startScroll = useRef({ top: 0, max: 0 })
+  // 0.5s pulse + 70ms stagger × 6 days (keep in sync with .day-wave in index.css)
+  const PULL_WAVE_MS = 500 + 70 * 6
+  const pullWave = () => {
+    const now = Date.now()
+    if (now < pullBusyUntil.current) return
+    pullBusyUntil.current = now + PULL_WAVE_MS
+    setPullPulse((n) => n + 1)
+  }
+
   // week carousels: the day strip and the cell panels translate together.
   const stripRef = useRef<HTMLDivElement>(null)
   const bodyStripRef = useRef<HTMLDivElement>(null)
@@ -185,6 +201,10 @@ export default function WeekGrid({
       if (e.pointerType === 'mouse' && e.button !== 0) return
       weekStartRef.current = { x: e.clientX, y: e.clientY }
       weekSwipeRef.current = 'pending'
+      const el = scrollRef.current
+      startScroll.current = el
+        ? { top: el.scrollTop, max: el.scrollHeight - el.clientHeight }
+        : { top: 0, max: 0 }
       beginDrag()
     },
     onPointerMove: (e: React.PointerEvent) => {
@@ -197,6 +217,10 @@ export default function WeekGrid({
           weekSwipeRef.current = 'horizontal'
           capture(e)
         } else if (Math.abs(dy) > 10) {
+          // a vertical swipe that has no scroll room in its direction is a
+          // confused gesture → wave the day strip
+          const s = startScroll.current
+          if ((dy > 0 && s.top <= 0) || (dy < 0 && s.top >= s.max - 1)) pullWave()
           weekSwipeRef.current = 'idle' // vertical scroll wins
           return
         } else return
@@ -278,7 +302,7 @@ export default function WeekGrid({
                 weekMonday={weekMonday}
                 todayKey={todayKey}
                 interactive
-                wave={hintPulse}
+                wave={hintPulse + pullPulse}
                 selectedDay={selectedDay}
                 onSelect={(d) => {
                   if (swiped.current) {
