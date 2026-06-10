@@ -33,11 +33,14 @@ export default function ProfilePage() {
     )
     .join(' · ')
 
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [gender, setGender] = useState<'' | 'F' | 'M'>('')
+  // initialize from the (already loaded) profile so the first paint is final —
+  // an empty-then-filled effect pass flickers every control on entry
+  const [name, setName] = useState(profile?.name ?? '')
+  const [phone, setPhone] = useState(profile?.phone ?? '')
+  const [gender, setGender] = useState<'' | 'F' | 'M'>(profile?.gender ?? '')
   const [savedAt, setSavedAt] = useState(false)
   useEffect(() => {
+    // keep in sync if the profile refreshes while the page is open
     setName(profile?.name ?? '')
     setPhone(profile?.phone ?? '')
     setGender(profile?.gender ?? '')
@@ -224,12 +227,17 @@ export default function ProfilePage() {
                 <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
                 <p className="text-xs text-gray-500">{t(`profile.emailPrefs.${group}Hint`)}</p>
               </div>
-              <Toggle
-                checked={emailOn(group)}
-                disabled={savePrefs.isPending}
-                ariaLabel={t(`profile.emailPrefs.${group}`)}
-                onChange={(on) => savePrefs.mutate({ group, on })}
-              />
+              {prefs ? (
+                <Toggle
+                  checked={emailOn(group)}
+                  disabled={savePrefs.isPending}
+                  ariaLabel={t(`profile.emailPrefs.${group}`)}
+                  onChange={(on) => savePrefs.mutate({ group, on })}
+                />
+              ) : (
+                // same footprint as the Toggle: no on→off flicker, no reflow
+                <div className="h-6 w-11 shrink-0 animate-pulse rounded-full bg-gray-200" aria-hidden />
+              )}
             </div>
           ))}
         </div>
