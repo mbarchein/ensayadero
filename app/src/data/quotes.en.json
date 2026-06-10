@@ -1,199 +1,987 @@
 [
-  { "q": "To be, or not to be, that is the question: whether 'tis nobler in the mind to suffer the slings and arrows of outrageous fortune, or to take arms against a sea of troubles and by opposing end them.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "To die, to sleep — to sleep, perchance to dream. Ay, there's the rub: for in that sleep of death what dreams may come, when we have shuffled off this mortal coil.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "—What do you read, my lord?\n—Words, words, words.\n—What is the matter, my lord?\n—Between who?\n—I mean the matter that you read, my lord.\n—Slanders, sir.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "There are more things in heaven and earth, Horatio, than are dreamt of in your philosophy.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "—Though this be madness, yet there is method in 't.\n—Will you walk out of the air, my lord?\n—Into my grave?", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "Something is rotten in the state of Denmark, and heaven will direct it.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "Use every man after his desert, and who should 'scape whipping? Use them after your own honour and dignity: the less they deserve, the more merit is in your bounty.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "Neither a borrower nor a lender be, for loan oft loses both itself and friend. This above all: to thine own self be true, and it must follow, as the night the day, thou canst not then be false to any man.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "The rest is silence.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "—How does my good Lord Hamlet?\n—Well, God-a-mercy.\n—Do you know me, my lord?\n—Excellent well; you are a fishmonger.", "w": "Hamlet", "a": "William Shakespeare" },
-  { "q": "Life's but a walking shadow, a poor player that struts and frets his hour upon the stage and then is heard no more: it is a tale told by an idiot, full of sound and fury, signifying nothing.", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "Tomorrow, and tomorrow, and tomorrow, creeps in this petty pace from day to day to the last syllable of recorded time, and all our yesterdays have lighted fools the way to dusty death.", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "—Fair is foul, and foul is fair:\n—Hover through the fog and filthy air.", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "Is this a dagger which I see before me, the handle toward my hand? Come, let me clutch thee. I have thee not, and yet I see thee still.", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "Out, damned spot! Out, I say! Yet who would have thought the old man to have had so much blood in him?", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "By the pricking of my thumbs, something wicked this way comes. Open, locks, whoever knocks!", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "Things without all remedy should be without regard: what's done is done.", "w": "Macbeth", "a": "William Shakespeare" },
-  { "q": "—O Romeo, Romeo, wherefore art thou Romeo? Deny thy father and refuse thy name; or, if thou wilt not, be but sworn my love, and I'll no longer be a Capulet.\n—Shall I hear more, or shall I speak at this?", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "What's in a name? That which we call a rose by any other name would smell as sweet.", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "—How camest thou hither, tell me, and wherefore? The orchard walls are high and hard to climb.\n—With love's light wings did I o'er-perch these walls, for stony limits cannot hold love out.", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "—O, swear not by the moon, the inconstant moon, that monthly changes in her circled orb, lest that thy love prove likewise variable.\n—What shall I swear by?\n—Do not swear at all; or, if thou wilt, swear by thy gracious self.", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "Good night, good night! Parting is such sweet sorrow, that I shall say good night till it be morrow.", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "These violent delights have violent ends, and in their triumph die, like fire and powder, which as they kiss consume.", "w": "Romeo and Juliet", "a": "William Shakespeare" },
-  { "q": "We are such stuff as dreams are made on, and our little life is rounded with a sleep.", "w": "The Tempest", "a": "William Shakespeare" },
-  { "q": "—Hell is empty, and all the devils are here!\n—Why, what? Art thou mad?", "w": "The Tempest", "a": "William Shakespeare" },
-  { "q": "O, wonder! How many goodly creatures are there here! How beauteous mankind is! O brave new world, that has such people in 't!", "w": "The Tempest", "a": "William Shakespeare" },
-  { "q": "What's past is prologue; what to come, in yours and my discharge.", "w": "The Tempest", "a": "William Shakespeare" },
-  { "q": "The isle is full of noises, sounds, and sweet airs, that give delight and hurt not. Sometimes a thousand twangling instruments will hum about mine ears.", "w": "The Tempest", "a": "William Shakespeare" },
-  { "q": "For aught that I could ever read, could ever hear by tale or history, the course of true love never did run smooth.", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "Love looks not with the eyes, but with the mind; and therefore is winged Cupid painted blind.", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "The lunatic, the lover, and the poet are of imagination all compact: one sees more devils than vast hell can hold; the lover sees Helen's beauty in a brow of Egypt.", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "Lord, what fools these mortals be!", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "—O, when she's angry, she is keen and shrewd!\n—Though she be but little, she is fierce.", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "If we shadows have offended, think but this, and all is mended: that you have but slumbered here while these visions did appear.", "w": "A Midsummer Night's Dream", "a": "William Shakespeare" },
-  { "q": "O, beware, my lord, of jealousy! It is the green-eyed monster which doth mock the meat it feeds on.", "w": "Othello", "a": "William Shakespeare" },
-  { "q": "Who steals my purse steals trash; 'tis something, nothing; 'twas mine, 'tis his, and has been slave to thousands. But he that filches from me my good name robs me of that which not enriches him and makes me poor indeed.", "w": "Othello", "a": "William Shakespeare" },
-  { "q": "Speak of me as I am; nothing extenuate, nor set down aught in malice. Then must you speak of one that loved not wisely, but too well.", "w": "Othello", "a": "William Shakespeare" },
-  { "q": "Keep up your bright swords, for the dew will rust them.", "w": "Othello", "a": "William Shakespeare" },
-  { "q": "—How now, daughter? So ill at ease?\n—How sharper than a serpent's tooth it is to have a thankless child!", "w": "King Lear", "a": "William Shakespeare" },
-  { "q": "—Nothing will come of nothing. Speak again.\n—Unhappy that I am, I cannot heave my heart into my mouth. I love your majesty according to my bond; no more nor less.", "w": "King Lear", "a": "William Shakespeare" },
-  { "q": "Blow, winds, and crack your cheeks! Rage! Blow! You cataracts and hurricanoes, spout till you have drenched our steeples, drowned the cocks!", "w": "King Lear", "a": "William Shakespeare" },
-  { "q": "As flies to wanton boys are we to the gods: they kill us for their sport.", "w": "King Lear", "a": "William Shakespeare" },
-  { "q": "I am a man more sinned against than sinning.", "w": "King Lear", "a": "William Shakespeare" },
-  { "q": "All the world's a stage, and all the men and women merely players: they have their exits and their entrances, and one man in his time plays many parts.", "w": "As You Like It", "a": "William Shakespeare" },
-  { "q": "The fool doth think he is wise, but the wise man knows himself to be a fool.", "w": "As You Like It", "a": "William Shakespeare" },
-  { "q": "—No sooner met but they looked; no sooner looked but they loved.\n—Who ever loved that loved not at first sight?", "w": "As You Like It", "a": "William Shakespeare" },
-  { "q": "Love is merely a madness, and, I tell you, deserves as well a dark house and a whip as madmen do; and the reason why they are not so punished is that the lunacy is so ordinary that the whippers are in love too.", "w": "As You Like It", "a": "William Shakespeare" },
-  { "q": "If you prick us, do we not bleed? If you tickle us, do we not laugh? If you poison us, do we not die? And if you wrong us, shall we not revenge?", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "The quality of mercy is not strained; it droppeth as the gentle rain from heaven upon the place beneath. It is twice blest: it blesseth him that gives and him that takes.", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "Mark you this: the devil can cite Scripture for his purpose. An evil soul producing holy witness is like a villain with a smiling cheek.", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "All that glisters is not gold; often have you heard that told. Many a man his life hath sold but my outside to behold.", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "How far that little candle throws his beams! So shines a good deed in a naughty world.", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "The man that hath no music in himself, nor is not moved with concord of sweet sounds, is fit for treasons, stratagems, and spoils. Let no such man be trusted.", "w": "The Merchant of Venice", "a": "William Shakespeare" },
-  { "q": "Men at some time are masters of their fates: the fault, dear Brutus, is not in our stars, but in ourselves, that we are underlings.", "w": "Julius Caesar", "a": "William Shakespeare" },
-  { "q": "Cowards die many times before their deaths; the valiant never taste of death but once. Of all the wonders that I yet have heard, it seems to me most strange that men should fear.", "w": "Julius Caesar", "a": "William Shakespeare" },
-  { "q": "—Caesar!\n—Who calls? Speak; Caesar is turned to hear.\n—Beware the ides of March!", "w": "Julius Caesar", "a": "William Shakespeare" },
-  { "q": "Friends, Romans, countrymen, lend me your ears: I come to bury Caesar, not to praise him. The evil that men do lives after them; the good is oft interrèd with their bones.", "w": "Julius Caesar", "a": "William Shakespeare" },
-  { "q": "There is a tide in the affairs of men which, taken at the flood, leads on to fortune; omitted, all the voyage of their life is bound in shallows and in miseries.", "w": "Julius Caesar", "a": "William Shakespeare" },
-  { "q": "If music be the food of love, play on; give me excess of it, that, surfeiting, the appetite may sicken, and so die.", "w": "Twelfth Night", "a": "William Shakespeare" },
-  { "q": "Be not afraid of greatness: some are born great, some achieve greatness, and some have greatness thrust upon 'em.", "w": "Twelfth Night", "a": "William Shakespeare" },
-  { "q": "Better a witty fool than a foolish wit.", "w": "Twelfth Night", "a": "William Shakespeare" },
-  { "q": "There is no darkness but ignorance, in which thou art more puzzled than the Egyptians in their fog.", "w": "Twelfth Night", "a": "William Shakespeare" },
-  { "q": "A horse! A horse! My kingdom for a horse!", "w": "Richard III", "a": "William Shakespeare" },
-  { "q": "Now is the winter of our discontent made glorious summer by this sun of York, and all the clouds that loured upon our house in the deep bosom of the ocean buried.", "w": "Richard III", "a": "William Shakespeare" },
-  { "q": "And therefore, since I cannot prove a lover to entertain these fair well-spoken days, I am determinèd to prove a villain and hate the idle pleasures of these days.", "w": "Richard III", "a": "William Shakespeare" },
-  { "q": "Conscience is but a word that cowards use, devised at first to keep the strong in awe.", "w": "Richard III", "a": "William Shakespeare" },
-  { "q": "What is life? A frenzy.\nWhat is life? An illusion,\na shadow, a fiction,\nand the greatest good is small:\nfor all of life is a dream,\nand dreams themselves are dreams.", "w": "Life Is a Dream", "a": "Calderón de la Barca" },
-  { "q": "Ah, wretched me, unhappy!\nI strive, o heavens, to know,\nsince you treat me so,\nwhat crime I committed against you\nby being born; though being born, I understand\nwhat crime it was:\nman's greatest crime\nis to have been born at all.", "w": "Life Is a Dream", "a": "Calderón de la Barca" },
-  { "q": "They tell of a wise man who one day\nwas so poor and wretched\nthat he lived only on the herbs\nhe gathered. \"Is there another,\"\nhe asked himself, \"poorer and sadder than I?\"\nAnd when he turned his head\nhe found the answer: another wise man\nwas gathering the herbs he had thrown away.", "w": "Life Is a Dream", "a": "Calderón de la Barca" },
-  { "q": "And I, with more soul,\nhave less liberty?\nAnd I, with more life,\nhave less liberty?", "w": "Life Is a Dream", "a": "Calderón de la Barca" },
-  { "q": "But, be it truth or dream,\nto do right is what matters:\nif it be truth, for truth's sake;\nif not, to win us friends\nfor when we wake.", "w": "Life Is a Dream", "a": "Calderón de la Barca" },
-  { "q": "To the king one owes fortune and life;\nbut honour is the patrimony of the soul,\nand the soul belongs to God alone.", "w": "The Mayor of Zalamea", "a": "Calderón de la Barca" },
-  { "q": "And thus all human life is but performance, and we are all players in the great theatre of the world.", "w": "The Great Theatre of the World", "a": "Calderón de la Barca" },
-  { "q": "—Who killed the Comendador?\n—Fuenteovejuna, my lord!\n—And who is Fuenteovejuna?\n—All of us as one!", "w": "Fuenteovejuna", "a": "Lope de Vega" },
-  { "q": "Cowardly hares you were born; barbarians, not Spaniards! Hens, who suffer that other men enjoy your women! Give the weapons to me, since you are stones, since you are bronze.", "w": "Fuenteovejuna", "a": "Lope de Vega" },
-  { "q": "By night they killed him,\nthe knight,\nthe pride of Medina,\nthe flower of Olmedo.\nShadows warned him\nnot to set out,\nand counselled him\nnot to go,\nthe knight,\nthe pride of Medina,\nthe flower of Olmedo.", "w": "The Knight of Olmedo", "a": "Lope de Vega" },
-  { "q": "Diana is like the gardener's dog: she neither eats the cabbages nor lets another eat them.", "w": "The Dog in the Manger", "a": "Lope de Vega" },
-  { "q": "—If he is my father, why does he not honour me?\n—You grant me long credit.\n—Such long credit you grant me! From here to there is a long journey.", "w": "The Trickster of Seville", "a": "Tirso de Molina" },
-  { "q": "All Seville calls me the Trickster, and the greatest pleasure I can have is to trick a woman and leave her without honour.", "w": "The Trickster of Seville", "a": "Tirso de Molina" },
-  { "q": "This is God's justice: as you do, so shall you pay.", "w": "The Trickster of Seville", "a": "Tirso de Molina" },
-  { "q": "Is it not true, angel of love,\nthat on this secluded shore\nthe moon shines purer\nand one breathes better here?", "w": "Don Juan Tenorio", "a": "José Zorrilla" },
-  { "q": "Down to the cottages I went,\nup to the palaces I climbed,\nthe cloisters' walls I scaled,\nand everywhere I left\nbitter memory of me.", "w": "Don Juan Tenorio", "a": "José Zorrilla" },
-  { "q": "I called upon heaven and it heard me not;\nand since it shuts its gates against me,\nlet heaven, not I, answer\nfor my steps upon the earth.", "w": "Don Juan Tenorio", "a": "José Zorrilla" },
-  { "q": "—And you are here, Doña Inés, for me?\n—Yes, Don Juan: the love I bear you has brought me to the edge of your grave.", "w": "Don Juan Tenorio", "a": "José Zorrilla" },
-  { "q": "—When did it happen?\n—Yesterday. The bride and Leonardo... they fled. They rode embraced, like a gust of wind.\n—After them! Who has a horse?", "w": "Blood Wedding", "a": "Federico García Lorca" },
-  { "q": "Let us go to the dark corner where I may love you always, for I care nothing for people, nor for the poison they pour on us.", "w": "Blood Wedding", "a": "Federico García Lorca" },
-  { "q": "The knife, the knife... Cursed be all knives, and the scoundrel who invented them.", "w": "Blood Wedding", "a": "Federico García Lorca" },
-  { "q": "And this is a knife, a little knife that barely fits the hand, but that slides in clean through astonished flesh, and stops at the place where trembles, entangled, the dark root of the scream.", "w": "Blood Wedding", "a": "Federico García Lorca" },
-  { "q": "—Mother, take me with you!\n—Alone? You alone? No. Here. Weep at your proper hour, whenever you wish to weep. But composed! Here! Be quiet, I said.", "w": "Blood Wedding", "a": "Federico García Lorca" },
-  { "q": "—Have you not begun the mourning?\n—In the eight years this mourning lasts, not even the wind from the street shall enter this house. Imagine we have sealed the doors and windows with bricks.", "w": "The House of Bernarda Alba", "a": "Federico García Lorca" },
-  { "q": "Needle and thread for females. Whip and mule for the male. That is the lot of people born with means.", "w": "The House of Bernarda Alba", "a": "Federico García Lorca" },
-  { "q": "To be born a woman is the greatest punishment.", "w": "The House of Bernarda Alba", "a": "Federico García Lorca" },
-  { "q": "And I want no weeping. Death must be looked at face to face. Silence! Be quiet, I said! She, the youngest daughter of Bernarda Alba, died a virgin. Do you hear me? Silence, silence I said! Silence!", "w": "The House of Bernarda Alba", "a": "Federico García Lorca" },
-  { "q": "—Why am I withered? Why?\n—Withered, withered, but safe.", "w": "Yerma", "a": "Federico García Lorca" },
-  { "q": "Every woman has blood for four or five children, and when she has none it turns to poison — as it will in me.", "w": "Yerma", "a": "Federico García Lorca" },
-  { "q": "Do not look at me any more. I have killed my child — I myself have killed my child!", "w": "Yerma", "a": "Federico García Lorca" },
-  { "q": "Esperpentism was invented by Goya. The classical heroes have gone strolling down Cat Alley. The classical heroes reflected in concave mirrors yield the Esperpento.", "w": "Bohemian Lights", "a": "Ramón M.ª del Valle-Inclán" },
-  { "q": "Spain is a grotesque deformation of European civilisation. The most beautiful images in a concave mirror are absurd.", "w": "Bohemian Lights", "a": "Ramón M.ª del Valle-Inclán" },
-  { "q": "—Max, don't be magnificent.\n—Our tragedy is no tragedy.\n—Then it must be something!\n—The Esperpento.", "w": "Bohemian Lights", "a": "Ramón M.ª del Valle-Inclán" },
-  { "q": "Behold the scaffolding of the old farce, the one that relieved in village inns the weariness of carters, the one that entranced the simple villagers in the squares of humble towns.", "w": "The Bonds of Interest", "a": "Jacinto Benavente" },
-  { "q": "I was not born to share hatred, but love.", "w": "Antigone", "a": "Sophocles" },
-  { "q": "Many wonders there are, and yet none more wondrous than man: he crosses the grey sea driven by the stormy south wind.", "w": "Antigone", "a": "Sophocles" },
-  { "q": "—And yet you dared to overstep these laws?\n—It was not Zeus who proclaimed them, nor Justice who dwells with the gods below. Nor did I think your decrees so strong that a mortal could override the unwritten and unfailing laws of the gods.", "w": "Antigone", "a": "Sophocles" },
-  { "q": "Wisdom is by far the greatest part of happiness. One must commit no impiety against the gods. The boastful words of the proud are paid with heavy blows, and in old age teach wisdom.", "w": "Antigone", "a": "Sophocles" },
-  { "q": "Count no man happy until he has crossed life's border free from pain.", "w": "Oedipus Rex", "a": "Sophocles" },
-  { "q": "O light, may I look on you now for the last time! I, born of those I should not have been born of, who lived with those I should not have lived with, and killed those I should not have killed.", "w": "Oedipus Rex", "a": "Sophocles" },
-  { "q": "Not to be born conquers all reasoning; and once one has come into the world, to return as soon as may be whence one came is second best.", "w": "Oedipus at Colonus", "a": "Sophocles" },
-  { "q": "Of all creatures that have life and thought, we women are the most wretched: we must buy a husband with a dowry, and so take a master over our body.", "w": "Medea", "a": "Euripides" },
-  { "q": "They say we live a life without danger at home, while they fight with the spear. Fools! I would rather stand three times in the battle line than give birth once.", "w": "Medea", "a": "Euripides" },
-  { "q": "I understand the crime I am about to commit, but my passion is stronger than my deliberations.", "w": "Medea", "a": "Euripides" },
-  { "q": "My tongue swore, but my heart did not.", "w": "Hippolytus", "a": "Euripides" },
-  { "q": "—And what remedy did you find for that sickness?\n—I lodged blind hopes within mortals.\n—A great benefit you gave them with that gift.\n—And besides, I gave them fire.", "w": "Prometheus Bound", "a": "Aeschylus" },
-  { "q": "In a word: I hate all the gods who, having received good from me, wrongfully mistreat me.", "w": "Prometheus Bound", "a": "Aeschylus" },
-  { "q": "Time, as it grows old, teaches all things.", "w": "Prometheus Bound", "a": "Aeschylus" },
-  { "q": "Zeus set mortals on the road to understanding when he laid down as sovereign law: by suffering we learn.", "w": "Agamemnon", "a": "Aeschylus" },
-  { "q": "—What sensible or glorious thing could we women do, we who sit at home in our rouge and saffron gowns?\n—Why, that is exactly what I am counting on to save us!", "w": "Lysistrata", "a": "Aristophanes" },
-  { "q": "There is no beast so untamable as woman, nor fire, nor any panther so shameless.", "w": "Lysistrata", "a": "Aristophanes" },
-  { "q": "Brekekekex, koax, koax! Brekekekex, koax, koax! Marsh-born daughters of the springs, let us sound the hymn that goes with the flutes, my resonant song.", "w": "The Frogs", "a": "Aristophanes" },
-  { "q": "I am human; nothing human is alien to me.", "w": "The Self-Tormentor", "a": "Terence" },
-  { "q": "Man is a wolf to man, and no man, when he knows not what the other is.", "w": "Asinaria", "a": "Plautus" },
-  { "q": "—Medea, what will you do now?\n—Now I am Medea: my genius has grown with my misfortunes.", "w": "Medea", "a": "Seneca" },
-  { "q": "—What! Going so fast?\n—Cover that bosom which I should not behold: souls are wounded by such sights, and guilty thoughts arise.", "w": "Tartuffe", "a": "Molière" },
-  { "q": "It is the public scandal that constitutes the offence: to sin in private is not to sin at all.", "w": "Tartuffe", "a": "Molière" },
-  { "q": "Thieves! Thieves! Assassins! Murder! Justice, just heaven! I am undone, I am murdered, they have cut my throat: they have stolen my money! My money, my poor money, my dear friend, they have taken you from me!", "w": "The Miser", "a": "Molière" },
-  { "q": "—One must eat to live, and not live to eat.\n—How well said that is!", "w": "The Miser", "a": "Molière" },
-  { "q": "Nearly all men die of their remedies, and not of their illnesses.", "w": "The Imaginary Invalid", "a": "Molière" },
-  { "q": "The more we love someone, the less we should flatter them: pure love pardons nothing.", "w": "The Misanthrope", "a": "Molière" },
-  { "q": "Perfect reason flees all extremity, and would have one be wise with sobriety.", "w": "The Misanthrope", "a": "Molière" },
-  { "q": "—Before all else you are a wife and a mother.\n—I no longer believe that. Before all else I am a human being, just as much as you are... or at least I must try to become one.", "w": "A Doll's House", "a": "Henrik Ibsen" },
-  { "q": "Our home has been nothing but a playroom. Here I have been your doll-wife, just as at home I was papa's doll-child. And the children, in their turn, have been my dolls.", "w": "A Doll's House", "a": "Henrik Ibsen" },
-  { "q": "—Do you know that millions of women have sacrificed themselves?\n—I have other duties just as sacred: my duties to myself.", "w": "A Doll's House", "a": "Henrik Ibsen" },
-  { "q": "For once in my life I want to have power over a human destiny!", "w": "Hedda Gabler", "a": "Henrik Ibsen" },
-  { "q": "—He shot himself in the temple! Imagine!\n—But, good God, people don't do such things!", "w": "Hedda Gabler", "a": "Henrik Ibsen" },
-  { "q": "That is the question: the majority is never right. Who make up the majority in any country? The intelligent people, or the fools?", "w": "An Enemy of the People", "a": "Henrik Ibsen" },
-  { "q": "The strongest man in the world is he who stands most alone.", "w": "An Enemy of the People", "a": "Henrik Ibsen" },
-  { "q": "Ghosts are not only what we inherit from our fathers and mothers; they are also old dead ideas and old lifeless beliefs. They are not alive, yet they cling to us, and we cannot rid ourselves of them.", "w": "Ghosts", "a": "Henrik Ibsen" },
-  { "q": "—Why do you always wear black?\n—I am in mourning for my life. I am unhappy.", "w": "The Seagull", "a": "Anton Chekhov" },
-  { "q": "I am a seagull... No, that's not it. I am an actress. Yes, that's it!", "w": "The Seagull", "a": "Anton Chekhov" },
-  { "q": "The theatre of today is routine and prejudice. New forms are needed; and if there are none, then better nothing at all.", "w": "The Seagull", "a": "Anton Chekhov" },
-  { "q": "Now I know, I understand, that in our work — acting or writing, it's all the same — the main thing is not fame, not glory, not what I used to dream of, but knowing how to endure. Have faith, and endure.", "w": "The Seagull", "a": "Anton Chekhov" },
-  { "q": "What can we do? We must live! We shall live, Uncle Vanya. We shall live through a long, long line of days, of endless evenings.", "w": "Uncle Vanya", "a": "Anton Chekhov" },
-  { "q": "We shall rest. We shall hear the angels, we shall see the sky all sparkling with diamonds, we shall see how all earthly evil and all our sufferings drown in the mercy that will fill the whole world.", "w": "Uncle Vanya", "a": "Anton Chekhov" },
-  { "q": "Everything in a human being should be beautiful: the face, the clothes, the soul, the thoughts.", "w": "Uncle Vanya", "a": "Anton Chekhov" },
-  { "q": "—She is gone!\n—All Russia is our orchard. The land is wide and beautiful; there are many wonderful places in it.", "w": "The Cherry Orchard", "a": "Anton Chekhov" },
-  { "q": "My dear, my tender, my beautiful orchard! My life, my youth, my happiness, farewell! Farewell!", "w": "The Cherry Orchard", "a": "Anton Chekhov" },
-  { "q": "Life has slipped by as though I had never lived. Goodbye, old life! Welcome, new life!", "w": "The Cherry Orchard", "a": "Anton Chekhov" },
-  { "q": "To Moscow, to Moscow, to Moscow!", "w": "Three Sisters", "a": "Anton Chekhov" },
-  { "q": "Time will pass and we shall be gone forever; they will forget us, forget our faces, our voices. But our sufferings will turn to joy for those who live after us.", "w": "Three Sisters", "a": "Anton Chekhov" },
-  { "q": "If only we knew, if only we knew!", "w": "Three Sisters", "a": "Anton Chekhov" },
-  { "q": "Grey, dear friend, is all theory, and green the golden tree of life.", "w": "Faust", "a": "Johann W. von Goethe" },
-  { "q": "If ever I say to the passing moment: \"Stay, thou art so fair!\" — then you may cast me into chains, then I will gladly accept my ruin.", "w": "Faust", "a": "Johann W. von Goethe" },
-  { "q": "—Who are you, then?\n—I am part of that power which eternally wills evil and eternally works good.", "w": "Faust", "a": "Johann W. von Goethe" },
-  { "q": "I am the spirit that eternally denies. And rightly so, for all that comes to be deserves to perish.", "w": "Faust", "a": "Johann W. von Goethe" },
-  { "q": "It is written: \"In the beginning was the Word\"... Here I stop already. Who helps me to go on? I should write: \"In the beginning was the Deed\".", "w": "Faust", "a": "Johann W. von Goethe" },
-  { "q": "That is rather short, young man! You could have said... oh, so many things! Aggressive: \"Sir, if I had such a nose, I'd amputate it at once.\" Friendly: \"When you drink, it must dip into your cup: use a tankard instead.\" Descriptive: \"It is a rock, a peak, a cape! What am I saying, a cape? It is a peninsula!\"", "w": "Cyrano de Bergerac", "a": "Edmond Rostand" },
-  { "q": "And what should one do? Seek a powerful protector? No, thank you. Climb by cunning instead of rising by strength? No, thank you. Not to rise very high, perhaps — but to rise alone.", "w": "Cyrano de Bergerac", "a": "Edmond Rostand" },
-  { "q": "What's that you say? It is useless? I know it! But one does not fight in the hope of success. No! It is far more beautiful when it is useless!", "w": "Cyrano de Bergerac", "a": "Edmond Rostand" },
-  { "q": "There is one thing I take with me in spite of all, without a stain or a crease: my panache.", "w": "Cyrano de Bergerac", "a": "Edmond Rostand" },
-  { "q": "The truth is rarely pure and never simple. Modern life would be very tedious if it were either, and modern literature a complete impossibility.", "w": "The Importance of Being Earnest", "a": "Oscar Wilde" },
-  { "q": "I do not approve of anything that tampers with natural ignorance... To be in love is very romantic. But there is nothing romantic about a definite proposal. Why, one may be accepted!", "w": "The Importance of Being Earnest", "a": "Oscar Wilde" },
-  { "q": "To lose one parent, Mr. Worthing, may be regarded as a misfortune; to lose both looks like carelessness.", "w": "The Importance of Being Earnest", "a": "Oscar Wilde" },
-  { "q": "In matters of grave importance, style, not sincerity, is the vital thing.", "w": "The Importance of Being Earnest", "a": "Oscar Wilde" },
-  { "q": "I never travel without my diary. One should always have something sensational to read in the train.", "w": "The Importance of Being Earnest", "a": "Oscar Wilde" },
-  { "q": "—Do you often go to the club?\n—I can resist everything except temptation.", "w": "Lady Windermere's Fan", "a": "Oscar Wilde" },
-  { "q": "We are all in the gutter, but some of us are looking at the stars.", "w": "Lady Windermere's Fan", "a": "Oscar Wilde" },
-  { "q": "Sooner or later we have all to pay for what we do.", "w": "An Ideal Husband", "a": "Oscar Wilde" },
-  { "q": "Ah! I have kissed thy mouth, Iokanaan, I have kissed thy mouth. There was a bitter taste on thy lips. Was it the taste of blood? Perchance it was the taste of love. They say that love hath a bitter taste.", "w": "Salomé", "a": "Oscar Wilde" },
-  { "q": "—Excuse me, who are you?\n—We are six characters in search of an author. We carry within us a painful drama, and we wish to perform it.", "w": "Six Characters in Search of an Author", "a": "Luigi Pirandello" },
-  { "q": "When a character is born, he at once acquires such independence, even from his own author, that everyone can imagine him in many situations of which his author never thought.", "w": "Six Characters in Search of an Author", "a": "Luigi Pirandello" },
-  { "q": "Life is full of infinite absurdities which do not even need to appear plausible, since they are true.", "w": "Six Characters in Search of an Author", "a": "Luigi Pirandello" },
-  { "q": "I am whoever each of you believes me to be. Right you are, if you think you are.", "w": "Right You Are (If You Think So)", "a": "Luigi Pirandello" },
-  { "q": "I often dream I am sitting on top of a pillar with no way of getting down; I grow dizzy looking down, but down I must come, and I haven't the courage to throw myself off.", "w": "Miss Julie", "a": "August Strindberg" },
-  { "q": "My wound is older. Scarcely was I bound by the laws of marriage to the son of Aegeus when Athens showed me my proud enemy: I saw him, I blushed, I turned pale at the sight of him.", "w": "Phaedra", "a": "Jean Racine" },
-  { "q": "—What about hanging ourselves?\n—Hmm. It'd give us an erection.\n—An erection! With all that follows?\n—Let's hang ourselves immediately!", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "—Let's go.\n—We can't.\n—Why not?\n—We're waiting for Godot.\n—Ah, true.", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "The tears of the world are a constant quantity. For each one who begins to weep, somewhere else another stops. The same is true of the laugh.", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "We are all born mad. Some remain so.", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "—What do we do now?\n—Wait.\n—Yes, but while waiting.\n—What about hanging ourselves?", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "Astride of a grave and a difficult birth. Down in the hole, lingeringly, the grave-digger puts on the forceps. We have time to grow old. The air is full of our cries.", "w": "Waiting for Godot", "a": "Samuel Beckett" },
-  { "q": "Was this the face that launched a thousand ships and burnt the topless towers of Ilium? Sweet Helen, make me immortal with a kiss.", "w": "Doctor Faustus", "a": "Christopher Marlowe" },
-  { "q": "—How comes it then that thou art out of hell?\n—Hell hath no limits, nor is circumscribed in one self place: for where we are is hell, and where hell is must we ever be.", "w": "Doctor Faustus", "a": "Christopher Marlowe" },
-  { "q": "—Ask of me what you will.\n—I grant you all you have asked... Grant us... freedom of thought, Sire!", "w": "Don Carlos", "a": "Friedrich Schiller" },
-  { "q": "I am a force that moves onward! Blind and deaf agent of funereal mysteries, a soul of misfortune made of darkness.", "w": "Hernani", "a": "Victor Hugo" },
-  { "q": "The difference between a lady and a flower girl is not how she behaves, but how she's treated. I shall always be a flower girl to Professor Higgins, because he always treats me as a flower girl; but I know I can be a lady to you.", "w": "Pygmalion", "a": "George Bernard Shaw" },
-  { "q": "O God that madest this beautiful earth, when will it be ready to receive Thy saints? How long, O Lord, how long?", "w": "Saint Joan", "a": "George Bernard Shaw" },
-  { "q": "—First comes the feeding, then comes morality.\n—First the poor must be able to cut their slice from the great loaf of bread.", "w": "The Threepenny Opera", "a": "Bertolt Brecht" },
-  { "q": "What is robbing a bank compared with founding a bank? What is a picklock compared with a share certificate?", "w": "The Threepenny Opera", "a": "Bertolt Brecht" },
-  { "q": "And the shark has teeth, and he wears them in his face. And Macheath has a knife, but the knife you do not see.", "w": "The Threepenny Opera", "a": "Bertolt Brecht" },
-  { "q": "There are some who are in darkness and some who are in light. And you see the ones in brightness; those in darkness you don't see.", "w": "The Threepenny Opera", "a": "Bertolt Brecht" },
-  { "q": "—Unhappy is the land that has no heroes!\n—No: unhappy is the land that needs heroes.", "w": "Life of Galileo", "a": "Bertolt Brecht" },
-  { "q": "He who does not know the truth is merely an ignoramus; but he who knows it and calls it a lie — he is a criminal.", "w": "Life of Galileo", "a": "Bertolt Brecht" },
-  { "q": "I believe the only purpose of science is to ease the hardship of human existence.", "w": "Life of Galileo", "a": "Bertolt Brecht" },
-  { "q": "The war always finds a way out. As long as there are people, war will find its way.", "w": "Mother Courage and Her Children", "a": "Bertolt Brecht" },
-  { "q": "—What's the matter with the war? Can't it stop for a moment?\n—War is nothing but business continued by other means.", "w": "Mother Courage and Her Children", "a": "Bertolt Brecht" },
-  { "q": "I must get back to business. Alone I am now, with the cart. There's still trading to be done. Hey, take me with you!", "w": "Mother Courage and Her Children", "a": "Bertolt Brecht" },
-  { "q": "That the child should go to the motherly, that they may thrive; the carts to good drivers, that they be well driven; and the valley to those who water it, that it bring forth fruit.", "w": "The Caucasian Chalk Circle", "a": "Bertolt Brecht" },
-  { "q": "Terrible is the temptation to do good!", "w": "The Caucasian Chalk Circle", "a": "Bertolt Brecht" }
+  {
+    "q": "To be, or not to be, that is the question: whether 'tis nobler in the mind to suffer the slings and arrows of outrageous fortune, or to take arms against a sea of troubles and by opposing end them.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "To die, to sleep — to sleep, perchance to dream. Ay, there's the rub: for in that sleep of death what dreams may come, when we have shuffled off this mortal coil.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—What do you read, my lord?\n—Words, words, words.\n—What is the matter, my lord?\n—Between who?\n—I mean the matter that you read, my lord.\n—Slanders, sir.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "There are more things in heaven and earth, Horatio, than are dreamt of in your philosophy.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—Though this be madness, yet there is method in 't.\n—Will you walk out of the air, my lord?\n—Into my grave?",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Something is rotten in the state of Denmark.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Use every man after his desert, and who should 'scape whipping? Use them after your own honour and dignity: the less they deserve, the more merit is in your bounty.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Neither a borrower nor a lender be, for loan oft loses both itself and friend, and borrowing dulls the edge of husbandry. This above all: to thine own self be true, and it must follow, as the night the day, thou canst not then be false to any man.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The rest is silence.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—How does my good Lord Hamlet?\n—Well, God-a-mercy.\n—Do you know me, my lord?\n—Excellent well; you are a fishmonger.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Life's but a walking shadow, a poor player that struts and frets his hour upon the stage and then is heard no more: it is a tale told by an idiot, full of sound and fury, signifying nothing.",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Tomorrow, and tomorrow, and tomorrow, creeps in this petty pace from day to day to the last syllable of recorded time, and all our yesterdays have lighted fools the way to dusty death.",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Fair is foul, and foul is fair: hover through the fog and filthy air.",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Is this a dagger which I see before me, the handle toward my hand? Come, let me clutch thee. I have thee not, and yet I see thee still.",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Out, damned spot! Out, I say!",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "By the pricking of my thumbs, something wicked this way comes. Open, locks, whoever knocks!",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Things without all remedy should be without regard: what's done is done.",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—O Romeo, Romeo, wherefore art thou Romeo? Deny thy father and refuse thy name; or, if thou wilt not, be but sworn my love, and I'll no longer be a Capulet.\n—Shall I hear more, or shall I speak at this?",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "What's in a name? That which we call a rose by any other name would smell as sweet.",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—How camest thou hither, tell me, and wherefore? The orchard walls are high and hard to climb, and the place death, considering who thou art, if any of my kinsmen find thee here.\n—With love's light wings did I o'er-perch these walls, for stony limits cannot hold love out.",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—O, swear not by the moon, the inconstant moon, that monthly changes in her circled orb, lest that thy love prove likewise variable.\n—What shall I swear by?\n—Do not swear at all; or, if thou wilt, swear by thy gracious self.",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Good night, good night! Parting is such sweet sorrow, that I shall say good night till it be morrow.",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "These violent delights have violent ends, and in their triumph die, like fire and powder, which as they kiss consume.",
+    "w": "Romeo and Juliet",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "We are such stuff as dreams are made on, and our little life is rounded with a sleep.",
+    "w": "The Tempest",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Hell is empty, and all the devils are here!",
+    "w": "The Tempest",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "O, wonder! How many goodly creatures are there here! How beauteous mankind is! O brave new world, that has such people in 't!",
+    "w": "The Tempest",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "What's past is prologue; what to come, in yours and my discharge.",
+    "w": "The Tempest",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The isle is full of noises, sounds, and sweet airs, that give delight and hurt not. Sometimes a thousand twangling instruments will hum about mine ears.",
+    "w": "The Tempest",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "For aught that I could ever read, could ever hear by tale or history, the course of true love never did run smooth.",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Love looks not with the eyes, but with the mind; and therefore is winged Cupid painted blind.",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The lunatic, the lover, and the poet are of imagination all compact: one sees more devils than vast hell can hold, that is, the madman; the lover, all as frantic, sees Helen's beauty in a brow of Egypt.",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Lord, what fools these mortals be!",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "O, when she's angry, she is keen and shrewd! She was a vixen when she went to school; and though she be but little, she is fierce.",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "If we shadows have offended, think but this, and all is mended: that you have but slumbered here while these visions did appear.",
+    "w": "A Midsummer Night's Dream",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "O, beware, my lord, of jealousy! It is the green-eyed monster which doth mock the meat it feeds on.",
+    "w": "Othello",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Who steals my purse steals trash; 'tis something, nothing; 'twas mine, 'tis his, and has been slave to thousands. But he that filches from me my good name robs me of that which not enriches him and makes me poor indeed.",
+    "w": "Othello",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Speak of me as I am; nothing extenuate, nor set down aught in malice. Then must you speak of one that loved not wisely, but too well.",
+    "w": "Othello",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Keep up your bright swords, for the dew will rust them.",
+    "w": "Othello",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "How sharper than a serpent's tooth it is to have a thankless child!",
+    "w": "King Lear",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—Nothing will come of nothing. Speak again.\n—Unhappy that I am, I cannot heave my heart into my mouth. I love your majesty according to my bond; no more nor less.",
+    "w": "King Lear",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Blow, winds, and crack your cheeks! Rage! Blow! You cataracts and hurricanoes, spout till you have drenched our steeples, drowned the cocks!",
+    "w": "King Lear",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "As flies to wanton boys are we to the gods: they kill us for their sport.",
+    "w": "King Lear",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "I am a man more sinned against than sinning.",
+    "w": "King Lear",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "All the world's a stage, and all the men and women merely players: they have their exits and their entrances, and one man in his time plays many parts.",
+    "w": "As You Like It",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The fool doth think he is wise, but the wise man knows himself to be a fool.",
+    "w": "As You Like It",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "No sooner met but they looked, no sooner looked but they loved, no sooner loved but they sighed.",
+    "w": "As You Like It",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Love is merely a madness, and, I tell you, deserves as well a dark house and a whip as madmen do; and the reason why they are not so punished and cured is that the lunacy is so ordinary that the whippers are in love too.",
+    "w": "As You Like It",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "If you prick us, do we not bleed? If you tickle us, do we not laugh? If you poison us, do we not die? And if you wrong us, shall we not revenge?",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The quality of mercy is not strained; it droppeth as the gentle rain from heaven upon the place beneath. It is twice blest: it blesseth him that gives and him that takes.",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The devil can cite Scripture for his purpose. An evil soul producing holy witness is like a villain with a smiling cheek.",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "All that glisters is not gold; often have you heard that told. Many a man his life hath sold but my outside to behold.",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "How far that little candle throws his beams! So shines a good deed in a naughty world.",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "The man that hath no music in himself, nor is not moved with concord of sweet sounds, is fit for treasons, stratagems, and spoils; the motions of his spirit are dull as night and his affections dark as Erebus. Let no such man be trusted.",
+    "w": "The Merchant of Venice",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Men at some time are masters of their fates: the fault, dear Brutus, is not in our stars, but in ourselves, that we are underlings.",
+    "w": "Julius Caesar",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Cowards die many times before their deaths; the valiant never taste of death but once. Of all the wonders that I yet have heard, it seems to me most strange that men should fear, seeing that death, a necessary end, will come when it will come.",
+    "w": "Julius Caesar",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "—Speak; Caesar is turned to hear.\n—Beware the ides of March.",
+    "w": "Julius Caesar",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Friends, Romans, countrymen, lend me your ears: I come to bury Caesar, not to praise him. The evil that men do lives after them; the good is oft interrèd with their bones.",
+    "w": "Julius Caesar",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "There is a tide in the affairs of men which, taken at the flood, leads on to fortune; omitted, all the voyage of their life is bound in shallows and in miseries.",
+    "w": "Julius Caesar",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "If music be the food of love, play on; give me excess of it, that, surfeiting, the appetite may sicken, and so die.",
+    "w": "Twelfth Night",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Be not afraid of greatness: some are born great, some achieve greatness, and some have greatness thrust upon 'em.",
+    "w": "Twelfth Night",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Better a witty fool than a foolish wit.",
+    "w": "Twelfth Night",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "There is no darkness but ignorance, in which thou art more puzzled than the Egyptians in their fog.",
+    "w": "Twelfth Night",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "A horse! A horse! My kingdom for a horse!",
+    "w": "Richard III",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Now is the winter of our discontent made glorious summer by this sun of York, and all the clouds that loured upon our house in the deep bosom of the ocean buried.",
+    "w": "Richard III",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "And therefore, since I cannot prove a lover to entertain these fair well-spoken days, I am determinèd to prove a villain and hate the idle pleasures of these days.",
+    "w": "Richard III",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "Conscience is but a word that cowards use, devised at first to keep the strong in awe.",
+    "w": "Richard III",
+    "a": "William Shakespeare"
+  },
+  {
+    "q": "What is life? A frenzy.\nWhat is life? An illusion,\na shadow, a fiction,\nand the greatest good is small:\nfor all of life is a dream,\nand dreams themselves are dreams.",
+    "w": "Life Is a Dream",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "Alas, wretched me! Alas, unhappy!\nI strive, o heavens, to learn,\nsince you treat me so,\nwhat crime I committed\nagainst you by being born;\nthough if I was born, I understand\nwhat crime I have committed:\nsufficient cause there has been\nfor your justice and rigour,\nsince the greatest crime\nof man is to have been born.",
+    "w": "Life Is a Dream",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "They tell of a sage who one day\nwas so poor and wretched\nthat he sustained himself only\non some herbs he gathered.\n\"Can there be another,\" he said to himself,\n\"poorer and sadder than I?\"\nAnd when he turned his face\nhe found the answer, seeing\nanother sage going along gathering\nthe leaves that he had thrown away.",
+    "w": "Life Is a Dream",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "The bird is born, and with the finery\nthat gives it supreme beauty,\nit is scarcely a feathered flower\nor a posy with wings\nwhen it cuts through the ethereal halls\nwith swiftness,\nrefusing the shelter\nof the nest it leaves in calm;\nand I, having more soul,\nhave less liberty?",
+    "w": "Life Is a Dream",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "But, be it truth or dream,\nto do right is what matters:\nif it be truth, for truth's sake;\nif not, to win us friends\nfor when we wake.",
+    "w": "Life Is a Dream",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "To the king one owes fortune and life;\nbut honour is the patrimony of the soul,\nand the soul belongs to God alone.",
+    "w": "The Mayor of Zalamea",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "With any role it is won,\nfor the whole of human life\nis a play of parts.",
+    "w": "The Great Theatre of the World",
+    "a": "Calderón de la Barca"
+  },
+  {
+    "q": "—I shall kill you, believe it,\non this rack, you villagers.\nWho killed the Comendador?\n—Fuenteovejuna, sir.",
+    "w": "Fuenteovejuna",
+    "a": "Lope de Vega"
+  },
+  {
+    "q": "Cowardly hares you were born;\nbarbarians you are, not Spaniards.\nHens! You suffer other men\nto enjoy your women!\nPut distaffs in your belts.\nWhy do you gird on swords?",
+    "w": "Fuenteovejuna",
+    "a": "Lope de Vega"
+  },
+  {
+    "q": "By night they killed him,\nthe knight,\nthe pride of Medina,\nthe flower of Olmedo.\nShadows warned him\nnot to set out,\nand counselled him\nnot to go,\nthe knight,\nthe pride of Medina,\nthe flower of Olmedo.",
+    "w": "The Knight of Olmedo",
+    "a": "Lope de Vega"
+  },
+  {
+    "q": "Doubt it not: she is by nature\nthe gardener's dog:\nshe neither eats nor lets eat,\nis neither outside nor within.",
+    "w": "The Dog in the Manger",
+    "a": "Lope de Vega"
+  },
+  {
+    "q": "—You who feign and deceive\nwomen in this fashion\nwill pay for it in death.\n—What long credit you give me!",
+    "w": "The Trickster of Seville",
+    "a": "Tirso de Molina"
+  },
+  {
+    "q": "All Seville calls me\nthe Trickster, and the greatest\npleasure I can have\nis to trick a woman\nand leave her without honour.",
+    "w": "The Trickster of Seville",
+    "a": "Tirso de Molina"
+  },
+  {
+    "q": "This is the justice of God:\nwho does such deeds, so shall he pay.",
+    "w": "The Trickster of Seville",
+    "a": "Tirso de Molina"
+  },
+  {
+    "q": "Ah! Is it not true, angel of love,\nthat on this secluded shore\nthe moon shines more purely\nand one breathes better?",
+    "w": "Don Juan Tenorio",
+    "a": "José Zorrilla"
+  },
+  {
+    "q": "Down to the cottages I went,\nup to the palaces I climbed,\nthe cloisters' walls I scaled,\nand everywhere I left\nbitter memory of me.",
+    "w": "Don Juan Tenorio",
+    "a": "José Zorrilla"
+  },
+  {
+    "q": "I called on heaven and it did not hear me,\nand since it shuts its gates against me,\nlet heaven, and not I, answer\nfor my steps upon the earth.",
+    "w": "Don Juan Tenorio",
+    "a": "José Zorrilla"
+  },
+  {
+    "q": "—I am Doña Inés, Don Juan,\nwho heard you from her grave.\n—Then you live?\n—For you;\nbut I keep my purgatory\nin that funeral marble\nthey carved for me.",
+    "w": "Don Juan Tenorio",
+    "a": "José Zorrilla"
+  },
+  {
+    "q": "—They have fled! They have fled! She and Leonardo. On the horse. They ride embraced, like a gust of wind.\n—It is not true! Not my daughter!\n—Your daughter, yes! Offshoot of a wicked mother, and he, he too, he. But now she is my son's wife!\n—After them! Who has a horse?",
+    "w": "Blood Wedding",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "Let us go to the dark corner,\nwhere I may love you always,\nfor I care nothing for people,\nnor the poison they cast on us.",
+    "w": "Blood Wedding",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "The knife, the knife... A curse on them all, and on the scoundrel who invented them.",
+    "w": "Blood Wedding",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "With a knife,\nwith a little knife\nthat barely fits the hand,\nbut that slides in clean\nthrough astonished flesh\nand stops at the place\nwhere trembles, entangled,\nthe dark root of the scream.",
+    "w": "Blood Wedding",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "—Let me weep with you.\n—Weep, but at the door.",
+    "w": "Blood Wedding",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "In the eight years this mourning lasts, the wind from the street shall not enter this house. Imagine that we have bricked up the doors and the windows.",
+    "w": "The House of Bernarda Alba",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "Needle and thread for females. Whip and mule for the male. That is the lot of people born with means.",
+    "w": "The House of Bernarda Alba",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "To be born a woman is the greatest punishment.",
+    "w": "The House of Bernarda Alba",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "And I want no weeping. Death must be looked at face to face. Silence! Be quiet, I said! Your tears when you are alone. We shall all drown ourselves in a sea of mourning! She, the youngest daughter of Bernarda Alba, died a virgin. Did you hear me? Silence, silence I said! Silence!",
+    "w": "The House of Bernarda Alba",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "Withered. Withered, but sure. Now I truly know it. And alone.",
+    "w": "Yerma",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "Every woman has blood for four or five children, and when she does not have them it turns to poison, as it will in me.",
+    "w": "Yerma",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "Do not come near, for I have killed my child, I myself have killed my child!",
+    "w": "Yerma",
+    "a": "Federico García Lorca"
+  },
+  {
+    "q": "—The ultraists are frauds. Esperpentism was invented by Goya. The classical heroes have gone strolling in the Callejón del Gato.\n—You are completely drunk!\n—The classical heroes reflected in concave mirrors yield the Esperpento. The tragic sense of Spanish life can only be rendered through an aesthetic that is systematically deformed.",
+    "w": "Bohemian Lights",
+    "a": "Ramón M.ª del Valle-Inclán"
+  },
+  {
+    "q": "—Spain is a grotesque deformation of European civilisation.\n—It may be! I take no part.\n—The most beautiful images in a concave mirror are absurd.",
+    "w": "Bohemian Lights",
+    "a": "Ramón M.ª del Valle-Inclán"
+  },
+  {
+    "q": "—Don Latino de Hispalis, grotesque personage, I shall immortalise you in a novel!\n—A tragedy, Max.\n—Our tragedy is not a tragedy.\n—Well, it must be something!\n—The Esperpento.",
+    "w": "Bohemian Lights",
+    "a": "Ramón M.ª del Valle-Inclán"
+  },
+  {
+    "q": "Behold the scaffolding of the old farce, the one that relieved in village inns the weariness of carters, the one that entranced the simple villagers in the squares of humble towns.",
+    "w": "The Bonds of Interest",
+    "a": "Jacinto Benavente"
+  },
+  {
+    "q": "I was not born to share hatred, but love.",
+    "w": "Antigone",
+    "a": "Sophocles"
+  },
+  {
+    "q": "Many wonders there are, and yet none more wondrous than man: he crosses the grey sea driven by the stormy south wind.",
+    "w": "Antigone",
+    "a": "Sophocles"
+  },
+  {
+    "q": "—And yet you dared to overstep these laws?\n—It was not Zeus who proclaimed them, nor did Justice who dwells with the gods below lay down such laws among men. Nor did I think your decrees so strong that a mortal could override the unwritten and unfailing laws of the gods.",
+    "w": "Antigone",
+    "a": "Sophocles"
+  },
+  {
+    "q": "Wisdom is by far the greatest part of happiness. One must commit no impiety against the gods. The boastful words of the proud are paid with heavy blows, and in old age teach wisdom.",
+    "w": "Antigone",
+    "a": "Sophocles"
+  },
+  {
+    "q": "Count no man happy until he has crossed life's border free from pain.",
+    "w": "Oedipus Rex",
+    "a": "Sophocles"
+  },
+  {
+    "q": "O light, may I look on you now for the last time! I, born of those I should not have been born of, who lived with those I should not have lived with, and killed those I should not have killed.",
+    "w": "Oedipus Rex",
+    "a": "Sophocles"
+  },
+  {
+    "q": "Not to be born conquers all reasoning; and once one has come into the world, to return as soon as may be whence one came is second best.",
+    "w": "Oedipus at Colonus",
+    "a": "Sophocles"
+  },
+  {
+    "q": "Of all creatures that have life and thought, we women are the most wretched: we must buy a husband with a dowry, and so take a master over our body.",
+    "w": "Medea",
+    "a": "Euripides"
+  },
+  {
+    "q": "They say we live a life without danger at home, while they fight with the spear. Fools! I would rather stand three times in the battle line than give birth once.",
+    "w": "Medea",
+    "a": "Euripides"
+  },
+  {
+    "q": "I understand the crime I am about to commit, but my passion is stronger than my deliberations.",
+    "w": "Medea",
+    "a": "Euripides"
+  },
+  {
+    "q": "My tongue swore, but my heart did not.",
+    "w": "Hippolytus",
+    "a": "Euripides"
+  },
+  {
+    "q": "—And what remedy did you find for that sickness?\n—I lodged blind hopes within mortals.\n—A great benefit you gave them with that gift.\n—And besides, I gave them fire.",
+    "w": "Prometheus Bound",
+    "a": "Aeschylus"
+  },
+  {
+    "q": "In a word: I hate all the gods who, having received good from me, wrongfully mistreat me.",
+    "w": "Prometheus Bound",
+    "a": "Aeschylus"
+  },
+  {
+    "q": "Time, as it grows old, teaches all things.",
+    "w": "Prometheus Bound",
+    "a": "Aeschylus"
+  },
+  {
+    "q": "Zeus set mortals on the road to understanding when he laid down as sovereign law: by suffering we learn.",
+    "w": "Agamemnon",
+    "a": "Aeschylus"
+  },
+  {
+    "q": "—What sensible or glorious thing could we women do, we who sit at home in our rouge and saffron gowns?\n—Why, that is exactly what I am counting on to save us!",
+    "w": "Lysistrata",
+    "a": "Aristophanes"
+  },
+  {
+    "q": "There is no beast so untamable as woman, nor fire, nor any panther so shameless.",
+    "w": "Lysistrata",
+    "a": "Aristophanes"
+  },
+  {
+    "q": "Brekekekex, koax, koax! Brekekekex, koax, koax! Marsh children of the springs, let us sound the hymn that goes with the flutes, my resonant song.",
+    "w": "The Frogs",
+    "a": "Aristophanes"
+  },
+  {
+    "q": "I am a man: I consider nothing human alien to me.",
+    "w": "The Self-Tormentor",
+    "a": "Terence"
+  },
+  {
+    "q": "Man is a wolf to man, and no man, when he knows not what the other is.",
+    "w": "Asinaria",
+    "a": "Plautus"
+  },
+  {
+    "q": "Now I am Medea: my genius has grown through evils.",
+    "w": "Medea",
+    "a": "Seneca"
+  },
+  {
+    "q": "—What?\n—Cover up that bosom, which I can't endure to look on. Things like that offend our souls, and fill our minds with sinful thoughts.",
+    "w": "Tartuffe",
+    "a": "Molière"
+  },
+  {
+    "q": "It is the public scandal that constitutes the offence: to sin in private is not to sin at all.",
+    "w": "Tartuffe",
+    "a": "Molière"
+  },
+  {
+    "q": "Thieves! thieves! assassins! murder! Justice, just heavens! I am undone; I am murdered; they have cut my throat; they have stolen my money!",
+    "w": "The Miser",
+    "a": "Molière"
+  },
+  {
+    "q": "—One must eat to live, and not live to eat.\n—How well said that is!",
+    "w": "The Miser",
+    "a": "Molière"
+  },
+  {
+    "q": "Nearly all men die of their remedies, and not of their illnesses.",
+    "w": "The Imaginary Invalid",
+    "a": "Molière"
+  },
+  {
+    "q": "The more we love someone, the less we should flatter them: pure love shows itself in pardoning nothing.",
+    "w": "The Misanthrope",
+    "a": "Molière"
+  },
+  {
+    "q": "Perfect reason flees all extremity, and would have one be wise with sobriety.",
+    "w": "The Misanthrope",
+    "a": "Molière"
+  },
+  {
+    "q": "—Before all else you are a wife and a mother.\n—I no longer believe that. Before all else I am a human being, just as much as you are... or at least I must try to become one.",
+    "w": "A Doll's House",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "Our home has been nothing but a playroom. Here I have been your doll-wife, just as at home I was papa's doll-child. And the children, in their turn, have been my dolls.",
+    "w": "A Doll's House",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "—Are they not your duties to your husband and your children?\n—I have other duties just as sacred.\n—That you have not. What duties could those be?\n—Duties to myself.",
+    "w": "A Doll's House",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "I want for once in my life to have power to mould a human destiny.",
+    "w": "Hedda Gabler",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "—Shot herself! Shot herself in the temple! Fancy that!\n—Good God! People don't do such things.",
+    "w": "Hedda Gabler",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "The majority never has right on its side. Never, I say! That is one of these social lies against which an independent, intelligent man must wage war. Who is it that constitute the majority of the population in a country? Is it the clever folk, or the stupid?",
+    "w": "An Enemy of the People",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "The strongest man in the world is he who stands most alone.",
+    "w": "An Enemy of the People",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "It is not only what we have inherited from our father and mother that walks in us. It is all sorts of dead ideas, and lifeless old beliefs, and so forth. They have no vitality, but they cling to us all the same, and we cannot shake them off.",
+    "w": "Ghosts",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "—Why do you always wear black?\n—I am in mourning for my life. I am unhappy.",
+    "w": "The Seagull",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "I am a seagull... No, that's not it. I am an actress. Yes, that's it!",
+    "w": "The Seagull",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "New forms are needed. New forms are needed, and if there are none, then better nothing at all.",
+    "w": "The Seagull",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "Now I know, I understand, that in our work — acting or writing, it's all the same — the main thing is not fame, not glory, not what I used to dream of, but knowing how to endure. Know how to bear your cross, and have faith.",
+    "w": "The Seagull",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "What can we do? We must live! We shall live, Uncle Vanya. We shall live through a long, long line of days, of long evenings.",
+    "w": "Uncle Vanya",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "We shall rest. We shall hear the angels, we shall see the whole sky all sparkling with diamonds, we shall see how all earthly evil and all our sufferings drown in the mercy that will fill the whole world.",
+    "w": "Uncle Vanya",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "Everything in a human being should be beautiful: the face, the clothes, the soul, the thoughts.",
+    "w": "Uncle Vanya",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "All Russia is our orchard. The land is great and beautiful, there are many marvellous places in it.",
+    "w": "The Cherry Orchard",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "My dear, my tender, my beautiful orchard! My life, my youth, my happiness, farewell! Farewell!",
+    "w": "The Cherry Orchard",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "—Good-bye, home! Good-bye, old life!\n—Welcome, new life!",
+    "w": "The Cherry Orchard",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "To Moscow! To Moscow! To Moscow!",
+    "w": "Three Sisters",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "Time will pass on, and we shall depart for ever, we shall be forgotten; they will forget our faces, voices, and even how many there were of us, but our sufferings will turn into joy for those who will live after us.",
+    "w": "Three Sisters",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "If only we knew, if only we knew!",
+    "w": "Three Sisters",
+    "a": "Anton Chekhov"
+  },
+  {
+    "q": "Grey, dear friend, is all theory, and green the golden tree of life.",
+    "w": "Faust",
+    "a": "Johann W. von Goethe"
+  },
+  {
+    "q": "If ever I say to the passing moment: \"Stay, thou art so fair!\" — then you may cast me into chains, then I will gladly accept my ruin.",
+    "w": "Faust",
+    "a": "Johann W. von Goethe"
+  },
+  {
+    "q": "—Who are you, then?\n—I am part of that power which eternally wills evil and eternally works good.",
+    "w": "Faust",
+    "a": "Johann W. von Goethe"
+  },
+  {
+    "q": "I am the spirit that eternally denies. And rightly so, for all that comes to be deserves to perish.",
+    "w": "Faust",
+    "a": "Johann W. von Goethe"
+  },
+  {
+    "q": "It is written: \"In the beginning was the Word\"... Here I stop already! Who helps me on?... and I write confidently: \"In the beginning was the Deed\".",
+    "w": "Faust",
+    "a": "Johann W. von Goethe"
+  },
+  {
+    "q": "Ah no! young blade! That was a trifle short! You might have said at least a hundred things by varying the tone... like this, suppose: Aggressive: \"Sir, if I had such a nose I'd amputate it!\" Friendly: \"When you sup it must annoy you, dipping in your cup; you need a drinking-bowl of special shape!\" Descriptive: \"'Tis a rock!... a peak!... a cape! A cape, forsooth! 'Tis a peninsular!\"",
+    "w": "Cyrano de Bergerac",
+    "a": "Edmond Rostand"
+  },
+  {
+    "q": "And what should one do? Seek a powerful protector, take a patron, and, like the dark ivy that winds about a trunk and makes it its prop by licking its bark, climb by cunning instead of rising by strength? No, thank you.",
+    "w": "Cyrano de Bergerac",
+    "a": "Edmond Rostand"
+  },
+  {
+    "q": "What say you?... It is useless?... I know it! But one does not fight in the hope of success! No! No! It is far more beautiful when it is useless!",
+    "w": "Cyrano de Bergerac",
+    "a": "Edmond Rostand"
+  },
+  {
+    "q": "There is something that, without a crease, without a stain, I take with me in spite of you... and that is... my panache!",
+    "w": "Cyrano de Bergerac",
+    "a": "Edmond Rostand"
+  },
+  {
+    "q": "The truth is rarely pure and never simple. Modern life would be very tedious if it were either, and modern literature a complete impossibility.",
+    "w": "The Importance of Being Earnest",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "I really don't see anything romantic in proposing. It is very romantic to be in love. But there is nothing romantic about a definite proposal. Why, one may be accepted. One usually is, I believe. Then the excitement is all over. The very essence of romance is uncertainty.",
+    "w": "The Importance of Being Earnest",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "To lose one parent, Mr. Worthing, may be regarded as a misfortune; to lose both looks like carelessness.",
+    "w": "The Importance of Being Earnest",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "In matters of grave importance, style, not sincerity is the vital thing.",
+    "w": "The Importance of Being Earnest",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "I never travel without my diary. One should always have something sensational to read in the train.",
+    "w": "The Importance of Being Earnest",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "—Ah, what a fascinating Puritan you are, Lady Windermere!\n—The adjective was unnecessary, Lord Darlington.\n—I couldn't help it. I can resist everything except temptation.",
+    "w": "Lady Windermere's Fan",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "We are all in the gutter, but some of us are looking at the stars.",
+    "w": "Lady Windermere's Fan",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "Sooner or later we have all to pay for what we do.",
+    "w": "An Ideal Husband",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "Ah! I have kissed thy mouth, Jokanaan, I have kissed thy mouth. There was a bitter taste on thy lips. Was it the taste of blood?... But perchance it is the taste of love.... They say that love hath a bitter taste....",
+    "w": "Salomé",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "—As a matter of fact... we have come here in search of an author...\n—An author? What author?\n—Any author, sir.\n—But there's no author here. We are not rehearsing a new piece.",
+    "w": "Six Characters in Search of an Author",
+    "a": "Luigi Pirandello"
+  },
+  {
+    "q": "When a character is born, he acquires at once such an independence, even of his own author, that he can be imagined by everybody even in many other situations where the author never dreamed of placing him; and so he acquires for himself a meaning which the author never thought of giving him.",
+    "w": "Six Characters in Search of an Author",
+    "a": "Luigi Pirandello"
+  },
+  {
+    "q": "Life is full of infinite absurdities, which, strangely enough, do not even need to appear plausible, since they are true.",
+    "w": "Six Characters in Search of an Author",
+    "a": "Luigi Pirandello"
+  },
+  {
+    "q": "—The truth? The truth is simply this. I am the daughter of Signora Frola, and I am the second wife of Signor Ponza. Yes, and—for myself, I am nobody, I am nobody...\n—Ah, but no, madam, for yourself... you must be... either the one or the other.\n—Not at all, not at all, sir! No, for myself I am... whoever you choose to have me.",
+    "w": "Right You Are (If You Think So)",
+    "a": "Luigi Pirandello"
+  },
+  {
+    "q": "I find myself seated at the top of a high pillar and I see no possible way to get down. I grow dizzy when I look down, but down I must. But I'm not brave enough to throw myself; I cannot hold fast and I long to fall—but I don't fall.",
+    "w": "Miss Julie",
+    "a": "August Strindberg"
+  },
+  {
+    "q": "My wound is not so recent. Scarcely had I been bound to Theseus by the marriage yoke, and happiness and peace seem'd well secured, when Athens show'd me my proud enemy. I look'd, alternately turn'd pale and blush'd to see him, and my soul grew all distraught.",
+    "w": "Phaedra",
+    "a": "Jean Racine"
+  },
+  {
+    "q": "—What about hanging ourselves?\n—Hmm. It'd give us an erection.\n—An erection!\n—With all that follows. Where it falls mandrakes grow. That's why they shriek when you pull them up. Did you not know that?\n—Let's hang ourselves immediately!",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "—Let's go.\n—We can't.\n—Why not?\n—We're waiting for Godot.\n—Ah!",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "The tears of the world are a constant quantity. For each one who begins to weep, somewhere else another stops. The same is true of the laugh.",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "We are all born mad. Some remain so.",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "—What do we do now?\n—Wait.\n—Yes, but while waiting.\n—What about hanging ourselves?",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "Astride of a grave and a difficult birth. Down in the hole, lingeringly, the grave-digger puts on the forceps. We have time to grow old. The air is full of our cries.",
+    "w": "Waiting for Godot",
+    "a": "Samuel Beckett"
+  },
+  {
+    "q": "Was this the face that launch'd a thousand ships, and burnt the topless towers of Ilium—Sweet Helen, make me immortal with a kiss.",
+    "w": "Doctor Faustus",
+    "a": "Christopher Marlowe"
+  },
+  {
+    "q": "—How comes it, then, that thou art out of hell?\n—Why, this is hell, nor am I out of it: think'st thou that I, who saw the face of God, and tasted the eternal joys of heaven, am not tormented with ten thousand hells, in being depriv'd of everlasting bliss?",
+    "w": "Doctor Faustus",
+    "a": "Christopher Marlowe"
+  },
+  {
+    "q": "One pen-stroke now, one motion of your hand, can new create the earth! But grant us liberty of thought.",
+    "w": "Don Carlos",
+    "a": "Friedrich Schiller"
+  },
+  {
+    "q": "I am a force that moves onward! Blind and deaf agent of funereal mysteries, a soul of misfortune made of darkness.",
+    "w": "Hernani",
+    "a": "Victor Hugo"
+  },
+  {
+    "q": "The difference between a lady and a flower girl is not how she behaves, but how she's treated. I shall always be a flower girl to Professor Higgins, because he always treats me as a flower girl, and always will; but I know I can be a lady to you, because you always treat me as a lady, and always will.",
+    "w": "Pygmalion",
+    "a": "George Bernard Shaw"
+  },
+  {
+    "q": "O God that madest this beautiful earth, when will it be ready to receive Thy saints? How long, O Lord, how long?",
+    "w": "Saint Joan",
+    "a": "George Bernard Shaw"
+  },
+  {
+    "q": "First comes the feeding, then comes morality. First the poor must be able to cut their slice from the great loaf of bread.",
+    "w": "The Threepenny Opera",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "What is a picklock compared with a share certificate? What is robbing a bank compared with founding a bank?",
+    "w": "The Threepenny Opera",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "And the shark has teeth, and he wears them in his face. And Macheath has a knife, but the knife you do not see.",
+    "w": "The Threepenny Opera",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "There are some who are in darkness and some who are in light. And you see the ones in brightness; those in darkness you don't see.",
+    "w": "The Threepenny Opera",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "—Unhappy is the land that has no heroes!\n—No: unhappy is the land that needs heroes.",
+    "w": "Life of Galileo",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "He who does not know the truth is merely an ignoramus; but he who knows it and calls it a lie — he is a criminal.",
+    "w": "Life of Galileo",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "I believe the only purpose of science is to ease the hardship of human existence.",
+    "w": "Life of Galileo",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "The war always finds a way out. As long as there are people, war will find its way.",
+    "w": "Mother Courage and Her Children",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "War is nothing but business, and instead of cheese it's lead.",
+    "w": "Mother Courage and Her Children",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "I hope I can pull the wagon alone. It'll be all right, there's not much in it. I must get back into business.",
+    "w": "Mother Courage and Her Children",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "That the child should go to the motherly, that they may thrive; the carts to good drivers, that they be well driven; and the valley to those who water it, that it bring forth fruit.",
+    "w": "The Caucasian Chalk Circle",
+    "a": "Bertolt Brecht"
+  },
+  {
+    "q": "Terrible is the temptation to do good!",
+    "w": "The Caucasian Chalk Circle",
+    "a": "Bertolt Brecht"
+  }
 ]
