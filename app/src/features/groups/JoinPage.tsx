@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { Button, Spinner } from '../../components/ui'
+import { BackButton, Button, Spinner } from '../../components/ui'
 
 export const PENDING_JOIN_KEY = 'pendingJoinCode'
 
@@ -54,8 +54,11 @@ export default function JoinPage() {
   if (loading || (codeParam && working)) return <Spinner />
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-start gap-4 p-6 pt-12">
-      <h1 className="text-center text-xl font-bold">{t('join.title')}</h1>
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-start gap-4 p-6 pt-2">
+      <header className="-mx-2 flex items-center gap-3 py-2">
+        <BackButton to="/" />
+        <h1 className="text-xl font-bold">{t('join.title')}</h1>
+      </header>
       <p className="text-center text-sm text-gray-600">{t('join.hint')}</p>
       <form
         className="space-y-3"
@@ -76,9 +79,6 @@ export default function JoinPage() {
           {working ? t('join.joining') : t('join.joinBtn')}
         </Button>
       </form>
-      <button onClick={() => navigate('/')} className="text-center text-sm text-gray-500 hover:underline">
-        {t('common.cancel')}
-      </button>
     </main>
   )
 }
