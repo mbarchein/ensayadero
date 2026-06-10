@@ -4,9 +4,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
-import { Archive, CheckCircle2, XCircle, Clock, AlarmClock, Bell, type LucideIcon } from 'lucide-react'
+import {
+  Archive,
+  Bird,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  AlarmClock,
+  Bell,
+  Leaf,
+  Sun,
+  type LucideIcon,
+} from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { BackButton, Button, EmptyState, Spinner } from '../../components/ui'
+import { BackButton, Button, Spinner } from '../../components/ui'
 import type { Notification } from '../../lib/types'
 
 const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -94,7 +105,28 @@ export default function NotificationsPage() {
       </header>
 
       {notifications?.length === 0 ? (
-        <EmptyState message={t('notifications.empty')} />
+        /* peaceful empty state: soft gradient backdrop with watermark art */
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-violet-50 via-sky-50 to-emerald-50 px-6 py-20 text-center">
+          <Sun
+            className="absolute -top-10 -right-10 h-44 w-44 text-amber-100"
+            strokeWidth={1}
+            aria-hidden
+          />
+          <Leaf
+            className="absolute -bottom-8 -left-8 h-40 w-40 rotate-12 text-emerald-100"
+            strokeWidth={1}
+            aria-hidden
+          />
+          <Bird
+            className="absolute top-8 left-1/2 h-24 w-24 -translate-x-1/2 text-violet-200"
+            strokeWidth={1}
+            aria-hidden
+          />
+          <p className="relative mt-10 text-lg font-semibold text-violet-900">
+            {t('notifications.emptyTitle')}
+          </p>
+          <p className="relative mt-1 text-sm text-violet-700">{t('notifications.empty')}</p>
+        </div>
       ) : (
         <ul className="space-y-2">
           {notifications?.map((n) => {

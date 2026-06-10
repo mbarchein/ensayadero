@@ -329,7 +329,8 @@
   "notifications": {
     "title": "Alerts",
     "markRead": "Mark as read",
-    "empty": "No alerts.",
+    "emptyTitle": "All calm",
+    "empty": "No alerts. Enjoy the quiet.",
     "types": {
       "SESSION_CONFIRMED": "Rehearsal confirmed",
       "SESSION_CANCELLED": "Rehearsal cancelled",

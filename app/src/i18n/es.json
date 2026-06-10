@@ -329,7 +329,8 @@
   "notifications": {
     "title": "Avisos",
     "markRead": "Marcar leídos",
-    "empty": "No tienes avisos.",
+    "emptyTitle": "Todo en calma",
+    "empty": "No tienes avisos. Disfruta del descanso.",
     "types": {
       "SESSION_CONFIRMED": "Ensayo confirmado",
       "SESSION_CANCELLED": "Ensayo cancelado",
