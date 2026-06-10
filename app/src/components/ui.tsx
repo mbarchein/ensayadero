@@ -6,6 +6,7 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { ArrowLeft, Eye, EyeOff, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -131,7 +132,10 @@ export function Modal({
   useBackClose(open, onClose)
 
   if (!open) return null
-  return (
+  // Portal to <body>: an ancestor with transform/filter/sticky positioning
+  // would otherwise become the fixed-position containing block and the
+  // backdrop wouldn't cover the whole viewport.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
       onClick={onClose}
@@ -152,7 +156,8 @@ export function Modal({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
