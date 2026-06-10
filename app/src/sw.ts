@@ -1,12 +1,19 @@
 /// <reference lib="webworker" />
 // Service worker: precache (Workbox injectManifest) + runtime cache API + Web Push.
 
+import { clientsClaim } from 'workbox-core'
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 
 declare const self: ServiceWorkerGlobalScope
+
+// Required for autoUpdate with injectManifest: without these the freshly
+// installed worker sits in "waiting" forever and users keep getting the OLD
+// precached app on every reload (only clearing site data escaped it).
+self.skipWaiting()
+clientsClaim()
 
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
