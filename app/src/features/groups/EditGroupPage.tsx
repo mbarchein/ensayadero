@@ -24,9 +24,15 @@ function EditGroupForm({ group }: { group: Group }) {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [name, setName] = useState(group.name)
-  // local seed/image; persisted on save
+  // avatar changes autosave; the save button only persists the name
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
   const [image, setImage] = useState<string | null>(group.avatar_image)
+  const [avatarSaved, setAvatarSaved] = useState(false)
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['group', group.id] })
+    qc.invalidateQueries({ queryKey: ['my-memberships'] })
+  }
 
   const save = useMutation({
     mutationFn: async () => {
@@ -39,13 +45,39 @@ function EditGroupForm({ group }: { group: Group }) {
       if (error) throw error
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['group', group.id] })
-      qc.invalidateQueries({ queryKey: ['my-memberships'] })
+      invalidate()
       navigate(`/g/${group.id}`, { replace: true })
     },
   })
 
-  const regenerate = () => setSeed(`${group.id}-${Math.floor(Math.random() * 1e9)}`)
+  // avatar/photo autosave: persists seed+image right away, keeping the
+  // SERVER name — a half-typed name draft must not be saved as a side effect
+  const saveAvatar = useMutation({
+    mutationFn: async (next: { seed: string; image: string | null }) => {
+      const { error } = await supabase.rpc('update_group_meta', {
+        gid: group.id,
+        new_name: group.name,
+        new_seed: next.seed,
+        new_image: next.image,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      invalidate()
+      setAvatarSaved(true)
+      setTimeout(() => setAvatarSaved(false), 2000)
+    },
+  })
+
+  const regenerate = () => {
+    const next = `${group.id}-${Math.floor(Math.random() * 1e9)}`
+    setSeed(next)
+    saveAvatar.mutate({ seed: next, image })
+  }
+  const changeImage = (next: string | null) => {
+    setImage(next)
+    saveAvatar.mutate({ seed, image: next })
+  }
 
   return (
     <div className="space-y-4 pb-6">
@@ -60,7 +92,13 @@ function EditGroupForm({ group }: { group: Group }) {
           save.mutate()
         }}
       >
-        <AvatarPicker seed={seed} image={image} onRollSeed={regenerate} onImageChange={setImage} />
+        <AvatarPicker seed={seed} image={image} onRollSeed={regenerate} onImageChange={changeImage} />
+        <p aria-live="polite" className="h-4 text-right text-sm text-green-600">
+          {saveAvatar.isPending ? t('availability.saving') : avatarSaved ? t('availability.saved') : ''}
+        </p>
+        {saveAvatar.isError && (
+          <p className="text-sm text-red-600">{(saveAvatar.error as Error).message}</p>
+        )}
         <label className="block text-sm">
           {t('admin.groupName')}
           <input
