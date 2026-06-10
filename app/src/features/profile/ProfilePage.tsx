@@ -166,7 +166,7 @@ export default function ProfilePage() {
           />
         </label>
         <label className="block text-sm">
-          {t('profile.phone')}
+          {t('profile.phone')} <span className="text-gray-400">{t('common.optionalField')}</span>
           <input
             type="tel"
             value={phone}
