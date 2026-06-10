@@ -1,20 +1,19 @@
 // Standalone edit-session page (/g/:groupId/sessions/:sessionId/edit).
 // The form owns a real history entry, so navigation is natural:
-// session detail → edit → back/save → session detail. (Editing from the
-// planner calendar still embeds the form there instead.)
+// session detail → edit → back/save → session detail.
 
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { addDays } from 'date-fns'
 import { useGroup } from '../groups/useGroup'
 import { supabase } from '../../lib/supabase'
-import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
-import { heatmap, weekStart } from '../../lib/slots'
-import CreateSessionModal from './CreateSessionModal'
+import { parseRange } from '../../lib/ranges'
+import { weekStart } from '../../lib/slots'
+import { useSessionGrid } from './useSessionGrid'
+import SessionForm from './SessionForm'
 import { Spinner } from '../../components/ui'
-import type { Availability, SessionWithParticipants } from '../../lib/types'
+import type { SessionWithParticipants } from '../../lib/types'
 
 export default function EditSessionPage() {
   const { t } = useTranslation()
@@ -36,64 +35,10 @@ export default function EditSessionPage() {
     },
   })
 
-  const monday = useMemo(
-    () => (session ? weekStart(parseRange(session.time_range).start) : null),
-    [session],
-  )
-
-  const { data: availabilities } = useQuery({
-    queryKey: ['group-availabilities', groupId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('availabilities')
-        .select('*')
-        .in(
-          'user_id',
-          members.map((m) => m.user_id),
-        )
-      if (error) throw error
-      return data as Availability[]
-    },
-    enabled: members.length > 0,
-  })
-
-  const { data: busyRows } = useQuery({
-    queryKey: ['group-busy', groupId, monday?.toISOString()],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('group_busy_ranges', {
-        gid: groupId,
-        search: `[${monday!.toISOString()},${addDays(monday!, 7).toISOString()})`,
-      })
-      if (error) throw error
-      return data as { user_id: string; busy: string }[]
-    },
-    enabled: !!monday,
-  })
-
-  // Same grid the planner builds for editing: over ALL members and excluding
-  // the edited session's own occupation — otherwise its participants would
-  // show as "busy" in their own slot.
-  const grid = useMemo(() => {
-    if (!availabilities || !session || !monday) return null
-    const exclude = parseRange(session.time_range)
-    const sessionPeople = new Set(session.session_participants.map((p) => p.user_id))
-    const busyByUser = new Map<string, TimeRange[]>()
-    for (const row of busyRows ?? []) {
-      const iv = parseRange(row.busy)
-      if (sessionPeople.has(row.user_id) && overlaps(iv, exclude)) continue
-      const list = busyByUser.get(row.user_id) ?? []
-      list.push(iv)
-      busyByUser.set(row.user_id, list)
-    }
-    return heatmap(
-      members.map((m) => ({
-        userId: m.user_id,
-        availabilities: availabilities.filter((a) => a.user_id === m.user_id),
-        busy: busyByUser.get(m.user_id) ?? [],
-      })),
-      monday,
-    )
-  }, [availabilities, busyRows, session, monday, members])
+  // week being inspected: follows the (editable) day chosen in the form
+  const [monday, setMonday] = useState<Date | null>(null)
+  const effectiveMonday = monday ?? (session ? weekStart(parseRange(session.time_range).start) : null)
+  const grid = useSessionGrid(groupId, members, effectiveMonday ?? new Date(0), session)
 
   const goBack = () => {
     // in-app history → the previous page (the session detail); direct entry
@@ -106,19 +51,22 @@ export default function EditSessionPage() {
   if (!isInstructor) {
     return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
   }
-  if (!session || !monday || !grid) return <Spinner />
+  if (!session || !effectiveMonday) return <Spinner />
 
+  const r = parseRange(session.time_range)
   return (
-    <CreateSessionModal
+    <SessionForm
       groupId={groupId}
       members={members}
       preselectedIds={[]}
-      session={session}
-      initialRange={parseRange(session.time_range)}
+      initialDay={r.start}
+      initialStartMin={r.start.getHours() * 60 + r.start.getMinutes()}
+      initialDurationMin={Math.round((r.end.getTime() - r.start.getTime()) / 60_000)}
       grid={grid}
-      weekMonday={monday}
+      weekMonday={effectiveMonday}
+      onDayChange={(d) => setMonday(weekStart(d))}
       onClose={goBack}
-      manageHistory={false}
+      session={session}
     />
   )
 }

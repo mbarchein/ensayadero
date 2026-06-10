@@ -329,10 +329,23 @@
     "optionalOutside_other": "{{count}} opcionales fuera de su disponibilidad.",
     "requiredOutsideConfirm": "Atención: {{names}} (obligatorios) NO tienen disponibilidad en esta franja. ¿Crear igualmente?",
     "saveDraft": "Guardar borrador",
+    "createDraft": "Crear borrador",
     "confirmAndNotify": "Confirmar y notificar",
-    "creating": "Creando…",
-    "commentsField": "Comentarios (opcional)",
-    "commentsPlaceholder": "Acto II, esc. 3"
+    "createAndNotify": "Crear y convocar",
+    "creating": "Guardando…",
+    "commentsField": "Notas (opcional)",
+    "commentsPlaceholder": "Acto II, esc. 3",
+    "dateField": "Fecha",
+    "participantsCount": "Participantes ({{included}}/{{total}})",
+    "selectAll": "Todos",
+    "selectNone": "Ninguno",
+    "selectAvailable": "Disponibles",
+    "coverageOk": "Todos los obligatorios disponibles",
+    "state": {
+      "required": "Convocado (obligatorio)",
+      "optional": "Convocado (opcional)",
+      "excluded": "No convocado"
+    }
   },
   "notifications": {
     "title": "Avisos",

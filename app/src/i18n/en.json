@@ -329,10 +329,23 @@
     "optionalOutside_other": "{{count}} optional people outside their availability.",
     "requiredOutsideConfirm": "Warning: {{names}} (required) have NO availability in this slot. Create anyway?",
     "saveDraft": "Save draft",
+    "createDraft": "Create draft",
     "confirmAndNotify": "Confirm and notify",
-    "creating": "Creating…",
-    "commentsField": "Comments (optional)",
-    "commentsPlaceholder": "Act II, sc. 3"
+    "createAndNotify": "Create and summon",
+    "creating": "Saving…",
+    "commentsField": "Notes (optional)",
+    "commentsPlaceholder": "Act II, sc. 3",
+    "dateField": "Date",
+    "participantsCount": "Participants ({{included}}/{{total}})",
+    "selectAll": "All",
+    "selectNone": "None",
+    "selectAvailable": "Available",
+    "coverageOk": "All required people are available",
+    "state": {
+      "required": "Summoned (required)",
+      "optional": "Summoned (optional)",
+      "excluded": "Not summoned"
+    }
   },
   "notifications": {
     "title": "Alerts",

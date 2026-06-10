@@ -12,9 +12,8 @@ import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
-import { SLOTS_PER_DAY, heatmap, slotRange, weekStart, type HeatCell } from '../../lib/slots'
+import { SLOTS_PER_DAY, heatmap, isoDay, slotRange, weekStart, type HeatCell } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
-import CreateSessionModal from './CreateSessionModal'
 import { Spinner, Button, Modal, BackButton } from '../../components/ui'
 import type { Availability, SessionWithParticipants } from '../../lib/types'
 
@@ -38,8 +37,6 @@ export default function PlannerPage() {
   // slot selection: day + anchor slot + end slot (drag). a/b unordered.
   const [sel, setSel] = useState<{ day: number; a: number; b: number } | null>(null)
   const [dragging, setDragging] = useState(false)
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editSession, setEditSession] = useState<SessionWithParticipants | null>(null)
   const selRange = sel ? { lo: Math.min(sel.a, sel.b), hi: Math.max(sel.a, sel.b) } : null
   // repeated taps on week-view cells without a rehearsal (read-only area)
   // → wave the day strip to hint where to tap (same UX as the agenda)
@@ -144,43 +141,15 @@ export default function PlannerPage() {
   }, [availabilities, busyRows, activeIds, monday])
   const grid = gridsByWeek?.get(monday.getTime()) ?? null
 
-  // Grid for the edit modal: over ALL members (so every participant's coverage
-  // is computed) and excluding the edited session's own occupation — otherwise
-  // its participants would show as "busy" in their own slot.
-  const editGrid = useMemo(() => {
-    if (!availabilities || !editSession) return null
-    const exclude = parseRange(editSession.time_range)
-    const sessionPeople = new Set(editSession.session_participants.map((p) => p.user_id))
-    const busyByUser = new Map<string, TimeRange[]>()
-    for (const row of busyRows ?? []) {
-      const iv = parseRange(row.busy)
-      // drop the edited session's slot from its own participants' busy time
-      if (sessionPeople.has(row.user_id) && overlaps(iv, exclude)) continue
-      const list = busyByUser.get(row.user_id) ?? []
-      list.push(iv)
-      busyByUser.set(row.user_id, list)
-    }
-    return heatmap(
-      memberIds.map((id) => ({
-        userId: id,
-        availabilities: availabilities.filter((a) => a.user_id === id),
-        busy: busyByUser.get(id) ?? [],
-      })),
-      monday,
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availabilities, busyRows, editSession, monday])
-
-  // tapping/selecting a slot that holds a session opens its editor instead of
-  // the create flow
+  // tapping/selecting a slot that holds a session opens its editor page
   const selLo = sel ? Math.min(sel.a, sel.b) : 0
   const sessionAtSel = sel ? sessionCells.get(`${sel.day}:${selLo}`) ?? null : null
   useEffect(() => {
     if (sel && !dragging && sessionAtSel) {
-      setEditSession(sessionAtSel)
       setSel(null)
+      navigate(`/g/${groupId}/sessions/${sessionAtSel.id}/edit`)
     }
-  }, [sel, dragging, sessionAtSel])
+  }, [sel, dragging, sessionAtSel, navigate, groupId])
 
   if (loading) return <Spinner />
   if (!isInstructor) {
@@ -193,38 +162,16 @@ export default function PlannerPage() {
     return m?.profiles.name || m?.profiles.email || '?'
   }
 
-  // full-screen session form replaces the planner (no longer a modal)
-  if (createOpen && sel && selRange && grid) {
-    return (
-      <CreateSessionModal
-        groupId={groupId}
-        members={members}
-        preselectedIds={activeIds}
-        initialRange={{
-          start: slotRange(monday, sel.day, selRange.lo).start,
-          end: slotRange(monday, sel.day, selRange.hi).end,
-        }}
-        grid={grid}
-        weekMonday={monday}
-        onClose={() => {
-          setCreateOpen(false)
-          setSel(null)
-        }}
-      />
-    )
-  }
-  if (editSession && editGrid) {
-    return (
-      <CreateSessionModal
-        groupId={groupId}
-        members={members}
-        preselectedIds={[]}
-        session={editSession}
-        initialRange={parseRange(editSession.time_range)}
-        grid={editGrid}
-        weekMonday={monday}
-        onClose={() => setEditSession(null)}
-      />
+  // navigate to the routed create form, prefilled with the selection
+  const openCreate = () => {
+    if (!sel || !selRange) return
+    const start = slotRange(monday, sel.day, selRange.lo).start
+    const end = slotRange(monday, sel.day, selRange.hi).end
+    const dur = Math.round((end.getTime() - start.getTime()) / 60_000)
+    const hh = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`
+    setSel(null)
+    navigate(
+      `/g/${groupId}/sessions/new?d=${isoDay(start)}&start=${hh}&dur=${dur}&people=${activeIds.join(',')}`,
     )
   }
 
@@ -357,7 +304,7 @@ export default function PlannerPage() {
 
       {/* selected slot: availability detail + create (overlay, nothing below the grid) */}
       <Modal
-        open={!!sel && !dragging && !createOpen && !sessionAtSel}
+        open={!!sel && !dragging && !sessionAtSel}
         onClose={() => setSel(null)}
         title={
           sel && selRange
@@ -373,7 +320,7 @@ export default function PlannerPage() {
               nameOf={nameOf}
               meId={profile?.id}
             />
-            <Button className="w-full" onClick={() => setCreateOpen(true)}>
+            <Button className="w-full" onClick={openCreate}>
               {t('planner.createHere')}
             </Button>
           </div>
