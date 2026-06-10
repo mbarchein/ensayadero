@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { PasswordInput } from '../components/ui'
+import { PASSWORD_MIN } from './SignupPage'
 
 export default function ResetPasswordPage() {
   const { t } = useTranslation()
@@ -30,7 +32,16 @@ export default function ResetPasswordPage() {
     setLoading(true)
     const { error } = await supabase.auth.updateUser({ password })
     setLoading(false)
-    if (error) setError(error.message)
+    if (error) {
+      const weak = error as { code?: string; reasons?: string[] }
+      if (weak.code === 'weak_password') {
+        setError(
+          weak.reasons?.includes('pwned')
+            ? t('signup.passwordPwned')
+            : t('signup.passwordTooShort', { min: PASSWORD_MIN }),
+        )
+      } else setError(error.message)
+    }
     else {
       setDone(true)
       setTimeout(() => navigate('/', { replace: true }), 1500)
@@ -60,14 +71,13 @@ export default function ResetPasswordPage() {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-violet-50 p-6">
       <h1 className="text-2xl font-bold text-violet-900">{t('reset.title')}</h1>
       <form onSubmit={submit} className="flex w-full max-w-xs flex-col gap-3">
-        <input
-          type="password"
+        <PasswordInput
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="rounded-lg border px-3 py-2 text-sm"
           placeholder={t('reset.newPasswordPlaceholder')}
           autoComplete="new-password"
-          minLength={8}
+          minLength={PASSWORD_MIN}
           required
         />
         {error && <p className="text-sm text-red-600">{error}</p>}

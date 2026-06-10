@@ -1,5 +1,12 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
-import { ArrowLeft, X } from 'lucide-react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ButtonHTMLAttributes,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from 'react'
+import { ArrowLeft, Eye, EyeOff, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -43,6 +50,26 @@ export function Badge({
     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[color]}`}>
       {children}
     </span>
+  )
+}
+
+/** Password field with a show/hide toggle. Style props apply to the input. */
+export function PasswordInput({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  const { t } = useTranslation()
+  const [visible, setVisible] = useState(false)
+  return (
+    <div className="relative">
+      <input {...props} type={visible ? 'text' : 'password'} className={`w-full pr-10 ${className}`} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        title={visible ? t('common.hidePassword') : t('common.showPassword')}
+        aria-label={visible ? t('common.hidePassword') : t('common.showPassword')}
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-400 hover:text-gray-600"
+      >
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
   )
 }
 

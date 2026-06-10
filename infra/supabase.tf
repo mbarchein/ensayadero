@@ -95,7 +95,8 @@ resource "supabase_settings" "main" {
     # --- Auth form hardening ---
     # Activation/recovery links: expire after 15 min, single-use.
     mailer_otp_exp = 900
-    # Password policy: minimum length + (optional) HIBP leaked check.
+    # Password policy: minimum length (keep in sync with PASSWORD_MIN in
+    # app/src/auth/SignupPage.tsx) + optional HIBP leaked check.
     password_min_length   = 8
     password_hibp_enabled = var.password_hibp_enabled
     # Anti email-bombing / volume-based enumeration.

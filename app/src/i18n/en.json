@@ -9,7 +9,9 @@
     "menu": "Menu",
     "loading": "Loading…",
     "error": "Error: {{message}}",
-    "optionalField": "(optional)"
+    "optionalField": "(optional)",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "roles": {
     "INSTRUCTOR": "Director",
@@ -86,6 +88,8 @@
     "createButton": "Create account",
     "creating": "Creating…",
     "captchaRequired": "Complete the anti-bot check.",
+    "passwordTooShort": "The password must be at least {{min}} characters long.",
+    "passwordPwned": "That password appears in known data breaches; please choose a different one.",
     "haveAccount": "I already have an account",
     "checkEmailTitle": "Check your email",
     "checkEmailBody": "We've sent an activation link to {{email}}. Open it to activate your account.",

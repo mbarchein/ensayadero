@@ -9,7 +9,9 @@
     "menu": "Menú",
     "loading": "Cargando…",
     "error": "Error: {{message}}",
-    "optionalField": "(opcional)"
+    "optionalField": "(opcional)",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "roles": {
     "INSTRUCTOR": "Director",
@@ -86,6 +88,8 @@
     "createButton": "Crear cuenta",
     "creating": "Creando…",
     "captchaRequired": "Completa la verificación anti-bot.",
+    "passwordTooShort": "La contraseña debe tener al menos {{min}} caracteres.",
+    "passwordPwned": "Esa contraseña aparece en filtraciones de datos conocidas; elige una diferente.",
     "haveAccount": "Ya tengo cuenta",
     "checkEmailTitle": "Revisa tu correo",
     "checkEmailBody": "Te hemos enviado un enlace de activación a {{email}}. Ábrelo para activar tu cuenta.",

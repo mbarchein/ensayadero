@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { PENDING_SESSION_KEY } from '../features/sessions/ShortLinkPage'
+import { PasswordInput } from '../components/ui'
 import Turnstile, { captchaEnabled } from './Turnstile'
 
 // Facebook login is shown only when its OAuth credentials are configured.
@@ -113,8 +114,7 @@ export default function LoginPage() {
           autoComplete="email"
           required
         />
-        <input
-          type="password"
+        <PasswordInput
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="rounded-lg border px-3 py-2 text-sm"

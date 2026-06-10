@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MailCheck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { PasswordInput } from '../components/ui'
 import Turnstile, { captchaEnabled } from './Turnstile'
+
+export const PASSWORD_MIN = 8 // keep in sync with password_min_length in infra/supabase.tf
 
 export default function SignupPage() {
   const { t, i18n } = useTranslation()
@@ -36,7 +39,15 @@ export default function SignupPage() {
     })
     setLoading(false)
     if (error) {
-      setError(error.message)
+      // explain a rejected password instead of echoing the raw API message
+      const weak = error as { code?: string; reasons?: string[] }
+      if (weak.code === 'weak_password') {
+        setError(
+          weak.reasons?.includes('pwned')
+            ? t('signup.passwordPwned')
+            : t('signup.passwordTooShort', { min: PASSWORD_MIN }),
+        )
+      } else setError(error.message)
       setCaptchaToken(null)
       setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
     } else setSent(true)
@@ -80,14 +91,13 @@ export default function SignupPage() {
           autoComplete="email"
           required
         />
-        <input
-          type="password"
+        <PasswordInput
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="rounded-lg border px-3 py-2 text-sm"
           placeholder={t('signup.passwordPlaceholder')}
           autoComplete="new-password"
-          minLength={8}
+          minLength={PASSWORD_MIN}
           required
         />
         <Turnstile key={captchaKey} onToken={setCaptchaToken} />
