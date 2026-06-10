@@ -350,6 +350,8 @@
     "genderM": "He",
     "savingDetails": "Saving…",
     "detailsSaved": "✓ Saved",
+    "accessVia": "Sign-in: {{methods}}",
+    "accessEmail": "email & password",
     "emailPrefsTitle": "Email alerts",
     "emailPrefsDescription": "Choose which emails you want to receive. In-app alerts are unaffected.",
     "emailPrefs": {

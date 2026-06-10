@@ -20,8 +20,18 @@ type EmailGroup = keyof typeof EMAIL_GROUPS
 
 export default function ProfilePage() {
   const { t } = useTranslation()
-  const { profile, signOut, refreshProfile } = useAuth()
+  const { session, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
+
+  // sign-in methods linked to the account (Google, Facebook, email+password)
+  const providers =
+    (session?.user.app_metadata?.providers as string[] | undefined) ??
+    (session?.user.app_metadata?.provider ? [session.user.app_metadata.provider] : [])
+  const accessMethods = providers
+    .map((p) =>
+      p === 'google' ? 'Google' : p === 'facebook' ? 'Facebook' : t('profile.accessEmail'),
+    )
+    .join(' · ')
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -122,8 +132,18 @@ export default function ProfilePage() {
         </Button>
       </header>
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
-        {profile?.avatar_url && <img src={profile.avatar_url} alt="" className="h-14 w-14 rounded-full" />}
-        <p className="text-sm text-gray-500">{profile?.email}</p>
+        {profile?.avatar_url ? (
+          <img src={profile.avatar_url} alt="" className="h-14 w-14 shrink-0 rounded-full" />
+        ) : (
+          <InitialsAvatar name={profile?.name || profile?.email || '?'} />
+        )}
+        <div className="min-w-0">
+          <p className="truncate font-medium">{profile?.name}</p>
+          <p className="truncate text-sm text-gray-500">{profile?.email}</p>
+          {accessMethods && (
+            <p className="text-xs text-gray-400">{t('profile.accessVia', { methods: accessMethods })}</p>
+          )}
+        </div>
       </div>
 
       <form
@@ -289,6 +309,41 @@ export default function ProfilePage() {
           </div>
         </div>
       </Modal>
+    </div>
+  )
+}
+
+// Fallback avatar when the account has no picture: initials over a color
+// picked from a palette by hashing the name — "random" but stable per user.
+const AVATAR_COLORS = [
+  'bg-violet-500',
+  'bg-emerald-500',
+  'bg-sky-500',
+  'bg-rose-500',
+  'bg-amber-500',
+  'bg-indigo-500',
+  'bg-teal-500',
+  'bg-fuchsia-500',
+]
+function InitialsAvatar({ name }: { name: string }) {
+  let h = 0
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  const initials =
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase() || '?'
+  return (
+    <div
+      aria-hidden
+      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white ${
+        AVATAR_COLORS[h % AVATAR_COLORS.length]
+      }`}
+    >
+      {initials}
     </div>
   )
 }

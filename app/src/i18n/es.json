@@ -350,6 +350,8 @@
     "genderM": "Él",
     "savingDetails": "Guardando…",
     "detailsSaved": "✓ Guardado",
+    "accessVia": "Acceso: {{methods}}",
+    "accessEmail": "email y contraseña",
     "emailPrefsTitle": "Avisos por email",
     "emailPrefsDescription": "Elige qué emails quieres recibir. Los avisos dentro de la app no cambian.",
     "emailPrefs": {
