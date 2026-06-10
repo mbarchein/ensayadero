@@ -2,7 +2,7 @@
 // Select a subset of people, intensity = number available,
 // tap a cell → create a session with prefilled times.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useQuery } from '@tanstack/react-query'
@@ -41,6 +41,13 @@ export default function PlannerPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editSession, setEditSession] = useState<SessionWithParticipants | null>(null)
   const selRange = sel ? { lo: Math.min(sel.a, sel.b), hi: Math.max(sel.a, sel.b) } : null
+  // repeated taps on week-view cells without a rehearsal (read-only area)
+  // → wave the day strip to hint where to tap (same UX as the agenda)
+  const [hintPulse, setHintPulse] = useState(0)
+  const emptyTaps = useRef<{ count: number; last: number }>({ count: 0, last: 0 })
+  const waveBusyUntil = useRef(0)
+  // 0.5s pulse + 70ms stagger × 6 days (keep in sync with .day-wave in index.css)
+  const WAVE_MS = 500 + 70 * 6
 
   const memberIds = members.map((m) => m.user_id)
   const activeIds = selected ? memberIds.filter((id) => selected.has(id)) : memberIds
@@ -343,10 +350,26 @@ export default function PlannerPage() {
           onWeekCellTap={(pos) => {
             // tap on a rehearsal in the week overview opens its detail
             const ses = sessionCells.get(`${pos.day}:${pos.slot}`)
-            if (ses) navigate(`/g/${groupId}/sessions/${ses.id}`)
+            if (ses) {
+              navigate(`/g/${groupId}/sessions/${ses.id}`)
+              return
+            }
+            // repeated taps elsewhere → wave the day strip (a running wave
+            // always completes before another can start)
+            const now = Date.now()
+            emptyTaps.current =
+              now - emptyTaps.current.last < 2000
+                ? { count: emptyTaps.current.count + 1, last: now }
+                : { count: 1, last: now }
+            if (emptyTaps.current.count >= 2 && now >= waveBusyUntil.current) {
+              emptyTaps.current.count = 0
+              waveBusyUntil.current = now + WAVE_MS
+              setHintPulse((n) => n + 1)
+            }
           }}
           onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
           onNextWeek={() => setWeekOffset((w) => w + 1)}
+          hintPulse={hintPulse}
           fill
         />
       )}
