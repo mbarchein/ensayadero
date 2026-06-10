@@ -38,6 +38,7 @@ const T: Record<Lang, Record<string, string>> = {
     placeChange: 'Cambio de lugar',
     timePlaceChange: 'Cambio de hora y lugar',
     reminder: 'Recordatorio',
+    nudge: 'Te esperan: confirma tu asistencia',
     when: 'Cuándo',
     where: 'Dónde',
     prevTime: 'Hora anterior',
@@ -57,6 +58,7 @@ const T: Record<Lang, Record<string, string>> = {
     placeChange: 'Location change',
     timePlaceChange: 'Time and location change',
     reminder: 'Reminder',
+    nudge: 'They are waiting: confirm your attendance',
     when: 'When',
     where: 'Where',
     prevTime: 'Previous time',
@@ -93,6 +95,7 @@ const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: 
     return `🕐 ${what}: ${sessionLabel(p, l, g)}`
   },
   REMINDER: (p, l, g) => `⏰ ${T[l].reminder}: ${sessionLabel(p, l, g)}`,
+  NUDGE: (p, l, g) => `📣 ${T[l].nudge}: ${sessionLabel(p, l, g)}`,
 }
 
 function fmtDate(iso: unknown, lang: Lang = 'es'): string {

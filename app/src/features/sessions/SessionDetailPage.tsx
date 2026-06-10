@@ -1,8 +1,19 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { useState } from 'react'
-import { MapPin, Share2, Check, X, Pencil } from 'lucide-react'
+import {
+  CalendarDays,
+  CalendarPlus,
+  MapPin,
+  Megaphone,
+  NotebookPen,
+  Phone,
+  Share2,
+  Check,
+  X,
+  Pencil,
+} from 'lucide-react'
 import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
@@ -11,9 +22,10 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
+import { downloadIcs } from '../../lib/ics'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
-import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
+import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 /** A user's available (painted) sub-intervals within range `r`, merged. */
@@ -50,8 +62,8 @@ export default function SessionDetailPage() {
   const navigate = useNavigate()
   const [shareCopied, setShareCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
-  const [editingResp, setEditingResp] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [nudgedCount, setNudgedCount] = useState<number | null>(null)
 
   const { data: session, isLoading } = useQuery({
     queryKey: ['session', sessionId],
@@ -116,6 +128,20 @@ export default function SessionDetailPage() {
       if (error) throw error
     },
     onSuccess: () => navigate(`/g/${groupId}`),
+  })
+
+  // queue a NUDGE for everyone still pending, then trigger immediate delivery
+  const nudge = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc('nudge_pending_participants', { sid: sessionId! })
+      if (error) throw error
+      supabase.functions.invoke('send-notifications', { body: {} }).catch(() => {})
+      return data as number
+    },
+    onSuccess: (n) => {
+      setNudgedCount(n)
+      setTimeout(() => setNudgedCount(null), 4000)
+    },
   })
 
   if (isLoading || !session) return <Spinner />
@@ -183,82 +209,196 @@ export default function SessionDetailPage() {
     }
   }
 
+  const isPast = r.end < new Date()
+  // "dentro de 19 horas" / "hace 2 días" — date-fns' suffix would say
+  // "en alrededor de 19 horas", so we strip the approximation words and
+  // add our own prefix
+  const relDist = formatDistanceToNow(r.start, { locale: dateLocale() }).replace(
+    /^(alrededor de|casi|más de|about|almost|over)\s+/i,
+    '',
+  )
+  const relLabel =
+    r.start < new Date()
+      ? t('sessions.relPast', { dist: relDist })
+      : t('sessions.relFuture', { dist: relDist })
+  const durMs = r.end.getTime() - r.start.getTime()
+  const durH = Math.floor(durMs / 3_600_000)
+  const durM = Math.round((durMs % 3_600_000) / 60_000)
+  const durationLabel = [durH ? `${durH} h` : null, durM ? `${durM} min` : null]
+    .filter(Boolean)
+    .join(' ')
+  const tally = session.session_participants.reduce(
+    (a, p) => {
+      a[p.response] = (a[p.response] ?? 0) + 1
+      return a
+    },
+    {} as Record<string, number>,
+  )
+
   return (
     <div className="space-y-5 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <GroupAvatar seed={group?.avatar_seed || groupId} image={group?.avatar_image} />
-        <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-xl font-bold">{group?.name}</h1>
+        {isInstructor && session.status === 'CONFIRMED' && (
+          <Button
+            variant="ghost"
+            className="p-2"
+            title={t('sessions.share')}
+            aria-label={t('sessions.share')}
+            onClick={shareSession}
+          >
+            {shareCopied ? <Check size={18} className="text-green-600" /> : <Share2 size={18} />}
+          </Button>
+        )}
+        {isInstructor && session.status !== 'CANCELLED' && (
+          <Button
+            variant="ghost"
+            className="p-2"
+            title={t('sessions.editBtn')}
+            aria-label={t('sessions.editBtn')}
+            onClick={() => navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)}
+          >
+            <Pencil size={18} />
+          </Button>
+        )}
       </header>
 
-      <div className="space-y-1">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">
-            {format(r.start, "EEEE d 'de' MMMM · HH:mm", { locale: dateLocale() })}–{format(r.end, 'HH:mm')}
-          </h2>
-          {session.status !== 'CONFIRMED' && (
-            <Badge color={session.status === 'CANCELLED' ? 'red' : 'gray'}>
-              {t(`sessions.status.${session.status}`)}
-            </Badge>
-          )}
+      {shareError && (
+        <p className="break-all text-xs text-gray-600">
+          {t('invite.copyManually')}: {shareError}
+        </p>
+      )}
+
+      {session.status === 'CANCELLED' && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {t('sessions.cancelledBanner')}
+        </p>
+      )}
+
+      {/* calendar-style date block + time/duration/location/relative time */}
+      <div className="flex items-center gap-3">
+        <div
+          className={`flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl py-2 text-white ${
+            isPast || session.status === 'CANCELLED' ? 'bg-gray-400' : 'bg-violet-600'
+          }`}
+        >
+          <span className="text-[11px] font-semibold uppercase leading-none">
+            {format(r.start, 'EEE', { locale: dateLocale() })}
+          </span>
+          <span className="text-2xl font-bold leading-none">{format(r.start, 'd')}</span>
+          <span className="text-[11px] uppercase leading-none">
+            {format(r.start, 'MMM', { locale: dateLocale() })}
+          </span>
         </div>
-        {session.comments && (
-          <p className="text-sm text-gray-600">{t('sessions.comments', { comments: session.comments })}</p>
-        )}
-        {session.location && (
-          <p className="flex items-center gap-1 text-sm text-gray-600">
-            <MapPin size={14} /> {session.location}
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <p className="text-lg font-semibold">
+            {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
+            <span className="text-sm font-normal text-gray-500">· {durationLabel}</span>
           </p>
-        )}
+          {session.location && (
+            <p className="flex items-center gap-1 text-sm text-gray-600">
+              <MapPin size={14} className="shrink-0" />
+              <a
+                href={`https://maps.google.com/?q=${encodeURIComponent(session.location)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="truncate hover:underline"
+              >
+                {session.location}
+              </a>
+            </p>
+          )}
+          <p className="text-xs text-gray-500">{relLabel}</p>
+        </div>
+        {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
       </div>
 
       {mine && session.status === 'CONFIRMED' && (
-        <section className="rounded-xl border border-violet-200 bg-violet-50 p-4">
-          <p className="mb-2 text-sm font-medium text-violet-900">
-            {mine.required ? t('sessions.yourAttendance.required') : t('sessions.yourAttendance.optional')}{' '}
+        <section
+          // the card mirrors my response: violet=going, red=not, amber=pending
+          className={`rounded-xl border p-4 ${
+            mine.response === 'ACCEPTED'
+              ? 'border-violet-200 bg-violet-50'
+              : mine.response === 'DECLINED'
+                ? 'border-red-200 bg-red-50'
+                : 'border-amber-200 bg-amber-50'
+          }`}
+        >
+          <p className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900">
             {t('sessions.areYouGoing')}
+            {!mine.required && <Badge color="gray">{t('sessions.optionalTag')}</Badge>}
           </p>
-          {mine.response !== 'PENDING' && !editingResp ? (
-            <div className="flex items-center gap-3">
-              <Badge color={mine.response === 'ACCEPTED' ? 'violet' : 'red'}>
-                {mine.response === 'ACCEPTED' ? t('sessions.response.going') : t('sessions.response.notGoing')}
-              </Badge>
-              <Button
-                variant="ghost"
-                className="inline-flex items-center gap-1.5"
-                onClick={() => setEditingResp(true)}
-              >
-                <Pencil size={15} /> {t('sessions.changeResponse')}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
-                className="inline-flex items-center gap-1.5"
-                onClick={() => {
-                  if (mine.response !== 'ACCEPTED') celebrate()
-                  respond.mutate('ACCEPTED')
-                  setEditingResp(false)
-                }}
-              >
-                <Check size={16} /> {t('sessions.goingBtn')}
-              </Button>
-              <Button
-                variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
-                className="inline-flex items-center gap-1.5"
-                onClick={() => {
-                  if (mine.response !== 'DECLINED') commiserate()
-                  respond.mutate('DECLINED')
-                  setEditingResp(false)
-                }}
-              >
-                <X size={16} /> {t('sessions.cantGoBtn')}
-              </Button>
-            </div>
+          <div className="flex gap-2">
+            <Button
+              variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={respond.isPending}
+              onClick={() => {
+                if (mine.response === 'ACCEPTED') return
+                celebrate()
+                respond.mutate('ACCEPTED')
+              }}
+            >
+              <Check size={16} /> {t('sessions.goingBtn')}
+            </Button>
+            <Button
+              variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={respond.isPending}
+              onClick={() => {
+                if (mine.response === 'DECLINED') return
+                commiserate()
+                respond.mutate('DECLINED')
+              }}
+            >
+              <X size={16} /> {t('sessions.cantGoBtn')}
+            </Button>
+          </div>
+          {availInfo.get(profile?.id ?? '')?.coverage === 'partial' && (
+            <p className="mt-2 text-xs text-amber-800">
+              ⚠ {t('sessions.yourPartialAvailability', { hours: availInfo.get(profile!.id)!.label })}
+            </p>
+          )}
+          {availInfo.get(profile?.id ?? '')?.coverage === 'none' && (
+            <p className="mt-2 text-xs text-amber-800">⚠ {t('sessions.yourNoAvailability')}</p>
           )}
         </section>
       )}
+
+      {/* attendance summary + remind-pending (instructor) */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-1.5 text-xs font-medium">
+          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
+            ✓ {tally.ACCEPTED ?? 0}
+          </span>
+          <span className="rounded-full bg-red-100 px-2 py-0.5 text-red-800">
+            ✗ {tally.DECLINED ?? 0}
+          </span>
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">
+            ? {tally.PENDING ?? 0}
+          </span>
+        </span>
+        {isInstructor && session.status === 'CONFIRMED' && (tally.PENDING ?? 0) > 0 && (
+          <span className="text-xs">
+            {nudgedCount !== null ? (
+              <span className="font-medium text-green-700">
+                {t('sessions.nudged', { count: nudgedCount })}
+              </span>
+            ) : (
+              <Button
+                variant="ghost"
+                className="inline-flex items-center gap-1.5 !py-1 text-xs"
+                disabled={nudge.isPending}
+                onClick={() => nudge.mutate()}
+              >
+                <Megaphone size={14} /> {t('sessions.nudgePending')}
+              </Button>
+            )}
+          </span>
+        )}
+      </div>
 
       <ParticipantList
         title={t('sessions.requiredList')}
@@ -277,58 +417,76 @@ export default function SessionDetailPage() {
         />
       )}
 
-      {isInstructor && (
-        <section className="space-y-2 border-t pt-4">
-          {session.status === 'CONFIRMED' && (
-            <>
-              <Button
-                variant="secondary"
-                className="inline-flex w-full items-center justify-center gap-1.5"
-                onClick={shareSession}
-              >
-                <Share2 size={16} /> {shareCopied ? t('sessions.shareCopied') : t('sessions.share')}
-              </Button>
-              {shareError && (
-                <p className="break-all text-xs text-gray-600">
-                  {t('invite.copyManually')}: {shareError}
-                </p>
-              )}
-            </>
-          )}
-          {session.status !== 'CANCELLED' && (
-            <Button
-              variant="secondary"
-              className="w-full"
-              onClick={() =>
-                navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)
-              }
-            >
-              {t('sessions.editBtn')}
-            </Button>
-          )}
-          {session.status === 'DRAFT' && (
-            <Button onClick={() => setStatus.mutate('CONFIRMED')} className="w-full">
-              {t('sessions.confirmBtn')}
-            </Button>
-          )}
-          {session.status === 'CONFIRMED' && (
-            <Button variant="danger" onClick={() => setCancelOpen(true)} className="w-full">
-              {t('sessions.cancelBtn')}
-            </Button>
-          )}
-          {session.status === 'DRAFT' && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                if (confirm(t('sessions.deleteDraftConfirm'))) remove.mutate()
-              }}
-              className="w-full"
-            >
-              {t('sessions.deleteDraft')}
-            </Button>
-          )}
+      {/* director's notes (the session comments) */}
+      {session.comments ? (
+        <section className="rounded-xl border bg-white p-3 text-sm">
+          <p className="mb-1 flex items-center gap-1.5 font-semibold text-gray-700">
+            <NotebookPen size={15} /> {t('sessions.notesTitle')}
+          </p>
+          <p className="whitespace-pre-line text-gray-700">{session.comments}</p>
         </section>
-      )}
+      ) : isInstructor && session.status !== 'CANCELLED' ? (
+        <button
+          onClick={() => navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)}
+          className="inline-flex items-center gap-1.5 text-sm text-violet-700 hover:underline"
+        >
+          <NotebookPen size={15} /> {t('sessions.addNotes')}
+        </button>
+      ) : null}
+
+      <section className="space-y-2 border-t pt-4">
+        {session.status === 'CONFIRMED' && (
+          <Button
+            variant="secondary"
+            className="inline-flex w-full items-center justify-center gap-1.5"
+            onClick={() =>
+              downloadIcs({
+                uid: session.id,
+                range: r,
+                summary: t('sessions.icsSummary', { group: group?.name ?? '' }),
+                location: session.location,
+                description: session.comments,
+                url: shareUrl,
+              })
+            }
+          >
+            <CalendarPlus size={16} /> {t('sessions.addToCalendar')}
+          </Button>
+        )}
+        {mine && (
+          <Button
+            variant="secondary"
+            className="inline-flex w-full items-center justify-center gap-1.5"
+            onClick={() => navigate(`/availability?d=${isoDay(r.start)}&s=${session.id}`)}
+          >
+            <CalendarDays size={16} /> {t('upcoming.viewInAgenda')}
+          </Button>
+        )}
+        {isInstructor && session.status === 'DRAFT' && (
+          <Button onClick={() => setStatus.mutate('CONFIRMED')} className="w-full">
+            {t('sessions.confirmBtn')}
+          </Button>
+        )}
+        {isInstructor && session.status === 'DRAFT' && (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (confirm(t('sessions.deleteDraftConfirm'))) remove.mutate()
+            }}
+            className="w-full"
+          >
+            {t('sessions.deleteDraft')}
+          </Button>
+        )}
+        {isInstructor && session.status === 'CONFIRMED' && (
+          <button
+            onClick={() => setCancelOpen(true)}
+            className="block w-full py-2 text-center text-sm font-medium text-red-600 hover:underline"
+          >
+            {t('sessions.cancelBtn')}
+          </button>
+        )}
+      </section>
 
       <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={t('sessions.cancelBtn')}>
         <div className="space-y-4">
@@ -376,21 +534,53 @@ function ParticipantList({
         {list.map((p) => {
           const role = roleOf(p.user_id)
           const av = availInfo.get(p.user_id)
+          const name = p.profiles.name || p.profiles.email
           return (
             <li key={p.user_id} className="rounded-lg border bg-white px-3 py-2 text-sm">
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2">
-                  {p.user_id === myId ? (
-                    <span className="font-bold text-violet-700">{t('upcoming.me')}</span>
-                  ) : (
-                    p.profiles.name || p.profiles.email
+              <div className="flex items-center gap-2.5">
+                {p.profiles.avatar_url ? (
+                  <img src={p.profiles.avatar_url} alt="" className="h-7 w-7 shrink-0 rounded-full" />
+                ) : (
+                  <InitialsAvatar name={name} size={28} />
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    {p.user_id === myId ? (
+                      <span className="font-bold text-violet-700">{t('upcoming.me')}</span>
+                    ) : (
+                      <span className="truncate">{name}</span>
+                    )}
+                    {role && (
+                      <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                        {roleLabel(t, role, p.profiles.gender)}
+                      </Badge>
+                    )}
+                  </span>
+                  {/* availability "traffic light": amber dot = partial (with the
+                      hours), gray dot = none; full coverage stays clean */}
+                  {av?.coverage === 'partial' && (
+                    <span className="mt-0.5 flex items-center gap-1.5 text-xs text-amber-700">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" aria-hidden />
+                      {av.label}
+                    </span>
                   )}
-                  {role && (
-                    <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                      {roleLabel(t, role, p.profiles.gender)}
-                    </Badge>
+                  {av?.coverage === 'none' && (
+                    <span className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-gray-300" aria-hidden />
+                      {t('sessions.noAvailabilityNote')}
+                    </span>
                   )}
                 </span>
+                {p.profiles.phone && p.user_id !== myId && (
+                  <a
+                    href={`tel:${p.profiles.phone.replace(/\s+/g, '')}`}
+                    title={t('sessions.call', { name })}
+                    aria-label={t('sessions.call', { name })}
+                    className="rounded-full p-1.5 text-violet-700 hover:bg-violet-100"
+                  >
+                    <Phone size={15} />
+                  </a>
+                )}
                 <Badge color={p.response === 'ACCEPTED' ? 'violet' : p.response === 'DECLINED' ? 'red' : 'amber'}>
                   {p.response === 'ACCEPTED'
                     ? t('sessions.response.going')
@@ -399,14 +589,6 @@ function ParticipantList({
                       : t('sessions.response.pending')}
                 </Badge>
               </div>
-              {av?.coverage === 'partial' && (
-                <p className="mt-1 text-xs text-amber-700">
-                  {t('sessions.partialAvailability', { hours: av.label })}
-                </p>
-              )}
-              {av?.coverage === 'none' && (
-                <p className="mt-1 text-xs text-gray-500">{t('sessions.noAvailabilityNote')}</p>
-              )}
             </li>
           )
         })}

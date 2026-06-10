@@ -261,18 +261,27 @@
       "pending": "Pendiente"
     },
     "backToSessions": "‹ Ensayos",
-    "yourAttendance": {
-      "required": "Tu asistencia es obligatoria.",
-      "optional": "Tu asistencia es opcional."
-    },
     "areYouGoing": "¿Vas a ir?",
+    "optionalTag": "Opcional",
     "goingBtn": "Voy",
     "cantGoBtn": "No puedo",
-    "changeResponse": "Cambiar",
-    "requiredList": "Asistentes obligatorios",
+    "requiredList": "Asistentes",
     "optionalList": "Asistentes opcionales",
     "partialAvailability": "Disponibilidad parcial: {{hours}}",
     "noAvailabilityNote": "Sin disponibilidad en esta franja",
+    "yourPartialAvailability": "Solo estás disponible: {{hours}}",
+    "yourNoAvailability": "No tienes disponibilidad en esta franja",
+    "cancelledBanner": "Este ensayo está cancelado.",
+    "relFuture": "dentro de {{dist}}",
+    "relPast": "hace {{dist}}",
+    "nudgePending": "Recordar a pendientes",
+    "nudged_one": "Aviso enviado a {{count}} persona",
+    "nudged_other": "Aviso enviado a {{count}} personas",
+    "notesTitle": "Notas de dirección",
+    "addNotes": "Añadir notas",
+    "addToCalendar": "Añadir a mi calendario",
+    "icsSummary": "Ensayo de {{group}}",
+    "call": "Llamar a {{name}}",
     "confirmBtn": "Confirmar ensayo (notifica a todos)",
     "cancelBtn": "Cancelar ensayo",
     "cancelConfirm": "¿Cancelar este ensayo? Se notificará a todos los participantes.",
@@ -338,7 +347,8 @@
       "SESSION_CHANGED": "Cambio de hora",
       "SESSION_CHANGED_LOCATION": "Cambio de lugar",
       "SESSION_CHANGED_BOTH": "Cambio de hora y lugar",
-      "REMINDER": "Recordatorio"
+      "REMINDER": "Recordatorio",
+      "NUDGE": "Confirma tu asistencia"
     }
   },
   "profile": {

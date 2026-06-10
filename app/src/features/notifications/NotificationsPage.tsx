@@ -13,6 +13,7 @@ import {
   Bell,
   Drama,
   Leaf,
+  Megaphone,
   Sun,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,6 +28,7 @@ const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   SESSION_CANCELLED: { Icon: XCircle, color: 'text-red-600' },
   SESSION_CHANGED: { Icon: Clock, color: 'text-amber-600' },
   REMINDER: { Icon: AlarmClock, color: 'text-violet-600' },
+  NUDGE: { Icon: Megaphone, color: 'text-violet-600' },
 }
 
 export default function NotificationsPage() {

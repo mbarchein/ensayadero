@@ -6,7 +6,7 @@ import { LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
-import { BackButton, Button, Modal } from '../../components/ui'
+import { BackButton, Button, InitialsAvatar, Modal } from '../../components/ui'
 
 // Email opt-out groups → notification event types (notification_preferences).
 // A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
@@ -317,41 +317,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </Modal>
-    </div>
-  )
-}
-
-// Fallback avatar when the account has no picture: initials over a color
-// picked from a palette by hashing the name — "random" but stable per user.
-const AVATAR_COLORS = [
-  'bg-violet-500',
-  'bg-emerald-500',
-  'bg-sky-500',
-  'bg-rose-500',
-  'bg-amber-500',
-  'bg-indigo-500',
-  'bg-teal-500',
-  'bg-fuchsia-500',
-]
-function InitialsAvatar({ name }: { name: string }) {
-  let h = 0
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0
-  const initials =
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join('')
-      .toUpperCase() || '?'
-  return (
-    <div
-      aria-hidden
-      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white ${
-        AVATAR_COLORS[h % AVATAR_COLORS.length]
-      }`}
-    >
-      {initials}
     </div>
   )
 }

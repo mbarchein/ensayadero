@@ -54,6 +54,42 @@ export function Badge({
   )
 }
 
+// Fallback avatar: initials over a color picked from a palette by hashing the
+// name — "random" but stable per user.
+const AVATAR_COLORS = [
+  'bg-violet-500',
+  'bg-emerald-500',
+  'bg-sky-500',
+  'bg-rose-500',
+  'bg-amber-500',
+  'bg-indigo-500',
+  'bg-teal-500',
+  'bg-fuchsia-500',
+]
+export function InitialsAvatar({ name, size = 56 }: { name: string; size?: number }) {
+  let h = 0
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  const initials =
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase() || '?'
+  return (
+    <div
+      aria-hidden
+      style={{ width: size, height: size, fontSize: size * 0.36 }}
+      className={`flex shrink-0 items-center justify-center rounded-full font-semibold text-white ${
+        AVATAR_COLORS[h % AVATAR_COLORS.length]
+      }`}
+    >
+      {initials}
+    </div>
+  )
+}
+
 /** Password field with a show/hide toggle. Style props apply to the input. */
 export function PasswordInput({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
   const { t } = useTranslation()

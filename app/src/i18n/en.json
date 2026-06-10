@@ -261,18 +261,27 @@
       "pending": "Pending"
     },
     "backToSessions": "‹ Rehearsals",
-    "yourAttendance": {
-      "required": "Your attendance is required.",
-      "optional": "Your attendance is optional."
-    },
     "areYouGoing": "Are you going?",
+    "optionalTag": "Optional",
     "goingBtn": "Going",
     "cantGoBtn": "Can't make it",
-    "changeResponse": "Change",
-    "requiredList": "Required attendees",
+    "requiredList": "Attendees",
     "optionalList": "Optional attendees",
     "partialAvailability": "Partial availability: {{hours}}",
     "noAvailabilityNote": "No availability in this slot",
+    "yourPartialAvailability": "You are only available: {{hours}}",
+    "yourNoAvailability": "You have no availability in this slot",
+    "cancelledBanner": "This rehearsal is cancelled.",
+    "relFuture": "in {{dist}}",
+    "relPast": "{{dist}} ago",
+    "nudgePending": "Remind pending",
+    "nudged_one": "Notice sent to {{count}} person",
+    "nudged_other": "Notice sent to {{count}} people",
+    "notesTitle": "Director's notes",
+    "addNotes": "Add notes",
+    "addToCalendar": "Add to my calendar",
+    "icsSummary": "{{group}} rehearsal",
+    "call": "Call {{name}}",
     "confirmBtn": "Confirm rehearsal (notifies everyone)",
     "cancelBtn": "Cancel rehearsal",
     "cancelConfirm": "Cancel this rehearsal? All participants will be notified.",
@@ -338,7 +347,8 @@
       "SESSION_CHANGED": "Time change",
       "SESSION_CHANGED_LOCATION": "Location change",
       "SESSION_CHANGED_BOTH": "Time and location change",
-      "REMINDER": "Reminder"
+      "REMINDER": "Reminder",
+      "NUDGE": "Confirm your attendance"
     }
   },
   "profile": {
