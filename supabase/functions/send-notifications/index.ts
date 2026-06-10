@@ -220,7 +220,12 @@ async function userLang(userId: string): Promise<Lang> {
   return lang
 }
 
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+/** Like sendEmail but keeps the failure reason (stored with invitations). */
+async function sendEmailDetailed(
+  to: string,
+  subject: string,
+  html: string,
+): Promise<{ ok: boolean; error: string | null }> {
   if (MAILPIT_URL) {
     const m = EMAIL_FROM.match(/^(.*?)\s*<(.+)>$/)
     const res = await fetch(`${MAILPIT_URL}/api/v1/send`, {
@@ -233,15 +238,22 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
         HTML: html,
       }),
     })
-    return res.ok
+    return { ok: res.ok, error: res.ok ? null : `mailpit HTTP ${res.status}` }
   }
-  if (!RESEND_API_KEY) return false
+  if (!RESEND_API_KEY) return { ok: false, error: 'RESEND_API_KEY is not set' }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: EMAIL_FROM, to, subject, html }),
   })
-  return res.ok
+  return {
+    ok: res.ok,
+    error: res.ok ? null : `Resend HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`,
+  }
+}
+
+async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  return (await sendEmailDetailed(to, subject, html)).ok
 }
 
 async function sendPush(userId: string, title: string, body: string): Promise<boolean> {
@@ -270,36 +282,67 @@ async function sendPush(userId: string, title: string, body: string): Promise<bo
   return any
 }
 
-async function processInvitation(invitationId: string): Promise<void> {
+async function processInvitation(invitationId: string): Promise<boolean> {
   const { data: inv } = await supabase
     .from('invitations')
     .select('email, role, groups(name)')
     .eq('id', invitationId)
     .single()
-  if (!inv) return
+  if (!inv) return false
   const groupName = (inv.groups as unknown as { name: string })?.name ?? 'un grupo'
   // Invitee has no account yet, so no stored language: Spanish by default.
-  await sendEmail(
-    inv.email,
-    `🎭 Invitación a "${groupName}" en Ensayadero`,
-    layout(
-      `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Te han invitado a "${groupName}"</h2>
-       <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
-       <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>
-       <p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/login" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Aceptar invitación</a></p>
-       <p style="color:#9ca3af;font-size:13px;margin:16px 0 0;text-align:center">La invitación caduca en 7 días.</p>`,
-      'es',
-    ),
-  )
+  let result: { ok: boolean; error: string | null }
+  try {
+    result = await sendEmailDetailed(
+      inv.email,
+      `🎭 Invitación a "${groupName}" en Ensayadero`,
+      layout(
+        `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Te han invitado a "${groupName}"</h2>
+         <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
+         <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>
+         <p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/login" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Aceptar invitación</a></p>
+         <p style="color:#9ca3af;font-size:13px;margin:16px 0 0;text-align:center">La invitación caduca en 7 días.</p>`,
+        'es',
+      ),
+    )
+  } catch (e) {
+    result = { ok: false, error: String(e).slice(0, 300) }
+  }
+  // record the attempt so the DB shows delivery state per invitation
+  await supabase
+    .from('invitations')
+    .update(
+      result.ok
+        ? { email_sent_at: new Date().toISOString(), email_send_error: null }
+        : { email_send_error: result.error ?? 'unknown error' },
+    )
+    .eq('id', invitationId)
+  return result.ok
+}
+
+// The function is invoked from the browser (supabase.functions.invoke) after
+// session changes and for invitations, so it must answer the CORS preflight;
+// auth is still enforced by the platform's JWT check. The cron path (pg_net)
+// is server-side and ignores CORS.
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS })
+
   // delivery of a specific invitation
   try {
     const body = await req.json().catch(() => ({}))
     if (body.invitation_id) {
-      await processInvitation(body.invitation_id)
-      return Response.json({ ok: true, invitation: true })
+      const ok = await processInvitation(body.invitation_id)
+      // non-2xx → functions.invoke reports an error → the resend UI shows it
+      return Response.json(
+        { ok, invitation: true },
+        { status: ok ? 200 : 502, headers: CORS_HEADERS },
+      )
     }
   } catch { /* no body → process queue */ }
 
@@ -311,7 +354,7 @@ Deno.serve(async (req) => {
     .or('sent_email_at.is.null,sent_push_at.is.null')
     .limit(50)
 
-  if (error) return new Response(error.message, { status: 500 })
+  if (error) return new Response(error.message, { status: 500, headers: CORS_HEADERS })
 
   let emails = 0
   let pushes = 0
@@ -350,5 +393,5 @@ Deno.serve(async (req) => {
     await supabase.from('notifications').update(updates).eq('id', n.id)
   }
 
-  return Response.json({ processed: pending?.length ?? 0, emails, pushes })
+  return Response.json({ processed: pending?.length ?? 0, emails, pushes }, { headers: CORS_HEADERS })
 })
