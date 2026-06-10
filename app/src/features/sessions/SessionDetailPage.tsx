@@ -258,7 +258,7 @@ export default function SessionDetailPage() {
             className="p-2"
             title={t('sessions.editBtn')}
             aria-label={t('sessions.editBtn')}
-            onClick={() => navigate(`/g/${groupId}/planner?d=${isoDay(r.start)}&edit=${session.id}`)}
+            onClick={() => navigate(`/g/${groupId}/sessions/${session.id}/edit`)}
           >
             <Pencil size={18} />
           </Button>

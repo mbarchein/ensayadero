@@ -27,6 +27,9 @@ interface Props {
   onClose: () => void
   /** If provided, the modal edits that session instead of creating a new one. */
   session?: SessionWithParticipants
+  /** False when the form is a routed page: the router already owns the
+      history entry, so the device back button must NOT be intercepted. */
+  manageHistory?: boolean
 }
 
 interface ParticipantDraft {
@@ -44,13 +47,15 @@ export default function CreateSessionModal({
   weekMonday,
   onClose,
   session,
+  manageHistory = true,
 }: Props) {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
-  // full-screen form: the device back button closes it like a page
-  useBackClose(true, onClose)
+  // full-screen form: the device back button closes it like a page (only
+  // when embedded in the planner — as a routed page the router handles it)
+  useBackClose(manageHistory, onClose)
   const editing = !!session
   const [comments, setComments] = useState(session?.comments ?? '')
   const [location, setLocation] = useState(session?.location ?? '')

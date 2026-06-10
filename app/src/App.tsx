@@ -19,6 +19,7 @@ import SessionsPage from './features/sessions/SessionsPage'
 import SessionDetailPage from './features/sessions/SessionDetailPage'
 import ShortLinkPage from './features/sessions/ShortLinkPage'
 import PlannerPage from './features/planner/PlannerPage'
+import EditSessionPage from './features/planner/EditSessionPage'
 import NotificationsPage from './features/notifications/NotificationsPage'
 import ProfilePage from './features/profile/ProfilePage'
 import AdminPage from './features/admin/AdminPage'
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/g/:groupId/planner" element={<PlannerPage />} />
           <Route path="/g/:groupId/members" element={<MembersPage />} />
           <Route path="/g/:groupId/sessions/:sessionId" element={<SessionDetailPage />} />
+          <Route path="/g/:groupId/sessions/:sessionId/edit" element={<EditSessionPage />} />
         </Route>
       </Routes>
     </AuthProvider>
