@@ -6,12 +6,12 @@ import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import {
   Archive,
-  Bird,
   CheckCircle2,
   XCircle,
   Clock,
   AlarmClock,
   Bell,
+  Drama,
   Leaf,
   Sun,
   type LucideIcon,
@@ -117,7 +117,7 @@ export default function NotificationsPage() {
             strokeWidth={1}
             aria-hidden
           />
-          <Bird
+          <Drama
             className="absolute top-8 left-1/2 h-24 w-24 -translate-x-1/2 text-violet-200"
             strokeWidth={1}
             aria-hidden
@@ -195,6 +195,7 @@ export default function NotificationsPage() {
 // collapses (animated height) before the row is removed. Vertical drags keep
 // native scroll; a horizontal drag suppresses the row's click/navigation.
 function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; children: ReactNode }) {
+  const { t } = useTranslation()
   const ref = useRef<HTMLLIElement>(null)
   const start = useRef<{ x: number; y: number } | null>(null)
   const swiping = useRef(false)
@@ -232,6 +233,19 @@ function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; child
     setDx(Math.max(0, ddx)) // only to the right
   }
 
+  // slide the card fully out, then collapse the gap (animated height) and
+  // archive — shared by the swipe release and the desktop hover button
+  const archiveAnimated = () => {
+    const w = ref.current?.offsetWidth ?? 320
+    setAnimated(true)
+    setDx(w * 1.05)
+    setTimeout(() => {
+      setHeight(ref.current?.offsetHeight ?? 0)
+      requestAnimationFrame(() => requestAnimationFrame(() => setHeight(0)))
+      setTimeout(onArchive, 230)
+    }, 180)
+  }
+
   const finish = () => {
     if (!start.current && !swiping.current) return
     start.current = null
@@ -240,13 +254,7 @@ function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; child
     const w = ref.current?.offsetWidth ?? 320
     setAnimated(true)
     if (dx > w * 0.35) {
-      setDx(w * 1.05) // slide the card fully out…
-      setTimeout(() => {
-        // …then collapse the gap: freeze the current height and animate to 0
-        setHeight(ref.current?.offsetHeight ?? 0)
-        requestAnimationFrame(() => requestAnimationFrame(() => setHeight(0)))
-        setTimeout(onArchive, 230)
-      }, 180)
+      archiveAnimated()
     } else {
       setDx(0) // not far enough: snap back
     }
@@ -265,7 +273,7 @@ function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; child
           e.stopPropagation()
         }
       }}
-      className="relative overflow-hidden"
+      className="group relative overflow-hidden"
       style={{
         touchAction: 'pan-y',
         ...(height !== null ? { height, transition: 'height 0.2s ease-out' } : null),
@@ -276,12 +284,28 @@ function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; child
         <Archive size={20} />
       </div>
       <div
+        className="relative"
         style={{
           transform: `translateX(${dx}px)`,
           transition: animated ? 'transform 0.18s ease-out' : 'none',
         }}
       >
         {children}
+        {/* desktop path: hover (or keyboard focus) reveals an archive button;
+            touch devices never hover, they swipe */}
+        <button
+          type="button"
+          title={t('notifications.archive')}
+          aria-label={t('notifications.archive')}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            archiveAnimated()
+          }}
+          className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-gray-400 opacity-0 shadow-sm transition hover:text-violet-700 focus-visible:pointer-events-auto focus-visible:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+        >
+          <Archive size={16} />
+        </button>
       </div>
     </li>
   )

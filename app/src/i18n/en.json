@@ -329,6 +329,7 @@
   "notifications": {
     "title": "Alerts",
     "markRead": "Mark as read",
+    "archive": "Archive alert",
     "emptyTitle": "All calm",
     "empty": "No alerts. Enjoy the quiet.",
     "types": {

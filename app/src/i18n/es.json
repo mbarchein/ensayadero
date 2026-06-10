@@ -329,6 +329,7 @@
   "notifications": {
     "title": "Avisos",
     "markRead": "Marcar leídos",
+    "archive": "Archivar aviso",
     "emptyTitle": "Todo en calma",
     "empty": "No tienes avisos. Disfruta del descanso.",
     "types": {
