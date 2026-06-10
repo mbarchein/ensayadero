@@ -8,10 +8,16 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Cropper, { type Area } from 'react-easy-crop'
-import { Camera, Dices, ImageUp } from 'lucide-react'
+import { Camera, Dices, Images, ImageUp } from 'lucide-react'
 import { Button, Modal } from '../../components/ui'
 import { cropToDataUrl } from '../../lib/cropImage'
 import GroupAvatar from './GroupAvatar'
+
+// Touch devices get a gallery/camera chooser: Android's system photo picker
+// (the Google Photos UI) has no camera option, so the camera needs its own
+// input with `capture`. On fine-pointer devices the file dialog covers both.
+const COARSE_POINTER =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
 export default function AvatarPicker({
   seed,
@@ -27,6 +33,8 @@ export default function AvatarPicker({
 }) {
   const { t } = useTranslation()
   const fileRef = useRef<HTMLInputElement>(null)
+  const cameraRef = useRef<HTMLInputElement>(null)
+  const [sourceOpen, setSourceOpen] = useState(false) // gallery/camera chooser
   // last cropped image: switching to avatar mode doesn't discard it
   const [cached, setCached] = useState<string | null>(image)
   const [raw, setRaw] = useState<string | null>(null) // image being cropped
@@ -67,9 +75,15 @@ export default function AvatarPicker({
     }
   }
 
+  // open the gallery/camera chooser on touch devices, the file dialog elsewhere
+  const openPicker = () => {
+    if (COARSE_POINTER) setSourceOpen(true)
+    else fileRef.current?.click()
+  }
+
   const selectImage = () => {
     if (cached) onImageChange(cached)
-    else fileRef.current?.click()
+    else openPicker()
   }
 
   const onDrop = (e: React.DragEvent) => {
@@ -138,7 +152,7 @@ export default function AvatarPicker({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  fileRef.current?.click()
+                  openPicker()
                 }}
                 className="inline-flex items-center gap-1 text-sm text-violet-700 hover:underline"
               >
@@ -164,6 +178,43 @@ export default function AvatarPicker({
           e.target.value = '' // allow re-picking the same file
         }}
       />
+      {/* capture bypasses the system photo picker and opens the camera */}
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          pickFile(e.target.files?.[0])
+          e.target.value = ''
+        }}
+      />
+
+      <Modal open={sourceOpen} onClose={() => setSourceOpen(false)} title={t('group.pickSourceTitle')}>
+        <div className="space-y-2">
+          <Button
+            variant="secondary"
+            className="flex w-full items-center justify-center gap-2"
+            onClick={() => {
+              setSourceOpen(false)
+              fileRef.current?.click()
+            }}
+          >
+            <Images size={18} /> {t('group.fromGallery')}
+          </Button>
+          <Button
+            variant="secondary"
+            className="flex w-full items-center justify-center gap-2"
+            onClick={() => {
+              setSourceOpen(false)
+              cameraRef.current?.click()
+            }}
+          >
+            <Camera size={18} /> {t('group.fromCamera')}
+          </Button>
+        </div>
+      </Modal>
 
       <Modal open={!!raw} onClose={() => setRaw(null)} title={t('group.cropTitle')}>
         <div className="space-y-4">
