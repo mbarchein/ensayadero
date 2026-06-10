@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
 import { BackButton, Button, Modal } from '../../components/ui'
+
+// Email opt-out groups → notification event types (notification_preferences).
+// A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
+// alerts unaffected either way).
+const EMAIL_GROUPS = {
+  reminders: ['REMINDER'],
+  sessions: ['SESSION_CONFIRMED', 'SESSION_CHANGED', 'SESSION_CANCELLED'],
+} as const
+type EmailGroup = keyof typeof EMAIL_GROUPS
 
 export default function ProfilePage() {
   const { t } = useTranslation()
@@ -58,6 +67,43 @@ export default function ProfilePage() {
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>(
     typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'ok' : 'idle',
   )
+
+  // email notification preferences (default: everything ON)
+  const qc = useQueryClient()
+  const [prefsSaved, setPrefsSaved] = useState(false)
+  const { data: prefs } = useQuery({
+    queryKey: ['notification-prefs', profile?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notification_preferences')
+        .select('event_type, channel')
+      if (error) throw error
+      return data as { event_type: string; channel: 'PUSH' | 'EMAIL' | 'BOTH' | 'NONE' }[]
+    },
+    enabled: !!profile,
+  })
+  // ON unless every type in the group has email explicitly disabled
+  const emailOn = (group: EmailGroup) =>
+    EMAIL_GROUPS[group].some((type) => {
+      const ch = prefs?.find((p) => p.event_type === type)?.channel ?? 'BOTH'
+      return ch === 'BOTH' || ch === 'EMAIL'
+    })
+  const savePrefs = useMutation({
+    mutationFn: async ({ group, on }: { group: EmailGroup; on: boolean }) => {
+      const rows = EMAIL_GROUPS[group].map((event_type) => ({
+        user_id: profile!.id,
+        event_type,
+        channel: on ? ('BOTH' as const) : ('PUSH' as const),
+      }))
+      const { error } = await supabase.from('notification_preferences').upsert(rows)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notification-prefs', profile?.id] })
+      setPrefsSaved(true)
+      setTimeout(() => setPrefsSaved(false), 2000)
+    },
+  })
 
   return (
     <div className="space-y-6 pb-6">
@@ -128,6 +174,30 @@ export default function ProfilePage() {
           {savedAt && <span className="text-sm text-green-600">{t('profile.detailsSaved')}</span>}
         </div>
       </form>
+
+      <section className="rounded-xl border bg-white p-4">
+        <h2 className="mb-1 font-semibold">{t('profile.emailPrefsTitle')}</h2>
+        <p className="mb-3 text-sm text-gray-600">{t('profile.emailPrefsDescription')}</p>
+        <div className="space-y-3">
+          {(Object.keys(EMAIL_GROUPS) as EmailGroup[]).map((group) => (
+            <div key={group} className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
+                <p className="text-xs text-gray-500">{t(`profile.emailPrefs.${group}Hint`)}</p>
+              </div>
+              <Toggle
+                checked={emailOn(group)}
+                disabled={savePrefs.isPending}
+                ariaLabel={t(`profile.emailPrefs.${group}`)}
+                onChange={(on) => savePrefs.mutate({ group, on })}
+              />
+            </div>
+          ))}
+        </div>
+        <p aria-live="polite" className="mt-2 h-4 text-right text-sm text-green-600">
+          {prefsSaved ? t('profile.detailsSaved') : ''}
+        </p>
+      </section>
 
       {/* hidden until Web Push is configured (VAPID keys, BOOTSTRAP §7) */}
       {!!import.meta.env.VITE_VAPID_PUBLIC_KEY && (
@@ -201,5 +271,37 @@ export default function ProfilePage() {
         </div>
       </Modal>
     </div>
+  )
+}
+
+function Toggle({
+  checked,
+  onChange,
+  disabled = false,
+  ariaLabel,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+  ariaLabel: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={ariaLabel}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-60 ${
+        checked ? 'bg-violet-600' : 'bg-gray-300'
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+          checked ? 'left-[22px]' : 'left-0.5'
+        }`}
+      />
+    </button>
   )
 }

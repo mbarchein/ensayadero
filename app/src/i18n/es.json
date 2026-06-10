@@ -350,6 +350,14 @@
     "genderM": "Él",
     "savingDetails": "Guardando…",
     "detailsSaved": "✓ Guardado",
+    "emailPrefsTitle": "Avisos por email",
+    "emailPrefsDescription": "Elige qué emails quieres recibir. Los avisos dentro de la app no cambian.",
+    "emailPrefs": {
+      "reminders": "Recordatorios de ensayo",
+      "remindersHint": "24 horas antes de cada ensayo",
+      "sessions": "Convocatorias, cambios y cancelaciones",
+      "sessionsHint": "Cuando se confirma, cambia o cancela un ensayo"
+    },
     "pushTitle": "Avisos en este dispositivo",
     "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",
     "pushEnabled": "✓ Activadas en este dispositivo",

@@ -350,6 +350,14 @@
     "genderM": "He",
     "savingDetails": "Saving…",
     "detailsSaved": "✓ Saved",
+    "emailPrefsTitle": "Email alerts",
+    "emailPrefsDescription": "Choose which emails you want to receive. In-app alerts are unaffected.",
+    "emailPrefs": {
+      "reminders": "Rehearsal reminders",
+      "remindersHint": "24 hours before each rehearsal",
+      "sessions": "Confirmations, changes and cancellations",
+      "sessionsHint": "When a rehearsal is confirmed, changed or cancelled"
+    },
     "pushTitle": "Alerts on this device",
     "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",
     "pushEnabled": "✓ Enabled on this device",
