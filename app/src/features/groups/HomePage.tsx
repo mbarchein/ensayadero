@@ -9,6 +9,7 @@ import { parseRange } from '../../lib/ranges'
 import { CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
+import InstallBanner from '../pwa/InstallBanner'
 import { roleLabel } from '../../lib/roleLabel'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
@@ -88,6 +89,8 @@ export default function HomePage() {
           </Link>
         )}
       </header>
+
+      <InstallBanner />
 
       {(pending?.length ?? 0) > 0 && (
         <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">

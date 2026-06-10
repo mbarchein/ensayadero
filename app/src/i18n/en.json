@@ -13,6 +13,11 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password"
   },
+  "pwa": {
+    "installHint": "Install Ensayadero on your phone for quick access and notifications.",
+    "installBtn": "Install",
+    "iosHint": "To install: tap Share and \"Add to Home Screen\"."
+  },
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",

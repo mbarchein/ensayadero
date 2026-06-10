@@ -13,6 +13,11 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña"
   },
+  "pwa": {
+    "installHint": "Instala Ensayadero en tu móvil para acceso rápido y notificaciones.",
+    "installBtn": "Instalar",
+    "iosHint": "Para instalar: pulsa Compartir y «Añadir a pantalla de inicio»."
+  },
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",
