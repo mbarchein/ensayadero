@@ -335,7 +335,6 @@
     "locationField": "Location (optional)",
     "locationPlaceholder": "Room 2",
     "startTime": "Start time",
-    "duration": "Duration",
     "participants": "Participants",
     "required": "Required",
     "optional": "Optional",
@@ -363,7 +362,10 @@
       "required": "Summoned (required)",
       "optional": "Summoned (optional)",
       "excluded": "Not summoned"
-    }
+    },
+    "endTime": "Ends",
+    "invalidEnd": "The end time must be after the start.",
+    "endsOutsideGrid": "Ends after 22:00; group availability only covers up to 22:00."
   },
   "notifications": {
     "title": "Alerts",

@@ -335,7 +335,6 @@
     "locationField": "Lugar (opcional)",
     "locationPlaceholder": "Sala 2",
     "startTime": "Hora inicio",
-    "duration": "Duración",
     "participants": "Participantes",
     "required": "Obligatorio",
     "optional": "Opcional",
@@ -363,7 +362,10 @@
       "required": "Convocado (obligatorio)",
       "optional": "Convocado (opcional)",
       "excluded": "No convocado"
-    }
+    },
+    "endTime": "Termina",
+    "invalidEnd": "La hora de fin debe ser posterior al inicio.",
+    "endsOutsideGrid": "Termina después de las 22:00; la disponibilidad del grupo solo cubre hasta las 22:00."
   },
   "notifications": {
     "title": "Avisos",

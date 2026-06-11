@@ -18,11 +18,12 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { formatRange } from '../../lib/ranges'
-import { isoDay, DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
+import { isoDay, DAY_START_HOUR, DAY_END_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
 import { BackButton, Badge, Button, InitialsAvatar } from '../../components/ui'
 import type { MembershipWithProfile, SessionWithParticipants } from '../../lib/types'
 
-const DURATION_PRESETS = [30, 60, 90, 120, 150, 180]
+// latest end the time input can hold on a 30-min grid (sessions end same day)
+const MAX_END_MIN = 23 * 60 + 30
 
 interface Props {
   groupId: string
@@ -69,7 +70,20 @@ export default function SessionForm({
 
   const [day, setDay] = useState(initialDay)
   const [startMin, setStartMin] = useState(initialStartMin)
-  const [durationMin, setDurationMin] = useState(Math.max(30, initialDurationMin))
+  // end time is the source of truth; duration is derived (rehearsals are
+  // thought as "from 13:00 to 21:00", and chips capped long sessions)
+  const [endMin, setEndMin] = useState(
+    Math.min(MAX_END_MIN, initialStartMin + Math.max(30, initialDurationMin)),
+  )
+  const durationMin = endMin - startMin
+  const validRange = durationMin >= 30
+
+  // moving the start shifts the end along, preserving the duration
+  const moveStart = (newStart: number) => {
+    const delta = newStart - startMin
+    setStartMin(newStart)
+    setEndMin((e) => Math.min(MAX_END_MIN, Math.max(newStart + 30, e + delta)))
+  }
   const [comments, setComments] = useState(session?.comments ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
   const [participants, setParticipants] = useState<ParticipantDraft[]>(
@@ -317,7 +331,8 @@ export default function SessionForm({
         ? t('planner.saveChanges')
         : t('planner.confirmAndNotify')
       : t('planner.createAndNotify')
-  const primaryDisabled = save.isPending || (editing && session!.status === 'CONFIRMED' && !dirty)
+  const primaryDisabled =
+    save.isPending || !validRange || (editing && session!.status === 'CONFIRMED' && !dirty)
 
   return (
     <form
@@ -325,7 +340,7 @@ export default function SessionForm({
       className="flex min-h-full flex-col gap-4 pb-2"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!confirmIfOutside()) return
+        if (!validRange || !confirmIfOutside()) return
         save.mutate('CONFIRMED')
       }}
     >
@@ -358,7 +373,7 @@ export default function SessionForm({
           </span>
         </div>
         <div className="grid flex-1 grid-cols-2 gap-3">
-          <label className="block text-sm">
+          <label className="col-span-2 block text-sm">
             {t('planner.dateField')}
             <input
               type="date"
@@ -380,38 +395,40 @@ export default function SessionForm({
               required
               step={SLOT_MINUTES * 60}
               value={toHHMM(startMin)}
-              onChange={(e) => setStartMin(fromHHMM(e.target.value))}
+              onChange={(e) => moveStart(fromHHMM(e.target.value))}
               className="mt-1 w-full rounded-lg border px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            {t('planner.endTime')}
+            <input
+              type="time"
+              required
+              step={SLOT_MINUTES * 60}
+              value={toHHMM(endMin)}
+              onChange={(e) => setEndMin(fromHHMM(e.target.value))}
+              aria-invalid={!validRange}
+              className={`mt-1 w-full rounded-lg border px-3 py-2 ${
+                validRange ? '' : 'border-red-400'
+              }`}
             />
           </label>
         </div>
       </div>
 
-      {/* duration chips + live range */}
-      <div className="text-sm">
-        <span>{t('planner.duration')}</span>
-        <div className="mt-1 flex flex-wrap items-center gap-1.5">
-          {[...new Set([...DURATION_PRESETS, durationMin])]
-            .sort((a, b) => a - b)
-            .map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setDurationMin(m)}
-                className={`rounded-full border px-3 py-1 transition ${
-                  durationMin === m
-                    ? 'border-violet-600 bg-violet-600 text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-violet-300'
-                }`}
-              >
-                {fmtDuration(m)}
-              </button>
-            ))}
+      {/* live range + derived duration */}
+      {validRange ? (
+        <div className="text-sm">
+          <p className="text-base font-semibold text-violet-700">
+            {fmtDuration(durationMin)} · {format(start, 'HH:mm')}–{format(end, 'HH:mm')}
+          </p>
+          {endMin > DAY_END_HOUR * 60 && (
+            <p className="mt-1 text-xs text-amber-700">{t('planner.endsOutsideGrid')}</p>
+          )}
         </div>
-        <p className="mt-2 text-base font-semibold text-violet-700">
-          {format(start, 'HH:mm')}–{format(end, 'HH:mm')}
-        </p>
-      </div>
+      ) : (
+        <p className="text-sm font-medium text-red-600">{t('planner.invalidEnd')}</p>
+      )}
 
       <label className="block text-sm">
         {t('planner.locationField')}
@@ -558,7 +575,7 @@ export default function SessionForm({
             type="button"
             variant="secondary"
             className="flex-1"
-            disabled={save.isPending || (editing && !dirty)}
+            disabled={save.isPending || !validRange || (editing && !dirty)}
             onClick={() => save.mutate('DRAFT')}
           >
             {editing ? t('planner.saveDraft') : t('planner.createDraft')}
