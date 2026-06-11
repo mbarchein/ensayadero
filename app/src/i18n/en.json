@@ -569,5 +569,25 @@
     "allDone": "{{name}} is already in every upcoming rehearsal.",
     "backToMembers": "Back to members",
     "memberGone": "This person is no longer a member of the group."
+  },
+  "welcome": {
+    "skip": "Skip",
+    "title0": "Welcome to the cast",
+    "sub0": "Tell us how to introduce you to the rest of your theatre group.",
+    "nameLabel": "Your name",
+    "pronounLabel": "How should we call you?",
+    "pronounF": "She",
+    "pronounM": "He",
+    "pronounNone": "Rather not say",
+    "pronounHint": "To introduce you as actress or actor, director.",
+    "next": "Next",
+    "title1": "Don't get caught offstage",
+    "sub1": "Choose what reaches you by email. In-app alerts are always on, and you can change this anytime from your profile.",
+    "pushBtn": "Enable alerts on this device",
+    "pushOk": "Device alerts enabled",
+    "title2": "Your availability is the script",
+    "sub2": "Mark when you can rehearse. Whoever directs your group plans rehearsals with the whole cast’s availability: without yours, there is no show.",
+    "ctaAvailability": "Set my availability",
+    "later": "I'll do it later"
   }
 }

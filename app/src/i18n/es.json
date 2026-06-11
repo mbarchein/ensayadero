@@ -569,5 +569,25 @@
     "allDone": "{{name}} ya está en todos los ensayos futuros.",
     "backToMembers": "Volver a miembros",
     "memberGone": "Esta persona ya no es miembro del grupo."
+  },
+  "welcome": {
+    "skip": "Saltar",
+    "title0": "Te damos la bienvenida al reparto",
+    "sub0": "Cuéntanos cómo presentarte al resto de tu grupo de teatro.",
+    "nameLabel": "Tu nombre",
+    "pronounLabel": "¿Cómo te llamamos?",
+    "pronounF": "Ella",
+    "pronounM": "Él",
+    "pronounNone": "Prefiero no decirlo",
+    "pronounHint": "Para presentarte como actriz o actor, directora o director.",
+    "next": "Siguiente",
+    "title1": "Que no te pillen fuera de escena",
+    "sub1": "Elige qué te llega por email. Los avisos dentro de la app siempre están, y puedes cambiarlo cuando quieras desde tu perfil.",
+    "pushBtn": "Activar avisos en este dispositivo",
+    "pushOk": "Avisos del dispositivo activados",
+    "title2": "Tu disponibilidad es el guion",
+    "sub2": "Marca cuándo puedes ensayar. Quien dirige tu grupo planifica los ensayos con la disponibilidad de todo el reparto: sin la tuya, no hay función.",
+    "ctaAvailability": "Marcar mi disponibilidad",
+    "later": "Lo haré más tarde"
   }
 }

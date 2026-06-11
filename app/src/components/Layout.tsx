@@ -60,6 +60,8 @@ export default function Layout() {
       </main>
     )
   }
+  // first login (any provider): the onboarding wizard runs before the app
+  if (!profile.onboarded_at) return <Navigate to="/welcome" replace />
 
   return (
     <div className="mx-auto flex h-dvh max-w-3xl flex-col">

@@ -12,6 +12,7 @@ export interface Profile {
   gender: 'F' | 'M' | null
   avatar_url: string | null
   platform_role: PlatformRole
+  onboarded_at: string | null
 }
 
 export interface Group {

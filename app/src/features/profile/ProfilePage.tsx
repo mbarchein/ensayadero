@@ -6,7 +6,7 @@ import { LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
-import { BackButton, Button, InitialsAvatar, Modal } from '../../components/ui'
+import { BackButton, Button, InitialsAvatar, Modal, Toggle } from '../../components/ui'
 import Tip, { resetTips } from '../../components/Tip'
 
 // Email opt-out groups → notification event types (notification_preferences).
@@ -336,34 +336,3 @@ export default function ProfilePage() {
   )
 }
 
-function Toggle({
-  checked,
-  onChange,
-  disabled = false,
-  ariaLabel,
-}: {
-  checked: boolean
-  onChange: (checked: boolean) => void
-  disabled?: boolean
-  ariaLabel: string
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={ariaLabel}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-60 ${
-        checked ? 'bg-violet-600' : 'bg-gray-300'
-      }`}
-    >
-      <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-          checked ? 'left-[22px]' : 'left-0.5'
-        }`}
-      />
-    </button>
-  )
-}

@@ -13,6 +13,7 @@ import NewGroupPage from './features/groups/NewGroupPage'
 import EditGroupPage from './features/groups/EditGroupPage'
 import MembersPage from './features/groups/MembersPage'
 import ConvokeMemberPage from './features/groups/ConvokeMemberPage'
+import WelcomePage from './features/onboarding/WelcomePage'
 import JoinPage from './features/groups/JoinPage'
 import AvailabilityPage from './features/availability/AvailabilityPage'
 import UpcomingPage from './features/agenda/UpcomingPage'
@@ -65,6 +66,8 @@ export default function App() {
           element={<LegalDoc ns="cookies" sections={['what', 'types', 'used', 'manage', 'changes']} gated={false} />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        {/* first-login onboarding: full screen, outside the Layout chrome */}
+        <Route path="/welcome" element={<WelcomePage />} />
         {/* /join/:code and /s/:code handle their own login (shareable links) */}
         <Route path="/join/:code" element={<JoinPage />} />
         <Route path="/s/:code" element={<ShortLinkPage />} />
