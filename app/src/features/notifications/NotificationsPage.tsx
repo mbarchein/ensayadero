@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  Crown,
   AlarmClock,
   Bell,
   Drama,
@@ -32,6 +33,7 @@ const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   REMINDER: { Icon: AlarmClock, color: 'text-violet-600' },
   NUDGE: { Icon: Megaphone, color: 'text-violet-600' },
   MEMBER_JOINED: { Icon: UserPlus, color: 'text-violet-600' },
+  MEMBER_PROMOTED: { Icon: Crown, color: 'text-violet-600' },
 }
 
 export default function NotificationsPage() {
@@ -206,7 +208,11 @@ export default function NotificationsPage() {
             }
             return (
               <SwipeArchiveRow key={n.id} onArchive={() => archive.mutate(n.id)}>
-                {n.type === 'MEMBER_JOINED' && n.group_id ? (
+                {n.type === 'MEMBER_PROMOTED' && n.group_id ? (
+                  <Link to={`/g/${n.group_id}`} onClick={readOnClick}>
+                    {inner}
+                  </Link>
+                ) : n.type === 'MEMBER_JOINED' && n.group_id ? (
                   <Link
                     to={
                       myRoles?.get(n.group_id) === 'INSTRUCTOR' && n.payload.member_id

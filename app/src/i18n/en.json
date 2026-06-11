@@ -379,7 +379,8 @@
       "SESSION_CHANGED_BOTH": "Time and location change",
       "REMINDER": "Reminder",
       "NUDGE": "Confirm your attendance",
-      "MEMBER_JOINED": "{{name}} has joined the group"
+      "MEMBER_JOINED": "{{name}} has joined the group",
+      "MEMBER_PROMOTED": "You now direct the group"
     }
   },
   "profile": {
@@ -407,7 +408,7 @@
       "sessions": "Confirmations, changes and cancellations",
       "sessionsHint": "When a rehearsal is confirmed, changed or cancelled",
       "members": "New group members",
-      "membersHint": "When someone joins one of your groups"
+      "membersHint": "When someone joins your groups or you are made a director"
     },
     "pushTitle": "Alerts on this device",
     "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",

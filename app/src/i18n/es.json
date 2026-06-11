@@ -379,7 +379,8 @@
       "SESSION_CHANGED_BOTH": "Cambio de hora y lugar",
       "REMINDER": "Recordatorio",
       "NUDGE": "Confirma tu asistencia",
-      "MEMBER_JOINED": "{{name}} se ha unido al grupo"
+      "MEMBER_JOINED": "{{name}} se ha unido al grupo",
+      "MEMBER_PROMOTED": "Ahora diriges el grupo"
     }
   },
   "profile": {
@@ -407,7 +408,7 @@
       "sessions": "Convocatorias, cambios y cancelaciones",
       "sessionsHint": "Cuando se confirma, cambia o cancela un ensayo",
       "members": "Nuevos miembros del grupo",
-      "membersHint": "Cuando alguien se une a uno de tus grupos"
+      "membersHint": "Cuando alguien se une a tus grupos o te nombran director"
     },
     "pushTitle": "Avisos en este dispositivo",
     "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",

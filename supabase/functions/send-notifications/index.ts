@@ -42,6 +42,11 @@ const T: Record<Lang, Record<string, string>> = {
     memberJoined: 'Nuevo miembro',
     memberJoinedBody: 'se ha unido al grupo',
     memberCta: 'Ver miembros',
+    promoted: 'Ahora diriges el grupo',
+    promotedBy: 'te ha dado el rol de dirección en',
+    promotedBody: 'Tienes el rol de dirección en',
+    promotedPerks: 'Ya puedes programar ensayos, convocar al grupo e invitar a nuevos miembros.',
+    promotedCta: 'Abrir el grupo',
     when: 'Cuándo',
     where: 'Dónde',
     prevTime: 'Hora anterior',
@@ -65,6 +70,11 @@ const T: Record<Lang, Record<string, string>> = {
     memberJoined: 'New member',
     memberJoinedBody: 'has joined the group',
     memberCta: 'See members',
+    promoted: 'You now direct the group',
+    promotedBy: 'has given you the director role in',
+    promotedBody: 'You have the director role in',
+    promotedPerks: 'You can now plan rehearsals, summon the group and invite new members.',
+    promotedCta: 'Open the group',
     when: 'When',
     where: 'Where',
     prevTime: 'Previous time',
@@ -103,6 +113,24 @@ const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: 
   REMINDER: (p, l, g) => `⏰ ${T[l].reminder}: ${sessionLabel(p, l, g)}`,
   NUDGE: (p, l, g) => `📣 ${T[l].nudge}: ${sessionLabel(p, l, g)}`,
   MEMBER_JOINED: (p, l, g) => `🎭 ${T[l].memberJoined}: ${[g, p.member_name].filter(Boolean).join(' · ')}`,
+  MEMBER_PROMOTED: (_p, l, g) => `🎬 ${T[l].promoted}${g ? `: ${g}` : ''}`,
+}
+
+// MEMBER_PROMOTED: who gave you the role (when known), what you can do now,
+// and a link to the group.
+function promotedBody(p: Record<string, unknown>, lang: Lang, groupId: unknown, group?: string): string {
+  const t = T[lang]
+  const intro = p.promoted_by
+    ? `<strong>${p.promoted_by}</strong> ${t.promotedBy} "${group ?? ''}".`
+    : `${t.promotedBody} "${group ?? ''}".`
+  return [
+    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">🎬 ${t.promoted}</h2>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${intro}</p>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${t.promotedPerks}</p>`,
+    groupId
+      ? `<p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/g/${groupId}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">${t.promotedCta}</a></p>`
+      : '',
+  ].filter(Boolean).join('\n')
 }
 
 // MEMBER_JOINED has no session payload: simple "X joined <group>" card with a
@@ -403,8 +431,10 @@ Deno.serve(async (req) => {
         const inner =
           n.type === 'MEMBER_JOINED'
             ? memberJoinedBody(payload, lang, n.group_id, groupName)
-            : ((n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
-              emailBody(n.type, payload, lang, groupName))
+            : n.type === 'MEMBER_PROMOTED'
+              ? promotedBody(payload, lang, n.group_id, groupName)
+              : ((n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
+                emailBody(n.type, payload, lang, groupName))
         if (await sendEmail(profile.email, subject, layout(inner, lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
@@ -412,7 +442,11 @@ Deno.serve(async (req) => {
     if (!n.sent_push_at) {
       if (channel === 'PUSH' || channel === 'BOTH') {
         const pushBody =
-          n.type === 'MEMBER_JOINED' ? String(payload.member_name ?? '') : fmtDate(payload.starts_at, lang)
+          n.type === 'MEMBER_JOINED'
+            ? String(payload.member_name ?? '')
+            : n.type === 'MEMBER_PROMOTED'
+              ? (groupName ?? '')
+              : fmtDate(payload.starts_at, lang)
         if (await sendPush(n.user_id, subject, pushBody)) pushes++
       }
       updates.sent_push_at = new Date().toISOString()
