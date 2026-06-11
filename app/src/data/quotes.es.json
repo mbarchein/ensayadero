@@ -1,472 +1,172 @@
 [
   {
-    "q": "Ser, o no ser, esa es la cuestión. ¿Cuál es más digna acción del ánimo, sufrir los tiros penetrantes de la fortuna injusta, u oponer los brazos a este torrente de calamidades, y darlas fin con atrevida resistencia?",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Morir es dormir... y tal vez soñar. Sí, y ved aquí el grande obstáculo, porque el considerar que sueños podrán ocurrir en el silencio del sepulcro, cuando hayamos abandonado este despojo mortal, es razón harto poderosa para detenernos.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—¿Qué estáis leyendo?\n—Palabras, palabras, todo palabras.\n—¿Y de qué se trata?\n—¿Entre quién?\n—Digo, que ¿de qué trata el libro que leéis?\n—De calumnias.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Ello es, Horacio, que en el cielo y en la tierra hay más de lo que puede soñar tu filosofía.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—Aunque todo es locura, no deja de observar método en lo que dice. ¿Queréis venir, señor, adonde no os dé el aire?\n—¿Adónde? ¿A la sepultura?",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Algún grave mal se oculta en Dinamarca.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Si a los hombres se les hubiese de tratar según merecen, ¿quién escaparía de ser azotado? Trátalos como corresponde a tu nobleza, y a tu propio honor; cuanto menor sea su mérito, mayor será tu bondad.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Procura no dar ni pedir prestado a nadie, porque el que presta suele perder a un tiempo el dinero y el amigo, y el que se acostumbra a pedir prestado falta al espíritu de economía y buen orden, que nos es tan útil. Pero, sobre todo, usa de ingenuidad contigo mismo, y no podrás ser falso con los demás, consecuencia tan necesaria como que la noche suceda al día.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Para mí solo queda ya... silencio eterno.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—¡Cómo os va, mi buen señor!\n—Bien, a Dios gracias.\n—¿Me conocéis?\n—Perfectamente. Tú vendes peces.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¿Qué es la vida sino una sombra, un histrión que pasa por el teatro, y a quien se olvida después, o la vana y ruidosa fábula de un necio?",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Esa engañosa palabra mañana, mañana, mañana nos va llevando por días al sepulcro, y la falaz lumbre del ayer ilumina al necio hasta que cae en la fosa.",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El mal es bien, y el bien es mal: cortemos los aires y la niebla.",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Me parece estar viendo el puño de una daga vuelta hacia mí! ¡Ven a mis manos, puñal que toco aunque no veo! ¿O eres acaso sueño de mi delirante fantasía? Me pareces tan real como el que en mi mano resplandece.",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Lejos de mí esta horrible mancha!",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Ya me pican los dedos: indicio de que el traidor Macbeth se aproxima. Abríos ante él, puertas.",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Las cosas sin remedio no deben tenerse en cuenta: lo hecho, hecho está.",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—¡Romeo, Romeo! ¿Por qué eres tú Romeo? ¿Por qué no reniegas del nombre de tu padre y de tu madre? Y si no tienes valor para tanto, ámame, y no me tendré por Capuleto.\n—¿Qué hago, seguirla oyendo o hablar?",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¿Por qué no tomas otro nombre? La rosa no dejaría de ser rosa, y de esparcir su aroma, aunque se llamase de otro modo.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—¿Cómo has llegado hasta aquí, y para qué? Las paredes de esta huerta son altas y difíciles de escalar, y aquí podrías tropezar con la muerte, siendo quien eres, si alguno de mis parientes te hallase.\n—Las paredes salté con las alas que me dio el amor, ante quien no resisten aun los muros de roca.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—No jures por la luna, que en su rápido movimiento cambia de aspecto cada mes. No vayas a imitar su inconstancia.\n—¿Pues por quién juraré?\n—No hagas ningún juramento. Si acaso, jura por ti mismo, por tu persona que es el dios que adoro y en quien he de creer.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Adiós, adiós! Triste es la ausencia y tan dulce la despedida, que no sé cómo arrancarme de los hierros de esta ventana.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Nada violento es duradero: ni el placer ni la pena: ellos mismos se consumen como el fuego y la pólvora al usarse.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Nosotros somos la estofa de que se fabrican los sueños, y nuestra corta vida se redondea con un sueño.",
-    "w": "La tempestad",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El infierno está vacío y todos los demonios se hallan aquí.",
-    "w": "La tempestad",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Oh, prodigio! ¡Qué hermosísimas son todas estas criaturas! ¡Qué bella es la humanidad! ¡Oh, admirable mundo nuevo que tales gentes contiene!",
-    "w": "La tempestad",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "La suerte nos destina a representar una obra cuyo prólogo ya se terminó, y lo que falta, a ti y a mí se nos confía.",
-    "w": "La tempestad",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "La isla está llena de ruidos, armonías y suaves cantos que alegran y no dañan. Algunas veces mil sonoros instrumentos vibran en mis oídos.",
-    "w": "La tempestad",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Por lo que he podido leer, por lo que he oído en cuentos e historias, el curso del amor verdadero nunca fluyó tranquilo.",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El amor no mira con los ojos, sino con la mente; por eso pintan ciego al alado Cupido.",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El lunático, el amante y el poeta están hechos por entero de imaginación: uno ve más demonios de los que caben en el vasto infierno, y ese es el loco; el amante, no menos frenético, ve la belleza de Helena en una frente egipcia.",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Señor, qué tontos son estos mortales!",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Oh, cuando está enfadada, es aguda y mordaz! Era una arpía cuando iba a la escuela, y aunque es pequeña, es feroz.",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Si nosotras, sombras, os hemos ofendido, pensad solo esto y todo queda arreglado: que os habéis quedado dormidos mientras estas visiones aparecían.",
-    "w": "El sueño de una noche de verano",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Señor, temed mucho a los celos, pálido monstruo, burlador del alma que le da abrigo.",
-    "w": "Otelo",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Poco roba quien roba mi dinero: antes fue algo, después nada: antes mío, ahora suyo, y puede ser de otros cincuenta. Pero quien me roba la fama, no se enriquece, y a mí me deja pobre.",
-    "w": "Otelo",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Cuando en vuestras cartas al Senado refiráis este lastimoso caso, no tratéis de disculparme, ni de agravar tampoco mi culpa. Decid que he sido un desdichado: que amé sin discreción y con furor.",
-    "w": "Otelo",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Envainad esos aceros vírgenes, porque el rocío de la noche podría violarlos.",
-    "w": "Otelo",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Más hiriente que el colmillo de una serpiente es tener un hijo ingrato!",
-    "w": "El rey Lear",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—Nada saldrá de la nada. Habla otra vez.\n—Desdichada de mí, que no sé levantar el corazón hasta los labios. Amo a vuestra majestad como debo: ni más ni menos.",
-    "w": "El rey Lear",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Sopla, vendaval, sopla furioso hasta reventar los carrillos! ¡Cataratas y huracanes, verted vuestros torrentes hasta sumergir los campanarios y tragar sus veletas!",
-    "w": "El rey Lear",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Como moscas para los niños traviesos somos para los dioses: nos matan por diversión.",
-    "w": "El rey Lear",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Soy un hombre contra quien se ha pecado más de lo que ha pecado.",
-    "w": "El rey Lear",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Todo el mundo es un escenario, y todos, hombres y mujeres, son meros actores. Todos tienen sus entradas y salidas, y cada hombre en su vida representa muchos papeles.",
-    "w": "Como gustéis",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El necio se cree discreto y el discreto se tiene a sí propio en concepto de necio.",
-    "w": "Como gustéis",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Todo fue encontrarse vuestro hermano con mi hermana, cuando se vieron; apenas se vieron se amaron; no bien nació este amor, se dieron a suspirar.",
-    "w": "Como gustéis",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El amor no es más que una locura, y os aseguro que merece tanto una celda oscura y un látigo, como los otros alienados. Y si alguna causa hay para que así no se les castigue y cure, es el ser la locura tan general que hasta los azotadores andan enamorados.",
-    "w": "Como gustéis",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Si le pican, ¿no sangra? ¿No se ríe si le hacen cosquillas? ¿No se muere si le envenenan? Si le ofenden, ¿no trata de vengarse?",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "La clemencia no quiere fuerza: es como la plácida lluvia del cielo que cae sobre un campo y le fecunda: dos veces bendita porque consuela al que la da y al que la recibe.",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El mismo demonio, para disculpar sus maldades, cita ejemplos de la Escritura. El espíritu infame, que invoca el testimonio de las santas leyes, se parece a un malvado de apacible rostro o a una hermosa fruta comida de gusanos.",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "No es oro todo lo que reluce: así dice el refrán antiguo: tú verás si con razón. ¡A cuántos ha engañado en la vida una vana exterioridad!",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "En mi sala hay luz. ¡Cuán lejos llegan sus rayos! Así es el resplandor de una obra buena en este perverso mundo.",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "El hombre que no siente ningún género de armonía, es capaz de todo engaño y alevosía, fraude y rapiña; los instintos de su alma son tan oscuros como la noche, tan lóbregos como el Tártaro. ¡Ay de quien se fíe de él!",
-    "w": "El mercader de Venecia",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Los hombres son algunas veces dueños de sus destinos! ¡La culpa, querido Bruto, no es de nuestras estrellas, sino de nosotros mismos, que consentimos en ser inferiores!",
-    "w": "Julio César",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Los cobardes mueren varias veces antes de expirar! ¡El valiente nunca saborea la muerte sino una vez! ¡De todas las maravillas que he oído, la que mayor asombro me causa es que los hombres tengan miedo! ¡Visto que la muerte es un fin necesario, cuando haya de venir, vendrá!",
-    "w": "Julio César",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "—Habla; César se vuelve para oírte.\n—¡Guárdate de los idus de marzo!",
-    "w": "Julio César",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Amigos, romanos, compatriotas, prestadme atención! ¡Vengo a inhumar a César, no a ensalzarle! ¡El mal que hacen los hombres les sobrevive! ¡El bien queda frecuentemente sepultado con sus huesos!",
-    "w": "Julio César",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Existe una marea en los asuntos humanos, que, tomada en pleamar, conduce a la fortuna; pero, omitida, todo el viaje de la vida va circuido de escollos y desgracias.",
-    "w": "Julio César",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Si es del amor la música sustento, seguid tocando, hartadme de armonía, que hastiado el dulce anhelo enferme y muera.",
-    "w": "Noche de reyes",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "No te arredre la grandeza. Unos nacen grandes, otros alcanzan grandeza, y a otros la grandeza se les echa encima.",
-    "w": "Noche de reyes",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Más vale ser bobo discreto que discreto bobo.",
-    "w": "Noche de reyes",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Te digo que no hay más tinieblas que la ignorancia, en que tú estás enredado como los egipcios en su niebla.",
-    "w": "Noche de reyes",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Un caballo, un caballo, mi reino por un caballo!",
-    "w": "Ricardo III",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Ya el invierno de nuestro descontento se transforma en glorioso verano gracias a este sol de York. Y todos los nubarrones que se cernían sobre nuestra casa yacen disueltos en las entrañas del océano.",
-    "w": "Ricardo III",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Y ya que no doy el tipo como amante entretenido en estos bonitos tiempos de galantería, me propongo hacer el papel de villano y odiar los fatuos placeres de estos felices días.",
-    "w": "Ricardo III",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Conciencia es una palabra que sólo usan los cobardes para intentar asustar a los fuertes!",
-    "w": "Ricardo III",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¿Qué es la vida? Un frenesí.\n¿Qué es la vida? Una ilusión,\nuna sombra, una ficción,\ny el mayor bien es pequeño:\nque toda la vida es sueño,\ny los sueños, sueños son.",
+    "q": "¿Qué es la vida? Un frenesí. ¿Qué es la vida? Una ficción, una sombra, una ilusión, y el mayor bien es pequeño; que toda la vida es sueño, y los sueños, sueños son.",
     "w": "La vida es sueño",
     "a": "Calderón de la Barca"
   },
   {
-    "q": "¡Ay mísero de mí! ¡Ay infelice!\nApurar, cielos, pretendo,\nya que me tratáis así,\nqué delito cometí\ncontra vosotros naciendo;\naunque si nací, ya entiendo\nqué delito he cometido:\nbastante causa ha tenido\nvuestra justicia y rigor,\npues el delito mayor\ndel hombre es haber nacido.",
+    "q": "¡Ay, mísero de mí, y ay infelice!",
     "w": "La vida es sueño",
     "a": "Calderón de la Barca"
   },
   {
-    "q": "Cuentan de un sabio que un día\ntan pobre y mísero estaba,\nque solo se sustentaba\nde unas hierbas que cogía.\n«¿Habrá otro», entre sí decía,\n«más pobre y triste que yo?»\nY cuando el rostro volvió\nhalló la respuesta, viendo\nque iba otro sabio cogiendo\nlas hojas que él arrojó.",
+    "q": "pues el delito mayor del hombre es haber nacido.",
     "w": "La vida es sueño",
     "a": "Calderón de la Barca"
   },
   {
-    "q": "Nace el ave, y con las galas\nque le dan belleza suma,\napenas es flor de pluma\no ramillete con alas,\ncuando las etéreas salas\ncorta con velocidad,\nnegándose a la piedad\ndel nido que deja en calma;\n¿y teniendo yo más alma,\ntengo menos libertad?",
-    "w": "La vida es sueño",
-    "a": "Calderón de la Barca"
-  },
-  {
-    "q": "Mas, sea verdad o sueño,\nobrar bien es lo que importa;\nsi fuere verdad, por serlo;\nsi no, por ganar amigos\npara cuando despertemos.",
-    "w": "La vida es sueño",
-    "a": "Calderón de la Barca"
-  },
-  {
-    "q": "Al rey la hacienda y la vida\nse ha de dar; pero el honor\nes patrimonio del alma,\ny el alma solo es de Dios.",
-    "w": "El alcalde de Zalamea",
-    "a": "Calderón de la Barca"
-  },
-  {
-    "q": "Con cualquier papel se gana,\nque toda la vida humana\nrepresentaciones es.",
-    "w": "El gran teatro del mundo",
-    "a": "Calderón de la Barca"
-  },
-  {
-    "q": "—Que os he de matar, creed,\nen este potro, villanos.\n¿Quién mató al Comendador?\n—Fuenteovejuna, señor.",
+    "q": "¿Quién mató al comendador? PASCUALA: Fuenteovejuna, señor.",
     "w": "Fuenteovejuna",
     "a": "Lope de Vega"
   },
   {
-    "q": "Liebres cobardes nacisteis;\nbárbaros sois, no españoles.\nGallinas, ¡vuestras mujeres\nsufrís que otros hombres gocen!\nPoneos ruecas en la cinta.\n¿Para qué os ceñís estoques?",
+    "q": "MENGO: Fuenteovejuna lo hizo.",
     "w": "Fuenteovejuna",
     "a": "Lope de Vega"
   },
   {
-    "q": "Que de noche le mataron\nal caballero,\nla gala de Medina,\nla flor de Olmedo.\nSombras le avisaron\nque no saliese,\ny le aconsejaron\nque no se fuese\nel caballero,\nla gala de Medina,\nla flor de Olmedo.",
+    "q": "la gala de Medina, la flor de Olmedo",
     "w": "El caballero de Olmedo",
     "a": "Lope de Vega"
   },
   {
-    "q": "No dudes, naturalmente\nes del hortelano el perro:\nni come ni comer deja,\nni está fuera ni está dentro.",
-    "w": "El perro del hortelano",
-    "a": "Lope de Vega"
-  },
-  {
-    "q": "—Los que fingís y engañáis\nlas mujeres de esa suerte\nlo pagaréis en la muerte.\n—¡Qué largo me lo fiáis!",
+    "q": "Los que fingís y engañáis las mujeres de esa suerte, lo pagaréis en la muerte. JUAN: ¡Qué largo me lo fiáis!",
     "w": "El burlador de Sevilla",
     "a": "Tirso de Molina"
   },
   {
-    "q": "Sevilla a voces me llama\nel Burlador, y el mayor\ngusto que en mí puede haber\nes burlar una mujer\ny dejalla sin honor.",
-    "w": "El burlador de Sevilla",
-    "a": "Tirso de Molina"
+    "q": "Ser o no ser, de eso se trata: Si para nuestro espíritu es más noble sufrir Las pedradas y dardos de la atroz Fortuna O levantarse en armas contra un mar de aflicciones Y oponiéndose a ellas darles fin.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
   },
   {
-    "q": "Esta es justicia de Dios:\nquien tal hace, que tal pague.",
-    "w": "El burlador de Sevilla",
-    "a": "Tirso de Molina"
+    "q": "Palabras, palabras, palabras.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
   },
   {
-    "q": "¡Ah! ¿No es cierto, ángel de amor,\nque en esta apartada orilla\nmás pura la luna brilla\ny se respira mejor?",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
+    "q": "Algo podrido hay en el reino de Dinamarca.",
+    "w": "Hamlet",
+    "a": "William Shakespeare"
   },
   {
-    "q": "Yo a las cabañas bajé,\nyo a los palacios subí,\nyo los claustros escalé,\ny en todas partes dejé\nmemoria amarga de mí.",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
+    "q": "¡Ah, Romeo, Romeo! ¿Por qué eres Romeo? Niega a tu padre y rechaza tu nombre, o, si no, júrame tu amor y ya nunca seré una Capuleto.",
+    "w": "Romeo y Julieta",
+    "a": "William Shakespeare"
   },
   {
-    "q": "Llamé al cielo y no me oyó,\ny pues sus puertas me cierra,\nde mis pasos en la tierra\nresponda el cielo, y no yo.",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
+    "q": "Ha sido el ruiseñor y no la alondra el que ha traspasado tu oído medroso.",
+    "w": "Romeo y Julieta",
+    "a": "William Shakespeare"
   },
   {
-    "q": "—Yo soy doña Inés, don Juan,\nque te oyó en su sepultura.\n—¿Conque vives?\n—Para ti;\nmas tengo mi purgatorio\nen ese mármol mortuorio\nque labraron para mí.",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
+    "q": "Mañana, y mañana, y mañana se arrastra con paso mezquino día tras día hasta la sílaba final del tiempo escrito",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
   },
   {
-    "q": "—¡Han huido! ¡Han huido! Ella y Leonardo. En el caballo. Van abrazados, como una exhalación.\n—¡No es verdad! ¡Mi hija, no!\n—¡Tu hija, sí! Planta de mala madre, y él, él también, él. Pero ¡ya es la mujer de mi hijo!\n—¡Vamos detrás! ¿Quién tiene un caballo?",
-    "w": "Bodas de sangre",
-    "a": "Federico García Lorca"
+    "q": "La vida es una sombra que camina, un pobre actor que en escena se arrebata y contonea y nunca más se le oye. Es un cuento que cuenta un idiota, lleno de ruido y de furia, que no significa nada",
+    "w": "Macbeth",
+    "a": "William Shakespeare"
   },
   {
-    "q": "Vamos al rincón oscuro,\ndonde yo siempre te quiera,\nque no me importa la gente,\nni el veneno que nos echa.",
-    "w": "Bodas de sangre",
-    "a": "Federico García Lorca"
+    "q": "¡Al ladrón! ¡Al ladrón! ¡Al ladrón! ¡Al asesino! ¡Al criminal! ¡Justicia, justo Cielo! ¡Estoy perdido! ¡Asesinado! ¡Me han cortado el cuello! ¡Me han robado mi dinero!",
+    "w": "El avaro",
+    "a": "Molière"
   },
   {
-    "q": "La navaja, la navaja... Malditas sean todas y el bribón que las inventó.",
-    "w": "Bodas de sangre",
-    "a": "Federico García Lorca"
+    "q": "Es cierto; eso cierra la boca en absoluto. ¡Sin dote! ¡No hay modo de resistir a tal razón!",
+    "w": "El avaro",
+    "a": "Molière"
   },
   {
-    "q": "Con un cuchillo,\ncon un cuchillito\nque apenas cabe en la mano,\npero que penetra fino\npor las carnes asombradas\ny que se para en el sitio\ndonde tiembla enmarañada\nla oscura raíz del grito.",
-    "w": "Bodas de sangre",
-    "a": "Federico García Lorca"
+    "q": "Para cubriros ese seno, cuya vista no puedo soportar. Cosas así lesionan las almas y hacen nacer culpables pensamientos.",
+    "w": "Tartufo",
+    "a": "Molière"
   },
   {
-    "q": "—Déjame llorar contigo.\n—Llora, pero en la puerta.",
-    "w": "Bodas de sangre",
-    "a": "Federico García Lorca"
+    "q": "Hoy he cometido la villanía de matar esta gaviota. La pongo a sus pies.",
+    "w": "La gaviota",
+    "a": "Antón Chéjov"
   },
   {
-    "q": "En ocho años que dure el luto no ha de entrar en esta casa el viento de la calle. Haceros cuenta que hemos tapiado con ladrillos puertas y ventanas.",
+    "q": "lo importante no es la fama, no es el brillo, no es aquello con que yo soñaba, sino saber sufrir. Aprende a llevar tu cruz y a creer.",
+    "w": "La gaviota",
+    "a": "Antón Chéjov"
+  },
+  {
+    "q": "¡Descansaremos!… ¡Oiremos a los ángeles, contemplaremos un cielo cuajado de diamantes y veremos cómo, bajo él, toda la maldad terrestre, todos nuestros sufrimientos, se ahogan en una misericordia que llenará el Universo!…",
+    "w": "El tío Vania",
+    "a": "Antón Chéjov"
+  },
+  {
+    "q": "Me llamaba su muñequita, y jugaba conmigo ni más ni menos que yo con mis muñecas.",
+    "w": "Casa de muñecas",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "El hombre más poderoso del mundo es el que está más solo.",
+    "w": "Un enemigo del pueblo",
+    "a": "Henrik Ibsen"
+  },
+  {
+    "q": "La verdad, es rara vez pura y nunca sencilla ¡La vida moderna sería aburridísima si la verdad fuera una u otra cosa, y la literatura moderna completamente imposible!",
+    "w": "La importancia de llamarse Ernesto",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "En cuestiones de gran importancia lo esencial es el estilo y no la sinceridad.",
+    "w": "La importancia de llamarse Ernesto",
+    "a": "Oscar Wilde"
+  },
+  {
+    "q": "Podría decirle a ese instante: «¡Detente, eres tan bello! La huella de mis días en la tierra no podrá disolverse en eones».",
+    "w": "Fausto",
+    "a": "Goethe"
+  },
+  {
+    "q": "No nací para compartir el odio sino el amor.",
+    "w": "Antígona",
+    "a": "Sófocles"
+  },
+  {
+    "q": "ningún mortal puede considerar a nadie feliz con la mira puesta en el último día, hasta que llegue al término de su vida sin haber sufrido nada doloroso.",
+    "w": "Edipo Rey",
+    "a": "Sófocles"
+  },
+  {
+    "q": "De todas las especies animadas y dotadas de pensamiento nosotras las mujeres somos los seres más miserables.",
+    "w": "Medea",
+    "a": "Eurípides"
+  },
+  {
+    "q": "Miradme: soy un dios y, sin embargo, ¡qué trato he recibido de los dioses!",
+    "w": "Prometeo encadenado",
+    "a": "Esquilo"
+  },
+  {
+    "q": "Aquí se hace lo que yo mando. Ya no puedes ir con el cuento a tu padre. Hilo y aguja para las hembras. Látigo y mula para el varón.",
     "w": "La casa de Bernarda Alba",
     "a": "Federico García Lorca"
   },
   {
-    "q": "Hilo y aguja para las hembras. Látigo y mula para el varón. Eso tiene la gente que nace con posibles.",
+    "q": "Y no quiero llantos. La muerte hay que mirarla cara a cara.",
     "w": "La casa de Bernarda Alba",
     "a": "Federico García Lorca"
   },
   {
-    "q": "Nacer mujer es el mayor castigo.",
+    "q": "¡Nos hundiremos todas en un mar de luto! Ella, la hija menor de Bernarda Alba, ha muerto virgen. ¿Me habéis oído? ¡Silencio, silencio he dicho! ¡Silencio!",
     "w": "La casa de Bernarda Alba",
     "a": "Federico García Lorca"
   },
   {
-    "q": "Y no quiero llantos. La muerte hay que mirarla cara a cara. ¡Silencio! ¡A callar he dicho! Las lágrimas cuando estés sola. ¡Nos hundiremos todas en un mar de luto! Ella, la hija menor de Bernarda Alba, ha muerto virgen. ¿Me habéis oído? ¡Silencio, silencio he dicho! ¡Silencio!",
-    "w": "La casa de Bernarda Alba",
+    "q": "La navaja, la navaja… Malditas sean todas y el bribón que las inventó.",
+    "w": "Bodas de sangre",
     "a": "Federico García Lorca"
   },
   {
-    "q": "Marchita. Marchita, pero segura. Ahora sí que lo sé de cierto. Y sola.",
-    "w": "Yerma",
+    "q": "Vecinas: con un cuchillo, con un cuchillito, en un día señalado, entre las dos y las tres, se mataron los dos hombres del amor.",
+    "w": "Bodas de sangre",
     "a": "Federico García Lorca"
   },
   {
@@ -480,508 +180,188 @@
     "a": "Federico García Lorca"
   },
   {
-    "q": "—Los ultraístas son unos farsantes. El esperpentismo lo ha inventado Goya. Los héroes clásicos han ido a pasearse en el callejón del Gato.\n—¡Estás completamente curda!\n—Los héroes clásicos reflejados en los espejos cóncavos dan el Esperpento. El sentido trágico de la vida española sólo puede darse con una estética sistemáticamente deformada.",
+    "q": "Los héroes clásicos reflejados en los espejos cóncavos dan el Esperpento. El sentido trágico de la vida española sólo puede darse con una estética sistemáticamente deformada.",
     "w": "Luces de bohemia",
-    "a": "Ramón M.ª del Valle-Inclán"
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "—España es una deformación grotesca de la civilización europea.\n—¡Pudiera! Yo me inhibo.\n—Las imágenes más bellas en un espejo cóncavo son absurdas.",
+    "q": "España es una deformación grotesca de la civilización europea.",
     "w": "Luces de bohemia",
-    "a": "Ramón M.ª del Valle-Inclán"
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "—¡Don Latino de Hispalis, grotesco personaje, te inmortalizaré en una novela!\n—Una tragedia, Max.\n—La tragedia nuestra no es tragedia.\n—¡Pues algo será!\n—El Esperpento.",
-    "w": "Luces de bohemia",
-    "a": "Ramón M.ª del Valle-Inclán"
+    "q": "¡Quien sea libre de culpa, tire la primera piedra!",
+    "w": "Divinas palabras",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "He aquí el tinglado de la antigua farsa, la que alivió en posadas aldeanas el cansancio de los trajinantes, la que embobó en las plazas de humildes lugares a los simples villanos.",
-    "w": "Los intereses creados",
-    "a": "Jacinto Benavente"
+    "q": "Qui sine peccato est vestrum, primus in illam lapidem mittat.",
+    "w": "Divinas palabras",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "No he nacido para compartir el odio, sino el amor.",
-    "w": "Antígona",
-    "a": "Sófocles"
+    "q": "¡Milagro del latín! Una emoción religiosa y litúrgica conmueve las conciencias, y cambia el sangriento resplandor de los rostros.",
+    "w": "Divinas palabras",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "Muchas cosas asombrosas existen y, con todo, nada más asombroso que el hombre: él cruza el mar gris empujado por el viento tempestuoso del sur.",
-    "w": "Antígona",
-    "a": "Sófocles"
+    "q": "La guerra es un negocio de los galones. El soldado sólo sabe morir.",
+    "w": "Las galas del difunto",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "—¿Y te atreviste a transgredir estas leyes?\n—No fue Zeus quien las promulgó, ni la Justicia que habita con los dioses de abajo fijó tales leyes entre los hombres. No creí que tus decretos tuvieran tanta fuerza como para que un mortal pudiera saltar por encima de las leyes no escritas e inquebrantables de los dioses.",
-    "w": "Antígona",
-    "a": "Sófocles"
+    "q": "Mi estética es una superación del dolor y de la risa, como deben ser las conversaciones de los muertos, al contarse historias de los vivos.",
+    "w": "Los cuernos de don Friolera",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "La sensatez es con mucho la primera fuente de felicidad. No hay que cometer impiedad contra los dioses. Las palabras arrogantes de los soberbios reciben grandes golpes en pago, y con la vejez enseñan la sensatez.",
-    "w": "Antígona",
-    "a": "Sófocles"
+    "q": "Todo nuestro arte nace de saber que un día pasaremos: Ese saber iguala a los hombres mucho más que la Revolución Francesa.",
+    "w": "Los cuernos de don Friolera",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "Que nadie sea considerado feliz hasta haber cruzado la frontera de su vida sin haber sufrido dolor.",
-    "w": "Edipo Rey",
-    "a": "Sófocles"
+    "q": "¡Don Joselito de mi vida, le rezaré por el alma! ¡Carajeta, si usted no la diña, la hubiera diñado la Madre Patria! ¡De risa me escacho!",
+    "w": "La hija del capitán",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "¡Oh luz, que te vea ahora por última vez! Yo, que he nacido de quienes no debía, que conviví con quienes no debía y maté a quienes no tenía que matar.",
-    "w": "Edipo Rey",
-    "a": "Sófocles"
+    "q": "es uno de esos hidalgos mujeriegos y despóticos, hospitalarios y violentos, que se conservan como retratos antiguos en las villas silenciosas y muertas, las villas que evocan con sus nombres feudales un herrumbroso son de armaduras",
+    "w": "Águila de blasón",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "No haber nacido triunfa sobre toda razón; y una vez que se ha venido al mundo, volver cuanto antes allí de donde se vino es lo segundo mejor.",
-    "w": "Edipo en Colono",
-    "a": "Sófocles"
+    "q": "¡Yo soy león! ¡Yo soy tigre!",
+    "w": "Águila de blasón",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "De todas las criaturas que tienen vida y pensamiento, nosotras las mujeres somos el ser más desgraciado: necesitamos comprar un marido con dote y tomar así un amo de nuestro cuerpo.",
-    "w": "Medea",
-    "a": "Eurípides"
+    "q": "¡Los lobos en el monte tienen más hermandad que vosotros! ¡Nacidos sois de un mismo vientre, y peleáis como fieras que por acaso se hallan en un camino!",
+    "w": "Romance de lobos",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "Dicen que vivimos en casa una vida sin peligro, mientras ellos combaten con la lanza. ¡Necios! Preferiría estar tres veces en el frente de batalla antes que parir una sola vez.",
-    "w": "Medea",
-    "a": "Eurípides"
+    "q": "¡Yo he sido siempre el peor hombre del mundo! Ahora siento que voy a dejarlo, y quiero arrepentirme.",
+    "w": "Romance de lobos",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "Comprendo el crimen que voy a cometer, pero mi pasión es más poderosa que mis reflexiones.",
-    "w": "Medea",
-    "a": "Eurípides"
+    "q": "¡Tengo miedo de ser el Diablo!",
+    "w": "Cara de Plata",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "Mi lengua juró, pero no mi corazón.",
-    "w": "Hipólito",
-    "a": "Eurípides"
+    "q": "¡Besa! ¡Muerde! ¡Ligazón te hago!",
+    "w": "Ligazón",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "—¿Y qué remedio encontraste contra esa enfermedad?\n—Alojé en los mortales ciegas esperanzas.\n—Gran beneficio les diste con ese don.\n—Y además les regalé el fuego.",
-    "w": "Prometeo encadenado",
-    "a": "Esquilo"
+    "q": "¡Flor de mozo! ¡Yo te maté cuando la vida me dabas!",
+    "w": "La cabeza del Bautista",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "En una palabra: odio a todos los dioses que, habiendo recibido de mí beneficios, me maltratan inicuamente.",
-    "w": "Prometeo encadenado",
-    "a": "Esquilo"
+    "q": "¡Si no le sello la boca, nos gana la entraña ese tunante!",
+    "w": "Sacrilegio",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "El tiempo, al envejecer, todo lo enseña.",
-    "w": "Prometeo encadenado",
-    "a": "Esquilo"
+    "q": "Primero me haré aparejador. ¡No es difícil! En unos años me haré un buen aparejador. Ganaré mucho dinero y me solicitarán todas las empresas constructoras. Para entonces ya estaremos casados… Tendremos nuestro hogar, alegre y limpio…, lejos de aquí.",
+    "w": "Historia de una escalera",
+    "a": "Antonio Buero Vallejo"
   },
   {
-    "q": "Zeus puso a los mortales en el camino del saber al establecer como ley soberana que se aprende sufriendo.",
-    "w": "Agamenón",
-    "a": "Esquilo"
+    "q": "Me repugna nuestro mundo. Todos piensan que en él no cabe sino comerte a los demás o ser comido. Y encima, todos te dicen: ¡devora antes de que te devoren!",
+    "w": "El tragaluz",
+    "a": "Antonio Buero Vallejo"
   },
   {
-    "q": "—¿Qué podríamos hacer las mujeres de sensato y de glorioso, nosotras que vivimos sentadas, llenas de colorete y con túnicas azafranadas?\n—¡Pues eso precisamente es lo que espero que nos salve!",
-    "w": "Lisístrata",
-    "a": "Aristófanes"
+    "q": "Yo me marcharé contigo y aprenderé a hacer juegos malabares con tres sombreros de copa…",
+    "w": "Tres sombreros de copa",
+    "a": "Miguel Mihura"
   },
   {
-    "q": "No hay fiera tan indomable como la mujer, ni el fuego, ni pantera alguna tan desvergonzada.",
-    "w": "Lisístrata",
-    "a": "Aristófanes"
+    "q": "¡Yo no puedo tomar huevos fritos a las seis y media de la mañana…!",
+    "w": "Tres sombreros de copa",
+    "a": "Miguel Mihura"
   },
   {
-    "q": "¡Brekekekex, coax, coax! ¡Brekekekex, coax, coax! Hijos palustres de las fuentes, entonemos el himno que acompaña a las flautas, mi canto sonoro.",
-    "w": "Las ranas",
-    "a": "Aristófanes"
+    "q": "Antes del amanecer, para dejarlo todo en la impunidad, di tierra a Eloísa debajo del almendro, donde ella solía sentarse a bordar y donde una tarde había pintado yo su retrato.",
+    "w": "Eloísa está debajo de un almendro",
+    "a": "Enrique Jardiel Poncela"
   },
   {
-    "q": "Hombre soy: nada de lo humano considero ajeno a mí.",
-    "w": "El atormentado",
-    "a": "Terencio"
+    "q": "¿Comprendes ahora lo amargo de mi destino? Presenciar todos los dolores sin poder llorar… Tener todos los sentimientos de una mujer sin poder usar ninguno… ¡Y estar condenada a matar siempre, siempre, sin poder nunca morir!",
+    "w": "La dama del alba",
+    "a": "Alejandro Casona"
   },
   {
-    "q": "Lobo es el hombre para el hombre, y no hombre, cuando desconoce cómo es el otro.",
-    "w": "Asinaria",
-    "a": "Plauto"
+    "q": "¡Todo el secreto está ahí! Primero, vivir apasionadamente, y después morir con belleza.",
+    "w": "La dama del alba",
+    "a": "Alejandro Casona"
   },
   {
-    "q": "Ahora soy Medea: mi ingenio ha crecido con los males.",
-    "w": "Medea",
-    "a": "Séneca"
+    "q": "Parece que estamos quietos, encerrados en una casa; pero, en realidad, marchamos, andamos día tras día. Somos una escuadra hacia la muerte.",
+    "w": "Escuadra hacia la muerte",
+    "a": "Alfonso Sastre"
   },
   {
-    "q": "—¿Para qué?\n—Para cubriros ese seno, cuya vista no puedo soportar. Cosas así lesionan las almas y hacen nacer culpables pensamientos.",
-    "w": "Tartufo",
-    "a": "Molière"
-  },
-  {
-    "q": "El escándalo del mundo es lo que constituye la ofensa: no es pecar, pecar en silencio.",
-    "w": "Tartufo",
-    "a": "Molière"
-  },
-  {
-    "q": "¡Al ladrón! ¡Al ladrón! ¡Al asesino! ¡Al criminal! ¡Justicia, justo cielo! ¡Estoy perdido! ¡Asesinado! ¡Me han cortado el cuello! ¡Me han robado mi dinero!",
-    "w": "El avaro",
-    "a": "Molière"
-  },
-  {
-    "q": "—Hay que comer para vivir y no vivir para comer.\n—¡Qué bien dicho está eso!",
-    "w": "El avaro",
-    "a": "Molière"
-  },
-  {
-    "q": "Casi todos los hombres mueren de sus remedios, y no de sus enfermedades.",
-    "w": "El enfermo imaginario",
-    "a": "Molière"
-  },
-  {
-    "q": "Cuanto más se ama a alguien, menos hay que adularlo: el amor puro se muestra en no perdonar nada.",
-    "w": "El misántropo",
-    "a": "Molière"
-  },
-  {
-    "q": "La perfecta razón huye de toda extremosidad, y quiere que se sea sabio con sobriedad.",
-    "w": "El misántropo",
-    "a": "Molière"
-  },
-  {
-    "q": "—Antes que nada eres esposa y madre.\n—Ya no creo en eso. Ante todo soy un ser humano, igual que tú... o al menos debo intentar serlo.",
-    "w": "Casa de muñecas",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "Nuestro hogar no ha sido más que un cuarto de juegos. Aquí he sido tu mujer-muñeca, igual que en casa era la niña-muñeca de papá. Y los niños, a su vez, han sido mis muñecos.",
-    "w": "Casa de muñecas",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "—¿No son tus deberes para con tu marido y tus hijos?\n—Tengo otros deberes igual de sagrados.\n—No los tienes. ¿Qué deberes podrían ser esos?\n—Mis deberes para conmigo misma.",
-    "w": "Casa de muñecas",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "¡Por una vez en la vida quiero tener poder sobre un destino humano!",
-    "w": "Hedda Gabler",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "—¡Se ha disparado en la sien! ¡Figúrese!\n—¡Pero, Dios mío, esas cosas no se hacen!",
-    "w": "Hedda Gabler",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "¡La mayoría nunca tiene razón de su parte! ¡Nunca, digo! Esa es una de esas mentiras sociales contra las que debe rebelarse todo hombre independiente e inteligente. ¿Quiénes forman la mayoría de la población en un país? ¿La gente inteligente o la gente necia?",
-    "w": "Un enemigo del pueblo",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "El hombre más fuerte del mundo es el que está más solo.",
-    "w": "Un enemigo del pueblo",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "No es solo lo que hemos heredado de nuestro padre y nuestra madre lo que vuelve en nosotros. Son toda clase de ideas muertas y viejas creencias sin vida. No tienen vitalidad, pero se aferran a nosotros y no podemos desprendernos de ellas.",
-    "w": "Espectros",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "—¿Por qué va usted siempre de negro?\n—Llevo luto por mi vida. Soy desgraciada.",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Soy una gaviota... No, no es eso. Soy una actriz. ¡Pues sí!",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Hacen falta formas nuevas. Formas nuevas hacen falta, y si no las hay, más vale que no haya nada.",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Ahora sé, comprendo, que en nuestro oficio —lo mismo da actuar que escribir— lo importante no es la fama, ni el brillo, ni nada de lo que yo soñaba, sino saber resistir. Aprende a llevar tu cruz y ten fe.",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "¡Qué le vamos a hacer, hay que vivir! Viviremos, tío Vania. Viviremos una larga, larga fila de días, de largas tardes.",
-    "w": "Tío Vania",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Descansaremos. Oiremos a los ángeles, veremos todo el cielo cuajado de diamantes, veremos cómo todo el mal de la tierra y todos nuestros sufrimientos se ahogan en la misericordia que llenará el mundo entero.",
-    "w": "Tío Vania",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "En el ser humano todo debe ser hermoso: el rostro, la ropa, el alma y los pensamientos.",
-    "w": "Tío Vania",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Toda Rusia es nuestro jardín. La tierra es grande y hermosa, hay en ella muchos lugares maravillosos.",
-    "w": "El jardín de los cerezos",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "¡Mi querido, mi tierno, mi hermoso jardín! ¡Mi vida, mi juventud, mi felicidad, adiós! ¡Adiós!",
-    "w": "El jardín de los cerezos",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "—¡Adiós, casa! ¡Adiós, vida vieja!\n—¡Bienvenida, vida nueva!",
-    "w": "El jardín de los cerezos",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "¡A Moscú! ¡A Moscú! ¡A Moscú!",
-    "w": "Tres hermanas",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Pasará el tiempo y nos iremos para siempre; nos olvidarán, olvidarán nuestras caras, nuestras voces y hasta cuántas éramos. Pero nuestros sufrimientos se convertirán en alegría para quienes vivan después de nosotros.",
-    "w": "Tres hermanas",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "¡Si supiéramos, si supiéramos!",
-    "w": "Tres hermanas",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Gris, querido amigo, es toda teoría, y verde el árbol dorado de la vida.",
-    "w": "Fausto",
-    "a": "Johann W. von Goethe"
-  },
-  {
-    "q": "Si alguna vez le digo al instante: «¡Detente, eres tan bello!», entonces podrás cargarme de cadenas, entonces aceptaré gustoso mi ruina.",
-    "w": "Fausto",
-    "a": "Johann W. von Goethe"
-  },
-  {
-    "q": "—¿Quién eres tú, pues?\n—Soy parte de aquella fuerza que siempre quiere el mal y siempre obra el bien.",
-    "w": "Fausto",
-    "a": "Johann W. von Goethe"
-  },
-  {
-    "q": "Soy el espíritu que siempre niega. Y con razón, pues todo cuanto nace merece ser aniquilado.",
-    "w": "Fausto",
-    "a": "Johann W. von Goethe"
-  },
-  {
-    "q": "Escrito está: «En el principio era la Palabra»... Aquí me detengo ya. ¿Quién me ayuda a proseguir?... y escribo confiado: «En el principio era la Acción».",
-    "w": "Fausto",
-    "a": "Johann W. von Goethe"
-  },
-  {
-    "q": "¡Ah, no! ¡Es un poco corto, joven! Se podían decir... ¡oh, Dios!... muchas cosas en suma, variando el tono. Por ejemplo: Agresivo: «Yo, señor, si tuviera semejante nariz, me la amputaría al instante». Amistoso: «¡Debe de mojarse en vuestra taza! Para beber, haceos fabricar una cántara». Descriptivo: «¡Es una roca!... ¡un pico!... ¡un cabo! ¿Qué digo un cabo?... ¡Es una península!»",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "¿Y qué habría que hacer? ¿Buscar un protector poderoso, procurarse un patrón y, como hiedra oscura que rodea un tronco y se hace de él su sostén lamiéndole la corteza, trepar con astucia en lugar de elevarse por la fuerza? No, gracias.",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "¿Qué decís?... ¿Que es inútil?... ¡Lo sé! ¡Pero no se pelea con la esperanza del éxito! ¡No, no! ¡Es mucho más bello cuando es inútil!",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "Hay algo que, sin un pliegue, sin una mancha, me llevo a pesar de vosotros... y es... ¡mi penacho!",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "La verdad rara vez es pura y nunca simple. La vida moderna sería muy tediosa si fuera cualquiera de las dos cosas, y la literatura moderna, completamente imposible.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Realmente no veo nada romántico en declararse. Es muy romántico estar enamorado. Pero no hay nada romántico en una declaración concreta. Pues pueden aceptarle a uno. Creo que es lo que suele suceder. Y entonces se acabó la emoción. La esencia misma de lo romántico es la incertidumbre.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Perder a un progenitor, señor Worthing, puede considerarse una desgracia; perder a los dos parece un descuido.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "En asuntos de suma gravedad, lo esencial es el estilo, no la sinceridad.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Nunca viajo sin mi diario. Siempre hay que tener algo sensacional que leer en el tren.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "—¡Ah, qué puritana tan fascinante es usted, lady Windermere!\n—El adjetivo era innecesario, lord Darlington.\n—No pude evitarlo. Puedo resistirlo todo excepto la tentación.",
-    "w": "El abanico de Lady Windermere",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Todos estamos en el fango, pero algunos miramos a las estrellas.",
-    "w": "El abanico de Lady Windermere",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Tarde o temprano todos tenemos que pagar por lo que hacemos.",
-    "w": "Un marido ideal",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "¡Ah! He besado tu boca, Iokanaán, he besado tu boca. Había un sabor amargo en tus labios. ¿Era el sabor de la sangre?... Pero quizá era el sabor del amor... Dicen que el amor tiene un sabor amargo...",
-    "w": "Salomé",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "—En realidad... hemos venido en busca de un autor...\n—¿De un autor? ¿De qué autor?\n—De un autor cualquiera, señor.\n—Pero aquí no hay ningún autor; no estamos ensayando ninguna obra nueva.",
-    "w": "Seis personajes en busca de autor",
-    "a": "Luigi Pirandello"
-  },
-  {
-    "q": "Cuando un personaje ha nacido, adquiere enseguida tal independencia, incluso de su propio autor, que todos pueden imaginarlo en otras muchas situaciones en las que el autor nunca pensó en ponerlo, y adquiere así, por sí mismo, un significado que el autor jamás soñó con darle.",
-    "w": "Seis personajes en busca de autor",
-    "a": "Luigi Pirandello"
-  },
-  {
-    "q": "La vida está llena de infinitos absurdos que, extrañamente, ni siquiera necesitan parecer verosímiles, porque son verdaderos.",
-    "w": "Seis personajes en busca de autor",
-    "a": "Luigi Pirandello"
-  },
-  {
-    "q": "—¿La verdad? La verdad es solo esta: yo soy la hija de la señora Frola y la segunda esposa del señor Ponza. Sí, y para mí, ¡nadie!, para mí yo no soy nadie...\n—¡Ah, no, señora! Para usted misma tendrá que ser una de las dos.\n—No, señores: para mí, yo soy aquella que se cree que soy.",
-    "w": "Así es (si así os parece)",
-    "a": "Luigi Pirandello"
-  },
-  {
-    "q": "Sueño que estoy encaramada a una alta columna y no veo modo alguno de bajar; me da vértigo mirar hacia abajo, pero tengo que bajar, y no tengo valor para tirarme; no puedo sostenerme y ansío caer, pero no caigo.",
-    "w": "La señorita Julia",
-    "a": "August Strindberg"
-  },
-  {
-    "q": "Mi mal viene de más lejos. Apenas me había unido por las leyes del matrimonio al hijo de Egeo, y mi reposo y mi dicha parecían afianzados, cuando Atenas me mostró a mi soberbio enemigo: lo vi, enrojecí, palidecí al verlo, y mi alma quedó turbada.",
-    "w": "Fedra",
-    "a": "Jean Racine"
-  },
-  {
-    "q": "—¿Y si nos ahorcáramos?\n—Sería un buen medio para que se nos pusiera tiesa.\n—¿Lo hacemos?\n—Con todo lo que sigue. Allí donde eso cae crecen mandrágoras. Por eso gritan cuando las arrancan. ¿No lo sabías?\n—Ahorquémonos ahora mismo.",
+    "q": "Vámonos. VLADIMIR: No podemos. ESTRAGON: ¿Por qué? VLADIMIR: Esperamos a Godot.",
     "w": "Esperando a Godot",
     "a": "Samuel Beckett"
   },
   {
-    "q": "—Vayámonos.\n—No podemos.\n—¿Por qué?\n—Esperamos a Godot.\n—Es cierto.",
+    "q": "No ocurre nada, nadie viene, nadie se va. Es terrible.",
     "w": "Esperando a Godot",
     "a": "Samuel Beckett"
   },
   {
-    "q": "Las lágrimas del mundo son inmutables. Cuando alguien empieza a llorar, alguien deja de hacerlo en otra parte. Lo mismo sucede con la risa.",
-    "w": "Esperando a Godot",
-    "a": "Samuel Beckett"
-  },
-  {
-    "q": "Todos nacemos locos. Algunos siguen siéndolo.",
-    "w": "Esperando a Godot",
-    "a": "Samuel Beckett"
-  },
-  {
-    "q": "—Y ahora, ¿qué hacemos?\n—Esperamos.\n—Sí, ¿pero mientras esperamos?\n—¿Y si nos ahorcáramos?",
-    "w": "Esperando a Godot",
-    "a": "Samuel Beckett"
-  },
-  {
-    "q": "A caballo entre una tumba y un parto difícil. En el fondo del agujero, pensativamente, el sepulturero prepara sus herramientas. Hay tiempo para envejecer. El aire está lleno de nuestros gritos.",
-    "w": "Esperando a Godot",
-    "a": "Samuel Beckett"
-  },
-  {
-    "q": "¿Es esa hermosa faz la que mil naves lanzó a la mar, la que abrasó las torres altísimas de Ilión? Elena, hermosa, hazme inmortal con un divino beso.",
-    "w": "La trágica historia del doctor Fausto",
-    "a": "Christopher Marlowe"
-  },
-  {
-    "q": "—¿Y cómo entonces de ese infierno, fuera te encuentras tú?\n—Porque el infierno es este, ni estoy yo fuera de él. ¿Te se figura que yo que vi de Dios la faz hermosa y gocé las eternas alegrías del cielo, no me siento atormentado cual por diez mil infiernos, al mirarme privado de la eterna venturanza?",
-    "w": "La trágica historia del doctor Fausto",
-    "a": "Christopher Marlowe"
-  },
-  {
-    "q": "Un solo rasgo de pluma, un solo gesto de vuestra mano, puede crear de nuevo la tierra. ¡Conceded libertad de pensamiento!",
-    "w": "Don Carlos",
-    "a": "Friedrich Schiller"
-  },
-  {
-    "q": "¡Soy una fuerza que avanza! Agente ciego y sordo de misterios funestos, un alma de desdicha hecha con tinieblas.",
-    "w": "Hernani",
-    "a": "Victor Hugo"
-  },
-  {
-    "q": "La diferencia entre una dama y una florista no está en cómo se comporta, sino en cómo es tratada. Para el profesor Higgins yo siempre seré una florista, porque él me trata como a una florista, y siempre me tratará así; pero sé que para usted puedo ser una dama, porque usted me trata como a una dama, y siempre me tratará así.",
-    "w": "Pigmalión",
-    "a": "George Bernard Shaw"
-  },
-  {
-    "q": "¡Oh Dios que hiciste esta hermosa tierra! ¿Cuándo estará dispuesta a recibir a tus santos? ¿Cuánto tiempo, Señor, cuánto tiempo?",
-    "w": "Santa Juana",
-    "a": "George Bernard Shaw"
-  },
-  {
-    "q": "Primero viene el comer, después viene la moral. Primero tiene que ser posible que también los pobres puedan cortarse su parte de la gran hogaza de pan.",
-    "w": "La ópera de los tres centavos",
+    "q": "La guerra es difícil de empezar, como todo lo bueno. Pero cuando crece y florece, arraiga bien. Entonces las gentes le temen a la paz como temen los jugadores acabar el juego, por no echar cuentas de lo perdido.",
+    "w": "Madre coraje y sus hijos",
     "a": "Bertolt Brecht"
   },
   {
-    "q": "¿Qué es una ganzúa comparada con una acción? ¿Qué es robar un banco comparado con fundarlo?",
-    "w": "La ópera de los tres centavos",
+    "q": "Desgraciada es la tierra que necesita héroes.",
+    "w": "Galileo Galilei",
     "a": "Bertolt Brecht"
   },
   {
-    "q": "Y el tiburón tiene dientes, y los lleva en la cara. Y Macheath tiene un cuchillo, pero el cuchillo no se ve.",
-    "w": "La ópera de los tres centavos",
-    "a": "Bertolt Brecht"
+    "q": "Sean quienes sean… yo siempre he dependido de la amabilidad de los desconocidos.",
+    "w": "Un tranvía llamado Deseo",
+    "a": "Tennessee Williams"
   },
   {
-    "q": "Hay quienes están en la oscuridad y quienes están en la luz. Y se ve a los que están en la luz; a los que están en la oscuridad no se les ve.",
-    "w": "La ópera de los tres centavos",
-    "a": "Bertolt Brecht"
+    "q": "pero es un ser humano, y le está ocurriendo algo terrible. Por eso debemos prestarle atención, evitar que acabe en la tumba como un perro viejo.",
+    "w": "Muerte de un viajante",
+    "a": "Arthur Miller"
   },
   {
-    "q": "—¡Desgraciada la tierra que no tiene héroes!\n—No: desgraciada la tierra que necesita héroes.",
-    "w": "Vida de Galileo",
-    "a": "Bertolt Brecht"
+    "q": "Es un hombre que va solo por la vida, sin más recursos que una sonrisa y unos zapatos bien limpios.",
+    "w": "Muerte de un viajante",
+    "a": "Arthur Miller"
   },
   {
-    "q": "Quien no conoce la verdad es solo un ignorante; pero quien la conoce y la llama mentira, ese es un criminal.",
-    "w": "Vida de Galileo",
-    "a": "Bertolt Brecht"
+    "q": "Un viajante tiene que soñar, muchacho. Es un gaje del oficio.",
+    "w": "Muerte de un viajante",
+    "a": "Arthur Miller"
   },
   {
-    "q": "Pienso que el único objetivo de la ciencia consiste en aliviar las fatigas de la existencia humana.",
-    "w": "Vida de Galileo",
-    "a": "Bertolt Brecht"
+    "q": "Porque no. Porque estoy muerta, y a los muertos no se les da besos.",
+    "w": "¡Ay, Carmela!",
+    "a": "José Sanchis Sinisterra"
   },
   {
-    "q": "La guerra siempre encuentra una salida. Mientras haya gente, la guerra encontrará su camino.",
-    "w": "Madre Coraje y sus hijos",
-    "a": "Bertolt Brecht"
+    "q": "¡Porque estás muerta, y los muertos no gritan!",
+    "w": "¡Ay, Carmela!",
+    "a": "José Sanchis Sinisterra"
   },
   {
-    "q": "La guerra no es más que los negocios, y en vez de con queso, se hace con plomo.",
-    "w": "Madre Coraje y sus hijos",
-    "a": "Bertolt Brecht"
+    "q": "A mí me dan más miedo los otros. Esos sí que son peligrosos. Esos no respetan nada: ni la ortografía, ni la sintaxis, ni el sentido común.",
+    "w": "El chico de la última fila",
+    "a": "Juan Mayorga"
   },
   {
-    "q": "Espero poder tirar sola del carro. Lo conseguiré, no hay gran cosa dentro. Tengo que volver al negocio.",
-    "w": "Madre Coraje y sus hijos",
-    "a": "Bertolt Brecht"
-  },
-  {
-    "q": "Que la criatura sea de los maternales, para que prospere; los carros, de los buenos conductores, para que conduzcan bien; y el valle de los que lo riegan, para que dé frutos.",
-    "w": "El círculo de tiza caucasiano",
-    "a": "Bertolt Brecht"
-  },
-  {
-    "q": "¡Terrible es la tentación de hacer el bien!",
-    "w": "El círculo de tiza caucasiano",
-    "a": "Bertolt Brecht"
+    "q": "Empiezo a creer que es realmente un maníaco de la actuación, que incluso está interpretando el papel de loco… y apuesto que está más cuerdo que yo.",
+    "w": "Muerte accidental de un anarquista",
+    "a": "Dario Fo"
   }
 ]
