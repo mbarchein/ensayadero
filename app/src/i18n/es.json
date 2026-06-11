@@ -224,7 +224,11 @@
       "sessions": "Ensayos",
       "planner": "Programar",
       "members": "Miembros"
-    }
+    },
+    "joinedBanner_one": "{{name}} se ha unido al grupo y hay {{count}} ensayo futuro al que no está convocado.",
+    "joinedBanner_other": "{{name}} se ha unido al grupo y hay {{count}} ensayos futuros a los que no está convocado.",
+    "joinedConvoke": "Convocar",
+    "joinedDismiss": "Descartar"
   },
   "invite": {
     "title": "Invitar al grupo",
@@ -374,7 +378,8 @@
       "SESSION_CHANGED_LOCATION": "Cambio de lugar",
       "SESSION_CHANGED_BOTH": "Cambio de hora y lugar",
       "REMINDER": "Recordatorio",
-      "NUDGE": "Confirma tu asistencia"
+      "NUDGE": "Confirma tu asistencia",
+      "MEMBER_JOINED": "{{name}} se ha unido al grupo"
     }
   },
   "profile": {
@@ -400,7 +405,9 @@
       "reminders": "Recordatorios de ensayo",
       "remindersHint": "24 horas antes de cada ensayo",
       "sessions": "Convocatorias, cambios y cancelaciones",
-      "sessionsHint": "Cuando se confirma, cambia o cancela un ensayo"
+      "sessionsHint": "Cuando se confirma, cambia o cancela un ensayo",
+      "members": "Nuevos miembros del grupo",
+      "membersHint": "Cuando alguien se une a uno de tus grupos"
     },
     "pushTitle": "Avisos en este dispositivo",
     "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",
@@ -546,5 +553,20 @@
       "title": "5. Cambios",
       "body": "Podemos actualizar esta política de cookies; publicaremos los cambios en esta misma página."
     }
+  },
+  "convoke": {
+    "title": "Convocar a {{name}}",
+    "futureCount_one": "Ensayos futuros ({{count}})",
+    "futureCount_other": "Ensayos futuros ({{count}})",
+    "convokeAs": "Convocar como:",
+    "asRequired": "Obligatorio",
+    "asOptional": "Opcional",
+    "submit_one": "Convocar a {{count}} ensayo",
+    "submit_other": "Convocar a {{count}} ensayos",
+    "confirmedNote_one": "Recibirá la convocatoria del ensayo ya confirmado.",
+    "confirmedNote_other": "Recibirá la convocatoria de los {{count}} ensayos ya confirmados.",
+    "allDone": "{{name}} ya está en todos los ensayos futuros.",
+    "backToMembers": "Volver a miembros",
+    "memberGone": "Esta persona ya no es miembro del grupo."
   }
 }

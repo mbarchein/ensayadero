@@ -224,7 +224,11 @@
       "sessions": "Rehearsals",
       "planner": "Plan",
       "members": "Members"
-    }
+    },
+    "joinedBanner_one": "{{name}} has joined the group and there is {{count}} upcoming rehearsal they are not summoned to.",
+    "joinedBanner_other": "{{name}} has joined the group and there are {{count}} upcoming rehearsals they are not summoned to.",
+    "joinedConvoke": "Summon",
+    "joinedDismiss": "Dismiss"
   },
   "invite": {
     "title": "Invite to the group",
@@ -374,7 +378,8 @@
       "SESSION_CHANGED_LOCATION": "Location change",
       "SESSION_CHANGED_BOTH": "Time and location change",
       "REMINDER": "Reminder",
-      "NUDGE": "Confirm your attendance"
+      "NUDGE": "Confirm your attendance",
+      "MEMBER_JOINED": "{{name}} has joined the group"
     }
   },
   "profile": {
@@ -400,7 +405,9 @@
       "reminders": "Rehearsal reminders",
       "remindersHint": "24 hours before each rehearsal",
       "sessions": "Confirmations, changes and cancellations",
-      "sessionsHint": "When a rehearsal is confirmed, changed or cancelled"
+      "sessionsHint": "When a rehearsal is confirmed, changed or cancelled",
+      "members": "New group members",
+      "membersHint": "When someone joins one of your groups"
     },
     "pushTitle": "Alerts on this device",
     "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",
@@ -546,5 +553,20 @@
       "title": "5. Changes",
       "body": "We may update this cookie policy; changes will be published on this page."
     }
+  },
+  "convoke": {
+    "title": "Summon {{name}}",
+    "futureCount_one": "Upcoming rehearsals ({{count}})",
+    "futureCount_other": "Upcoming rehearsals ({{count}})",
+    "convokeAs": "Summon as:",
+    "asRequired": "Required",
+    "asOptional": "Optional",
+    "submit_one": "Summon to {{count}} rehearsal",
+    "submit_other": "Summon to {{count}} rehearsals",
+    "confirmedNote_one": "They will receive the summons for the already-confirmed rehearsal.",
+    "confirmedNote_other": "They will receive the summons for the {{count}} already-confirmed rehearsals.",
+    "allDone": "{{name}} is already in every upcoming rehearsal.",
+    "backToMembers": "Back to members",
+    "memberGone": "This person is no longer a member of the group."
   }
 }

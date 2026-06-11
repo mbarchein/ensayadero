@@ -16,6 +16,7 @@ import Tip, { resetTips } from '../../components/Tip'
 const EMAIL_GROUPS = {
   sessions: ['SESSION_CONFIRMED', 'SESSION_CHANGED', 'SESSION_CANCELLED'],
   reminders: ['REMINDER'],
+  members: ['MEMBER_JOINED'],
 } as const
 type EmailGroup = keyof typeof EMAIL_GROUPS
 

@@ -12,6 +12,7 @@ import HomePage from './features/groups/HomePage'
 import NewGroupPage from './features/groups/NewGroupPage'
 import EditGroupPage from './features/groups/EditGroupPage'
 import MembersPage from './features/groups/MembersPage'
+import ConvokeMemberPage from './features/groups/ConvokeMemberPage'
 import JoinPage from './features/groups/JoinPage'
 import AvailabilityPage from './features/availability/AvailabilityPage'
 import UpcomingPage from './features/agenda/UpcomingPage'
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/g/:groupId/edit" element={<EditGroupPage />} />
           <Route path="/g/:groupId/planner" element={<PlannerPage />} />
           <Route path="/g/:groupId/members" element={<MembersPage />} />
+          <Route path="/g/:groupId/members/:memberId/sessions" element={<ConvokeMemberPage />} />
           <Route path="/g/:groupId/sessions/new" element={<NewSessionPage />} />
           <Route path="/g/:groupId/sessions/:sessionId" element={<SessionDetailPage />} />
           <Route path="/g/:groupId/sessions/:sessionId/edit" element={<EditSessionPage />} />

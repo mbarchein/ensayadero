@@ -15,6 +15,7 @@ import {
   Leaf,
   Megaphone,
   Sun,
+  UserPlus,
   type LucideIcon,
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -30,6 +31,7 @@ const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   SESSION_CHANGED: { Icon: Clock, color: 'text-amber-600' },
   REMINDER: { Icon: AlarmClock, color: 'text-violet-600' },
   NUDGE: { Icon: Megaphone, color: 'text-violet-600' },
+  MEMBER_JOINED: { Icon: UserPlus, color: 'text-violet-600' },
 }
 
 export default function NotificationsPage() {
@@ -40,6 +42,17 @@ export default function NotificationsPage() {
   const [quote] = useState(() => {
     const list = i18n.language?.startsWith('en') ? quotesEn : quotesEs
     return list[Math.floor(Math.random() * list.length)]
+  })
+
+  // role per group: a MEMBER_JOINED tap sends instructors to the convoke
+  // selector and everyone else to the members page
+  const { data: myRoles } = useQuery({
+    queryKey: ['my-roles'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('memberships').select('group_id, role')
+      if (error) throw error
+      return new Map((data as { group_id: string; role: string }[]).map((m) => [m.group_id, m.role]))
+    },
   })
 
   const { data: notifications, isLoading } = useQuery({
@@ -164,7 +177,9 @@ export default function NotificationsPage() {
                   ? 'SESSION_CHANGED_LOCATION'
                   : 'SESSION_CHANGED'
             }
-            const label = meta ? t(`notifications.types.${typeKey}`) : n.type
+            const label = meta
+              ? t(`notifications.types.${typeKey}`, { name: String(n.payload.member_name ?? '') })
+              : n.type
             const starts = n.payload.starts_at ? new Date(String(n.payload.starts_at)) : null
             const inner = (
               <div
@@ -191,7 +206,18 @@ export default function NotificationsPage() {
             }
             return (
               <SwipeArchiveRow key={n.id} onArchive={() => archive.mutate(n.id)}>
-                {n.payload.session_id && n.group_id ? (
+                {n.type === 'MEMBER_JOINED' && n.group_id ? (
+                  <Link
+                    to={
+                      myRoles?.get(n.group_id) === 'INSTRUCTOR' && n.payload.member_id
+                        ? `/g/${n.group_id}/members/${n.payload.member_id}/sessions`
+                        : `/g/${n.group_id}/members`
+                    }
+                    onClick={readOnClick}
+                  >
+                    {inner}
+                  </Link>
+                ) : n.payload.session_id && n.group_id ? (
                   <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`} onClick={readOnClick}>
                     {inner}
                   </Link>

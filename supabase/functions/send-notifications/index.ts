@@ -39,6 +39,9 @@ const T: Record<Lang, Record<string, string>> = {
     timePlaceChange: 'Cambio de hora y lugar',
     reminder: 'Recordatorio',
     nudge: 'Te esperan: confirma tu asistencia',
+    memberJoined: 'Nuevo miembro',
+    memberJoinedBody: 'se ha unido al grupo',
+    memberCta: 'Ver miembros',
     when: 'Cuándo',
     where: 'Dónde',
     prevTime: 'Hora anterior',
@@ -59,6 +62,9 @@ const T: Record<Lang, Record<string, string>> = {
     timePlaceChange: 'Time and location change',
     reminder: 'Reminder',
     nudge: 'They are waiting: confirm your attendance',
+    memberJoined: 'New member',
+    memberJoinedBody: 'has joined the group',
+    memberCta: 'See members',
     when: 'When',
     where: 'Where',
     prevTime: 'Previous time',
@@ -96,6 +102,20 @@ const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: 
   },
   REMINDER: (p, l, g) => `⏰ ${T[l].reminder}: ${sessionLabel(p, l, g)}`,
   NUDGE: (p, l, g) => `📣 ${T[l].nudge}: ${sessionLabel(p, l, g)}`,
+  MEMBER_JOINED: (p, l, g) => `🎭 ${T[l].memberJoined}: ${[g, p.member_name].filter(Boolean).join(' · ')}`,
+}
+
+// MEMBER_JOINED has no session payload: simple "X joined <group>" card with a
+// link to the group's members page instead of the generic session body.
+function memberJoinedBody(p: Record<string, unknown>, lang: Lang, groupId: unknown, group?: string): string {
+  const t = T[lang]
+  return [
+    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">🎭 ${t.memberJoined}</h2>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${p.member_name ?? ''}</strong> ${t.memberJoinedBody}${group ? ` "${group}"` : ''}.</p>`,
+    groupId
+      ? `<p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/g/${groupId}/members" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">${t.memberCta}</a></p>`
+      : '',
+  ].filter(Boolean).join('\n')
 }
 
 function fmtDate(iso: unknown, lang: Lang = 'es'): string {
@@ -353,7 +373,7 @@ Deno.serve(async (req) => {
   langCache.clear() // metadata may change between runs
   const { data: pending, error } = await supabase
     .from('notifications')
-    .select('id, user_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name), groups(name)')
+    .select('id, user_id, group_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name), groups(name)')
     .or('sent_email_at.is.null,sent_push_at.is.null')
     .limit(50)
 
@@ -381,15 +401,19 @@ Deno.serve(async (req) => {
     if (!n.sent_email_at) {
       if (channel === 'EMAIL' || channel === 'BOTH') {
         const inner =
-          (n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
-          emailBody(n.type, payload, lang, groupName)
+          n.type === 'MEMBER_JOINED'
+            ? memberJoinedBody(payload, lang, n.group_id, groupName)
+            : ((n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
+              emailBody(n.type, payload, lang, groupName))
         if (await sendEmail(profile.email, subject, layout(inner, lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
     }
     if (!n.sent_push_at) {
       if (channel === 'PUSH' || channel === 'BOTH') {
-        if (await sendPush(n.user_id, subject, fmtDate(payload.starts_at, lang))) pushes++
+        const pushBody =
+          n.type === 'MEMBER_JOINED' ? String(payload.member_name ?? '') : fmtDate(payload.starts_at, lang)
+        if (await sendPush(n.user_id, subject, pushBody)) pushes++
       }
       updates.sent_push_at = new Date().toISOString()
     }

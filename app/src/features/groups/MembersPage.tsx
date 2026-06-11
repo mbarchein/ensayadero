@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
+import { parseRange } from '../../lib/ranges'
 import type { GroupRole, Invitation, MembershipWithProfile } from '../../lib/types'
 
 export default function MembersPage() {
@@ -33,6 +34,45 @@ export default function MembersPage() {
     isInstructor &&
     otherMembers.length > 0 &&
     !otherMembers.some((m) => m.role === 'INSTRUCTOR')
+
+  // "new member" banner: members who joined recently and are not summoned to
+  // any upcoming session yet. Dismissals are per-device (localStorage).
+  const dismissKey = (userId: string) => `member-onboard-dismissed:${groupId}:${userId}`
+  // session-only mirror of localStorage so dismissing re-renders immediately
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set())
+  const { data: futureSessions } = useQuery({
+    queryKey: ['future-sessions', groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('id, time_range, status, session_participants(user_id)')
+        .eq('group_id', groupId)
+        .neq('status', 'CANCELLED')
+      if (error) throw error
+      return data as { id: string; time_range: string; status: string; session_participants: { user_id: string }[] }[]
+    },
+    enabled: isInstructor,
+  })
+  const JOIN_BANNER_DAYS = 14
+  const newJoiners = !futureSessions
+    ? []
+    : members
+        .filter(
+          (m) =>
+            m.user_id !== profile?.id &&
+            !dismissed.has(m.user_id) &&
+            localStorage.getItem(dismissKey(m.user_id)) === null &&
+            Date.now() - new Date(m.joined_at).getTime() < JOIN_BANNER_DAYS * 86_400_000,
+        )
+        .map((m) => ({
+          member: m,
+          missing: futureSessions.filter(
+            (s) =>
+              parseRange(s.time_range).start > new Date() &&
+              !s.session_participants.some((p) => p.user_id === m.user_id),
+          ).length,
+        }))
+        .filter((x) => x.missing > 0)
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations', groupId],
@@ -146,6 +186,37 @@ export default function MembersPage() {
       <Tip id="members" />
 
       {isInstructor && group && <InvitePanel group={group} />}
+
+      {newJoiners.map(({ member: m, missing }) => (
+        <div
+          key={m.user_id}
+          className="rounded-xl border border-violet-200 bg-violet-50 p-3 text-sm"
+        >
+          <div className="flex gap-2.5">
+            <UserPlus size={18} className="mt-0.5 shrink-0 text-violet-700" aria-hidden />
+            <p className="text-violet-900">
+              {t('group.joinedBanner', {
+                name: m.profiles.name || m.profiles.email,
+                count: missing,
+              })}
+            </p>
+          </div>
+          <div className="mt-2 flex justify-end gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                localStorage.setItem(dismissKey(m.user_id), '1')
+                setDismissed((prev) => new Set(prev).add(m.user_id))
+              }}
+            >
+              {t('group.joinedDismiss')}
+            </Button>
+            <Button onClick={() => navigate(`/g/${groupId}/members/${m.user_id}/sessions`)}>
+              {t('group.joinedConvoke')}
+            </Button>
+          </div>
+        </div>
+      ))}
 
       <ul className="space-y-2">
         {members.map((m) => (
