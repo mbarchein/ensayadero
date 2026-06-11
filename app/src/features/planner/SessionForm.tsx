@@ -568,6 +568,14 @@ export default function SessionForm({
           {primaryLabel}
         </Button>
       </div>
+      {/* Spacer for the fixed bottom nav: the sticky bar pins above the nav
+          (the scroll container's bottom padding shrinks its sticky
+          rectangle), but trailing padding doesn't extend the scroll range, so
+          without this element the bar's resting position stays behind the nav
+          and the pinned bar covers the last participant row at max scroll.
+          2.5rem + the form's gap-4 and pb-2 add up to the nav's 3.5rem, so
+          the bar rests exactly where it pins. */}
+      <div aria-hidden className="h-[calc(2.5rem+env(safe-area-inset-bottom))] shrink-0" />
     </form>
   )
 }
