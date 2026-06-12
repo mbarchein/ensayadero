@@ -6,8 +6,9 @@ help: ## List of commands
 
 up: ## Bring up the full local stack (app :5173, API :54321, db :54322)
 	docker compose up -d
-	@echo "App:     http://localhost:5173"
-	@echo "API:     http://localhost:54321"
+	@echo "App:      http://localhost:5173"
+	@echo "API:      http://localhost:54321"
+	@echo "Mailpit:  http://localhost:54324"
 	@echo "Postgres: localhost:54322 (supabase_admin/postgres)"
 
 down: ## Stop the stack
