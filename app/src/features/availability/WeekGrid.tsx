@@ -8,6 +8,8 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { addDays, format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { DAY_START_HOUR, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
@@ -64,6 +66,7 @@ export default function WeekGrid({
   onDayChange,
   hintPulse = 0,
 }: Props) {
+  const { t } = useTranslation()
   // null = week view (all days, read-only); number = day view (editable).
   // Uncontrolled by default; controlled when the parent passes `day`.
   const [internalDay, setInternalDay] = useState<number | null>(null)
@@ -258,6 +261,34 @@ export default function WeekGrid({
 
   return (
     <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
+      {/* week navigation (week view only): explicit prev/next for desktop;
+          on touch the swipe carousel is the gesture, so hide below md */}
+      {!editing && onPrevWeek && onNextWeek && (
+        <div className="hidden items-center justify-between px-1 pb-1 md:flex">
+          <button
+            type="button"
+            onClick={onPrevWeek}
+            aria-label={t('availability.prevWeek')}
+            title={t('availability.prevWeek')}
+            className="rounded p-1 text-violet-700 hover:bg-violet-50"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <span className="text-xs font-medium text-gray-700">
+            {format(weekMonday, 'd', { locale: dateLocale() })}–
+            {format(addDays(weekMonday, 6), 'd MMM', { locale: dateLocale() })}
+          </span>
+          <button
+            type="button"
+            onClick={onNextWeek}
+            aria-label={t('availability.nextWeek')}
+            title={t('availability.nextWeek')}
+            className="rounded p-1 text-violet-700 hover:bg-violet-50"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
       {/* day selector header — always visible; drag to change week (carousel) */}
       <div className="flex border-b border-gray-200">
         {/* corner cell: empty — exiting day view is done from the page header
