@@ -430,6 +430,7 @@
     "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",
     "pushEnabled": "✓ Enabled on this device",
     "pushEnable": "Enable notifications",
+    "pushDisable": "Disable",
     "pushError": "Could not enable. Check browser permissions or install the app (iOS requires installing it).",
     "signOut": "Sign out",
     "dangerZone": "Danger zone",

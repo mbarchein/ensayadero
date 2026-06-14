@@ -430,6 +430,7 @@
     "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",
     "pushEnabled": "✓ Activadas en este dispositivo",
     "pushEnable": "Activar notificaciones",
+    "pushDisable": "Desactivar",
     "pushError": "No se pudo activar. Revisa permisos del navegador o instala la app (iOS requiere instalarla).",
     "signOut": "Cerrar sesión",
     "dangerZone": "Zona peligrosa",

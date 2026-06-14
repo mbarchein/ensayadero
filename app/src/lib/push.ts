@@ -26,6 +26,27 @@ export async function enablePush(): Promise<boolean> {
   return !error
 }
 
+/** Unsubscribes this device from Web Push and removes its saved subscription.
+ * The OS-level notification permission stays granted (a site can't revoke it) —
+ * this just stops deliveries to this device. */
+export async function disablePush(): Promise<boolean> {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false
+  const reg = await navigator.serviceWorker.ready
+  const sub = await reg.pushManager.getSubscription()
+  if (!sub) return true // already off
+  // delete the row first (we still hold the endpoint), then drop the browser sub
+  const { error } = await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
+  await sub.unsubscribe()
+  return !error
+}
+
+/** True if this device currently has an active push subscription. */
+export async function isPushSubscribed(): Promise<boolean> {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false
+  const reg = await navigator.serviceWorker.ready
+  return !!(await reg.pushManager.getSubscription())
+}
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')

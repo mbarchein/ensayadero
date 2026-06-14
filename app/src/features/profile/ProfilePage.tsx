@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Download, LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { enablePush } from '../../lib/push'
+import { enablePush, disablePush, isPushSubscribed } from '../../lib/push'
 import { useInstallPrompt, promptInstall, isIOS, isStandalone } from '../pwa/installPrompt'
 import { BackButton, Button, InitialsAvatar, Modal, Toggle } from '../../components/ui'
 import Tip, { resetTips } from '../../components/Tip'
@@ -82,9 +82,12 @@ export default function ProfilePage() {
   })
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteText, setDeleteText] = useState('')
-  const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>(
-    typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'ok' : 'idle',
-  )
+  // Reflect the real subscription state (not just the OS permission): a device
+  // can have permission granted but be unsubscribed after disabling here.
+  const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>('idle')
+  useEffect(() => {
+    isPushSubscribed().then((on) => on && setPushState('ok'))
+  }, [])
 
   // email notification preferences (default: everything ON)
   const qc = useQueryClient()
@@ -269,7 +272,17 @@ export default function ProfilePage() {
           <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
           <p className="mb-3 text-sm text-gray-600">{t('profile.pushDescription')}</p>
           {pushState === 'ok' ? (
-            <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  if (await disablePush()) setPushState('idle')
+                }}
+              >
+                {t('profile.pushDisable')}
+              </Button>
+            </div>
           ) : (
             <Button onClick={async () => setPushState((await enablePush()) ? 'ok' : 'fail')}>
               {t('profile.pushEnable')}
