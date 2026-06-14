@@ -124,11 +124,15 @@ export default function MonthCalendar<T>({
     const viewport = (stripRef.current?.offsetWidth ?? 3) / 3
     const th = viewport * 0.3
     if (dx <= -th) {
+      // deselect now (not in the timeout) so a tap after the swipe isn't wiped
+      // by a late setSelected(null); only the month change waits for the slide.
+      setSelected(null)
       snap('translateX(-66.6667%)') // slide in next month
-      setTimeout(() => goMonth(1), 200)
+      setTimeout(() => setMonth((m) => addMonths(m, 1)), 200)
     } else if (dx >= th) {
+      setSelected(null)
       snap('translateX(0%)') // slide in previous month
-      setTimeout(() => goMonth(-1), 200)
+      setTimeout(() => setMonth((m) => addMonths(m, -1)), 200)
     } else {
       // not far enough to change month: snap back and treat it as a tap, so the
       // click on the day under the finger still selects it (no double tap).
