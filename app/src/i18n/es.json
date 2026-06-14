@@ -283,6 +283,11 @@
     "tomorrow": "Mañana",
     "thisWeek": "Esta semana",
     "nextWeek": "Semana que viene",
+    "viewList": "Vista de lista",
+    "viewMonth": "Vista de mes",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "noneThisDay": "No hay ensayos este día.",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
     "archive": "Archivar",
     "status": {

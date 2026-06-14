@@ -283,6 +283,11 @@
     "tomorrow": "Tomorrow",
     "thisWeek": "This week",
     "nextWeek": "Next week",
+    "viewList": "List view",
+    "viewMonth": "Month view",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "noneThisDay": "No rehearsals this day.",
     "pastAndCancelled": "Past and cancelled ({{count}})",
     "archive": "Archive",
     "status": {
