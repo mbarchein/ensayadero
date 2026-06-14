@@ -530,9 +530,35 @@ function ParticipantList({
   myId?: string
 }) {
   const { t } = useTranslation()
+  const going = list.filter((p) => p.response === 'ACCEPTED').length
+  const pending = list.filter((p) => p.response === 'PENDING').length
+  const declined = list.filter((p) => p.response === 'DECLINED').length
   return (
     <section>
-      <h2 className="mb-2 text-sm font-semibold text-gray-700">{title}</h2>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
+        {/* response tally with the same colored dots as the session cards */}
+        <div className="flex items-center gap-2.5 text-xs text-gray-600">
+          {going > 0 && (
+            <span className="inline-flex items-center gap-1" title={t('sessions.response.going')}>
+              <span className="h-2 w-2 rounded-full bg-violet-500" />
+              {going}
+            </span>
+          )}
+          {pending > 0 && (
+            <span className="inline-flex items-center gap-1" title={t('sessions.response.pendingShort')}>
+              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              {pending}
+            </span>
+          )}
+          {declined > 0 && (
+            <span className="inline-flex items-center gap-1" title={t('sessions.response.notGoing')}>
+              <span className="h-2 w-2 rounded-full bg-red-400" />
+              {declined}
+            </span>
+          )}
+        </div>
+      </div>
       <ul className="space-y-1">
         {list.map((p) => {
           const role = roleOf(p.user_id)
@@ -584,13 +610,27 @@ function ParticipantList({
                     <Phone size={15} />
                   </a>
                 )}
-                <Badge color={p.response === 'ACCEPTED' ? 'violet' : p.response === 'DECLINED' ? 'red' : 'amber'}>
-                  {p.response === 'ACCEPTED'
-                    ? t('sessions.response.going')
-                    : p.response === 'DECLINED'
-                      ? t('sessions.response.notGoingList')
-                      : t('sessions.response.pending')}
-                </Badge>
+                {(() => {
+                  const label =
+                    p.response === 'ACCEPTED'
+                      ? t('sessions.response.going')
+                      : p.response === 'DECLINED'
+                        ? t('sessions.response.notGoingList')
+                        : t('sessions.response.pending')
+                  return (
+                    <span
+                      title={label}
+                      aria-label={label}
+                      className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                        p.response === 'ACCEPTED'
+                          ? 'bg-violet-500'
+                          : p.response === 'DECLINED'
+                            ? 'bg-red-400'
+                            : 'bg-amber-400'
+                      }`}
+                    />
+                  )
+                })()}
               </div>
             </li>
           )
