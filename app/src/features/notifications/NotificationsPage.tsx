@@ -6,6 +6,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import {
   Archive,
+  CheckCheck,
   CheckCircle2,
   XCircle,
   Clock,
@@ -13,6 +14,7 @@ import {
   AlarmClock,
   Bell,
   Drama,
+  History,
   Leaf,
   Megaphone,
   Sun,
@@ -20,7 +22,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { BackButton, Button, Spinner } from '../../components/ui'
+import { BackButton, Button, Modal, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
 import type { Notification } from '../../lib/types'
 import quotesEs from '../../data/quotes.es.json'
@@ -39,6 +41,8 @@ const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
 export default function NotificationsPage() {
   const { t, i18n } = useTranslation()
   const qc = useQueryClient()
+  const [showArchived, setShowArchived] = useState(false)
+  const [archiveAllOpen, setArchiveAllOpen] = useState(false)
 
   // one random famous theatre fragment per visit, in the app's language
   const [quote] = useState(() => {
@@ -58,14 +62,16 @@ export default function NotificationsPage() {
   })
 
   const { data: notifications, isLoading } = useQuery({
-    queryKey: ['notifications'],
+    queryKey: ['notifications', showArchived],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const base = supabase
         .from('notifications')
         .select('*, groups(name)')
-        .is('archived_at', null)
         .order('created_at', { ascending: false })
         .limit(50)
+      const { data, error } = await (showArchived
+        ? base.not('archived_at', 'is', null)
+        : base.is('archived_at', null))
       if (error) throw error
       return data as (Notification & { groups: { name: string } | null })[]
     },
@@ -114,6 +120,20 @@ export default function NotificationsPage() {
     },
   })
 
+  const archiveAll = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ archived_at: new Date().toISOString() })
+        .is('archived_at', null)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['unread-count'] })
+    },
+  })
+
   if (isLoading) return <Spinner />
 
   return (
@@ -123,16 +143,50 @@ export default function NotificationsPage() {
           <BackButton to="/" />
           <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
         </span>
-        {notifications?.some((n) => !n.read_at) && (
-          <Button variant="ghost" onClick={() => markAllRead.mutate()}>
-            {t('notifications.markRead')}
-          </Button>
-        )}
+        <div className="flex items-center gap-0.5">
+          {!showArchived && notifications?.some((n) => !n.read_at) && (
+            <button
+              type="button"
+              onClick={() => markAllRead.mutate()}
+              title={t('notifications.markRead')}
+              aria-label={t('notifications.markRead')}
+              className="rounded-lg p-2 text-violet-700 hover:bg-violet-100"
+            >
+              <CheckCheck size={20} />
+            </button>
+          )}
+          {!showArchived && (notifications?.length ?? 0) > 0 && (
+            <button
+              type="button"
+              onClick={() => setArchiveAllOpen(true)}
+              title={t('notifications.archiveAll')}
+              aria-label={t('notifications.archiveAll')}
+              className="rounded-lg p-2 text-violet-700 hover:bg-violet-100"
+            >
+              <Archive size={20} />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowArchived((v) => !v)}
+            title={showArchived ? t('notifications.viewActive') : t('notifications.viewArchived')}
+            aria-label={showArchived ? t('notifications.viewActive') : t('notifications.viewArchived')}
+            aria-pressed={showArchived}
+            className={`rounded-lg p-2 ${
+              showArchived ? 'bg-violet-600 text-white' : 'text-violet-700 hover:bg-violet-100'
+            }`}
+          >
+            <History size={20} />
+          </button>
+        </div>
       </header>
 
       <Tip id="notifications" />
 
       {notifications?.length === 0 ? (
+        showArchived ? (
+          <p className="py-12 text-center text-sm text-gray-500">{t('notifications.archivedEmpty')}</p>
+        ) : (
         /* peaceful empty state: soft gradient backdrop with watermark art */
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-violet-50 via-sky-50 to-emerald-50 px-6 py-20 text-center">
           <Sun
@@ -163,6 +217,7 @@ export default function NotificationsPage() {
             </figcaption>
           </figure>
         </div>
+        )
       ) : (
         <ul className="space-y-2">
           {notifications?.map((n) => {
@@ -206,39 +261,69 @@ export default function NotificationsPage() {
             const readOnClick = () => {
               if (!n.read_at) markRead.mutate(n.id)
             }
-            return (
+            const content =
+              n.type === 'MEMBER_PROMOTED' && n.group_id ? (
+                <Link to={`/g/${n.group_id}`} onClick={readOnClick}>
+                  {inner}
+                </Link>
+              ) : n.type === 'MEMBER_JOINED' && n.group_id ? (
+                <Link
+                  to={
+                    myRoles?.get(n.group_id) === 'INSTRUCTOR' && n.payload.member_id
+                      ? `/g/${n.group_id}/members/${n.payload.member_id}/sessions`
+                      : `/g/${n.group_id}/members`
+                  }
+                  onClick={readOnClick}
+                >
+                  {inner}
+                </Link>
+              ) : n.payload.session_id && n.group_id ? (
+                <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`} onClick={readOnClick}>
+                  {inner}
+                </Link>
+              ) : n.read_at ? (
+                inner
+              ) : (
+                <button type="button" className="w-full text-left" onClick={readOnClick}>
+                  {inner}
+                </button>
+              )
+            // archived items are shown read-only (no swipe-to-archive)
+            return showArchived ? (
+              <li key={n.id}>{content}</li>
+            ) : (
               <SwipeArchiveRow key={n.id} onArchive={() => archive.mutate(n.id)}>
-                {n.type === 'MEMBER_PROMOTED' && n.group_id ? (
-                  <Link to={`/g/${n.group_id}`} onClick={readOnClick}>
-                    {inner}
-                  </Link>
-                ) : n.type === 'MEMBER_JOINED' && n.group_id ? (
-                  <Link
-                    to={
-                      myRoles?.get(n.group_id) === 'INSTRUCTOR' && n.payload.member_id
-                        ? `/g/${n.group_id}/members/${n.payload.member_id}/sessions`
-                        : `/g/${n.group_id}/members`
-                    }
-                    onClick={readOnClick}
-                  >
-                    {inner}
-                  </Link>
-                ) : n.payload.session_id && n.group_id ? (
-                  <Link to={`/g/${n.group_id}/sessions/${n.payload.session_id}`} onClick={readOnClick}>
-                    {inner}
-                  </Link>
-                ) : n.read_at ? (
-                  inner
-                ) : (
-                  <button type="button" className="w-full text-left" onClick={readOnClick}>
-                    {inner}
-                  </button>
-                )}
+                {content}
               </SwipeArchiveRow>
             )
           })}
         </ul>
       )}
+
+      <Modal
+        open={archiveAllOpen}
+        onClose={() => setArchiveAllOpen(false)}
+        title={t('notifications.archiveAll')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('notifications.archiveAllConfirm')}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setArchiveAllOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={archiveAll.isPending}
+              onClick={() => {
+                archiveAll.mutate()
+                setArchiveAllOpen(false)
+              }}
+            >
+              <Archive size={16} /> {t('notifications.archiveAll')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

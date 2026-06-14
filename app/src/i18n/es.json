@@ -395,6 +395,11 @@
     "title": "Avisos",
     "markRead": "Marcar leídos",
     "archive": "Archivar aviso",
+    "archiveAll": "Archivar todos",
+    "archiveAllConfirm": "¿Archivar todos los avisos? Podrás seguir viéndolos en archivados.",
+    "viewArchived": "Ver archivados",
+    "viewActive": "Ver activos",
+    "archivedEmpty": "No tienes avisos archivados.",
     "emptyTitle": "Todo en calma",
     "empty": "No tienes avisos. Disfruta del descanso.",
     "types": {

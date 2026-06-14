@@ -395,6 +395,11 @@
     "title": "Alerts",
     "markRead": "Mark as read",
     "archive": "Archive alert",
+    "archiveAll": "Archive all",
+    "archiveAllConfirm": "Archive all alerts? You'll still find them in the archive.",
+    "viewArchived": "View archived",
+    "viewActive": "View active",
+    "archivedEmpty": "No archived alerts.",
     "emptyTitle": "All calm",
     "empty": "No alerts. Enjoy the quiet.",
     "types": {
