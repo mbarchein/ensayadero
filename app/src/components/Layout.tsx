@@ -64,7 +64,7 @@ export default function Layout() {
   if (!profile.onboarded_at) return <Navigate to="/welcome" replace />
 
   return (
-    <div className="mx-auto flex h-dvh max-w-3xl flex-col">
+    <div className="mx-auto flex h-full max-w-3xl flex-col">
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 pb-4">
         <Outlet />
       </main>

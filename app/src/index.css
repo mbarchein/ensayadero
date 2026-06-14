@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stable full-height app shell: the Layout anchors to this html/body/#root
+   chain (h-full) instead of 100dvh. dvh is recomputed dynamically and can be
+   momentarily wrong right after the service-worker auto-update reload, which
+   pushed the in-flow bottom nav below the viewport until the app was fully
+   restarted. A static 100% chain doesn't drift. */
+html,
+body,
+#root {
+  height: 100%;
+}
+
 /* Marching-ants outline for unsaved (pending) calendar cells. */
 .cell-pending {
   position: relative;
