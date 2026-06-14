@@ -101,17 +101,32 @@ export default function AvailabilityPage() {
   const agenda = useMyAgenda()
   const buildSessionCells = useCallback(
     (m: Date) => {
-      const map = new Map<string, MyParticipation>()
+      // one slot can hold several overlapping rehearsals → list per slot
+      const map = new Map<string, MyParticipation[]>()
       const windowEnd = addDays(m, 7)
       for (const p of agenda.data ?? []) {
         const r = parseRange(p.sessions.time_range)
         if (r.start >= windowEnd || r.end <= m) continue
         for (let d = 0; d < 7; d++) {
           for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
-            if (overlaps(slotRange(m, d, slot), r)) map.set(`${d}:${slot}`, p)
+            if (overlaps(slotRange(m, d, slot), r)) {
+              const k = `${d}:${slot}`
+              const arr = map.get(k)
+              if (arr) arr.push(p)
+              else map.set(k, [p])
+            }
           }
         }
       }
+      // stable order per slot so each rehearsal keeps the same sub-column across
+      // the slots it spans (earlier start first, then id as tie-breaker)
+      for (const arr of map.values())
+        arr.sort((a, b) => {
+          const t =
+            parseRange(a.sessions.time_range).start.getTime() -
+            parseRange(b.sessions.time_range).start.getTime()
+          return t !== 0 ? t : a.session_id.localeCompare(b.session_id)
+        })
       return map
     },
     [agenda.data],
@@ -122,9 +137,10 @@ export default function AvailabilityPage() {
   // availability that overlaps them, so we list them in the confirm modal.
   const weekScheduled = useMemo(() => {
     const seen = new Map<string, MyParticipation>()
-    for (const p of sessionCells.values()) {
-      if (p.sessions.status === 'CONFIRMED') seen.set(p.session_id, p)
-    }
+    for (const arr of sessionCells.values())
+      for (const p of arr) {
+        if (p.sessions.status === 'CONFIRMED') seen.set(p.session_id, p)
+      }
     return [...seen.values()].sort(
       (a, b) =>
         parseRange(a.sessions.time_range).start.getTime() -
@@ -155,7 +171,7 @@ export default function AvailabilityPage() {
   // read-only availability + rehearsal maps for the carousel's adjacent weeks,
   // so the incoming week shows its real occupation mid-swipe
   const adjacentWeeks = useMemo(() => {
-    const map = new Map<number, { grid: SlotState[][] | null; cells: Map<string, MyParticipation> }>()
+    const map = new Map<number, { grid: SlotState[][] | null; cells: Map<string, MyParticipation[]> }>()
     for (const off of [-7, 7]) {
       const m = addDays(monday, off)
       map.set(m.getTime(), {
@@ -313,15 +329,13 @@ export default function AvailabilityPage() {
   if (isLoading || !grid) return <Spinner />
 
   // does the slot have a SCHEDULED (confirmed) rehearsal?
-  const hasConfirmed = (pos: CellPos) => {
-    const p = sessionCells.get(`${pos.day}:${pos.slot}`)
-    return !!p && p.sessions.status === 'CONFIRMED'
-  }
+  const hasConfirmed = (pos: CellPos) =>
+    (sessionCells.get(`${pos.day}:${pos.slot}`) ?? []).some((p) => p.sessions.status === 'CONFIRMED')
 
   // does the given grid leave ANY availability overlapping the session?
   const coversSession = (g: SlotState[][], sessionId: string) => {
-    for (const [key, p] of sessionCells) {
-      if (p.session_id !== sessionId) continue
+    for (const [key, arr] of sessionCells) {
+      if (!arr.some((p) => p.session_id === sessionId)) continue
       const [day, slot] = key.split(':').map(Number)
       if (g[day][slot] !== 'NONE') return true
     }
@@ -353,8 +367,8 @@ export default function AvailabilityPage() {
         for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
           if (serverGrid[day][slot] !== 'NONE' && d[day][slot] === 'NONE' && hasConfirmed({ day, slot })) {
             reverted.push({ day, slot })
-            const p = sessionCells.get(`${day}:${slot}`)
-            if (p) sessionIds.add(p.session_id)
+            for (const p of sessionCells.get(`${day}:${slot}`) ?? [])
+              if (p.sessions.status === 'CONFIRMED') sessionIds.add(p.session_id)
           }
         }
       }
@@ -379,8 +393,8 @@ export default function AvailabilityPage() {
       for (const p of prompt.reverted) base[p.day][p.slot] = serverGrid[p.day][p.slot]
     } else if (choice === 'full') {
       // remove availability from ALL slots of those rehearsals this week
-      for (const [key, p] of sessionCells) {
-        if (prompt.sessionIds.includes(p.session_id)) {
+      for (const [key, arr] of sessionCells) {
+        if (arr.some((p) => prompt.sessionIds.includes(p.session_id))) {
           const [day, slot] = key.split(':').map(Number)
           base[day][slot] = 'NONE'
         }
@@ -471,67 +485,79 @@ export default function AvailabilityPage() {
           const current = wm.getTime() === monday.getTime()
           const week = current ? null : adjacentWeeks.get(wm.getTime())
           const cells = current ? sessionCells : (week?.cells ?? null)
-          const ses = cells?.get(`${day}:${slot}`)
           // unsaved edits (additions and deletions): dashed outline until the
           // save confirms, then it switches to the final style
           const pending =
             current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
               ? 'cell-pending'
               : ''
-          // scheduled rehearsals: thick side stripe colored by my response
-          // (violet=accepted, orange=not confirmed by me, red=declined) and
-          // top/bottom edges on the first/last cell to separate contiguous ones
-          let sesMark = ''
-          if (ses?.sessions.status === 'CONFIRMED' && cells) {
-            const first = cells.get(`${day}:${slot - 1}`) !== ses
-            const last = cells.get(`${day}:${slot + 1}`) !== ses
-            sesMark =
-              ses.response === 'ACCEPTED'
-                ? `border-l-4 border-l-violet-700 !border-r-2 !border-r-violet-700 ${first ? '!border-t-2 !border-t-violet-700' : ''} ${last ? '!border-b-2 !border-b-violet-700' : ''}`
-                : ses.response === 'DECLINED'
-                  ? `border-l-4 border-l-red-500 !border-r-2 !border-r-red-500 ${first ? '!border-t-2 !border-t-red-500' : ''} ${last ? '!border-b-2 !border-b-red-500' : ''}`
-                  : `border-l-4 border-l-orange-500 !border-r-2 !border-r-orange-500 ${first ? '!border-t-2 !border-t-orange-500' : ''} ${last ? '!border-b-2 !border-b-orange-500' : ''}`
-          }
-          const flash = current && ses && ses.session_id === flashSession ? 'cell-flash' : ''
+          // rehearsals are drawn by renderCell (side-by-side sub-columns); here
+          // we only flash the slot when it holds the deep-linked session
+          const flash =
+            current && (cells?.get(`${day}:${slot}`) ?? []).some((p) => p.session_id === flashSession)
+              ? 'cell-flash'
+              : ''
           const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-          return `${CELL_STYLE[state]} cursor-pointer ${sesMark} ${pending} ${flash}`
+          return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
         }}
         renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
           const cells =
             wm.getTime() === monday.getTime()
               ? sessionCells
               : adjacentWeeks.get(wm.getTime())?.cells
-          const p = cells?.get(`${day}:${slot}`)
-          if (!p || !cells) return null
-          const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
-          // week view: avatar against the side stripe + group initials
-          // (response shown by the stripe color)
-          if (!dayView) {
-            const initials = p.sessions.groups.name
-              .split(/\s+/)
-              .map((w) => w[0])
-              .join('')
-              .slice(0, 3)
-              .toUpperCase()
-            return (
-              <span className="flex h-full items-center gap-0.5 pl-0.5" title={title}>
-                <GroupAvatar
-                  seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
-                  image={p.sessions.groups.avatar_image}
-                  size={14}
-                />
-                <span className="truncate text-[11px] font-bold text-gray-900">{initials}</span>
-              </span>
-            )
-          }
-          // day view: the group name in every cell of the rehearsal
+          const list = cells?.get(`${day}:${slot}`)
+          if (!list || !cells) return null
+          // overlapping rehearsals share the cell as equal-width sub-columns,
+          // each a left stripe colored by my response (violet=going, red=not,
+          // orange=pending, grey=draft); the avatar/name shows on the first slot
+          // of each rehearsal's run.
           return (
-            <span
-              className="block truncate px-1 text-xs font-semibold leading-5 text-gray-900"
-              title={title}
-            >
-              {p.sessions.groups.name}
-            </span>
+            <div className="flex h-full">
+              {list.map((p) => {
+                const stripe =
+                  p.sessions.status !== 'CONFIRMED'
+                    ? 'border-l-gray-400'
+                    : p.response === 'ACCEPTED'
+                      ? 'border-l-violet-700'
+                      : p.response === 'DECLINED'
+                        ? 'border-l-red-500'
+                        : 'border-l-orange-500'
+                const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
+                  (x) => x.session_id === p.session_id,
+                )
+                const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
+                const initials = p.sessions.groups.name
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join('')
+                  .slice(0, 3)
+                  .toUpperCase()
+                return (
+                  <span
+                    key={p.session_id}
+                    title={title}
+                    className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 pl-0.5 ${stripe}`}
+                  >
+                    {firstOfRun && (
+                      <>
+                        <GroupAvatar
+                          seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
+                          image={p.sessions.groups.avatar_image}
+                          size={14}
+                        />
+                        {(dayView || list.length === 1) && (
+                          <span
+                            className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
+                          >
+                            {dayView ? p.sessions.groups.name : initials}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </span>
+                )
+              })}
+            </div>
           )
         }}
         onPaintStart={(pos) => {
@@ -542,8 +568,9 @@ export default function AvailabilityPage() {
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
         onWeekCellTap={(pos) => {
-          // tap on a rehearsal in the week view opens its detail
-          const ses = sessionCells.get(`${pos.day}:${pos.slot}`)
+          // tap on a rehearsal in the week view opens its detail (the first one
+          // when several overlap in the slot)
+          const ses = sessionCells.get(`${pos.day}:${pos.slot}`)?.[0]
           if (ses) {
             navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
             return
@@ -685,8 +712,8 @@ export default function AvailabilityPage() {
               const selectedCells = clearPrompt?.reverted ?? []
               const fullCells: CellPos[] = []
               if (clearPrompt) {
-                for (const [key, p] of sessionCells) {
-                  if (clearPrompt.sessionIds.includes(p.session_id)) {
+                for (const [key, arr] of sessionCells) {
+                  if (arr.some((p) => clearPrompt.sessionIds.includes(p.session_id))) {
                     const [day, slot] = key.split(':').map(Number)
                     fullCells.push({ day, slot })
                   }
