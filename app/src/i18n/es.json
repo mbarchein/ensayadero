@@ -34,6 +34,12 @@
     "sectionTitle": "Instalar la app",
     "iosHint": "Para instalar: pulsa Compartir y «Añadir a pantalla de inicio»."
   },
+  "whatsnew": {
+    "install-app": {
+      "title": "Novedad: instala la app",
+      "body": "Ahora puedes instalar Ensayadero en tu dispositivo desde tu perfil, para abrirla como una app."
+    }
+  },
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",

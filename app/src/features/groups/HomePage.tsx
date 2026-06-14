@@ -10,6 +10,8 @@ import { CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import InstallBanner from '../pwa/InstallBanner'
+import { useInstallPrompt, isIOS, isStandalone } from '../pwa/installPrompt'
+import FeatureCallout from '../whatsnew/FeatureCallout'
 import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
@@ -18,6 +20,7 @@ export default function HomePage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const { canInstall } = useInstallPrompt()
   const openNewGroup = () => navigate('/new-group')
 
   const { data: memberships, isLoading } = useQuery({
@@ -92,6 +95,9 @@ export default function HomePage() {
       </header>
 
       <InstallBanner />
+      {/* Cross-device install pointer for users the actionable banner can't help
+          right now (e.g. desktop, or the prompt hasn't fired) — once per user. */}
+      {!canInstall && !isIOS && !isStandalone() && <FeatureCallout id="install-app" />}
       <Tip id="home" />
 
       {(pending?.length ?? 0) > 0 && (

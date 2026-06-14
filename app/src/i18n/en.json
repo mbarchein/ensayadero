@@ -34,6 +34,12 @@
     "sectionTitle": "Install the app",
     "iosHint": "To install: tap Share and \"Add to Home Screen\"."
   },
+  "whatsnew": {
+    "install-app": {
+      "title": "New: install the app",
+      "body": "You can now install Ensayadero on your device from your profile, to open it like an app."
+    }
+  },
   "roles": {
     "INSTRUCTOR": "Director",
     "ACTOR": "Actor",

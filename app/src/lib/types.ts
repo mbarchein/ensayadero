@@ -13,6 +13,7 @@ export interface Profile {
   avatar_url: string | null
   platform_role: PlatformRole
   onboarded_at: string | null
+  seen_features: string[]
 }
 
 export interface Group {
