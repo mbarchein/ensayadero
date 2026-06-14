@@ -263,6 +263,54 @@ export function Toggle({
   disabled?: boolean
   ariaLabel: string
 }) {
+  // Tap flips the switch; a horizontal swipe sets it by direction (right = on,
+  // left = off). We only claim the gesture once it's clearly horizontal, so a
+  // vertical drag still scrolls the page (touch-action: pan-y).
+  const start = useRef<{ x: number; y: number } | null>(null)
+  const swiping = useRef(false)
+  const swiped = useRef(false)
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (disabled) return
+    start.current = { x: e.clientX, y: e.clientY }
+    swiping.current = false
+    swiped.current = false
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!start.current || swiping.current) return
+    const dx = e.clientX - start.current.x
+    const dy = e.clientY - start.current.y
+    if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
+      swiping.current = true
+      try {
+        ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      } catch {
+        /* not capturable in some environments */
+      }
+    } else if (Math.abs(dy) > 6) {
+      start.current = null // vertical scroll wins
+    }
+  }
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!start.current) return
+    const dx = e.clientX - start.current.x
+    const wasSwiping = swiping.current
+    start.current = null
+    swiping.current = false
+    if (wasSwiping) {
+      swiped.current = true // suppress the click that follows the release
+      const next = dx > 0
+      if (next !== checked) onChange(next)
+    }
+  }
+
+  const reset = () => {
+    start.current = null
+    swiping.current = false
+  }
+
   return (
     <button
       type="button"
@@ -270,7 +318,18 @@ export function Toggle({
       aria-checked={checked}
       aria-label={ariaLabel}
       disabled={disabled}
-      onClick={() => onChange(!checked)}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={reset}
+      onClick={() => {
+        if (swiped.current) {
+          swiped.current = false // a swipe already handled it
+          return
+        }
+        onChange(!checked)
+      }}
+      style={{ touchAction: 'pan-y' }}
       className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-60 ${
         checked ? 'bg-violet-600' : 'bg-gray-300'
       }`}
