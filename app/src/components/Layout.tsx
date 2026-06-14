@@ -68,7 +68,7 @@ export default function Layout() {
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 pb-4">
         <Outlet />
       </main>
-      <nav className="z-40 border-t border-violet-100 bg-violet-50 pb-[env(safe-area-inset-bottom)]">
+      <nav className="z-40 border-t border-violet-100 bg-violet-50 shadow-[0_-2px_12px_rgba(0,0,0,0.07)] pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex h-14 max-w-3xl items-stretch">
           {tabs.map((t2) => (
             <NavLink
@@ -81,17 +81,29 @@ export default function Layout() {
                 }`
               }
             >
-              <t2.icon size={20} aria-hidden />
-              {t(t2.key)}
-              {t2.to === '/notifications' && (unread ?? 0) > 0 && (
-                <span className="absolute right-1/4 top-1 rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white">
-                  {unread}
-                </span>
-              )}
-              {t2.to === '/upcoming' && (pendingAttendance ?? 0) > 0 && (
-                <span className="absolute right-1/4 top-1 rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
-                  {pendingAttendance}
-                </span>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span
+                      className="absolute inset-x-4 top-0 z-10 h-0.5 rounded-full bg-violet-600"
+                      aria-hidden
+                    />
+                  )}
+                  <span className="relative">
+                    <t2.icon size={20} aria-hidden />
+                    {t2.to === '/notifications' && (unread ?? 0) > 0 && (
+                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-violet-50">
+                        {unread}
+                      </span>
+                    )}
+                    {t2.to === '/upcoming' && (pendingAttendance ?? 0) > 0 && (
+                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-violet-50">
+                        {pendingAttendance}
+                      </span>
+                    )}
+                  </span>
+                  {t(t2.key)}
+                </>
               )}
             </NavLink>
           ))}
