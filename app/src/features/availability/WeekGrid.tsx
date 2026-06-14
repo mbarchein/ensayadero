@@ -549,7 +549,7 @@ function DayStripView({
         const date = addDays(weekMonday, d)
         const isToday = format(date, 'yyyyMMdd') === todayKey
         const isSel = interactive && selectedDay === d
-        const cls = `flex flex-col items-center py-1 text-center leading-tight ${
+        const cls = `flex flex-col items-center pb-0.5 text-center leading-tight ${
           isSel
             ? 'bg-violet-600 font-bold text-white'
             : isToday
@@ -564,7 +564,9 @@ function DayStripView({
             <span className={`text-[9px] uppercase ${isSel ? 'text-violet-200' : 'text-gray-600'}`}>
               {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
             </span>
-            <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>
+            <span className={`text-sm leading-none ${isToday || isSel ? 'font-bold' : ''}`}>
+              {format(date, 'd')}
+            </span>
           </>
         )
         return interactive ? (
