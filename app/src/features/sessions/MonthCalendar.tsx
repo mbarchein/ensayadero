@@ -152,7 +152,11 @@ export default function MonthCalendar<T>({
       end: endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 }),
     })
     return (
-      <div className="shrink-0 space-y-1 px-0.5 pb-0.5" style={{ width: '33.3333%' }}>
+      <div
+        key={format(monthDate, 'yyyy-MM')}
+        className="shrink-0 space-y-1 px-0.5 pb-0.5"
+        style={{ width: '33.3333%' }}
+      >
         <p className="px-8 pb-1 text-center font-semibold">
           {cap(format(monthDate, 'LLLL yyyy', { locale: dateLocale() }))}
         </p>
