@@ -42,6 +42,11 @@
     "push-notifications": {
       "title": "Novedad: avisos en el móvil",
       "body": "Ya puedes recibir notificaciones de tus ensayos en este dispositivo."
+    },
+    "profile-photo": {
+      "title": "Novedad: tu foto de perfil",
+      "body": "Ya puedes poner tu foto en Mi perfil: sube una imagen o usa la cámara.",
+      "cta": "Cambiar foto"
     }
   },
   "roles": {
@@ -418,6 +423,10 @@
   },
   "profile": {
     "title": "Mi perfil",
+    "photoTitle": "Foto de perfil",
+    "addPhoto": "Añadir foto",
+    "changePhoto": "Cambiar foto",
+    "removePhoto": "Quitar foto",
     "name": "Nombre",
     "phone": "Teléfono",
     "gender": "Pronombre (opcional)",

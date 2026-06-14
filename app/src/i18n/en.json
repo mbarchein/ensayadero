@@ -42,6 +42,11 @@
     "push-notifications": {
       "title": "New: phone notifications",
       "body": "You can now get rehearsal notifications on this device."
+    },
+    "profile-photo": {
+      "title": "New: your profile photo",
+      "body": "You can now set your photo in My profile: upload an image or use the camera.",
+      "cta": "Change photo"
     }
   },
   "roles": {
@@ -418,6 +423,10 @@
   },
   "profile": {
     "title": "My profile",
+    "photoTitle": "Profile photo",
+    "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
     "name": "Name",
     "phone": "Phone",
     "gender": "Pronoun (optional)",

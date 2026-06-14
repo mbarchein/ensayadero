@@ -121,6 +121,15 @@ export default function HomePage() {
           </Button>
         </FeatureCallout>
       )}
+      <FeatureCallout id="profile-photo">
+        <Link
+          to="/profile"
+          state={{ openAvatar: true }}
+          className="mt-1 inline-flex items-center gap-1.5 font-medium text-violet-700 underline"
+        >
+          {t('whatsnew.profile-photo.cta')}
+        </Link>
+      </FeatureCallout>
       <Tip id="home" />
 
       {(pending?.length ?? 0) > 0 && (

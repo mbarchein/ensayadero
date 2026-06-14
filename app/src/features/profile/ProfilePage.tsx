@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Download, LogOut, Trash2 } from 'lucide-react'
@@ -7,8 +7,9 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush, disablePush, isPushSubscribed } from '../../lib/push'
 import { useInstallPrompt, promptInstall, isIOS, isStandalone } from '../pwa/installPrompt'
-import { BackButton, Button, InitialsAvatar, Modal, Toggle } from '../../components/ui'
+import { BackButton, Button, Modal, Toggle } from '../../components/ui'
 import Tip, { resetTips } from '../../components/Tip'
+import AvatarEditor from './AvatarEditor'
 
 // Email opt-out groups → notification event types (notification_preferences).
 // A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const { t } = useTranslation()
   const { session, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
+  const openAvatar = !!(useLocation().state as { openAvatar?: boolean } | null)?.openAvatar
   const { canInstall } = useInstallPrompt()
 
   // sign-in methods linked to the account (Google, Facebook, email+password)
@@ -68,6 +70,15 @@ export default function ProfilePage() {
     name.trim() !== (profile?.name ?? '') ||
     phone.trim() !== (profile?.phone ?? '') ||
     gender !== (profile?.gender ?? '')
+
+  // profile photo: cropped data URL (or null = initials avatar), saved on change
+  const saveAvatar = useMutation({
+    mutationFn: async (avatar_url: string | null) => {
+      const { error } = await supabase.from('profiles').update({ avatar_url }).eq('id', profile!.id)
+      if (error) throw error
+      await refreshProfile()
+    },
+  })
 
   const deleteAccount = useMutation({
     mutationFn: async () => {
@@ -144,11 +155,13 @@ export default function ProfilePage() {
       </header>
       <Tip id="profile" />
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
-        {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="" className="h-14 w-14 shrink-0 rounded-full" />
-        ) : (
-          <InitialsAvatar name={profile?.name || profile?.email || '?'} />
-        )}
+        <AvatarEditor
+          name={profile?.name || profile?.email || '?'}
+          image={profile?.avatar_url ?? null}
+          onChange={(img) => saveAvatar.mutate(img)}
+          pending={saveAvatar.isPending}
+          autoOpen={openAvatar}
+        />
         <div className="min-w-0">
           <p className="truncate font-medium">{profile?.name}</p>
           <p className="truncate text-sm text-gray-600">{profile?.email}</p>
