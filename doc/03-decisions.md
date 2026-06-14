@@ -169,6 +169,7 @@ earlier focus-refetch-only approach.
 | D-invite-delivery | Pending invitations show their per-invite email delivery state (`email_sent_at` / `email_send_error`) and can be **resent or deleted** from the members page. |
 | D-auth-affordances | Login/signup gained a password visibility toggle and clearer, localized rejection reasons. |
 | D-admin-recent | The superadmin user list shows newest users first, with their join date. |
+| D-member-gallery | The members page has a gallery ("orla") action: a modal grid of every member's avatar large with name + role below, sorted directors-first then alphabetically by name. |
 
 ## Relevant modeling decisions
 - Time ranges as `tstzrange` + GiST indexes; overlaps with `&&`.

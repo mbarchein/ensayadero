@@ -182,7 +182,9 @@ their **email delivery state** (`email_sent_at` / `email_send_error` → "sent o
 X" / "never sent") and can be **resent or deleted**. A `MEMBER_JOINED`
 notification lets a director jump to `ConvokeMemberPage` to **bulk-summon** the
 newcomer to chosen upcoming sessions in one call
-(`add_member_to_future_sessions`). `JoinPage` joins by code; if there's no
+(`add_member_to_future_sessions`). A header action opens the **gallery ("orla")**
+modal: a grid of every member's avatar large with name + role below, sorted
+directors-first then alphabetically by name. `JoinPage` joins by code; if there's no
 session, it stashes the code and resumes after login (`AuthCallback`).
 
 ### Group management (`NewGroupPage`, `EditGroupPage`, `AvatarPicker`)
