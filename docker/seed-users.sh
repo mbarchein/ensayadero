@@ -4,6 +4,12 @@
 set -euo pipefail
 
 API=${API:-http://localhost:54321}
+# NOT a secret: this is the local-dev service_role JWT signed with Supabase's
+# well-known default JWT secret ("your-super-secret-jwt-token-with-at-least-32-
+# characters-long"). It only works against a local instance using that default
+# secret — it grants nothing on the production cloud project, which uses its own
+# private secret. Safe to commit. (Never reuse the default secret if you ever
+# self-host Supabase in production.)
 SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UtbG9jYWwiLCJpYXQiOjE3MzU2ODk2MDAsImV4cCI6MjA4Mjc1ODQwMH0.hKugUZ3psc796Vm1pvDwNp_KGtbvF22bnuyE6pjGQFk"
 PSQL="docker compose exec -T -e PGPASSWORD=postgres db psql -U supabase_admin -h localhost -d postgres -v ON_ERROR_STOP=1"
 
