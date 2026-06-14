@@ -290,10 +290,10 @@ export default function SessionDetailPage() {
         onClick={() => navigate(`/availability?d=${isoDay(r.start)}&s=${session.id}`)}
         title={t('upcoming.viewInAgenda')}
         aria-label={t('upcoming.viewInAgenda')}
-        className="flex w-full items-center gap-3 rounded-xl border bg-white p-3 text-left shadow-sm transition hover:shadow"
+        className="flex w-full overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:shadow"
       >
         <div
-          className={`flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl py-2 text-white ${
+          className={`flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-white ${
             isPast || session.status === 'CANCELLED' ? 'bg-gray-400' : 'bg-violet-600'
           }`}
         >
@@ -305,11 +305,14 @@ export default function SessionDetailPage() {
             {format(r.start, 'MMM', { locale: dateLocale() })}
           </span>
         </div>
-        <div className="min-w-0 flex-1 space-y-0.5">
-          <p className="text-lg font-semibold">
-            {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
-            <span className="text-sm font-normal text-gray-600">· {durationLabel}</span>
-          </p>
+        <div className="min-w-0 flex-1 px-3 py-2">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-lg font-semibold">
+              {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
+              <span className="text-sm font-normal text-gray-600">· {durationLabel}</span>
+            </p>
+            {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
+          </div>
           {session.location && (
             <p className="flex items-center gap-1 text-sm text-gray-600">
               <MapPin size={14} className="shrink-0" />
@@ -318,7 +321,6 @@ export default function SessionDetailPage() {
           )}
           <p className="text-xs text-gray-600">{relLabel}</p>
         </div>
-        {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
       </button>
 
       {mine && session.status === 'CONFIRMED' && (
