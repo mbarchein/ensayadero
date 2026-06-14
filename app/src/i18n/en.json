@@ -38,6 +38,11 @@
     "install-app": {
       "title": "New: install the app",
       "body": "You can now install Ensayadero on your device from your profile, to open it like an app."
+    },
+    "push-notifications": {
+      "title": "New: phone notifications",
+      "body": "You can now get rehearsal notifications on this device. Enable them from your profile.",
+      "cta": "Go to profile"
     }
   },
   "roles": {

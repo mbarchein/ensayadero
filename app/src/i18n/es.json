@@ -38,6 +38,11 @@
     "install-app": {
       "title": "Novedad: instala la app",
       "body": "Ahora puedes instalar Ensayadero en tu dispositivo desde tu perfil, para abrirla como una app."
+    },
+    "push-notifications": {
+      "title": "Novedad: avisos en el móvil",
+      "body": "Ya puedes recibir notificaciones de tus ensayos en este dispositivo. Actívalas desde tu perfil.",
+      "cta": "Ir al perfil"
     }
   },
   "roles": {

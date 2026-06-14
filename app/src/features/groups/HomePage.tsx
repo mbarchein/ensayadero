@@ -23,6 +23,13 @@ export default function HomePage() {
   const { canInstall } = useInstallPrompt()
   const openNewGroup = () => navigate('/new-group')
 
+  // Announce push to already-onboarded users: only when the feature is enabled
+  // (VAPID configured) and notifications aren't granted yet on this device.
+  const canOfferPush =
+    !!import.meta.env.VITE_VAPID_PUBLIC_KEY &&
+    typeof Notification !== 'undefined' &&
+    Notification.permission !== 'granted'
+
   const { data: memberships, isLoading } = useQuery({
     queryKey: ['my-memberships'],
     queryFn: async () => {
@@ -98,6 +105,13 @@ export default function HomePage() {
       {/* Cross-device install pointer for users the actionable banner can't help
           right now (e.g. desktop, or the prompt hasn't fired) — once per user. */}
       {!canInstall && !isIOS && !isStandalone() && <FeatureCallout id="install-app" />}
+      {canOfferPush && (
+        <FeatureCallout id="push-notifications">
+          <Link to="/profile" className="mt-1 inline-block font-medium text-violet-700 underline">
+            {t('whatsnew.push-notifications.cta')}
+          </Link>
+        </FeatureCallout>
+      )}
       <Tip id="home" />
 
       {(pending?.length ?? 0) > 0 && (
