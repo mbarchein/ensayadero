@@ -376,38 +376,26 @@ export default function SessionDetailPage() {
         </section>
       )}
 
-      {/* attendance summary + remind-pending (instructor) */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1.5 text-xs font-medium">
-          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
-            ✓ {tally.ACCEPTED ?? 0}
-          </span>
-          <span className="rounded-full bg-red-100 px-2 py-0.5 text-red-800">
-            ✗ {tally.DECLINED ?? 0}
-          </span>
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">
-            ? {tally.PENDING ?? 0}
-          </span>
-        </span>
-        {isInstructor && session.status === 'CONFIRMED' && (tally.PENDING ?? 0) > 0 && (
-          <span className="text-xs">
-            {nudgedCount !== null ? (
-              <span className="font-medium text-green-700">
-                {t('sessions.nudged', { count: nudgedCount })}
-              </span>
-            ) : (
-              <Button
-                variant="ghost"
-                className="inline-flex items-center gap-1.5 !py-1 text-xs"
-                disabled={nudge.isPending}
-                onClick={() => nudge.mutate()}
-              >
-                <Megaphone size={14} /> {t('sessions.nudgePending')}
-              </Button>
-            )}
-          </span>
-        )}
-      </div>
+      {/* remind-pending (instructor) — the response tally now lives in the
+          participant-list headers, so it's not repeated here */}
+      {isInstructor && session.status === 'CONFIRMED' && (tally.PENDING ?? 0) > 0 && (
+        <div className="flex justify-end text-xs">
+          {nudgedCount !== null ? (
+            <span className="font-medium text-green-700">
+              {t('sessions.nudged', { count: nudgedCount })}
+            </span>
+          ) : (
+            <Button
+              variant="ghost"
+              className="inline-flex items-center gap-1.5 !py-1 text-xs"
+              disabled={nudge.isPending}
+              onClick={() => nudge.mutate()}
+            >
+              <Megaphone size={14} /> {t('sessions.nudgePending')}
+            </Button>
+          )}
+        </div>
+      )}
 
       <ParticipantList
         title={t('sessions.requiredList')}
