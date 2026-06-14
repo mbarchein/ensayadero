@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { format, isToday, differenceInCalendarWeeks } from 'date-fns'
+import { format, isToday, isTomorrow, differenceInCalendarWeeks } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
@@ -78,6 +78,9 @@ export default function SessionsPage() {
   const cap = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
   const bucketOf = (d: Date): { key: string; label: string } => {
     if (isToday(d)) return { key: 'today', label: t('sessions.today') }
+    // checked before the week diff so tomorrow keeps its own bucket even when
+    // it falls into next calendar week (e.g. today Sunday → tomorrow Monday)
+    if (isTomorrow(d)) return { key: 'tomorrow', label: t('sessions.tomorrow') }
     const wk = differenceInCalendarWeeks(d, now, { weekStartsOn: 1 })
     if (wk <= 0) return { key: 'this-week', label: t('sessions.thisWeek') }
     if (wk === 1) return { key: 'next-week', label: t('sessions.nextWeek') }

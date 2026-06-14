@@ -280,6 +280,7 @@
     "empty": "No hay ensayos programados.",
     "planOne": "Crear un ensayo",
     "today": "Hoy",
+    "tomorrow": "Mañana",
     "thisWeek": "Esta semana",
     "nextWeek": "Semana que viene",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
