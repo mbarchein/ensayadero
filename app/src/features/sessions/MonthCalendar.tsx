@@ -5,9 +5,10 @@
 // the group sessions list and the cross-group "Upcoming" view.
 //
 // Days carry up to three colored dots; tapping a day lists its items below.
-// Swipe left/right (or the arrows) changes month.
+// The arrows change month instantly; a horizontal swipe slides a 3-panel
+// carousel (prev/current/next) like the WeekGrid and snaps to the new month.
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import {
   format,
   startOfMonth,
@@ -26,6 +27,7 @@ import { dateLocale } from '../../lib/dateLocale'
 
 const dayKey = (d: Date) => format(d, 'yyyy-MM-dd')
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+const CENTER = 'translateX(-33.3333%)'
 
 export default function MonthCalendar<T>({
   items,
@@ -53,37 +55,117 @@ export default function MonthCalendar<T>({
   }
   for (const arr of byDay.values()) arr.sort((a, b) => dateOf(a).getTime() - dateOf(b).getTime())
 
-  const days = eachDayOfInterval({
-    start: startOfWeek(startOfMonth(month), { weekStartsOn: 1 }),
-    end: endOfWeek(endOfMonth(month), { weekStartsOn: 1 }),
-  })
-
   const letters = (dateLocale().code ?? 'en').startsWith('es')
     ? ['L', 'M', 'X', 'J', 'V', 'S', 'D']
     : ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
   const selectedItems = byDay.get(dayKey(selected)) ?? []
 
-  // swipe left → next month, right → previous; only claimed when clearly
-  // horizontal so vertical scroll still works (touch-action: pan-y)
+  // ── carousel: 3 month panels, current centered; swipe slides to a neighbour ──
+  const stripRef = useRef<HTMLDivElement>(null)
   const start = useRef<{ x: number; y: number } | null>(null)
+  const swiping = useRef(false)
   const moved = useRef(false)
+
+  // recenter (no animation) after any month change: the panel we slid to and
+  // the new centre panel render the same month, so the swap is seamless.
+  useLayoutEffect(() => {
+    const s = stripRef.current
+    if (s) {
+      s.style.transition = 'none'
+      s.style.transform = CENTER
+    }
+  }, [month])
+
   const onPointerDown = (e: React.PointerEvent) => {
     start.current = { x: e.clientX, y: e.clientY }
+    swiping.current = false
     moved.current = false
+    if (stripRef.current) stripRef.current.style.transition = 'none'
   }
   const onPointerMove = (e: React.PointerEvent) => {
     if (!start.current) return
     const dx = e.clientX - start.current.x
     const dy = e.clientY - start.current.y
-    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) moved.current = true
+    if (!swiping.current) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+        swiping.current = true
+        moved.current = true
+      } else if (Math.abs(dy) > 10) {
+        start.current = null // vertical scroll wins
+        return
+      } else return
+    }
+    if (stripRef.current)
+      stripRef.current.style.transform = `translateX(calc(-33.3333% + ${dx}px))`
+  }
+  const snap = (transform: string) => {
+    const s = stripRef.current
+    if (s) {
+      s.style.transition = 'transform 0.2s ease-out'
+      s.style.transform = transform
+    }
   }
   const onPointerUp = (e: React.PointerEvent) => {
-    if (start.current && moved.current) {
-      const dx = e.clientX - start.current.x
-      setMonth((m) => addMonths(m, dx < 0 ? 1 : -1))
+    if (!start.current || !swiping.current) {
+      start.current = null
+      swiping.current = false
+      return
     }
+    const dx = e.clientX - start.current.x
     start.current = null
+    swiping.current = false
+    const viewport = (stripRef.current?.offsetWidth ?? 3) / 3
+    const th = viewport * 0.3
+    if (dx <= -th) {
+      snap('translateX(-66.6667%)') // slide in next month
+      setTimeout(() => setMonth((m) => addMonths(m, 1)), 200)
+    } else if (dx >= th) {
+      snap('translateX(0%)') // slide in previous month
+      setTimeout(() => setMonth((m) => addMonths(m, -1)), 200)
+    } else {
+      snap(CENTER) // not far enough: snap back
+    }
+  }
+
+  const renderMonthGrid = (monthDate: Date) => {
+    const days = eachDayOfInterval({
+      start: startOfWeek(startOfMonth(monthDate), { weekStartsOn: 1 }),
+      end: endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 }),
+    })
+    return (
+      <div className="shrink-0 space-y-1" style={{ width: '33.3333%' }}>
+        <div className="grid grid-cols-7 text-center text-xs font-medium text-gray-500">
+          {letters.map((l, i) => (
+            <span key={i}>{l}</span>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((d) => {
+            const inMonth = isSameMonth(d, monthDate)
+            const list = byDay.get(dayKey(d)) ?? []
+            return (
+              <button
+                key={dayKey(d)}
+                type="button"
+                onClick={() => setSelected(d)}
+                className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
+                  isSameDay(d, selected) ? 'bg-violet-100 ring-1 ring-violet-300' : 'hover:bg-gray-50'
+                } ${!inMonth ? 'text-gray-300' : isToday(d) ? 'font-bold text-violet-700' : 'text-gray-800'}`}
+              >
+                <span className="leading-none">{format(d, 'd')}</span>
+                <span className="flex h-1.5 items-center gap-0.5">
+                  {list.slice(0, 3).map((it, i) => (
+                    <span key={i} className={`h-1.5 w-1.5 rounded-full ${dotOf(it)}`} />
+                  ))}
+                  {list.length > 3 && <span className="text-[9px] leading-none text-gray-400">+</span>}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -109,10 +191,16 @@ export default function MonthCalendar<T>({
       </div>
 
       <div
+        className="overflow-hidden"
+        style={{ touchAction: 'pan-y' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={() => (start.current = null)}
+        onPointerCancel={() => {
+          start.current = null
+          swiping.current = false
+          snap(CENTER)
+        }}
         onClickCapture={(e) => {
           // a horizontal swipe ends over a day button — swallow that click
           if (moved.current) {
@@ -121,38 +209,11 @@ export default function MonthCalendar<T>({
             moved.current = false
           }
         }}
-        style={{ touchAction: 'pan-y' }}
-        className="space-y-1"
       >
-        <div className="grid grid-cols-7 text-center text-xs font-medium text-gray-500">
-          {letters.map((l, i) => (
-            <span key={i}>{l}</span>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-1">
-          {days.map((d) => {
-            const inMonth = isSameMonth(d, month)
-            const list = byDay.get(dayKey(d)) ?? []
-            return (
-              <button
-                key={dayKey(d)}
-                type="button"
-                onClick={() => setSelected(d)}
-                className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
-                  isSameDay(d, selected) ? 'bg-violet-100 ring-1 ring-violet-300' : 'hover:bg-gray-50'
-                } ${!inMonth ? 'text-gray-300' : isToday(d) ? 'font-bold text-violet-700' : 'text-gray-800'}`}
-              >
-                <span className="leading-none">{format(d, 'd')}</span>
-                <span className="flex h-1.5 items-center gap-0.5">
-                  {list.slice(0, 3).map((it, i) => (
-                    <span key={i} className={`h-1.5 w-1.5 rounded-full ${dotOf(it)}`} />
-                  ))}
-                  {list.length > 3 && <span className="text-[9px] leading-none text-gray-400">+</span>}
-                </span>
-              </button>
-            )
-          })}
+        <div ref={stripRef} className="flex" style={{ width: '300%', transform: CENTER }}>
+          {renderMonthGrid(addMonths(month, -1))}
+          {renderMonthGrid(month)}
+          {renderMonthGrid(addMonths(month, 1))}
         </div>
       </div>
 
