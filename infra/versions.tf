@@ -14,6 +14,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.0"
     }
+    vercel = {
+      source  = "vercel/vercel"
+      version = "~> 3.0"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
@@ -44,4 +48,9 @@ provider "cloudflare" {
 provider "github" {
   token = var.github_token
   owner = var.github_owner
+}
+
+provider "vercel" {
+  api_token = var.vercel_token
+  team      = var.vercel_org_id
 }

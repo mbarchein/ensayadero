@@ -34,8 +34,22 @@ turnstile_enabled = false
 # Public key here; private key goes to the Edge Function secret VAPID_PRIVATE_KEY.
 vapid_public_key = ""
 
-# Cloudflare — Custom API token. Permissions (scope -> group -> access):
-#   Account -> Cloudflare Pages   -> Edit
+# Vercel — frontend hosting. Token: https://vercel.com/account/tokens (team-scoped).
+# Org ID: Team Settings -> General, or `vercel teams ls`.
+# IMPORTANT: after the first apply, disable Deployment Protection on the project
+# (Vercel dashboard -> Project -> Settings -> Deployment Protection -> Off for
+# production). Left on, it puts a login interstitial in front of the site and
+# breaks the service worker / manifest (public PWA can't load).
+vercel_token  = "xxx"
+vercel_org_id = "team_xxx"
+
+# Two-phase cutover. Apply with false first: Pages keeps serving the app while
+# Vercel is created + CI deploys to it (verify on its *.vercel.app URL). Once
+# verified, set true and apply again to move DNS to Vercel and remove Pages.
+frontend_cutover = false
+
+# Cloudflare — DNS + Turnstile only (hosting is on Vercel now).
+# Custom API token permissions (scope -> group -> access):
 #   Account -> Turnstile          -> Edit   (only if turnstile_enabled = true)
 #   Zone    -> DNS                -> Edit
 #   Zone    -> Zone               -> Read

@@ -4,22 +4,25 @@ data "cloudflare_zone" "main" {
   }
 }
 
-# ── Cloudflare Pages: PWA frontend ──────────────────────────
+# ── Frontend hosting: migrating Pages -> Vercel (vercel.tf) ─
+# Cloudflare keeps the DNS zone + Turnstile. During phase 1 (frontend_cutover =
+# false) Pages stays up and the app CNAME still points at it; phase 2 cuts the
+# CNAME over to Vercel (DNS-only) and tears Pages down. See var.frontend_cutover.
 resource "cloudflare_pages_project" "app" {
+  count             = var.frontend_cutover ? 0 : 1
   account_id        = var.cloudflare_account_id
   name              = var.project_name
   production_branch = "main"
 
-  # Deploy via GitHub Actions with wrangler (direct upload), no native Git
-  # integration — more control from CI. No build_config block on purpose: an
-  # empty one diverges from the API's stored value (null) and trips a known
-  # cloudflare provider v5 bug ("inconsistent values for sensitive attribute")
-  # on every apply, which would block the pages_domain + DNS record below.
+  # No build_config block on purpose: an empty one diverges from the API's stored
+  # value (null) and trips a known cloudflare provider v5 bug ("inconsistent
+  # values for sensitive attribute") on every apply.
 }
 
 resource "cloudflare_pages_domain" "app" {
+  count        = var.frontend_cutover ? 0 : 1
   account_id   = var.cloudflare_account_id
-  project_name = cloudflare_pages_project.app.name
+  project_name = cloudflare_pages_project.app[0].name
   name         = local.app_fqdn
 }
 
@@ -44,9 +47,13 @@ resource "cloudflare_dns_record" "app" {
   zone_id = data.cloudflare_zone.main.zone_id
   name    = var.app_subdomain != "" ? var.app_subdomain : "@"
   type    = "CNAME"
-  content = cloudflare_pages_project.app.subdomain # <project>.pages.dev
-  proxied = true
+  # Phase 1: points at Pages (proxied). Phase 2: Vercel edge, DNS-only — Vercel
+  # terminates TLS, so proxying it would stack two CDNs and break cert issuance.
+  content = var.frontend_cutover ? "cname.vercel-dns.com" : cloudflare_pages_project.app[0].subdomain
+  proxied = !var.frontend_cutover
   ttl     = 1
+
+  depends_on = [vercel_project_domain.app]
 }
 
 # ── Resend verification DNS (SPF/DKIM/MX) ───────────────────
