@@ -328,7 +328,6 @@
     "nudgeConfirm": "A reminder will be sent to those who haven't replied yet (in-app, plus email or a phone notification per their preferences):",
     "nudged_one": "Notice sent to {{count}} person",
     "nudged_other": "Notice sent to {{count}} people",
-    "notesTitle": "Director's notes",
     "addToCalendar": "Add to my calendar",
     "icsSummary": "{{group}} rehearsal",
     "call": "Call {{name}}",

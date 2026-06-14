@@ -284,45 +284,54 @@ export default function SessionDetailPage() {
         </p>
       )}
 
-      {/* calendar-style date block + time/duration/location/relative time */}
-      {/* the whole card opens the agenda on this day, with the session flashing */}
-      <button
-        type="button"
-        onClick={() => navigate(`/availability?d=${isoDay(r.start)}&s=${session.id}`)}
-        title={t('upcoming.viewInAgenda')}
-        aria-label={t('upcoming.viewInAgenda')}
-        className="flex w-full overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:shadow"
-      >
-        <div
-          className={`flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-white ${
-            isPast || session.status === 'CANCELLED' ? 'bg-gray-400' : 'bg-violet-600'
-          }`}
+      {/* calendar-style date block + time/duration/location/relative time, with
+          the director's notes attached below as part of the same card */}
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        {/* the date row opens the agenda on this day, with the session flashing */}
+        <button
+          type="button"
+          onClick={() => navigate(`/availability?d=${isoDay(r.start)}&s=${session.id}`)}
+          title={t('upcoming.viewInAgenda')}
+          aria-label={t('upcoming.viewInAgenda')}
+          className="flex w-full text-left transition hover:bg-gray-50"
         >
-          <span className="text-[11px] font-semibold uppercase leading-none">
-            {format(r.start, 'EEE', { locale: dateLocale() })}
-          </span>
-          <span className="text-2xl font-bold leading-none">{format(r.start, 'd')}</span>
-          <span className="text-[11px] uppercase leading-none">
-            {format(r.start, 'MMM', { locale: dateLocale() })}
-          </span>
-        </div>
-        <div className="min-w-0 flex-1 px-3 py-2">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-lg font-semibold">
-              {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
-              <span className="text-sm font-normal text-gray-600">· {durationLabel}</span>
-            </p>
-            {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
+          <div
+            className={`flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-white ${
+              isPast || session.status === 'CANCELLED' ? 'bg-gray-400' : 'bg-violet-600'
+            }`}
+          >
+            <span className="text-[11px] font-semibold uppercase leading-none">
+              {format(r.start, 'EEE', { locale: dateLocale() })}
+            </span>
+            <span className="text-2xl font-bold leading-none">{format(r.start, 'd')}</span>
+            <span className="text-[11px] uppercase leading-none">
+              {format(r.start, 'MMM', { locale: dateLocale() })}
+            </span>
           </div>
-          {session.location && (
-            <p className="flex items-center gap-1 text-sm text-gray-600">
-              <MapPin size={14} className="shrink-0" />
-              <span className="truncate">{session.location}</span>
-            </p>
-          )}
-          <p className="text-xs text-gray-600">{relLabel}</p>
-        </div>
-      </button>
+          <div className="min-w-0 flex-1 px-3 py-2">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-lg font-semibold">
+                {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
+                <span className="text-sm font-normal text-gray-600">· {durationLabel}</span>
+              </p>
+              {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
+            </div>
+            {session.location && (
+              <p className="flex items-center gap-1 text-sm text-gray-600">
+                <MapPin size={14} className="shrink-0" />
+                <span className="truncate">{session.location}</span>
+              </p>
+            )}
+            <p className="text-xs text-gray-600">{relLabel}</p>
+          </div>
+        </button>
+        {session.comments && (
+          <p className="flex gap-1.5 border-t border-violet-100 bg-violet-50 px-3 py-2.5 text-sm text-violet-900">
+            <NotebookPen size={15} className="mt-0.5 shrink-0" />
+            <span className="whitespace-pre-line">{session.comments}</span>
+          </p>
+        )}
+      </div>
 
       {mine && session.status === 'CONFIRMED' && (
         <section
@@ -409,17 +418,6 @@ export default function SessionDetailPage() {
             <Megaphone size={16} /> {t('sessions.nudgePending')}
           </Button>
         )
-      )}
-
-      {/* director's notes (the session comments); editing them lives behind
-          the header's pencil */}
-      {session.comments && (
-        <section className="rounded-xl border bg-white p-3 text-sm">
-          <p className="mb-1 flex items-center gap-1.5 font-semibold text-gray-700">
-            <NotebookPen size={15} /> {t('sessions.notesTitle')}
-          </p>
-          <p className="whitespace-pre-line text-gray-700">{session.comments}</p>
-        </section>
       )}
 
       <section className="space-y-2 border-t pt-4">
