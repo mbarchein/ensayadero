@@ -277,6 +277,8 @@
   "sessions": {
     "empty": "No hay ensayos programados.",
     "planOne": "Programar un ensayo",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
     "pastAndCancelled": "Pasados y cancelados ({{count}})",
     "archive": "Archivar",
     "status": {

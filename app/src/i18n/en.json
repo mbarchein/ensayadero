@@ -277,6 +277,8 @@
   "sessions": {
     "empty": "No rehearsals scheduled.",
     "planOne": "Plan a rehearsal",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
     "pastAndCancelled": "Past and cancelled ({{count}})",
     "archive": "Archive",
     "status": {
