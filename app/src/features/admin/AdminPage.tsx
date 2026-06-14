@@ -146,7 +146,7 @@ export default function AdminPage() {
                     <p className="font-medium">
                       {g.name} {g.archived_at && <Badge color="gray">{t('admin.archived')}</Badge>}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-600">
                       {t('admin.members', { count: ms.length })} ·{' '}
                       {instructors.length === 0 ? (
                         <span className="font-medium text-red-600">{t('admin.noDirector')}</span>
@@ -185,7 +185,7 @@ export default function AdminPage() {
                   {u.name || u.email}{' '}
                   {u.platform_role === 'SUPERADMIN' && <Badge color="violet">{t('roles.SUPERADMIN')}</Badge>}
                 </span>
-                <span className="text-xs text-gray-500">{t('admin.groupsCount', { count: ms.length })}</span>
+                <span className="text-xs text-gray-600">{t('admin.groupsCount', { count: ms.length })}</span>
               </li>
             )
           })}
@@ -219,7 +219,7 @@ export default function AdminPage() {
               className="mt-1 w-full rounded-lg border px-3 py-2"
               placeholder="directora@ejemplo.com"
             />
-            <span className="text-xs text-gray-500">{t('admin.directorEmailHint')}</span>
+            <span className="text-xs text-gray-600">{t('admin.directorEmailHint')}</span>
           </label>
           {createGroup.isError && (
             <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>

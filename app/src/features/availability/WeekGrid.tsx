@@ -561,7 +561,7 @@ function DayStripView({
             <span className={`text-[11px] uppercase ${isToday || isSel ? 'font-bold' : 'font-medium'}`}>
               {letters[d]}
             </span>
-            <span className={`text-[9px] uppercase ${isSel ? 'text-violet-200' : 'text-gray-500'}`}>
+            <span className={`text-[9px] uppercase ${isSel ? 'text-violet-200' : 'text-gray-600'}`}>
               {format(date, 'MMM', { locale: dateLocale() }).replace('.', '')}
             </span>
             <span className={`text-sm ${isToday || isSel ? 'font-bold' : ''}`}>{format(date, 'd')}</span>

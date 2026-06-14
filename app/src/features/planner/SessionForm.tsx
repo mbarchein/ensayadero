@@ -563,7 +563,7 @@ export default function SessionForm({
             )
           })}
         </ul>
-        {!grid && <p className="mt-2 text-xs text-gray-500">{t('common.loading')}</p>}
+        {!grid && <p className="mt-2 text-xs text-gray-600">{t('common.loading')}</p>}
       </fieldset>
 
       {save.isError && <p className="text-sm text-red-600">{(save.error as Error).message}</p>}

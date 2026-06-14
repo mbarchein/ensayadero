@@ -136,7 +136,7 @@ export default function SessionsPage() {
 
       {past.length > 0 && (
         <details>
-          <summary className="cursor-pointer text-sm text-gray-500">
+          <summary className="cursor-pointer text-sm text-gray-600">
             {t('sessions.pastAndCancelled', { count: past.length })}
           </summary>
           <ul className="mt-2 space-y-2 opacity-60">
@@ -206,7 +206,7 @@ function SessionCard({
       {onArchive && (
         <button
           onClick={onArchive}
-          className="flex w-full items-center justify-center gap-1.5 rounded-b-xl border border-t-0 bg-gray-50 py-1.5 text-xs text-gray-500 hover:bg-gray-100"
+          className="flex w-full items-center justify-center gap-1.5 rounded-b-xl border border-t-0 bg-gray-50 py-1.5 text-xs text-gray-600 hover:bg-gray-100"
         >
           <Archive size={13} /> {t('sessions.archive')}
         </button>

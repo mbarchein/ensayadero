@@ -133,7 +133,7 @@ export default function WelcomePage() {
           type="button"
           onClick={() => finish.mutate(false)}
           disabled={busy}
-          className="text-sm text-gray-400 hover:text-violet-700"
+          className="text-sm text-gray-500 hover:text-violet-700"
         >
           {t('welcome.skip')}
         </button>
@@ -190,7 +190,7 @@ export default function WelcomePage() {
                   </button>
                 ))}
               </div>
-              <p className="mt-2 text-xs text-gray-500">{t('welcome.pronounHint')}</p>
+              <p className="mt-2 text-xs text-gray-600">{t('welcome.pronounHint')}</p>
             </div>
           </div>
         )}
@@ -208,7 +208,7 @@ export default function WelcomePage() {
               >
                 <div>
                   <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
-                  <p className="text-xs text-gray-500">{t(`profile.emailPrefs.${group}Hint`)}</p>
+                  <p className="text-xs text-gray-600">{t(`profile.emailPrefs.${group}Hint`)}</p>
                 </div>
                 <Toggle
                   checked={checked}

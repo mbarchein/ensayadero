@@ -54,7 +54,7 @@ export default function UpcomingPage() {
       ) : (
         sections.map((s) => (
           <section key={s.key} className="space-y-2">
-            <h2 className="text-sm font-semibold text-gray-500">{t(`upcoming.group.${s.key}`)}</h2>
+            <h2 className="text-sm font-semibold text-gray-600">{t(`upcoming.group.${s.key}`)}</h2>
             <ul className="space-y-3">
               {s.items.map((p) => (
                 <ParticipationCard

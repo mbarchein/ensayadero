@@ -65,7 +65,7 @@ export default function LegalDoc({
       </Link>
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">{t(`${ns}.title`)}</h1>
-        <p className="text-xs text-gray-500">{t(`${ns}.updated`)}</p>
+        <p className="text-xs text-gray-600">{t(`${ns}.updated`)}</p>
       </div>
       <p className="text-sm text-gray-700">{t(`${ns}.intro`)}</p>
       {gated && captchaEnabled && !loaded && (

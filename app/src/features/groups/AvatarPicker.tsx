@@ -105,7 +105,7 @@ export default function AvatarPicker({
           onKeyDown={(e) => e.key === 'Enter' && onImageChange(null)}
           className={cardCls(mode === 'avatar')}
         >
-          <span className="text-xs font-semibold uppercase text-gray-500">
+          <span className="text-xs font-semibold uppercase text-gray-600">
             {t('group.modeAvatar')}
           </span>
           <GroupAvatar seed={seed} size={64} />
@@ -142,7 +142,7 @@ export default function AvatarPicker({
             dragging ? 'border-dashed !border-violet-600 !bg-violet-100' : ''
           }`}
         >
-          <span className="text-xs font-semibold uppercase text-gray-500">
+          <span className="text-xs font-semibold uppercase text-gray-600">
             {t('group.modeImage')}
           </span>
           {cached ? (

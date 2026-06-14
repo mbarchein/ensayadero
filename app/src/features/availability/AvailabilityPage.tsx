@@ -410,7 +410,7 @@ export default function AvailabilityPage() {
             {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
           </h1>
           {editDay != null && (
-            <span className="truncate text-xs text-gray-500">
+            <span className="truncate text-xs text-gray-600">
               {format(addDays(monday, editDay), 'EEEE, d-MMMM-yyyy', { locale: dateLocale() })}
             </span>
           )}
@@ -418,7 +418,7 @@ export default function AvailabilityPage() {
         <div className="flex items-center gap-1">
           <span className="mr-1 flex w-5 justify-center" role="status">
             {save.isPending || hasUnsaved ? (
-              <Loader2 size={18} className="animate-spin text-gray-400" aria-label={t('availability.saving')} />
+              <Loader2 size={18} className="animate-spin text-gray-500" aria-label={t('availability.saving')} />
             ) : save.isError || copyWeeks.isError || clearWeek.isError ? (
               <AlertCircle size={18} className="text-red-600" aria-label={t('common.error', { message: '' })} />
             ) : showOk ? (

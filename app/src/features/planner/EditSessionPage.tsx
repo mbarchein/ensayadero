@@ -49,7 +49,7 @@ export default function EditSessionPage() {
 
   if (loading) return <Spinner />
   if (!isInstructor) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
+    return <p className="py-10 text-center text-sm text-gray-600">{t('planner.directorsOnly')}</p>
   }
   if (!session || !effectiveMonday) return <Spinner />
 

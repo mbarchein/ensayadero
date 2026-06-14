@@ -301,7 +301,7 @@ export default function SessionDetailPage() {
         <div className="min-w-0 flex-1 space-y-0.5">
           <p className="text-lg font-semibold">
             {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}{' '}
-            <span className="text-sm font-normal text-gray-500">· {durationLabel}</span>
+            <span className="text-sm font-normal text-gray-600">· {durationLabel}</span>
           </p>
           {session.location && (
             <p className="flex items-center gap-1 text-sm text-gray-600">
@@ -316,7 +316,7 @@ export default function SessionDetailPage() {
               </a>
             </p>
           )}
-          <p className="text-xs text-gray-500">{relLabel}</p>
+          <p className="text-xs text-gray-600">{relLabel}</p>
         </div>
         {session.status === 'DRAFT' && <Badge color="amber">{t('sessions.status.DRAFT')}</Badge>}
       </div>
@@ -336,7 +336,7 @@ export default function SessionDetailPage() {
             {t('sessions.areYouGoing')}
             {!mine.required && <Badge color="gray">{t('sessions.optionalTag')}</Badge>}
           </p>
-          <p className="mb-3 text-xs text-gray-500">{t('sessions.canChangeLater')}</p>
+          <p className="mb-3 text-xs text-gray-600">{t('sessions.canChangeLater')}</p>
           <div className="flex gap-2">
             <Button
               variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
@@ -566,7 +566,7 @@ function ParticipantList({
                     </span>
                   )}
                   {av?.coverage === 'none' && (
-                    <span className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+                    <span className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-600">
                       <span className="h-2 w-2 shrink-0 rounded-full bg-gray-300" aria-hidden />
                       {t('sessions.noAvailabilityNote')}
                     </span>

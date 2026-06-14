@@ -154,7 +154,7 @@ export default function PlannerPage() {
 
   if (loading) return <Spinner />
   if (!isInstructor) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
+    return <p className="py-10 text-center text-sm text-gray-600">{t('planner.directorsOnly')}</p>
   }
 
   const total = activeIds.length
@@ -336,7 +336,7 @@ export default function PlannerPage() {
 
 const chip = (active: boolean) =>
   `rounded-full px-3 py-1 text-xs font-medium transition ${
-    active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500 line-through'
+    active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-600 line-through'
   }`
 
 type MergedCell = HeatCell & { partial: string[] }
@@ -387,7 +387,7 @@ function NameChip({
     available: 'bg-green-100 text-green-800',
     partial: 'bg-orange-100 text-orange-800',
     busy: 'bg-amber-100 text-amber-800',
-    unavailable: 'bg-gray-100 text-gray-500',
+    unavailable: 'bg-gray-100 text-gray-600',
   }[variant]
   return (
     <span
@@ -450,7 +450,7 @@ function CellDetail({
       )}
       {unavailable.length > 0 && (
         <div>
-          <span className="font-medium text-gray-500">{t('planner.unavailableLabel')}</span>
+          <span className="font-medium text-gray-600">{t('planner.unavailableLabel')}</span>
           <div className="mt-1 flex flex-wrap gap-1">
             {unavailable.map((id) => (
               <NameChip key={id} name={nameOf(id)} me={id === meId} variant="unavailable" />

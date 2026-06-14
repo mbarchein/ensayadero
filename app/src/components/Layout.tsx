@@ -77,7 +77,7 @@ export default function Layout() {
               end={t2.end}
               className={({ isActive }) =>
                 `relative flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
-                  isActive ? 'font-semibold text-violet-700' : 'text-gray-500'
+                  isActive ? 'font-semibold text-violet-700' : 'text-gray-600'
                 }`
               }
             >

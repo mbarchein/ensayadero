@@ -64,7 +64,7 @@ export default function NewGroupPage() {
             placeholder={placeholder}
           />
         </label>
-        <p className="text-xs text-gray-500">{t('home.newGroupHint')}</p>
+        <p className="text-xs text-gray-600">{t('home.newGroupHint')}</p>
         {createGroup.isError && (
           <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>
         )}

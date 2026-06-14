@@ -277,7 +277,7 @@ export default function MembersPage() {
                         {t('invite.lastSendFailed')}
                       </span>
                     ) : i.email_sent_at ? (
-                      <span className="text-gray-400">
+                      <span className="text-gray-500">
                         {t('invite.sentAt', { date: new Date(i.email_sent_at).toLocaleString() })}
                       </span>
                     ) : (

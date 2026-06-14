@@ -187,7 +187,7 @@ export default function NotificationsPage() {
               <div
                 className={`flex gap-3 rounded-xl border p-3 ${n.read_at ? 'bg-white' : 'border-violet-200 bg-violet-50'}`}
               >
-                <Icon size={20} className={`mt-0.5 shrink-0 ${meta?.color ?? 'text-gray-500'}`} aria-hidden />
+                <Icon size={20} className={`mt-0.5 shrink-0 ${meta?.color ?? 'text-gray-600'}`} aria-hidden />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{label}</p>
                   {starts && (
@@ -196,7 +196,7 @@ export default function NotificationsPage() {
                       {n.payload.location ? ` · ${n.payload.location}` : ''}
                     </p>
                   )}
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     {n.groups?.name ? `${n.groups.name} · ` : ''}
                     {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: dateLocale() })}
                   </p>
@@ -355,7 +355,7 @@ function SwipeArchiveRow({ onArchive, children }: { onArchive: () => void; child
             e.stopPropagation()
             archiveAnimated()
           }}
-          className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-gray-400 opacity-0 shadow-sm transition hover:text-violet-700 focus-visible:pointer-events-auto focus-visible:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+          className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-gray-500 opacity-0 shadow-sm transition hover:text-violet-700 focus-visible:pointer-events-auto focus-visible:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
         >
           <Archive size={16} />
         </button>

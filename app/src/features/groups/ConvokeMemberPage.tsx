@@ -180,10 +180,10 @@ export default function ConvokeMemberPage() {
 
   if (loading || !sessions) return <Spinner />
   if (!isInstructor) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('planner.directorsOnly')}</p>
+    return <p className="py-10 text-center text-sm text-gray-600">{t('planner.directorsOnly')}</p>
   }
   if (!member) {
-    return <p className="py-10 text-center text-sm text-gray-500">{t('convoke.memberGone')}</p>
+    return <p className="py-10 text-center text-sm text-gray-600">{t('convoke.memberGone')}</p>
   }
 
   return (
@@ -337,7 +337,7 @@ export default function ConvokeMemberPage() {
               {t('convoke.submit', { count: selected.length })}
             </Button>
             {confirmedCount > 0 && (
-              <p className="text-center text-xs text-gray-500">
+              <p className="text-center text-xs text-gray-600">
                 {t('convoke.confirmedNote', { count: confirmedCount })}
               </p>
             )}

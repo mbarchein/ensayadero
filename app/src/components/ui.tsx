@@ -102,7 +102,7 @@ export function PasswordInput({ className = '', ...props }: InputHTMLAttributes<
         onClick={() => setVisible((v) => !v)}
         title={visible ? t('common.hidePassword') : t('common.showPassword')}
         aria-label={visible ? t('common.hidePassword') : t('common.showPassword')}
-        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-400 hover:text-gray-600"
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-500 hover:text-gray-600"
       >
         {visible ? <EyeOff size={18} /> : <Eye size={18} />}
       </button>
@@ -186,7 +186,7 @@ export function Modal({
         {/* fixed header; only the body below scrolls */}
         <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 text-gray-500 hover:bg-gray-100">
+          <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 text-gray-600 hover:bg-gray-100">
             <X size={18} />
           </button>
         </div>
@@ -208,7 +208,7 @@ export function Spinner() {
 export function EmptyState({ message, action }: { message: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
-      <p className="text-sm text-gray-500">{message}</p>
+      <p className="text-sm text-gray-600">{message}</p>
       {action}
     </div>
   )

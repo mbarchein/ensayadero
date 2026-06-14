@@ -168,7 +168,7 @@ export default function HomePage() {
                             {roleLabel(t, m.role, profile?.gender)}
                           </Badge>
                           {groupStats?.has(m.group_id) && (
-                            <span className="flex items-center gap-2 text-xs text-gray-500">
+                            <span className="flex items-center gap-2 text-xs text-gray-600">
                               <span className="flex items-center gap-1" title={t('home.membersCount')}>
                                 <Users size={13} aria-hidden /> {groupStats.get(m.group_id)!.members}
                               </span>
@@ -180,7 +180,7 @@ export default function HomePage() {
                         </div>
                       </div>
                     </div>
-                    <span aria-hidden className="text-gray-400">
+                    <span aria-hidden className="text-gray-500">
                       ›
                     </span>
                   </Link>

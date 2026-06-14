@@ -148,9 +148,9 @@ export default function ProfilePage() {
         )}
         <div className="min-w-0">
           <p className="truncate font-medium">{profile?.name}</p>
-          <p className="truncate text-sm text-gray-500">{profile?.email}</p>
+          <p className="truncate text-sm text-gray-600">{profile?.email}</p>
           {accessMethods && (
-            <p className="text-xs text-gray-400">{t('profile.accessVia', { methods: accessMethods })}</p>
+            <p className="text-xs text-gray-500">{t('profile.accessVia', { methods: accessMethods })}</p>
           )}
         </div>
       </div>
@@ -172,7 +172,7 @@ export default function ProfilePage() {
           />
         </label>
         <label className="block text-sm">
-          {t('profile.phone')} <span className="text-gray-400">{t('common.optionalField')}</span>
+          {t('profile.phone')} <span className="text-gray-500">{t('common.optionalField')}</span>
           <input
             type="tel"
             value={phone}
@@ -210,7 +210,7 @@ export default function ProfilePage() {
               ))}
             </div>
           </div>
-          <span className="mt-1 block text-xs text-gray-500">{t('profile.genderHint')}</span>
+          <span className="mt-1 block text-xs text-gray-600">{t('profile.genderHint')}</span>
         </div>
         {saveDetails.isError && (
           <p className="text-sm text-red-600">{(saveDetails.error as Error).message}</p>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
             <div key={group} className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
-                <p className="text-xs text-gray-500">{t(`profile.emailPrefs.${group}Hint`)}</p>
+                <p className="text-xs text-gray-600">{t(`profile.emailPrefs.${group}Hint`)}</p>
               </div>
               {prefs ? (
                 <Toggle
