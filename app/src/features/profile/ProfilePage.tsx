@@ -255,17 +255,6 @@ export default function ProfilePage() {
         </p>
       </section>
 
-      <section className="rounded-xl border bg-white p-4">
-        <h2 className="mb-1 font-semibold">{t('profile.tipsTitle')}</h2>
-        <p className="mb-3 text-sm text-gray-600">{t('profile.tipsDescription')}</p>
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={() => { resetTips(); setTipsReset(true); setTimeout(() => setTipsReset(false), 2000) }}>
-            {t('profile.resetTips')}
-          </Button>
-          {tipsReset && <span className="text-sm text-green-600">{t('profile.tipsResetDone')}</span>}
-        </div>
-      </section>
-
       {/* hidden until Web Push is configured (VAPID keys, BOOTSTRAP §7) */}
       {!!import.meta.env.VITE_VAPID_PUBLIC_KEY && (
         <section className="rounded-xl border bg-white p-4">
@@ -293,6 +282,17 @@ export default function ProfilePage() {
           )}
         </section>
       )}
+
+      <section className="rounded-xl border bg-white p-4">
+        <h2 className="mb-1 font-semibold">{t('profile.tipsTitle')}</h2>
+        <p className="mb-3 text-sm text-gray-600">{t('profile.tipsDescription')}</p>
+        <div className="flex items-center gap-3">
+          <Button variant="secondary" onClick={() => { resetTips(); setTipsReset(true); setTimeout(() => setTipsReset(false), 2000) }}>
+            {t('profile.resetTips')}
+          </Button>
+          {tipsReset && <span className="text-sm text-green-600">{t('profile.tipsResetDone')}</span>}
+        </div>
+      </section>
 
       {/* Install the PWA. Only shown when actionable: Chromium offered the
           prompt (canInstall) or iOS (manual Share → Add to Home Screen). Hidden
