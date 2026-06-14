@@ -71,7 +71,6 @@ export default function MonthCalendar<T>({
   const stripRef = useRef<HTMLDivElement>(null)
   const start = useRef<{ x: number; y: number } | null>(null)
   const swiping = useRef(false)
-  const moved = useRef(false)
 
   // recenter (no animation) after any month change: the panel we slid to and
   // the new centre panel render the same month, so the swap is seamless.
@@ -86,7 +85,6 @@ export default function MonthCalendar<T>({
   const onPointerDown = (e: React.PointerEvent) => {
     start.current = { x: e.clientX, y: e.clientY }
     swiping.current = false
-    moved.current = false
     if (stripRef.current) stripRef.current.style.transition = 'none'
   }
   const onPointerMove = (e: React.PointerEvent) => {
@@ -96,7 +94,6 @@ export default function MonthCalendar<T>({
     if (!swiping.current) {
       if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
         swiping.current = true
-        moved.current = true
       } else if (Math.abs(dy) > 10) {
         start.current = null // vertical scroll wins
         return
@@ -113,19 +110,30 @@ export default function MonthCalendar<T>({
     }
   }
   const onPointerUp = (e: React.PointerEvent) => {
-    if (!start.current || !swiping.current) {
-      start.current = null
-      swiping.current = false
+    const st = start.current
+    start.current = null
+    if (!st) return
+    // a tap (never crossed the swipe threshold) → select the day under it.
+    // Detecting selection here (not via the buttons' onClick) avoids the
+    // swipe-release click racing with the gesture.
+    if (!swiping.current) {
+      if (Math.hypot(e.clientX - st.x, e.clientY - st.y) < 12) {
+        const cell = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest(
+          '[data-date]',
+        ) as HTMLElement | null
+        const iso = cell?.dataset.date
+        if (iso) {
+          const [y, m, d] = iso.split('-').map(Number)
+          setSelected(new Date(y, m - 1, d))
+        }
+      }
       return
     }
-    const dx = e.clientX - start.current.x
-    start.current = null
     swiping.current = false
+    const dx = e.clientX - st.x
     const viewport = (stripRef.current?.offsetWidth ?? 3) / 3
     const th = viewport * 0.3
     if (dx <= -th) {
-      // deselect now (not in the timeout) so a tap after the swipe isn't wiped
-      // by a late setSelected(null); only the month change waits for the slide.
       setSelected(null)
       snap('translateX(-66.6667%)') // slide in next month
       setTimeout(() => setMonth((m) => addMonths(m, 1)), 200)
@@ -134,10 +142,7 @@ export default function MonthCalendar<T>({
       snap('translateX(0%)') // slide in previous month
       setTimeout(() => setMonth((m) => addMonths(m, -1)), 200)
     } else {
-      // not far enough to change month: snap back and treat it as a tap, so the
-      // click on the day under the finger still selects it (no double tap).
-      snap(CENTER)
-      moved.current = false
+      snap(CENTER) // not far enough: snap back
     }
   }
 
@@ -165,7 +170,7 @@ export default function MonthCalendar<T>({
               <button
                 key={dayKey(d)}
                 type="button"
-                onClick={() => setSelected(d)}
+                data-date={dayKey(d)}
                 className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
                   selected && isSameDay(d, selected)
                     ? 'bg-violet-100 ring-1 ring-violet-300'
@@ -228,14 +233,6 @@ export default function MonthCalendar<T>({
             start.current = null
             swiping.current = false
             snap(CENTER)
-          }}
-          onClickCapture={(e) => {
-            // a horizontal swipe ends over a day button — swallow that click
-            if (moved.current) {
-              e.preventDefault()
-              e.stopPropagation()
-              moved.current = false
-            }
           }}
         >
           <div ref={stripRef} className="flex" style={{ width: '300%', transform: CENTER }}>
