@@ -317,6 +317,8 @@
     "relFuture": "dentro de {{dist}}",
     "relPast": "hace {{dist}}",
     "nudgePending": "Recordar a pendientes",
+    "nudgeSend": "Recordar",
+    "nudgeConfirm": "Se enviará un recordatorio a quienes aún no han respondido (aviso en la app y, según sus preferencias, email o notificación al móvil):",
     "nudged_one": "Aviso enviado a {{count}} persona",
     "nudged_other": "Aviso enviado a {{count}} personas",
     "notesTitle": "Notas de dirección",

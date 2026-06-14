@@ -66,6 +66,7 @@ export default function SessionDetailPage() {
   const [shareCopied, setShareCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [nudgeOpen, setNudgeOpen] = useState(false)
   const [nudgedCount, setNudgedCount] = useState<number | null>(null)
 
   const { data: session, isLoading } = useQuery({
@@ -376,27 +377,6 @@ export default function SessionDetailPage() {
         </section>
       )}
 
-      {/* remind-pending (instructor) — the response tally now lives in the
-          participant-list headers, so it's not repeated here */}
-      {isInstructor && session.status === 'CONFIRMED' && (tally.PENDING ?? 0) > 0 && (
-        <div className="flex justify-end text-xs">
-          {nudgedCount !== null ? (
-            <span className="font-medium text-green-700">
-              {t('sessions.nudged', { count: nudgedCount })}
-            </span>
-          ) : (
-            <Button
-              variant="ghost"
-              className="inline-flex items-center gap-1.5 !py-1 text-xs"
-              disabled={nudge.isPending}
-              onClick={() => nudge.mutate()}
-            >
-              <Megaphone size={14} /> {t('sessions.nudgePending')}
-            </Button>
-          )}
-        </div>
-      )}
-
       <ParticipantList
         title={t('sessions.requiredList')}
         list={required}
@@ -412,6 +392,23 @@ export default function SessionDetailPage() {
           roleOf={roleOf}
           myId={profile?.id}
         />
+      )}
+
+      {/* remind-pending (instructor): full-width, below the attendees */}
+      {isInstructor && session.status === 'CONFIRMED' && (tally.PENDING ?? 0) > 0 && (
+        nudgedCount !== null ? (
+          <p className="text-center text-sm font-medium text-green-700">
+            {t('sessions.nudged', { count: nudgedCount })}
+          </p>
+        ) : (
+          <Button
+            variant="secondary"
+            className="inline-flex w-full items-center justify-center gap-1.5"
+            onClick={() => setNudgeOpen(true)}
+          >
+            <Megaphone size={16} /> {t('sessions.nudgePending')}
+          </Button>
+        )
       )}
 
       {/* director's notes (the session comments); editing them lives behind
@@ -478,6 +475,37 @@ export default function SessionDetailPage() {
           </button>
         )}
       </section>
+
+      <Modal open={nudgeOpen} onClose={() => setNudgeOpen(false)} title={t('sessions.nudgePending')}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">{t('sessions.nudgeConfirm')}</p>
+          <ul className="max-h-48 space-y-1 overflow-y-auto">
+            {session.session_participants
+              .filter((p) => p.response === 'PENDING')
+              .map((p) => (
+                <li key={p.user_id} className="flex items-center gap-2 text-sm">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" aria-hidden />
+                  <span className="truncate">{p.profiles.name || p.profiles.email}</span>
+                </li>
+              ))}
+          </ul>
+          <div className="flex gap-2">
+            <Button variant="secondary" className="flex-1" onClick={() => setNudgeOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              className="inline-flex flex-1 items-center justify-center gap-1.5"
+              disabled={nudge.isPending}
+              onClick={() => {
+                nudge.mutate()
+                setNudgeOpen(false)
+              }}
+            >
+              <Megaphone size={16} /> {t('sessions.nudgeSend')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={t('sessions.cancelBtn')}>
         <div className="space-y-4">
