@@ -215,7 +215,9 @@
     "removeConfirm": "Remove {{name}} from the group?",
     "backToGroups": "‹ My groups",
     "editGroup": "Edit group",
-    "edit": "Edit",
+    "edit": "Edit group",
+    "membersManage": "View members / Invite",
+    "membersView": "View members",
     "regenerateAvatar": "Regenerate avatar",
     "uploadImage": "Upload image",
     "modeAvatar": "Avatar",
@@ -235,7 +237,7 @@
     "leaveSuccessor": "You are the only director: choose who will direct the group",
     "tabs": {
       "sessions": "Rehearsals",
-      "planner": "Plan",
+      "planner": "New rehearsal",
       "members": "Members"
     },
     "joinedBanner_one": "{{name}} has joined the group and there is {{count}} upcoming rehearsal they are not summoned to.",
@@ -276,7 +278,7 @@
   },
   "sessions": {
     "empty": "No rehearsals scheduled.",
-    "planOne": "Plan a rehearsal",
+    "planOne": "Create a rehearsal",
     "today": "Today",
     "thisWeek": "This week",
     "nextWeek": "Next week",
@@ -329,7 +331,7 @@
     "comments": "Comments: {{comments}}"
   },
   "planner": {
-    "title": "Plan rehearsal",
+    "title": "New rehearsal",
     "directorsOnly": "Only directors can plan.",
     "membersOnly": "You must be a group member to plan.",
     "all": "Everyone ({{count}})",

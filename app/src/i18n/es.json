@@ -215,7 +215,9 @@
     "removeConfirm": "¿Quitar a {{name}} del grupo?",
     "backToGroups": "‹ Mis grupos",
     "editGroup": "Editar grupo",
-    "edit": "Editar",
+    "edit": "Editar grupo",
+    "membersManage": "Ver miembros / Invitar",
+    "membersView": "Ver miembros",
     "regenerateAvatar": "Regenerar avatar",
     "uploadImage": "Subir imagen",
     "modeAvatar": "Avatar",
@@ -235,7 +237,7 @@
     "leaveSuccessor": "Eres el único director: elige quién dirigirá el grupo",
     "tabs": {
       "sessions": "Ensayos",
-      "planner": "Programar",
+      "planner": "Nuevo ensayo",
       "members": "Miembros"
     },
     "joinedBanner_one": "{{name}} se ha unido al grupo y hay {{count}} ensayo futuro al que no está convocado.",
@@ -276,7 +278,7 @@
   },
   "sessions": {
     "empty": "No hay ensayos programados.",
-    "planOne": "Programar un ensayo",
+    "planOne": "Crear un ensayo",
     "today": "Hoy",
     "thisWeek": "Esta semana",
     "nextWeek": "Semana que viene",
@@ -329,7 +331,7 @@
     "comments": "Comentarios: {{comments}}"
   },
   "planner": {
-    "title": "Programar ensayo",
+    "title": "Nuevo ensayo",
     "directorsOnly": "Solo los directores pueden planificar.",
     "membersOnly": "Debes ser miembro del grupo para planificar.",
     "all": "Todos ({{count}})",

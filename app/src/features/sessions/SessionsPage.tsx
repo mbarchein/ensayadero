@@ -105,11 +105,11 @@ export default function SessionsPage() {
       {justJoined && <Tip id="groupJoined" />}
       <Tip id="group" />
 
-      <div className="flex gap-2">
+      <div className="space-y-2">
         {isInstructor && (
           <Button
             onClick={() => navigate(`/g/${groupId}/planner`)}
-            className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
+            className="inline-flex w-full items-center justify-center gap-1.5"
           >
             <CalendarPlus size={16} /> {t('group.tabs.planner')}
           </Button>
@@ -117,15 +117,15 @@ export default function SessionsPage() {
         <Button
           variant="secondary"
           onClick={() => navigate(`/g/${groupId}/members`)}
-          className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
+          className="inline-flex w-full items-center justify-center gap-1.5"
         >
-          <Users size={16} /> {t('group.tabs.members')}
+          <Users size={16} /> {isInstructor ? t('group.membersManage') : t('group.membersView')}
         </Button>
         {isInstructor && group && (
           <Button
             variant="secondary"
             onClick={() => navigate(`/g/${groupId}/edit`)}
-            className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 !px-2"
+            className="inline-flex w-full items-center justify-center gap-1.5"
           >
             <Pencil size={16} /> {t('group.edit')}
           </Button>
