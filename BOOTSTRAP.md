@@ -220,9 +220,15 @@ npx web-push generate-vapid-keys
 # node -e "const c=require('crypto');const{privateKey:k}=c.generateKeyPairSync('ec',{namedCurve:'prime256v1'});const j=k.export({format:'jwk'});console.log('Public :',Buffer.concat([Buffer.from([4]),Buffer.from(j.x,'base64url'),Buffer.from(j.y,'base64url')]).toString('base64url'));console.log('Private:',j.d);"
 ```
 
-- **Public** → `vapid_public_key` in `terraform.tfvars` → `terraform apply`
-  (Terraform publishes it as the `VITE_VAPID_PUBLIC_KEY` build variable). Also add
-  it to `app/.env.local` for local dev.
+- **Public** → goes to TWO places:
+  - `vapid_public_key` in `terraform.tfvars` → `terraform apply` (Terraform
+    publishes it as the `VITE_VAPID_PUBLIC_KEY` build variable). Also add it to
+    `app/.env.local` for local dev.
+  - Edge Functions secret — `send-notifications` needs it too; without it
+    `sendPush` bails out and push is silently skipped (in-app/email still work):
+    ```bash
+    supabase secrets set VAPID_PUBLIC_KEY=xxx --project-ref <project-ref>
+    ```
 - **Private** → Edge Functions secrets:
   ```bash
   supabase secrets set VAPID_PRIVATE_KEY=xxx --project-ref <project-ref>
