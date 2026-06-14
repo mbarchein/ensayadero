@@ -8,7 +8,7 @@
 // → required. Bulk actions: all / none / only-available. A coverage summary
 // replaces the loose warnings.
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import { format } from 'date-fns'
@@ -84,6 +84,19 @@ export default function SessionForm({
     setStartMin(newStart)
     setEndMin((e) => Math.min(MAX_END_MIN, Math.max(newStart + 30, e + delta)))
   }
+
+  // Up/Down on a time input steps the whole value by one slot WITH carry
+  // (e.g. 9:00 → 9:30 → 10:00), unlike the native per-segment arrows that wrap
+  // the minutes without touching the hour. Reuses the setters so the duration
+  // shift and validation still run.
+  const stepOnArrow =
+    (current: number, apply: (v: number) => void, lo: number, hi: number) =>
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+      e.preventDefault()
+      const next = current + (e.key === 'ArrowUp' ? SLOT_MINUTES : -SLOT_MINUTES)
+      apply(Math.min(hi, Math.max(lo, next)))
+    }
   const [comments, setComments] = useState(session?.comments ?? '')
   const [location, setLocation] = useState(session?.location ?? '')
   const [participants, setParticipants] = useState<ParticipantDraft[]>(
@@ -396,6 +409,7 @@ export default function SessionForm({
               step={SLOT_MINUTES * 60}
               value={toHHMM(startMin)}
               onChange={(e) => moveStart(fromHHMM(e.target.value))}
+              onKeyDown={stepOnArrow(startMin, moveStart, 0, MAX_END_MIN - SLOT_MINUTES)}
               className="mt-1 w-full rounded-lg border px-3 py-2"
             />
           </label>
@@ -407,6 +421,7 @@ export default function SessionForm({
               step={SLOT_MINUTES * 60}
               value={toHHMM(endMin)}
               onChange={(e) => setEndMin(fromHHMM(e.target.value))}
+              onKeyDown={stepOnArrow(endMin, setEndMin, startMin + SLOT_MINUTES, MAX_END_MIN)}
               aria-invalid={!validRange}
               className={`mt-1 w-full rounded-lg border px-3 py-2 ${
                 validRange ? '' : 'border-red-400'
