@@ -204,6 +204,8 @@
   },
   "group": {
     "membersTitle": "Members",
+    "gallery": "Gallery",
+    "galleryTitle": "Member gallery",
     "invite": "+ Invite",
     "inviteTitle": "Invite to group",
     "email": "Email",

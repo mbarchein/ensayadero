@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
-import { Badge, BackButton, Button, Modal, Spinner } from '../../components/ui'
+import { AlertCircle, Check, LayoutGrid, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
+import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
@@ -22,6 +22,7 @@ export default function MembersPage() {
   const [removeTarget, setRemoveTarget] = useState<MembershipWithProfile | null>(null)
   const [roleTarget, setRoleTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveOpen, setLeaveOpen] = useState(false)
+  const [galleryOpen, setGalleryOpen] = useState(false)
   const [leaveText, setLeaveText] = useState('')
   const [successor, setSuccessor] = useState<string | null>(null)
   // per-invitation resend feedback: id → ok/error (cleared after a few seconds)
@@ -181,6 +182,15 @@ export default function MembersPage() {
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
+        <Button
+          variant="ghost"
+          className="ml-auto inline-flex items-center gap-1.5 p-2"
+          title={t('group.gallery')}
+          aria-label={t('group.gallery')}
+          onClick={() => setGalleryOpen(true)}
+        >
+          <LayoutGrid size={18} />
+        </Button>
       </header>
 
       <Tip id="members" />
@@ -466,6 +476,31 @@ export default function MembersPage() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* member gallery (orla): every avatar large with the name below */}
+      <Modal open={galleryOpen} onClose={() => setGalleryOpen(false)} title={t('group.galleryTitle')}>
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+          {members.map((m) => (
+            <li key={m.user_id} className="flex flex-col items-center text-center">
+              {m.profiles.avatar_url ? (
+                <img
+                  src={m.profiles.avatar_url}
+                  alt=""
+                  className="h-24 w-24 rounded-full object-cover ring-2 ring-violet-100"
+                />
+              ) : (
+                <InitialsAvatar name={m.profiles.name || m.profiles.email} size={96} />
+              )}
+              <p className="mt-2 text-sm font-medium leading-tight">
+                {m.profiles.name || m.profiles.email}
+              </p>
+              <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                {roleLabel(t, m.role, m.profiles.gender)}
+              </Badge>
+            </li>
+          ))}
+        </ul>
       </Modal>
     </div>
   )
