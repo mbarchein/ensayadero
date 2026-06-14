@@ -8,12 +8,13 @@ import { useGroup } from '../groups/useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
-import { Pencil, CalendarPlus, Users, List, CalendarDays } from 'lucide-react'
+import { Pencil, CalendarPlus, Users } from 'lucide-react'
 import { BackButton, Button, EmptyState, Spinner } from '../../components/ui'
 import GroupAvatar from '../groups/GroupAvatar'
 import Tip from '../../components/Tip'
-import SessionCard from './SessionCard'
+import SessionCard, { responseDotColor } from './SessionCard'
 import MonthCalendar from './MonthCalendar'
+import ViewToggle from './ViewToggle'
 
 import type { SessionWithParticipants } from '../../lib/types'
 
@@ -142,30 +143,24 @@ export default function SessionsPage() {
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{t('group.tabs.sessions')}</h2>
-        <div className="flex rounded-lg border border-violet-200 p-0.5">
-          <button
-            type="button"
-            onClick={() => switchView('list')}
-            aria-label={t('sessions.viewList')}
-            aria-pressed={view === 'list'}
-            className={`rounded-md p-1.5 ${view === 'list' ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-          >
-            <List size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={() => switchView('month')}
-            aria-label={t('sessions.viewMonth')}
-            aria-pressed={view === 'month'}
-            className={`rounded-md p-1.5 ${view === 'month' ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-          >
-            <CalendarDays size={18} />
-          </button>
-        </div>
+        <ViewToggle value={view} onChange={switchView} />
       </div>
 
       {view === 'month' ? (
-        <MonthCalendar sessions={visible} groupId={groupId} userId={profile!.id} />
+        <MonthCalendar
+          items={visible}
+          dateOf={(s) => parseRange(s.time_range).start}
+          dotOf={(s) =>
+            responseDotColor(s.status, s.session_participants.find((p) => p.user_id === profile!.id)?.response)
+          }
+          renderAgenda={(items) => (
+            <ul className="space-y-3">
+              {items.map((s) => (
+                <SessionCard key={s.id} session={s} groupId={groupId} userId={profile!.id} />
+              ))}
+            </ul>
+          )}
+        />
       ) : (
         <>
           {upcoming.length === 0 ? (

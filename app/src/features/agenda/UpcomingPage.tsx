@@ -1,6 +1,7 @@
 // "Upcoming": ordered list of my future rehearsals (all groups),
 // with an inline confirmation flow.
 
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { addDays } from 'date-fns'
@@ -10,11 +11,21 @@ import { BackButton, EmptyState, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
 import { useMyAgenda } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
+import MonthCalendar from '../sessions/MonthCalendar'
+import ViewToggle from '../sessions/ViewToggle'
+import { responseDotColor } from '../sessions/SessionCard'
 
 export default function UpcomingPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { data, isLoading, respond } = useMyAgenda()
+  const [view, setView] = useState<'list' | 'month'>(
+    () => (localStorage.getItem('upcoming-view') === 'month' ? 'month' : 'list'),
+  )
+  const switchView = (v: 'list' | 'month') => {
+    localStorage.setItem('upcoming-view', v)
+    setView(v)
+  }
 
   if (isLoading) return <Spinner />
 
@@ -39,6 +50,9 @@ export default function UpcomingPage() {
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to="/" />
         <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
+        <div className="ml-auto">
+          <ViewToggle value={view} onChange={switchView} />
+        </div>
       </header>
 
       <Tip id="upcoming" />
@@ -49,7 +63,30 @@ export default function UpcomingPage() {
         </p>
       )}
 
-      {upcoming.length === 0 ? (
+      {view === 'month' ? (
+        <MonthCalendar
+          items={data ?? []}
+          dateOf={(p) => parseRange(p.sessions.time_range).start}
+          dotOf={(p) => responseDotColor(p.sessions.status, p.response)}
+          renderAgenda={(items) => (
+            <ul className="space-y-3">
+              {items.map((p) => (
+                <ParticipationCard
+                  key={p.session_id}
+                  p={p}
+                  pending={respond.isPending}
+                  onRespond={(response) => respond.mutate({ sessionId: p.session_id, response })}
+                  onViewAgenda={() =>
+                    navigate(
+                      `/availability?d=${isoDay(parseRange(p.sessions.time_range).start)}&s=${p.session_id}`,
+                    )
+                  }
+                />
+              ))}
+            </ul>
+          )}
+        />
+      ) : upcoming.length === 0 ? (
         <EmptyState message={t('upcoming.empty')} />
       ) : (
         sections.map((s) => (

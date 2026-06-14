@@ -10,12 +10,29 @@ import { dateLocale } from '../../lib/dateLocale'
 import { Archive } from 'lucide-react'
 import { Badge, InitialsAvatar } from '../../components/ui'
 import { parseRange } from '../../lib/ranges'
-import type { Profile, SessionWithParticipants } from '../../lib/types'
+import type {
+  ParticipantResponse,
+  Profile,
+  SessionStatus,
+  SessionWithParticipants,
+} from '../../lib/types'
 
 export const STATUS_COLOR = {
   DRAFT: 'gray' as const,
   CONFIRMED: 'green' as const,
   CANCELLED: 'red' as const,
+}
+
+// Dot/accent color for a session by my relation to it: cancelled/draft by
+// status, otherwise by my response (going / pending / declined), grey when I'm
+// not summoned. Shared by the month calendar dots.
+export function responseDotColor(status: SessionStatus, response?: ParticipantResponse): string {
+  if (status === 'CANCELLED') return 'bg-red-400'
+  if (status === 'DRAFT') return 'bg-gray-300'
+  if (response === 'ACCEPTED') return 'bg-violet-500'
+  if (response === 'DECLINED') return 'bg-red-400'
+  if (response) return 'bg-amber-400' // PENDING (summoned)
+  return 'bg-gray-300' // not summoned
 }
 
 // Small overlapping participant avatar for the attendance stack.
