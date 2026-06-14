@@ -306,14 +306,7 @@ export default function SessionDetailPage() {
           {session.location && (
             <p className="flex items-center gap-1 text-sm text-gray-600">
               <MapPin size={14} className="shrink-0" />
-              <a
-                href={`https://maps.google.com/?q=${encodeURIComponent(session.location)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="truncate hover:underline"
-              >
-                {session.location}
-              </a>
+              <span className="truncate">{session.location}</span>
             </p>
           )}
           <p className="text-xs text-gray-600">{relLabel}</p>

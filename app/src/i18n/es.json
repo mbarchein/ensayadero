@@ -21,7 +21,7 @@
     "notifications": "Los avisos de tus grupos. Desliza uno a la derecha para archivarlo (en ordenador, con el icono al pasar el ratón).",
     "group": "Los ensayos de este grupo. Toca uno para ver el detalle y confirmar tu asistencia.",
     "groupJoined": "¡Ya estás dentro! Marca tu disponibilidad en Agenda para que te puedan convocar a los ensayos.",
-    "sessionDetail": "Confirma aquí tu asistencia y consulta quién va. El bloque de fecha te lleva a ese día en tu agenda.",
+    "sessionDetail": "Aquí confirmas si vas a este ensayo y ves quién más va.",
     "sessionShared": "Te han compartido este ensayo. Si estás en la lista, responde Voy / No puedo.",
     "planner": "Mapa de disponibilidad del grupo: más verde = más gente puede. Toca un día y elige una franja para crear el ensayo.",
     "members": "Miembros del grupo. Los directores pueden invitar por email, código o QR.",

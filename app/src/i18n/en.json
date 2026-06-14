@@ -21,7 +21,7 @@
     "notifications": "Alerts from your groups. Swipe one to the right to archive it (on desktop, use the hover icon).",
     "group": "This group's rehearsals. Tap one to see the detail and confirm your attendance.",
     "groupJoined": "You're in! Mark your availability in Agenda so you can be summoned to rehearsals.",
-    "sessionDetail": "Confirm your attendance here and see who's going. The date block jumps to that day in your schedule.",
+    "sessionDetail": "Here you confirm whether you're going to this rehearsal and see who else is.",
     "sessionShared": "Someone shared this rehearsal with you. If you're on the list, answer Going / Can't make it.",
     "planner": "The group's availability map: greener = more people can make it. Tap a day and pick a slot to create the rehearsal.",
     "members": "Group members. Directors can invite by email, code or QR.",
