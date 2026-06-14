@@ -53,10 +53,12 @@ resource "cloudflare_dns_record" "app" {
 resource "cloudflare_dns_record" "resend" {
   for_each = { for r in var.resend_dkim_records : "${r.type}-${r.name}" => r }
 
-  zone_id  = data.cloudflare_zone.main.zone_id
-  name     = each.value.name
-  type     = each.value.type
-  content  = each.value.content
+  zone_id = data.cloudflare_zone.main.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  # TXT record content must be wrapped in quotation marks for the Cloudflare v5
+  # provider (otherwise it warns and quotes it for you); MX/CNAME must not be.
+  content  = each.value.type == "TXT" ? "\"${each.value.content}\"" : each.value.content
   priority = try(each.value.priority, null)
   proxied  = false
   ttl      = 1
