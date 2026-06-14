@@ -130,7 +130,10 @@ export default function MonthCalendar<T>({
       snap('translateX(0%)') // slide in previous month
       setTimeout(() => goMonth(-1), 200)
     } else {
-      snap(CENTER) // not far enough: snap back
+      // not far enough to change month: snap back and treat it as a tap, so the
+      // click on the day under the finger still selects it (no double tap).
+      snap(CENTER)
+      moved.current = false
     }
   }
 
