@@ -402,7 +402,7 @@ export default function AvailabilityPage() {
 
   return (
     // fixed full-height layout: only the calendar scrolls (its own scroll box)
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       <header className="-mx-4 flex min-h-9 items-center justify-between border-b border-violet-100 bg-violet-50 px-4 py-2">
         <div className="flex min-w-0 items-center gap-3">
           {dayView ? <BackButton onBack={() => setEditDay(null)} /> : <BackButton to="/" />}

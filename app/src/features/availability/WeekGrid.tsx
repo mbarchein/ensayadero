@@ -559,7 +559,7 @@ function DayStripView({
         const inner = (
           <>
             <span
-              className={`-mt-0.5 text-[11px] uppercase leading-none ${isToday || isSel ? 'font-bold' : 'font-medium'}`}
+              className={`text-[11px] uppercase leading-none ${isToday || isSel ? 'font-bold' : 'font-medium'}`}
             >
               {letters[d]}
             </span>
