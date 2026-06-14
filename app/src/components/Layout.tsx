@@ -92,12 +92,12 @@ export default function Layout() {
                   <span className="relative">
                     <t2.icon size={20} aria-hidden />
                     {t2.to === '/notifications' && (unread ?? 0) > 0 && (
-                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-violet-50">
+                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-violet-50">
                         {unread}
                       </span>
                     )}
                     {t2.to === '/upcoming' && (pendingAttendance ?? 0) > 0 && (
-                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-violet-50">
+                      <span className="absolute -right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-violet-50">
                         {pendingAttendance}
                       </span>
                     )}

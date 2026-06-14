@@ -520,7 +520,7 @@ export default function AvailabilityPage() {
                   image={p.sessions.groups.avatar_image}
                   size={14}
                 />
-                <span className="truncate text-[10px] font-bold text-gray-900">{initials}</span>
+                <span className="truncate text-[11px] font-bold text-gray-900">{initials}</span>
               </span>
             )
           }

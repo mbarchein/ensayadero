@@ -261,13 +261,13 @@ export default function ConvokeMemberPage() {
                       className="h-5 w-5 shrink-0 accent-violet-600"
                     />
                     <span className="flex w-12 shrink-0 flex-col items-center rounded-lg bg-violet-600 py-1 text-white">
-                      <span className="text-[10px] font-semibold uppercase leading-tight">
+                      <span className="text-[11px] font-semibold uppercase leading-tight">
                         {format(s.range.start, 'EEE', { locale: dateLocale() })}
                       </span>
                       <span className="text-lg font-bold leading-tight">
                         {format(s.range.start, 'd')}
                       </span>
-                      <span className="text-[10px] uppercase leading-tight">
+                      <span className="text-[11px] uppercase leading-tight">
                         {format(s.range.start, 'MMM', { locale: dateLocale() })}
                       </span>
                     </span>
