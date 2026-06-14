@@ -31,6 +31,7 @@
     "installHint": "Install Ensayadero on your phone for quick access and notifications.",
     "installBtn": "Install",
     "installApp": "Install app",
+    "sectionTitle": "Install the app",
     "iosHint": "To install: tap Share and \"Add to Home Screen\"."
   },
   "roles": {
@@ -588,6 +589,8 @@
     "sub1": "Choose what reaches you by email. In-app alerts are always on, and you can change this anytime from your profile.",
     "pushBtn": "Enable alerts on this device",
     "pushOk": "Device alerts enabled",
+    "titleInstall": "Keep it within reach",
+    "subInstall": "Install it as an app to open it from your home screen and get instant alerts. If you prefer, you can install it later from your profile.",
     "title2": "Your availability is the script",
     "sub2": "Mark when you can rehearse. Whoever directs your group plans rehearsals with the whole cast’s availability: without yours, there is no show.",
     "ctaAvailability": "Set my availability",

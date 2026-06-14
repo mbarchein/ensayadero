@@ -31,6 +31,7 @@
     "installHint": "Instala Ensayadero en tu móvil para acceso rápido y notificaciones.",
     "installBtn": "Instalar",
     "installApp": "Instalar app",
+    "sectionTitle": "Instalar la app",
     "iosHint": "Para instalar: pulsa Compartir y «Añadir a pantalla de inicio»."
   },
   "roles": {
@@ -588,6 +589,8 @@
     "sub1": "Elige qué te llega por email. Los avisos dentro de la app siempre están, y puedes cambiarlo cuando quieras desde tu perfil.",
     "pushBtn": "Activar avisos en este dispositivo",
     "pushOk": "Avisos del dispositivo activados",
+    "titleInstall": "Tenla siempre a mano",
+    "subInstall": "Instálala como app para abrirla desde tu pantalla de inicio y recibir avisos al instante. Si lo prefieres, puedes instalarla más tarde desde tu perfil.",
     "title2": "Tu disponibilidad es el guion",
     "sub2": "Marca cuándo puedes ensayar. Quien dirige tu grupo planifica los ensayos con la disponibilidad de todo el reparto: sin la tuya, no hay función.",
     "ctaAvailability": "Marcar mi disponibilidad",

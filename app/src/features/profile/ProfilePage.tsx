@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { LogOut, Trash2 } from 'lucide-react'
+import { Download, LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
+import { useInstallPrompt, promptInstall, isIOS, isStandalone } from '../pwa/installPrompt'
 import { BackButton, Button, InitialsAvatar, Modal, Toggle } from '../../components/ui'
 import Tip, { resetTips } from '../../components/Tip'
 
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   const { t } = useTranslation()
   const { session, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
+  const { canInstall } = useInstallPrompt()
 
   // sign-in methods linked to the account (Google, Facebook, email+password)
   const providers =
@@ -275,6 +277,26 @@ export default function ProfilePage() {
           )}
           {pushState === 'fail' && (
             <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
+          )}
+        </section>
+      )}
+
+      {/* Install the PWA. Only shown when actionable: Chromium offered the
+          prompt (canInstall) or iOS (manual Share → Add to Home Screen). Hidden
+          when already running as an installed app. */}
+      {!isStandalone() && (canInstall || isIOS) && (
+        <section className="rounded-xl border bg-white p-4">
+          <h2 className="mb-1 font-semibold">{t('pwa.sectionTitle')}</h2>
+          <p className="mb-3 text-sm text-gray-600">{t('pwa.installHint')}</p>
+          {canInstall ? (
+            <Button
+              className="inline-flex items-center gap-2"
+              onClick={() => promptInstall()}
+            >
+              <Download size={18} aria-hidden /> {t('pwa.installApp')}
+            </Button>
+          ) : (
+            <p className="text-sm text-gray-600">{t('pwa.iosHint')}</p>
           )}
         </section>
       )}

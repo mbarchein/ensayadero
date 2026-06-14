@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { BellRing, CalendarHeart, Download, Drama } from 'lucide-react'
+import { BellRing, CalendarHeart, Download, Drama, type LucideIcon } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
@@ -18,14 +18,30 @@ import { Button, InitialsAvatar, Spinner, Toggle } from '../../components/ui'
 import quotesEs from '../../data/quotes.es.json'
 import quotesEn from '../../data/quotes.en.json'
 
-const STEP_ICONS = [Drama, BellRing, CalendarHeart]
+// The install screen only exists when the browser can actually install (see
+// screens[] below), so the wizard is 3 or 4 steps depending on the device.
+type Screen = 'identity' | 'notifications' | 'install' | 'finish'
+
+const SCREEN_ICON: Record<Screen, LucideIcon> = {
+  identity: Drama,
+  notifications: BellRing,
+  install: Download,
+  finish: CalendarHeart,
+}
+// suffix for the welcome.title<x> / welcome.sub<x> i18n keys, per screen
+const SCREEN_KEY: Record<Screen, string> = {
+  identity: '0',
+  notifications: '1',
+  install: 'Install',
+  finish: '2',
+}
 
 export default function WelcomePage() {
   const { t, i18n } = useTranslation()
   const { session, profile, loading, refreshProfile } = useAuth()
   const navigate = useNavigate()
 
-  const [step, setStep] = useState(0)
+  const [screen, setScreen] = useState<Screen>('identity')
   const [name, setName] = useState(profile?.name ?? '')
   const [gender, setGender] = useState<'F' | 'M' | null>(profile?.gender ?? null)
   const [emailSessions, setEmailSessions] = useState(true)
@@ -39,6 +55,14 @@ export default function WelcomePage() {
     return list[Math.floor(Math.random() * list.length)]
   })
 
+  const screens: Screen[] = [
+    'identity',
+    'notifications',
+    ...(canInstall ? (['install'] as Screen[]) : []),
+    'finish',
+  ]
+  const idx = Math.max(0, screens.indexOf(screen))
+
   const saveIdentity = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
@@ -48,7 +72,7 @@ export default function WelcomePage() {
       if (error) throw error
       await refreshProfile()
     },
-    onSuccess: () => setStep(1),
+    onSuccess: () => setScreen('notifications'),
   })
 
   const savePrefs = useMutation({
@@ -68,7 +92,7 @@ export default function WelcomePage() {
       const { error } = await supabase.from('notification_preferences').upsert(rows)
       if (error) throw error
     },
-    onSuccess: () => setStep(2),
+    onSuccess: () => setScreen(canInstall ? 'install' : 'finish'),
   })
 
   const finish = useMutation({
@@ -91,19 +115,23 @@ export default function WelcomePage() {
     return <Navigate to="/" replace />
   }
 
-  const Icon = STEP_ICONS[step]
+  const Icon = SCREEN_ICON[screen]
   const busy = saveIdentity.isPending || savePrefs.isPending || finish.isPending
+
+  const install = async () => {
+    if ((await promptInstall()) === 'accepted') setScreen('finish')
+  }
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col bg-gradient-to-b from-violet-100 via-violet-50 to-white px-6 pb-8 pt-4">
       <div className="flex items-center justify-between">
         {/* progress dots */}
         <div className="flex gap-1.5" aria-hidden>
-          {[0, 1, 2].map((i) => (
+          {screens.map((s, i) => (
             <span
-              key={i}
+              key={s}
               className={`h-2 rounded-full transition-all ${
-                i === step ? 'w-6 bg-violet-600' : 'w-2 bg-violet-200'
+                i === idx ? 'w-6 bg-violet-600' : 'w-2 bg-violet-200'
               }`}
             />
           ))}
@@ -118,16 +146,18 @@ export default function WelcomePage() {
         </button>
       </div>
 
-      <div key={step} className="flex flex-1 flex-col">
+      <div key={screen} className="flex flex-1 flex-col">
         <div className="mt-10 text-center">
           <Icon size={64} strokeWidth={1.25} className="mx-auto text-violet-600" aria-hidden />
-          <h1 className="mt-4 text-2xl font-bold text-violet-900">{t(`welcome.title${step}`)}</h1>
+          <h1 className="mt-4 text-2xl font-bold text-violet-900">
+            {t(`welcome.title${SCREEN_KEY[screen]}`)}
+          </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-gray-600">
-            {t(`welcome.sub${step}`)}
+            {t(`welcome.sub${SCREEN_KEY[screen]}`)}
           </p>
         </div>
 
-        {step === 0 && (
+        {screen === 'identity' && (
           <div className="mt-8 space-y-5">
             <div className="flex justify-center">
               {profile.avatar_url ? (
@@ -172,7 +202,7 @@ export default function WelcomePage() {
           </div>
         )}
 
-        {step === 1 && (
+        {screen === 'notifications' && (
           <div className="mt-8 space-y-4">
             {([
               ['sessions', emailSessions, setEmailSessions],
@@ -206,20 +236,10 @@ export default function WelcomePage() {
             {pushState === 'ok' && (
               <p className="text-center text-sm text-green-600">{t('welcome.pushOk')}</p>
             )}
-            {canInstall && (
-              <Button
-                variant="secondary"
-                className="inline-flex w-full items-center justify-center gap-2"
-                onClick={() => promptInstall()}
-              >
-                <Download size={18} aria-hidden />
-                {t('pwa.installApp')}
-              </Button>
-            )}
           </div>
         )}
 
-        {step === 2 && (
+        {screen === 'finish' && (
           <figure className="mx-auto mt-10 max-w-sm text-center">
             <blockquote className="whitespace-pre-line font-serif text-base italic leading-relaxed text-violet-900">
               “{quote.q}”
@@ -231,7 +251,7 @@ export default function WelcomePage() {
         )}
 
         <div className="mt-auto space-y-2 pt-10">
-          {step === 0 && (
+          {screen === 'identity' && (
             <Button
               className="w-full"
               disabled={!name.trim() || busy}
@@ -240,12 +260,32 @@ export default function WelcomePage() {
               {t('welcome.next')}
             </Button>
           )}
-          {step === 1 && (
+          {screen === 'notifications' && (
             <Button className="w-full" disabled={busy} onClick={() => savePrefs.mutate()}>
               {t('welcome.next')}
             </Button>
           )}
-          {step === 2 && (
+          {screen === 'install' && (
+            <>
+              <Button
+                className="inline-flex w-full items-center justify-center gap-2"
+                disabled={busy}
+                onClick={install}
+              >
+                <Download size={18} aria-hidden />
+                {t('pwa.installApp')}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full"
+                disabled={busy}
+                onClick={() => setScreen('finish')}
+              >
+                {t('welcome.later')}
+              </Button>
+            </>
+          )}
+          {screen === 'finish' && (
             <>
               <Button className="w-full" disabled={busy} onClick={() => finish.mutate(true)}>
                 {t('welcome.ctaAvailability')}
