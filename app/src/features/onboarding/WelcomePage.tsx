@@ -15,8 +15,6 @@ import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
 import { useInstallPrompt, promptInstall } from '../pwa/installPrompt'
 import { Button, InitialsAvatar, Spinner, Toggle } from '../../components/ui'
-import quotesEs from '../../data/quotes.es.json'
-import quotesEn from '../../data/quotes.en.json'
 
 // The install screen only exists when the browser can actually install (see
 // screens[] below), so the wizard is 3 or 4 steps depending on the device.
@@ -37,7 +35,7 @@ const SCREEN_KEY: Record<Screen, string> = {
 }
 
 export default function WelcomePage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { session, profile, loading, refreshProfile } = useAuth()
   const navigate = useNavigate()
 
@@ -49,11 +47,6 @@ export default function WelcomePage() {
   const [emailMembers, setEmailMembers] = useState(true)
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>('idle')
   const { canInstall } = useInstallPrompt()
-
-  const [quote] = useState(() => {
-    const list = i18n.language?.startsWith('en') ? quotesEn : quotesEs
-    return list[Math.floor(Math.random() * list.length)]
-  })
 
   const screens: Screen[] = [
     'identity',
@@ -237,17 +230,6 @@ export default function WelcomePage() {
               <p className="text-center text-sm text-green-600">{t('welcome.pushOk')}</p>
             )}
           </div>
-        )}
-
-        {screen === 'finish' && (
-          <figure className="mx-auto mt-10 max-w-sm text-center">
-            <blockquote className="whitespace-pre-line font-serif text-base italic leading-relaxed text-violet-900">
-              “{quote.q}”
-            </blockquote>
-            <figcaption className="mt-2 text-xs text-violet-600">
-              — {quote.w} · {quote.a}
-            </figcaption>
-          </figure>
         )}
 
         <div className="mt-auto space-y-2 pt-10">
