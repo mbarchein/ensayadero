@@ -135,7 +135,10 @@ export default function MonthCalendar<T>({
     })
     return (
       <div className="shrink-0 space-y-1" style={{ width: '33.3333%' }}>
-        <div className="grid grid-cols-7 text-center text-xs font-medium text-gray-500">
+        <p className="px-8 pb-1 text-center font-semibold">
+          {cap(format(monthDate, 'LLLL yyyy', { locale: dateLocale() }))}
+        </p>
+        <div className="grid grid-cols-7 border-b border-gray-200 pb-1 text-center text-[11px] font-semibold uppercase tracking-wide text-violet-400">
           {letters.map((l, i) => (
             <span key={i}>{l}</span>
           ))}
@@ -143,6 +146,7 @@ export default function MonthCalendar<T>({
         <div className="grid grid-cols-7 gap-1">
           {days.map((d) => {
             const inMonth = isSameMonth(d, monthDate)
+            const past = dayKey(d) < dayKey(today)
             const list = byDay.get(dayKey(d)) ?? []
             return (
               <button
@@ -150,8 +154,20 @@ export default function MonthCalendar<T>({
                 type="button"
                 onClick={() => setSelected(d)}
                 className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
-                  isSameDay(d, selected) ? 'bg-violet-100 ring-1 ring-violet-300' : 'hover:bg-gray-50'
-                } ${!inMonth ? 'text-gray-300' : isToday(d) ? 'font-bold text-violet-700' : 'text-gray-800'}`}
+                  isSameDay(d, selected)
+                    ? 'bg-violet-100 ring-1 ring-violet-300'
+                    : inMonth && past
+                      ? 'bg-gray-100'
+                      : 'hover:bg-gray-50'
+                } ${
+                  !inMonth
+                    ? 'text-gray-300'
+                    : isToday(d)
+                      ? 'font-bold text-violet-700'
+                      : past
+                        ? 'text-gray-400'
+                        : 'text-gray-800'
+                }`}
               >
                 <span className="leading-none">{format(d, 'd')}</span>
                 <span className="flex h-1.5 items-center gap-0.5">
@@ -170,50 +186,50 @@ export default function MonthCalendar<T>({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {/* arrows fixed at the corners; the month label lives inside each panel so
+          it slides with the grid */}
+      <div className="relative">
         <button
           type="button"
           onClick={() => setMonth((m) => addMonths(m, -1))}
           aria-label={t('sessions.prevMonth')}
-          className="rounded p-1.5 text-violet-700 hover:bg-violet-50"
+          className="absolute left-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
           <ChevronLeft size={20} />
         </button>
-        <span className="font-semibold">{cap(format(month, 'LLLL yyyy', { locale: dateLocale() }))}</span>
         <button
           type="button"
           onClick={() => setMonth((m) => addMonths(m, 1))}
           aria-label={t('sessions.nextMonth')}
-          className="rounded p-1.5 text-violet-700 hover:bg-violet-50"
+          className="absolute right-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
           <ChevronRight size={20} />
         </button>
-      </div>
-
-      <div
-        className="overflow-hidden"
-        style={{ touchAction: 'pan-y' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={() => {
-          start.current = null
-          swiping.current = false
-          snap(CENTER)
-        }}
-        onClickCapture={(e) => {
-          // a horizontal swipe ends over a day button — swallow that click
-          if (moved.current) {
-            e.preventDefault()
-            e.stopPropagation()
-            moved.current = false
-          }
-        }}
-      >
-        <div ref={stripRef} className="flex" style={{ width: '300%', transform: CENTER }}>
-          {renderMonthGrid(addMonths(month, -1))}
-          {renderMonthGrid(month)}
-          {renderMonthGrid(addMonths(month, 1))}
+        <div
+          className="overflow-hidden"
+          style={{ touchAction: 'pan-y' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={() => {
+            start.current = null
+            swiping.current = false
+            snap(CENTER)
+          }}
+          onClickCapture={(e) => {
+            // a horizontal swipe ends over a day button — swallow that click
+            if (moved.current) {
+              e.preventDefault()
+              e.stopPropagation()
+              moved.current = false
+            }
+          }}
+        >
+          <div ref={stripRef} className="flex" style={{ width: '300%', transform: CENTER }}>
+            {renderMonthGrid(addMonths(month, -1))}
+            {renderMonthGrid(month)}
+            {renderMonthGrid(addMonths(month, 1))}
+          </div>
         </div>
       </div>
 
