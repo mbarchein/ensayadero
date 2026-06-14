@@ -481,7 +481,18 @@ export default function MembersPage() {
       {/* member gallery (orla): every avatar large with the name below */}
       <Modal open={galleryOpen} onClose={() => setGalleryOpen(false)} title={t('group.galleryTitle')}>
         <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-          {members.map((m) => (
+          {[...members]
+            .sort((a, b) => {
+              // directors first, then alphabetical by name (fallback email)
+              if ((a.role === 'INSTRUCTOR') !== (b.role === 'INSTRUCTOR'))
+                return a.role === 'INSTRUCTOR' ? -1 : 1
+              return (a.profiles.name || a.profiles.email).localeCompare(
+                b.profiles.name || b.profiles.email,
+                undefined,
+                { sensitivity: 'base' },
+              )
+            })
+            .map((m) => (
             <li key={m.user_id} className="flex flex-col items-center text-center">
               {m.profiles.avatar_url ? (
                 <img
