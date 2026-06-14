@@ -43,7 +43,13 @@ export default function MonthCalendar<T>({
   const { t } = useTranslation()
   const today = new Date()
   const [month, setMonth] = useState(() => startOfMonth(today))
-  const [selected, setSelected] = useState<Date>(today)
+  const [selected, setSelected] = useState<Date | null>(today)
+
+  // changing month clears the day selection (and its agenda below)
+  const goMonth = (delta: number) => {
+    setMonth((m) => addMonths(m, delta))
+    setSelected(null)
+  }
 
   // bucket items by day (and keep each day time-ascending)
   const byDay = new Map<string, T[]>()
@@ -59,7 +65,7 @@ export default function MonthCalendar<T>({
     ? ['L', 'M', 'X', 'J', 'V', 'S', 'D']
     : ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
-  const selectedItems = byDay.get(dayKey(selected)) ?? []
+  const selectedItems = selected ? (byDay.get(dayKey(selected)) ?? []) : []
 
   // ── carousel: 3 month panels, current centered; swipe slides to a neighbour ──
   const stripRef = useRef<HTMLDivElement>(null)
@@ -119,10 +125,10 @@ export default function MonthCalendar<T>({
     const th = viewport * 0.3
     if (dx <= -th) {
       snap('translateX(-66.6667%)') // slide in next month
-      setTimeout(() => setMonth((m) => addMonths(m, 1)), 200)
+      setTimeout(() => goMonth(1), 200)
     } else if (dx >= th) {
       snap('translateX(0%)') // slide in previous month
-      setTimeout(() => setMonth((m) => addMonths(m, -1)), 200)
+      setTimeout(() => goMonth(-1), 200)
     } else {
       snap(CENTER) // not far enough: snap back
     }
@@ -134,7 +140,7 @@ export default function MonthCalendar<T>({
       end: endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 }),
     })
     return (
-      <div className="shrink-0 space-y-1 px-0.5" style={{ width: '33.3333%' }}>
+      <div className="shrink-0 space-y-1 px-0.5 pb-0.5" style={{ width: '33.3333%' }}>
         <p className="px-8 pb-1 text-center font-semibold">
           {cap(format(monthDate, 'LLLL yyyy', { locale: dateLocale() }))}
         </p>
@@ -154,7 +160,7 @@ export default function MonthCalendar<T>({
                 type="button"
                 onClick={() => setSelected(d)}
                 className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
-                  isSameDay(d, selected)
+                  selected && isSameDay(d, selected)
                     ? 'bg-violet-100 ring-1 ring-violet-300'
                     : inMonth && past
                       ? 'bg-gray-100'
@@ -191,7 +197,7 @@ export default function MonthCalendar<T>({
       <div className="relative">
         <button
           type="button"
-          onClick={() => setMonth((m) => addMonths(m, -1))}
+          onClick={() => goMonth(-1)}
           aria-label={t('sessions.prevMonth')}
           className="absolute left-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
@@ -199,7 +205,7 @@ export default function MonthCalendar<T>({
         </button>
         <button
           type="button"
-          onClick={() => setMonth((m) => addMonths(m, 1))}
+          onClick={() => goMonth(1)}
           aria-label={t('sessions.nextMonth')}
           className="absolute right-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
@@ -233,16 +239,18 @@ export default function MonthCalendar<T>({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-violet-700">
-          {cap(format(selected, 'EEEE d MMM', { locale: dateLocale() }))}
-        </h3>
-        {selectedItems.length > 0 ? (
-          renderAgenda(selectedItems)
-        ) : (
-          <p className="text-sm text-gray-500">{t('sessions.noneThisDay')}</p>
-        )}
-      </div>
+      {selected && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-violet-700">
+            {cap(format(selected, 'EEEE d MMM yyyy', { locale: dateLocale() }))}
+          </h3>
+          {selectedItems.length > 0 ? (
+            renderAgenda(selectedItems)
+          ) : (
+            <p className="text-sm text-gray-500">{t('sessions.noneThisDay')}</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }
