@@ -322,10 +322,11 @@ export default function SessionForm({
       qc.invalidateQueries({ queryKey: ['week-sessions', groupId] })
       qc.invalidateQueries({ queryKey: ['session', id] })
       qc.invalidateQueries({ queryKey: ['pending-attendance'] })
-      // edit: back to where we came from; create: replace the form with the
-      // new session's detail so back skips the form
+      // edit: back to where we came from. create: return to the group's
+      // sessions view (directors usually convene several in a row), replacing
+      // the form so Back skips it.
       if (editing) onClose()
-      else navigate(`/g/${groupId}/sessions/${id}`, { replace: true })
+      else navigate(`/g/${groupId}`, { replace: true })
     },
   })
 
