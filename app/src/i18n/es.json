@@ -470,6 +470,7 @@
     "archiveConfirm": "¿Archivar \"{{name}}\"? Dejará de ser visible para sus miembros.",
     "groupsCount_one": "{{count}} grupo",
     "groupsCount_other": "{{count}} grupos",
+    "joinedOn": "Alta: {{date}}",
     "newGroupTitle": "Nuevo grupo",
     "groupName": "Nombre del grupo",
     "groupNamePlaceholder": "La Tempestad — montaje 2026",

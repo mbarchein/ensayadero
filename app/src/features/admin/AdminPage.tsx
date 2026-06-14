@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
+import { dateLocale } from '../../lib/dateLocale'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { randomPlay } from '../../lib/plays'
@@ -47,9 +49,13 @@ export default function AdminPage() {
   const { data: users } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('profiles').select('*').order('created_at')
+      // newest first, so freshly joined users are at the top
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
       if (error) throw error
-      return data as Profile[]
+      return data as (Profile & { created_at: string })[]
     },
     enabled: profile?.platform_role === 'SUPERADMIN',
   })
@@ -180,12 +186,23 @@ export default function AdminPage() {
           {users?.map((u) => {
             const ms = memberships?.filter((m) => m.user_id === u.id) ?? []
             return (
-              <li key={u.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
-                <span>
-                  {u.name || u.email}{' '}
-                  {u.platform_role === 'SUPERADMIN' && <Badge color="violet">{t('roles.SUPERADMIN')}</Badge>}
+              <li key={u.id} className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2">
+                <div className="min-w-0">
+                  <span>
+                    {u.name || u.email}{' '}
+                    {u.platform_role === 'SUPERADMIN' && (
+                      <Badge color="violet">{t('roles.SUPERADMIN')}</Badge>
+                    )}
+                  </span>
+                  <p className="text-xs text-gray-600">
+                    {t('admin.joinedOn', {
+                      date: format(new Date(u.created_at), 'd MMM yyyy', { locale: dateLocale() }),
+                    })}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs text-gray-600">
+                  {t('admin.groupsCount', { count: ms.length })}
                 </span>
-                <span className="text-xs text-gray-600">{t('admin.groupsCount', { count: ms.length })}</span>
               </li>
             )
           })}

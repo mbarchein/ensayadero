@@ -470,6 +470,7 @@
     "archiveConfirm": "Archive \"{{name}}\"? It will no longer be visible to its members.",
     "groupsCount_one": "{{count}} group",
     "groupsCount_other": "{{count}} groups",
+    "joinedOn": "Joined {{date}}",
     "newGroupTitle": "New group",
     "groupName": "Group name",
     "groupNamePlaceholder": "The Tempest — 2026 production",
