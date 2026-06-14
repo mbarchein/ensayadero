@@ -47,6 +47,10 @@ vercel_org_id = "team_xxx"
 # of clicking Vercel's "Authorize DNS records from Cloudflare", which fights TF.
 # vercel_domain_verification = "vc-domain-verify=app.example.com,xxxxx,dc"
 
+# CNAME target Vercel recommends for the app host (Project -> Domains). Override
+# only if Vercel asks for a project-specific endpoint; default is the generic one.
+# vercel_cname_target = "xxxxxxxx.vercel-dns-0NN.com"
+
 # Cloudflare — DNS + Turnstile only (hosting is on Vercel now).
 # Custom API token permissions (scope -> group -> access):
 #   Account -> Turnstile          -> Edit   (only if turnstile_enabled = true)

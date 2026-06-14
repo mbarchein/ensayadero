@@ -29,7 +29,7 @@ resource "cloudflare_dns_record" "app" {
   zone_id = data.cloudflare_zone.main.zone_id
   name    = var.app_subdomain != "" ? var.app_subdomain : "@"
   type    = "CNAME"
-  content = "cname.vercel-dns.com" # Vercel edge
+  content = var.vercel_cname_target # Vercel edge
   # DNS-only (grey cloud): Vercel terminates TLS for the app host. Proxying it
   # through Cloudflare would stack two CDNs and break Vercel's cert issuance.
   proxied = false

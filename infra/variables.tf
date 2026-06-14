@@ -135,6 +135,15 @@ variable "vercel_org_id" {
   type        = string
 }
 
+# CNAME target for the app host. Default is Vercel's generic endpoint; Vercel may
+# recommend a project-specific one (e.g. <hash>.vercel-dns-0NN.com) under Project
+# -> Domains — set that here without the trailing dot.
+variable "vercel_cname_target" {
+  description = "CNAME target the app subdomain points at on Vercel's edge."
+  type        = string
+  default     = "cname.vercel-dns.com"
+}
+
 # Domain-ownership TXT that Vercel requires to verify the custom domain. Vercel
 # shows it under Project -> Domains as a `_vercel` TXT (value `vc-domain-verify=
 # ...`). It does not rotate. Empty = no record created. Do NOT use Vercel's
