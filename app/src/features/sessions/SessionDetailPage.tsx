@@ -332,10 +332,11 @@ export default function SessionDetailPage() {
                 : 'border-amber-200 bg-amber-50'
           }`}
         >
-          <p className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900">
+          <p className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-900">
             {t('sessions.areYouGoing')}
             {!mine.required && <Badge color="gray">{t('sessions.optionalTag')}</Badge>}
           </p>
+          <p className="mb-3 text-xs text-gray-500">{t('sessions.canChangeLater')}</p>
           <div className="flex gap-2">
             <Button
               variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
