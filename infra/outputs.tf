@@ -18,10 +18,6 @@ output "vercel_project_id" {
   value       = vercel_project.app.id
 }
 
-output "pages_subdomain" {
-  description = "Subdominio *.pages.dev (solo en fase 1; null tras el cutover)"
-  value       = var.frontend_cutover ? null : cloudflare_pages_project.app[0].subdomain
-}
 
 output "google_oauth_redirect_uri" {
   description = "Redirect URI a registrar en el OAuth client de Google Console"

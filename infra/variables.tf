@@ -124,19 +124,6 @@ variable "resend_dkim_records" {
 }
 
 # ── Vercel (PWA frontend hosting) ───────────────────────────
-# Two-phase cutover for rollback safety:
-#   false (phase 1): Cloudflare Pages still serves the app domain; Vercel is
-#          created and CI deploys to it — verify it on its *.vercel.app URL.
-#   true  (phase 2): DNS points at Vercel, Pages + its CI creds are torn down.
-# Roll back from phase 1 by doing nothing (Pages keeps serving). After phase 2,
-# rolling back means flipping this to false and redeploying to Pages.
-variable "frontend_cutover" {
-  description = "false = keep Pages live while Vercel is verified; true = cut DNS over to Vercel and remove Pages."
-  type        = bool
-  default     = false
-}
-
-
 variable "vercel_token" {
   description = "Vercel API token (https://vercel.com/account/tokens), team-scoped"
   type        = string

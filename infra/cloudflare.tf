@@ -4,27 +4,9 @@ data "cloudflare_zone" "main" {
   }
 }
 
-# ── Frontend hosting: migrating Pages -> Vercel (vercel.tf) ─
-# Cloudflare keeps the DNS zone + Turnstile. During phase 1 (frontend_cutover =
-# false) Pages stays up and the app CNAME still points at it; phase 2 cuts the
-# CNAME over to Vercel (DNS-only) and tears Pages down. See var.frontend_cutover.
-resource "cloudflare_pages_project" "app" {
-  count             = var.frontend_cutover ? 0 : 1
-  account_id        = var.cloudflare_account_id
-  name              = var.project_name
-  production_branch = "main"
-
-  # No build_config block on purpose: an empty one diverges from the API's stored
-  # value (null) and trips a known cloudflare provider v5 bug ("inconsistent
-  # values for sensitive attribute") on every apply.
-}
-
-resource "cloudflare_pages_domain" "app" {
-  count        = var.frontend_cutover ? 0 : 1
-  account_id   = var.cloudflare_account_id
-  project_name = cloudflare_pages_project.app[0].name
-  name         = local.app_fqdn
-}
+# ── Frontend hosting is on Vercel (vercel.tf) ───────────────
+# Cloudflare keeps the DNS zone + Turnstile; the app host is a DNS-only CNAME to
+# Vercel's edge (cloudflare_dns_record.app below).
 
 locals {
   app_fqdn = var.app_subdomain != "" ? "${var.app_subdomain}.${var.domain}" : var.domain
@@ -47,10 +29,10 @@ resource "cloudflare_dns_record" "app" {
   zone_id = data.cloudflare_zone.main.zone_id
   name    = var.app_subdomain != "" ? var.app_subdomain : "@"
   type    = "CNAME"
-  # Phase 1: points at Pages (proxied). Phase 2: Vercel edge, DNS-only — Vercel
-  # terminates TLS, so proxying it would stack two CDNs and break cert issuance.
-  content = var.frontend_cutover ? "cname.vercel-dns.com" : cloudflare_pages_project.app[0].subdomain
-  proxied = !var.frontend_cutover
+  content = "cname.vercel-dns.com" # Vercel edge
+  # DNS-only (grey cloud): Vercel terminates TLS for the app host. Proxying it
+  # through Cloudflare would stack two CDNs and break Vercel's cert issuance.
+  proxied = false
   ttl     = 1
 
   depends_on = [vercel_project_domain.app]

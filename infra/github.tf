@@ -3,22 +3,8 @@
 # - apply Supabase migrations (supabase CLI)
 # - deploy Edge Functions
 #
-# The Cloudflare CI creds below live only through phase 1 (frontend_cutover =
-# false), so a quick rollback to a Pages deploy is still possible; phase 2 drops
-# them. Terraform itself keeps using the Cloudflare token from tfvars regardless.
-resource "github_actions_secret" "cloudflare_api_token" {
-  count       = var.frontend_cutover ? 0 : 1
-  repository  = var.github_repo
-  secret_name = "CLOUDFLARE_API_TOKEN"
-  value       = var.cloudflare_api_token
-}
-
-resource "github_actions_secret" "cloudflare_account_id" {
-  count       = var.frontend_cutover ? 0 : 1
-  repository  = var.github_repo
-  secret_name = "CLOUDFLARE_ACCOUNT_ID"
-  value       = var.cloudflare_account_id
-}
+# Cloudflare creds are NOT here on purpose: CI no longer touches Cloudflare
+# (DNS/Turnstile are managed only by Terraform). The token stays in tfvars.
 
 resource "github_actions_secret" "vercel_token" {
   repository  = var.github_repo
@@ -97,15 +83,6 @@ resource "github_actions_variable" "supabase_anon_key" {
   repository    = var.github_repo
   variable_name = "VITE_SUPABASE_ANON_KEY"
   value         = data.supabase_apikeys.main.anon_key
-}
-
-# Cloudflare Pages project name — used only if CI is rolled back to a Pages
-# deploy during phase 1. Removed at cutover (phase 2).
-resource "github_actions_variable" "pages_project_name" {
-  count         = var.frontend_cutover ? 0 : 1
-  repository    = var.github_repo
-  variable_name = "CLOUDFLARE_PROJECT_NAME"
-  value         = var.project_name
 }
 
 # Whether the frontend shows the Facebook login button — true only when the Meta

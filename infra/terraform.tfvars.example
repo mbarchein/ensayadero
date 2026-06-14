@@ -43,11 +43,6 @@ vapid_public_key = ""
 vercel_token  = "xxx"
 vercel_org_id = "team_xxx"
 
-# Two-phase cutover. Apply with false first: Pages keeps serving the app while
-# Vercel is created + CI deploys to it (verify on its *.vercel.app URL). Once
-# verified, set true and apply again to move DNS to Vercel and remove Pages.
-frontend_cutover = false
-
 # _vercel TXT verification value (Project -> Domains in Vercel). Add this instead
 # of clicking Vercel's "Authorize DNS records from Cloudflare", which fights TF.
 # vercel_domain_verification = "vc-domain-verify=app.example.com,xxxxx,dc"
