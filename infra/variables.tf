@@ -148,6 +148,17 @@ variable "vercel_org_id" {
   type        = string
 }
 
+# Domain-ownership TXT that Vercel requires to verify the custom domain. Vercel
+# shows it under Project -> Domains as a `_vercel` TXT (value `vc-domain-verify=
+# ...`). It does not rotate. Empty = no record created. Do NOT use Vercel's
+# "Authorize DNS records from Cloudflare" flow — it writes records directly and
+# fights this Terraform-managed zone.
+variable "vercel_domain_verification" {
+  description = "Value of the _vercel TXT record from Vercel (without surrounding quotes). Empty = skip."
+  type        = string
+  default     = ""
+}
+
 # ── GitHub (CI/CD) ──────────────────────────────────────────
 variable "github_token" {
   description = "GitHub token with repo + secrets scope"

@@ -56,6 +56,19 @@ resource "cloudflare_dns_record" "app" {
   depends_on = [vercel_project_domain.app]
 }
 
+# Vercel domain-ownership verification. Quoted for the cloudflare v5 provider,
+# like the resend TXTs below. Set var.vercel_domain_verification from the value
+# Vercel shows under Project -> Domains.
+resource "cloudflare_dns_record" "vercel_verify" {
+  count   = var.vercel_domain_verification != "" ? 1 : 0
+  zone_id = data.cloudflare_zone.main.zone_id
+  name    = "_vercel"
+  type    = "TXT"
+  content = "\"${var.vercel_domain_verification}\""
+  proxied = false
+  ttl     = 1
+}
+
 # ── Resend verification DNS (SPF/DKIM/MX) ───────────────────
 resource "cloudflare_dns_record" "resend" {
   for_each = { for r in var.resend_dkim_records : "${r.type}-${r.name}" => r }

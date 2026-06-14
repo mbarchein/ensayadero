@@ -48,6 +48,10 @@ vercel_org_id = "team_xxx"
 # verified, set true and apply again to move DNS to Vercel and remove Pages.
 frontend_cutover = false
 
+# _vercel TXT verification value (Project -> Domains in Vercel). Add this instead
+# of clicking Vercel's "Authorize DNS records from Cloudflare", which fights TF.
+# vercel_domain_verification = "vc-domain-verify=app.example.com,xxxxx,dc"
+
 # Cloudflare — DNS + Turnstile only (hosting is on Vercel now).
 # Custom API token permissions (scope -> group -> access):
 #   Account -> Turnstile          -> Edit   (only if turnstile_enabled = true)
