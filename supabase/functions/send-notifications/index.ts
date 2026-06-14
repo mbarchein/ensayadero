@@ -307,7 +307,26 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
   return (await sendEmailDetailed(to, subject, html)).ok
 }
 
-async function sendPush(userId: string, title: string, body: string): Promise<boolean> {
+// Deep-link a push to the relevant page (mirrors the in-app click routing):
+// session events → the rehearsal detail; member events → the group.
+function notificationUrl(
+  type: string,
+  payload: Record<string, unknown>,
+  groupId: string | null,
+): string {
+  let path = '/'
+  if (groupId && payload.session_id) path = `/g/${groupId}/sessions/${payload.session_id}`
+  else if (groupId && type === 'MEMBER_JOINED') path = `/g/${groupId}/members`
+  else if (groupId && type === 'MEMBER_PROMOTED') path = `/g/${groupId}`
+  return (APP_URL || '') + path
+}
+
+async function sendPush(
+  userId: string,
+  title: string,
+  body: string,
+  url: string,
+): Promise<boolean> {
   if (!VAPID_PUBLIC || !VAPID_PRIVATE) return false
   const { data: subs } = await supabase
     .from('push_subscriptions')
@@ -319,7 +338,7 @@ async function sendPush(userId: string, title: string, body: string): Promise<bo
     try {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: sub.keys as { p256dh: string; auth: string } },
-        JSON.stringify({ title, body, url: APP_URL }),
+        JSON.stringify({ title, body, url }),
       )
       any = true
     } catch (err: unknown) {
@@ -447,7 +466,8 @@ Deno.serve(async (req) => {
             : n.type === 'MEMBER_PROMOTED'
               ? (groupName ?? '')
               : fmtDate(payload.starts_at, lang)
-        if (await sendPush(n.user_id, subject, pushBody)) pushes++
+        const url = notificationUrl(n.type, payload, n.group_id)
+        if (await sendPush(n.user_id, subject, pushBody, url)) pushes++
       }
       updates.sent_push_at = new Date().toISOString()
     }
