@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { format, isToday, isTomorrow, isThisWeek } from 'date-fns'
+import { format, isToday, differenceInCalendarWeeks } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
@@ -73,23 +73,23 @@ export default function SessionsPage() {
   const canArchive = (s: SessionWithParticipants) =>
     s.status === 'CANCELLED' || parseRange(s.time_range).end < now
 
-  // group upcoming by calendar day (the list is already time-ascending), each
-  // day headed by a friendly relative label (Today / Tomorrow / weekday / date)
-  const dayLabel = (d: Date) => {
-    if (isToday(d)) return t('sessions.today')
-    if (isTomorrow(d)) return t('sessions.tomorrow')
-    const label = isThisWeek(d, { weekStartsOn: 1 })
-      ? format(d, 'EEEE', { locale: dateLocale() })
-      : format(d, 'EEEE d MMM', { locale: dateLocale() })
-    return label.charAt(0).toUpperCase() + label.slice(1)
+  // bucket upcoming (list is time-ascending) into Today / This week / Next week
+  // / <month>. Buckets appear in first-seen order, which is already chronological.
+  const cap = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+  const bucketOf = (d: Date): { key: string; label: string } => {
+    if (isToday(d)) return { key: 'today', label: t('sessions.today') }
+    const wk = differenceInCalendarWeeks(d, now, { weekStartsOn: 1 })
+    if (wk <= 0) return { key: 'this-week', label: t('sessions.thisWeek') }
+    if (wk === 1) return { key: 'next-week', label: t('sessions.nextWeek') }
+    const fmt = d.getFullYear() === now.getFullYear() ? 'LLLL' : 'LLLL yyyy'
+    return { key: `m-${format(d, 'yyyy-MM')}`, label: cap(format(d, fmt, { locale: dateLocale() })) }
   }
-  const upcomingByDay: { key: string; date: Date; items: SessionWithParticipants[] }[] = []
+  const buckets: { key: string; label: string; items: SessionWithParticipants[] }[] = []
   for (const s of upcoming) {
-    const date = parseRange(s.time_range).start
-    const key = format(date, 'yyyy-MM-dd')
-    const last = upcomingByDay[upcomingByDay.length - 1]
-    if (last && last.key === key) last.items.push(s)
-    else upcomingByDay.push({ key, date, items: [s] })
+    const { key, label } = bucketOf(parseRange(s.time_range).start)
+    const b = buckets.find((x) => x.key === key)
+    if (b) b.items.push(s)
+    else buckets.push({ key, label, items: [s] })
   }
 
   return (
@@ -147,18 +147,12 @@ export default function SessionsPage() {
         />
       ) : (
         <div className="space-y-5">
-          {upcomingByDay.map((g) => (
-            <section key={g.key} className="space-y-2">
-              <h3 className="text-sm font-semibold text-violet-700">{dayLabel(g.date)}</h3>
+          {buckets.map((b) => (
+            <section key={b.key} className="space-y-2">
+              <h3 className="text-sm font-semibold text-violet-700">{b.label}</h3>
               <ul className="space-y-3">
-                {g.items.map((s) => (
-                  <SessionCard
-                    key={s.id}
-                    session={s}
-                    groupId={groupId}
-                    userId={profile!.id}
-                    showDate={false}
-                  />
+                {b.items.map((s) => (
+                  <SessionCard key={s.id} session={s} groupId={groupId} userId={profile!.id} />
                 ))}
               </ul>
             </section>
@@ -208,13 +202,11 @@ function SessionCard({
   groupId,
   userId,
   onArchive,
-  showDate = true,
 }: {
   session: SessionWithParticipants
   groupId: string
   userId: string
   onArchive?: () => void
-  showDate?: boolean
 }) {
   const { t } = useTranslation()
   const r = parseRange(s.time_range)
@@ -225,91 +217,104 @@ function SessionCard({
   const pending = s.session_participants.filter((p) => p.response === 'PENDING')
   const declined = s.session_participants.filter((p) => p.response === 'DECLINED')
 
-  // left accent stripe: cancelled/draft by status, else by my own response
-  const accent =
+  // calendar-style date block, colored like the Upcoming cards: cancelled/draft
+  // by status, otherwise by my own response.
+  const block =
     s.status === 'CANCELLED'
-      ? 'border-l-red-400'
+      ? 'bg-red-500 text-white'
       : s.status === 'DRAFT'
-        ? 'border-l-gray-300'
+        ? 'bg-gray-100 text-gray-600'
         : mine?.response === 'ACCEPTED'
-          ? 'border-l-violet-500'
+          ? 'bg-violet-600 text-white'
           : mine?.response === 'DECLINED'
-            ? 'border-l-red-400'
+            ? 'bg-red-500 text-white'
             : mine
-              ? 'border-l-amber-400' // summoned, pending
-              : 'border-l-gray-200' // not summoned
+              ? 'bg-amber-400 text-amber-950' // summoned, pending
+              : 'bg-gray-100 text-gray-600' // not summoned
 
   return (
     <li>
       <Link
         to={`/g/${groupId}/sessions/${s.id}`}
-        className={`block rounded-xl border border-l-4 p-4 shadow-sm transition hover:shadow ${accent} ${
-          mine ? 'bg-white' : 'bg-gray-50' // muted when I'm not summoned
+        className={`flex overflow-hidden rounded-xl border shadow-sm transition hover:shadow ${
+          mine ? 'bg-white' : 'bg-gray-50'
         } ${onArchive ? 'rounded-b-none' : ''}`}
       >
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="font-medium">
-              {showDate ? `${format(r.start, 'EEEE d MMM · HH:mm', { locale: dateLocale() })}` : format(r.start, 'HH:mm')}
-              –{format(r.end, 'HH:mm')}
-            </p>
-            {s.location && <p className="text-sm text-gray-600">{s.location}</p>}
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            {s.status !== 'CONFIRMED' && (
-              <Badge color={STATUS_COLOR[s.status]}>{t(`sessions.status.${s.status}`)}</Badge>
-            )}
-            {mine && s.status === 'CONFIRMED' && (
-              <Badge
-                color={mine.response === 'ACCEPTED' ? 'violet' : mine.response === 'DECLINED' ? 'red' : 'amber'}
-              >
-                {mine.response === 'ACCEPTED'
-                  ? t('sessions.response.going')
-                  : mine.response === 'DECLINED'
-                    ? t('sessions.response.notGoing')
-                    : t('sessions.response.pendingShort')}
-              </Badge>
-            )}
-          </div>
+        <div className={`flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 ${block}`}>
+          <span className="text-[11px] font-semibold uppercase leading-none">
+            {format(r.start, 'EEE', { locale: dateLocale() })}
+          </span>
+          <span className="text-2xl font-bold leading-none">{format(r.start, 'd')}</span>
+          <span className="text-[11px] uppercase leading-none">
+            {format(r.start, 'MMM', { locale: dateLocale() })}
+          </span>
+          <span className="mt-1 text-xs font-semibold leading-none">{format(r.start, 'HH:mm')}</span>
         </div>
 
-        {/* attendance at a glance: avatars of who's going + per-response counts */}
-        {s.status !== 'CANCELLED' && s.session_participants.length > 0 && (
-          <div className="mt-3 flex items-center gap-3">
-            {going.length > 0 && (
-              <div className="flex -space-x-2">
-                {going.slice(0, 5).map((p) => (
-                  <PersonAvatar key={p.user_id} profile={p.profiles} />
-                ))}
-                {going.length > 5 && (
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-[11px] font-medium text-gray-600 ring-2 ring-white">
-                    +{going.length - 5}
-                  </span>
-                )}
-              </div>
-            )}
-            <div className="flex items-center gap-2.5 text-xs text-gray-600">
-              {going.length > 0 && (
-                <span className="inline-flex items-center gap-1" title={t('sessions.response.going')}>
-                  <span className="h-2 w-2 rounded-full bg-violet-500" />
-                  {going.length}
-                </span>
+        <div className="min-w-0 flex-1 px-3 py-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-medium">
+                {format(r.start, 'HH:mm')}–{format(r.end, 'HH:mm')}
+              </p>
+              {s.location && <p className="truncate text-sm text-gray-600">{s.location}</p>}
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              {s.status !== 'CONFIRMED' && (
+                <Badge color={STATUS_COLOR[s.status]}>{t(`sessions.status.${s.status}`)}</Badge>
               )}
-              {pending.length > 0 && (
-                <span className="inline-flex items-center gap-1" title={t('sessions.response.pendingShort')}>
-                  <span className="h-2 w-2 rounded-full bg-amber-400" />
-                  {pending.length}
-                </span>
-              )}
-              {declined.length > 0 && (
-                <span className="inline-flex items-center gap-1" title={t('sessions.response.notGoing')}>
-                  <span className="h-2 w-2 rounded-full bg-red-400" />
-                  {declined.length}
-                </span>
+              {mine && s.status === 'CONFIRMED' && (
+                <Badge
+                  color={mine.response === 'ACCEPTED' ? 'violet' : mine.response === 'DECLINED' ? 'red' : 'amber'}
+                >
+                  {mine.response === 'ACCEPTED'
+                    ? t('sessions.response.going')
+                    : mine.response === 'DECLINED'
+                      ? t('sessions.response.notGoing')
+                      : t('sessions.response.pendingShort')}
+                </Badge>
               )}
             </div>
           </div>
-        )}
+
+          {/* attendance at a glance: avatars of who's going + per-response counts */}
+          {s.status !== 'CANCELLED' && s.session_participants.length > 0 && (
+            <div className="mt-2 flex items-center gap-3">
+              {going.length > 0 && (
+                <div className="flex -space-x-2">
+                  {going.slice(0, 5).map((p) => (
+                    <PersonAvatar key={p.user_id} profile={p.profiles} />
+                  ))}
+                  {going.length > 5 && (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-[11px] font-medium text-gray-600 ring-2 ring-white">
+                      +{going.length - 5}
+                    </span>
+                  )}
+                </div>
+              )}
+              <div className="flex items-center gap-2.5 text-xs text-gray-600">
+                {going.length > 0 && (
+                  <span className="inline-flex items-center gap-1" title={t('sessions.response.going')}>
+                    <span className="h-2 w-2 rounded-full bg-violet-500" />
+                    {going.length}
+                  </span>
+                )}
+                {pending.length > 0 && (
+                  <span className="inline-flex items-center gap-1" title={t('sessions.response.pendingShort')}>
+                    <span className="h-2 w-2 rounded-full bg-amber-400" />
+                    {pending.length}
+                  </span>
+                )}
+                {declined.length > 0 && (
+                  <span className="inline-flex items-center gap-1" title={t('sessions.response.notGoing')}>
+                    <span className="h-2 w-2 rounded-full bg-red-400" />
+                    {declined.length}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </Link>
       {onArchive && (
         <button
