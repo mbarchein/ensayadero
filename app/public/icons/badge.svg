@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Monochrome status-bar badge (Android uses the alpha channel only and
+       paints it white). White silhouette on a transparent background — never
+       give it a solid/colored fill or it renders as a white square. Source for
+       badge-96.png; keep them in sync. -->
+  <rect x="10" y="13" width="44" height="4" rx="2" fill="#fff"/>
+  <path d="M11 15 H53 V24
+           Q49.5 31 46 24 Q42.5 31 39 24 Q35.5 31 32 24
+           Q28.5 31 25 24 Q21.5 31 18 24 Q14.5 31 11 24 Z"
+        fill="#fff"/>
+  <circle cx="20" cy="44" r="5" fill="#fff"/>
+  <circle cx="32" cy="44" r="6" fill="#fff"/>
+  <circle cx="44" cy="44" r="5" fill="#fff"/>
+</svg>
