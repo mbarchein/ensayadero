@@ -44,13 +44,17 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
 - 🟡 FR18. Configurable reminders: `generate_reminders` job (24h) created; 2h
   window and antecedence preference not exposed in UI.
 - 🟡 FR19. Per-channel preferences: `notification_preferences` table + logic in
-  the Edge Function; preferences UI pending (⬜).
+  the Edge Function. The profile page exposes **per-event email opt-outs**;
+  reminder emails are opt-in for new accounts. Finer per-channel UI still partial.
 - ✅ FR20. The director sees response status (pending/going/not going) and an
   aggregate tally; on the Upcoming card the tally opens a "Convocados" modal with
-  the full attendee list (sorted by response then name).
+  the full attendee list (sorted by response then name). "Remind pending" queues a
+  NUDGE to non-responders (full-width button + confirm modal).
 
 ### Non-functional
-- ✅ NFR1. Installable PWA (manifest, SW, precache, push).
+- ✅ NFR1. Installable PWA (manifest, SW, precache, push). In-app install banner +
+  button (captured `beforeinstallprompt`), iOS standalone metas, SW auto-update on
+  window focus, stable shell height so the bottom nav survives auto-reload.
 - ✅ NFR2. Mobile-first (bottom nav, touch gestures, 44px targets).
 - ✅ NFR3. i18n (es default, en).
 - ✅ NFR4. Time zones: stored in UTC (`tstzrange`), shown in local time.
@@ -82,3 +86,20 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
   captcha.
 - ✅ FR35. Leave group is a destructive, irreversible action ("Salir del grupo",
   red styling) requiring the user to type "SALIR" to confirm.
+- ✅ FR36. First-login onboarding wizard (`/welcome`): name, pronoun, email
+  preferences, availability pitch, optional PWA install; gated by
+  `profiles.onboarded_at` and run once for every existing user.
+- ✅ FR37. Cross-device "what's new" callouts (`profiles.seen_features` +
+  `mark_feature_seen`), reinstall-proof, announcing new features after onboarding.
+- ✅ FR38. Personal profile photo (gallery or camera, round crop → data URL in
+  `profiles.avatar_url`), with initials-avatar fallback and a remove action.
+- ✅ FR39. Notification inbox management: swipe-to-archive, mark-all-read /
+  archive-all, archived toggle; calm empty state with a random theatre fragment.
+- ✅ FR40. Member lifecycle notifications: MEMBER_JOINED (to every other member,
+  with one-tap bulk summon of the newcomer to upcoming sessions) and
+  MEMBER_PROMOTED (on promotion to director).
+- ✅ FR41. Per-invitation email delivery state (sent-on / never-sent), with
+  resend and delete of pending invitations.
+- ✅ FR42. Session form as routed create/edit pages with start + end time inputs
+  (no duration chips); the group/upcoming lists bucket by day and offer a
+  swipeable month-calendar view; add-to-calendar `.ics` export from the detail.

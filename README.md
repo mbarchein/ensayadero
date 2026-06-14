@@ -8,7 +8,8 @@ sessions with required/optional participants. Push + email notifications.
 
 | Piece | Service | Tier |
 |-------|---------|------|
-| Frontend PWA | Cloudflare Pages | free |
+| Frontend PWA | Vercel | free (Hobby) |
+| DNS | Cloudflare | free (the domain lives in a CF zone) |
 | DB + Auth + API + RLS | Supabase | free |
 | Scheduled jobs | pg_cron + Edge Functions | free |
 | Email | Resend | free (3k/month) |
@@ -39,7 +40,7 @@ Key design decisions:
 ```
 app/        React + Vite + PWA frontend (vite-plugin-pwa)
 supabase/   SQL migrations (schema + RLS), Edge Functions, seed
-infra/      Terraform: Supabase, Cloudflare Pages + DNS, GitHub secrets
+infra/      Terraform: Supabase, Vercel hosting, Cloudflare DNS/Turnstile, GitHub secrets
 ```
 
 ## Local development setup
@@ -79,31 +80,43 @@ terraform init && terraform apply
    Then **Audience → Publish app → In production** (else login is limited to test users).
 2. **Meta/Facebook OAuth** (optional, Instagram login path) — create a Meta app, add
    Facebook Login, set the same redirect URI, copy App ID/Secret to tfvars. See BOOTSTRAP.
-3. **Tokens** — Supabase access token; Cloudflare API token (Pages:Edit, DNS:Edit,
-   Zone:Read, Turnstile:Edit, Single Redirect:Edit); GitHub token (classic `repo`
+3. **Tokens** — Supabase access token; Vercel API token + team/org id (frontend
+   hosting); Cloudflare API token (DNS:Edit, Zone:Read, Turnstile:Edit, Single
+   Redirect:Edit — **no** Pages scope anymore); GitHub token (classic `repo`
    or fine-grained with Secrets+Variables read/write) → tfvars.
 4. **Resend** — add the domain in the dashboard, copy the DNS records to
    `resend_dkim_records`, re-apply, verify. Create an API key → tfvars.
 5. **VAPID keys** — `npx web-push generate-vapid-keys`; public to the
-   `VITE_VAPID_PUBLIC_KEY` variable (GitHub vars), private to Edge Functions secrets:
-   `supabase secrets set VAPID_PRIVATE_KEY=...`
-6. **Superadmin** — after the first login, in the SQL editor:
+   `VITE_VAPID_PUBLIC_KEY` variable (GitHub vars) **and** as the
+   `VAPID_PUBLIC_KEY` Edge Function secret; private + subject to Edge Functions
+   secrets: `supabase secrets set VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:...`
+6. **`APP_URL` Edge secret** — `supabase secrets set APP_URL=https://app.yourdomain.es`
+   so notification emails and push deep-links point at the live app.
+7. **Vercel project** — after the first `terraform apply`, in the Vercel
+   dashboard disable Deployment Protection for production (else a login
+   interstitial breaks the service worker / manifest).
+8. **Superadmin** — after the first login, in the SQL editor:
    `update profiles set platform_role='SUPERADMIN' where email='...';`
 
-Terraform also provisions a Cloudflare Turnstile widget (when `turnstile_enabled`),
-an apex→app 301 redirect (Cloudflare Single Redirect ruleset), and all GitHub
-Actions secrets **and** variables (including `VITE_SUPABASE_ANON_KEY`,
-`VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`,
-`VITE_SUPABASE_URL`, `VITE_APP_URL` and `CLOUDFLARE_PROJECT_NAME`). The Turnstile
-site/secret keys are derived from the widget (TF outputs `turnstile_site_key` and
-`turnstile_secret_key`), not entered by hand. The `turnstile_secret_key` output is
-also used to set the `legal-info` function's `TURNSTILE_SECRET_KEY` secret.
+Terraform also provisions the Vercel project + custom domain, the Cloudflare DNS
+records (app CNAME → Vercel edge as **DNS-only**, the `_vercel` ownership TXT, and
+the Resend records), a Cloudflare Turnstile widget (when `turnstile_enabled`), an
+apex→app 301 redirect (Cloudflare Single Redirect ruleset), and all GitHub Actions
+secrets **and** variables (including `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
+`VERCEL_PROJECT_ID`, `VITE_SUPABASE_ANON_KEY`, `VITE_VAPID_PUBLIC_KEY`,
+`VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`, `VITE_SUPABASE_URL` and
+`VITE_APP_URL`). The Turnstile site/secret keys are derived from the widget (TF
+outputs `turnstile_site_key` and `turnstile_secret_key`), not entered by hand. The
+`turnstile_secret_key` output is also used to set the `legal-info` function's
+`TURNSTILE_SECRET_KEY` secret. CI no longer touches Cloudflare (DNS/Turnstile are
+Terraform-only).
 
 ## Deploy
 
 Push to `main` → GitHub Actions (`paths-ignore` skips docs/infra/docker-only
-changes): tests → migrations + Edge Functions (Supabase CLI) → build → Cloudflare
-Pages (wrangler, project name from the `CLOUDFLARE_PROJECT_NAME` variable).
+changes): tests → migrations + Edge Functions (Supabase CLI) → build + deploy to
+Vercel (`vercel pull/build/deploy --prebuilt --prod`; the `VITE_*` vars are baked
+in at build time, so the Vercel project itself stores no env).
 
 ## Free tier limitations (assumed)
 

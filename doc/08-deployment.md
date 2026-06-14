@@ -2,8 +2,9 @@
 
 Two supported paths. Pick one; both are fully documented in the repo root:
 
-- **Managed (free tier)** — Supabase cloud + Cloudflare Pages, provisioned with
-  Terraform (`infra/`). Manual steps in **`BOOTSTRAP.md`**. Detailed below.
+- **Managed (free tier)** — Supabase cloud + Vercel (frontend) + Cloudflare
+  (DNS/Turnstile), provisioned with Terraform (`infra/`). Manual steps in
+  **`BOOTSTRAP.md`**. Detailed below.
 - **Self-hosted on Docker Swarm** — the whole backend (Postgres, GoTrue,
   PostgREST, Realtime, Deno edge function, nginx gateway) and the built PWA via
   `docker-stack.yml` + `docker/*.Dockerfile`. See **`DEPLOY.md`**.
@@ -23,7 +24,8 @@ and `app/Dockerfile`. Full instructions: `DEPLOY.md`.
 
 | Piece | Service | Plan |
 |-------|---------|------|
-| Frontend PWA | Cloudflare Pages | free |
+| Frontend PWA | Vercel | free (Hobby) |
+| DNS + CAPTCHA | Cloudflare | free |
 | DB + Auth + API + RLS + Edge | Supabase | free |
 | Scheduled jobs | pg_cron + Edge Function | free |
 | Email | Resend | free (3k/mo) |
@@ -44,20 +46,29 @@ Provisions:
   branded bilingual email templates: subjects via `mailer_subjects_*` and the
   `docker/mail-templates/*.html` files inlined via `mailer_templates_*_content`
   (language selected per user from `user_metadata.lang`).
-- Cloudflare `pages_project` + custom domain + DNS (app CNAME + Resend records),
-  an apex→app **301 redirect** (Single Redirect ruleset), and (optional) a
+- `vercel_project` (framework `vite`, `root_directory = app`, deployment
+  protection pinned **off** so no interstitial blocks the PWA) + custom domain
+  (`vercel_project_domain`).
+- Cloudflare DNS: the app host as a **DNS-only** CNAME to Vercel's edge
+  (`vercel_cname_target`; proxying would stack two CDNs and break Vercel's cert),
+  the `_vercel` ownership TXT (`vercel_domain_verification`, quoted for the v5
+  provider), the Resend records (TXT quoted, MX/CNAME not), and an apex→app **301
+  redirect** (Single Redirect ruleset). No more `pages_project`. Optional
   **Turnstile widget** whose sitekey/secret are derived.
-- **All** GitHub Actions secrets **and** variables: tokens, `SUPABASE_PROJECT_REF`,
+- **All** GitHub Actions secrets **and** variables: tokens (incl. `VERCEL_TOKEN`,
+  `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`), `SUPABASE_PROJECT_REF`,
   `VITE_SUPABASE_URL`, `VITE_APP_URL`, `VITE_SUPABASE_ANON_KEY`,
-  `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`,
-  `CLOUDFLARE_PROJECT_NAME`.
-- TF outputs include `turnstile_site_key` and the sensitive
+  `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`.
+  Cloudflare creds are deliberately **not** in CI (DNS/Turnstile are
+  Terraform-only).
+- TF outputs include `vercel_project_id`, `turnstile_site_key` and the sensitive
   `turnstile_secret_key` (used to set the `legal-info` function's
   `TURNSTILE_SECRET_KEY` secret).
 
-The Cloudflare API token needs Pages:Edit, DNS:Edit, Zone:Read plus
-**Turnstile:Edit** and **Single Redirect:Edit** (Zone); the GitHub token needs
-classic `repo` (or fine-grained Secrets+Variables read/write).
+The Cloudflare API token needs DNS:Edit, Zone:Read plus **Turnstile:Edit** and
+**Single Redirect:Edit** (Zone) — **no** Pages scope. The Vercel token is
+team-scoped. The GitHub token needs classic `repo` (or fine-grained
+Secrets+Variables read/write).
 
 Local state by default; can be moved to HCP Terraform (commented in
 `versions.tf`).
@@ -67,8 +78,10 @@ Local state by default; can be moved to HCP Terraform (commented in
 On push to `main` (`paths-ignore` skips docs / `infra/` / Docker-only changes):
 1. **test** — typecheck + vitest.
 2. **migrate** — `supabase link` + `supabase db push` + Edge Functions deploy.
-3. **deploy-frontend** — `npm run build` + `wrangler pages deploy` to Cloudflare
-   (project name from the `CLOUDFLARE_PROJECT_NAME` variable).
+3. **deploy-frontend** — `vercel pull` + `vercel build --prod` +
+   `vercel deploy --prebuilt --prod` (token/org/project from the `VERCEL_*`
+   secrets). The `VITE_*` build vars are baked in at `vercel build` time, so the
+   Vercel project stores no env of its own.
 
 Runs on Node 22; actions bumped off Node 20 (`actions/checkout@v5`,
 `actions/setup-node@v5`, `supabase/setup-cli@v2`).
@@ -77,22 +90,29 @@ Runs on Node 22; actions bumped off Node 20 (`actions/checkout@v5`,
 
 Not automatable by Terraform:
 1. Domain on Cloudflare (nameservers).
-2. Tokens → `terraform.tfvars` (Supabase, Cloudflare, GitHub).
+2. Tokens → `terraform.tfvars` (Supabase, **Vercel** token + org id, Cloudflare,
+   GitHub).
 3. **OAuth clients**: Google (Console) and Meta/Facebook (Meta for Developers),
    each with redirect URI `https://<ref>.supabase.co/auth/v1/callback`. Email +
    password (with activation and recovery) needs no external client.
 4. **Resend**: add domain, copy DNS records to `resend_dkim_records`, verify,
    create API key; `supabase secrets set RESEND_API_KEY/EMAIL_FROM`.
 5. **VAPID**: `npx web-push generate-vapid-keys`; public in GH var
-   `VITE_VAPID_PUBLIC_KEY`, private in Edge Functions secrets.
-6. `VITE_SUPABASE_ANON_KEY` in GitHub variables.
-7. Push to `main` → deploy.
-8. **Superadmin**: after your own login, `update profiles set
+   `VITE_VAPID_PUBLIC_KEY` **and** as the `VAPID_PUBLIC_KEY` Edge secret, private
+   + `VAPID_SUBJECT` in Edge Functions secrets.
+6. **`APP_URL` Edge secret**: `supabase secrets set APP_URL=https://app.<domain>`
+   so email/push deep-links resolve to the live app.
+7. **Vercel**: after the first apply, disable Deployment Protection for
+   production (else its login interstitial breaks the service worker / manifest);
+   set `vercel_domain_verification` from the `_vercel` TXT shown under
+   Project → Domains.
+8. Push to `main` → deploy.
+9. **Superadmin**: after your own login, `update profiles set
    platform_role='SUPERADMIN' where email='…'`.
-9. **Delivery cron**: created by Terraform (`infra/cron.tf`) with drift
-   detection on every plan — `cron.schedule('process-notifications',
-   '* * * * *', …)` with `net.http_post` to the Edge Function (BOOTSTRAP §11).
-10. **legal-info secrets**: set the function's secrets (`LEGAL_ENTITY`,
+10. **Delivery cron**: created by Terraform (`infra/cron.tf`) with drift
+    detection on every plan — `cron.schedule('process-notifications',
+    '* * * * *', …)` with `net.http_post` to the Edge Function (BOOTSTRAP §11).
+11. **legal-info secrets**: set the function's secrets (`LEGAL_ENTITY`,
     `LEGAL_TAX_ID`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `CONTACT_EMAIL`, and
     `TURNSTILE_SECRET_KEY` from the `turnstile_secret_key` TF output).
 
@@ -101,8 +121,9 @@ Not automatable by Terraform:
   keeps it alive.
 - DB 500 MB; 50k auth MAU; 500k Edge Function invocations/mo — plenty for theatre
   groups.
-- Vercel discarded (Hobby forbids commercial use and limits crons) → Cloudflare
-  Pages.
+- Frontend on **Vercel Hobby**: static hosting only (no server functions, no
+  Vercel crons — all scheduling stays in Supabase pg_cron), so it stays within
+  the free tier. DNS and Turnstile remain on Cloudflare.
 
 ## Auth providers
 Implemented: **Google**, **Meta/Facebook** (the supported route for "Instagram"

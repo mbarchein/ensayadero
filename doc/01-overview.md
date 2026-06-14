@@ -42,6 +42,9 @@ have several directors.
 1. **Sign-up**: open registration (revised D5'). Anyone signs up with Google,
    Meta/Facebook, or email + password (with email activation); or arrives via an
    invitation link/code to a group.
+1b. **Onboarding**: first login opens the `/welcome` wizard (name, pronoun, email
+   preferences, availability pitch, optional PWA install) until
+   `profiles.onboarded_at` is set; every existing user runs it once.
 2. **Create group**: any user creates a group and becomes its director.
 3. **Invite**: the director shares a code/link/QR or invites by email (bulk).
 4. **Availability**: each member paints their weekly availability (autosave).
@@ -64,16 +67,20 @@ have several directors.
 | `/login`, `/auth/callback` | Sign in (Google, Meta/Facebook when configured, email+password); footer links to the legal policies |
 | `/signup` | Create account (email + password, email activation) |
 | `/forgot-password`, `/reset-password` | Password recovery |
+| `/welcome` | First-login onboarding wizard (gated by `profiles.onboarded_at`) |
 | `/goodbye` | Confirmation after self-deleting the account |
 | `/privacy`, `/legal`, `/cookies` | Public legal pages (privacy / aviso legal LSSI-CE / cookies) |
-| `/` | Home: my groups (avatar+role), pending, create/join group |
+| `/` | Home: my groups (avatar+role), pending, create/join group, install + "what's new" callouts |
 | `/availability` | My schedule: availability calendar + overlaid rehearsals |
-| `/upcoming` | Upcoming rehearsals (all groups) + confirmation |
-| `/notifications` | Alerts |
-| `/profile` | Profile: name, phone, pronoun, push, delete account |
+| `/upcoming` | Upcoming rehearsals (all groups) + confirmation; list or month-calendar view |
+| `/notifications` | Alerts (swipe-to-archive, mark/archive-all, archived toggle) |
+| `/profile` | Profile: name, phone, pronoun, photo, email opt-outs, device push, install, delete account |
 | `/join`, `/join/:code` | Join a group by code |
-| `/g/:groupId` | Group: rehearsal list + nav buttons |
+| `/s/:code` | Short share link → resolves to a session |
+| `/g/:groupId` | Group: rehearsal list (buckets / month view) + nav buttons |
 | `/g/:groupId/planner` | Heatmap and scheduling (director) |
+| `/g/:groupId/sessions/new`, `/g/:groupId/sessions/:id/edit` | Create / edit a session (routed pages, director) |
 | `/g/:groupId/members` | Members + invitation panel (director) |
+| `/g/:groupId/members/:memberId/sessions` | Summon a member to upcoming sessions (director) |
 | `/g/:groupId/sessions/:id` | Session detail |
-| `/admin` | Superadmin panel (structure) |
+| `/admin` | Superadmin panel (structure, newest users first) |

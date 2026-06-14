@@ -51,9 +51,10 @@ key is configured). Account self-deletion via `delete_my_account` (GDPR).
 
 ### D-stack — Two deployment paths
 Two supported paths (see `08-deployment.md`):
-- **Managed (free tier)**: Supabase (DB+Auth+RLS+Edge) + Cloudflare Pages +
-  Resend + Web Push, provisioned by Terraform in `infra/` (`BOOTSTRAP.md`). ~€0
-  cost; free-tier limits assumed (pause on inactivity, 500MB).
+- **Managed (free tier)**: Supabase (DB+Auth+RLS+Edge) + Vercel (frontend) +
+  Cloudflare (DNS/Turnstile) + Resend + Web Push, provisioned by Terraform in
+  `infra/` (`BOOTSTRAP.md`). ~€0 cost; free-tier limits assumed (pause on
+  inactivity, 500MB).
 - **Self-hosted on Docker Swarm**: the whole backend (Postgres, GoTrue,
   PostgREST, Realtime, Deno edge function, nginx gateway) plus the built PWA via
   `docker-stack.yml` + `docker/*.Dockerfile` (`DEPLOY.md`).
@@ -62,19 +63,34 @@ Two supported paths (see `08-deployment.md`):
 `infra/` provisions everything reproducible: the Supabase project and
 `supabase_settings` (auth — SMTP via Resend with `smtp_port` as a string,
 `uri_allow_list` redirect allow-list, `rate_limit_verify`, optional Turnstile
-captcha), Cloudflare Pages project + custom domain + DNS, an apex→app **301
-redirect** (Cloudflare Single Redirect ruleset, `http_request_dynamic_redirect`),
-and an optional **Turnstile widget** (`cloudflare_turnstile_widget`) whose
-sitekey/secret are **derived** (no manual keys; TF outputs `turnstile_site_key`
-and the sensitive `turnstile_secret_key`). It also creates **all** GitHub Actions
-secrets **and** variables, including `VITE_SUPABASE_ANON_KEY` (from the
-`supabase_apikeys` data source), `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`,
-`VITE_FACEBOOK_ENABLED`, `VITE_SUPABASE_URL`, `VITE_APP_URL` and
-`CLOUDFLARE_PROJECT_NAME`. The Cloudflare API token needs Pages/DNS/Zone plus
-**Turnstile:Edit** and **Single Redirect:Edit** (Zone); the GitHub token needs
+captcha), the **Vercel** project + custom domain (`vercel_project`,
+`vercel_project_domain`; deployment protection pinned off), the Cloudflare DNS
+zone records (app **DNS-only** CNAME to Vercel's edge, the `_vercel` ownership
+TXT, the Resend records) and an apex→app **301 redirect** (Cloudflare Single
+Redirect ruleset, `http_request_dynamic_redirect`), plus an optional **Turnstile
+widget** (`cloudflare_turnstile_widget`) whose sitekey/secret are **derived** (no
+manual keys; TF outputs `turnstile_site_key` and the sensitive
+`turnstile_secret_key`). It also creates **all** GitHub Actions secrets **and**
+variables, including `VERCEL_TOKEN`/`VERCEL_ORG_ID`/`VERCEL_PROJECT_ID`,
+`VITE_SUPABASE_ANON_KEY` (from the `supabase_apikeys` data source),
+`VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY`, `VITE_FACEBOOK_ENABLED`,
+`VITE_SUPABASE_URL` and `VITE_APP_URL`. The Cloudflare API token needs DNS/Zone
+plus **Turnstile:Edit** and **Single Redirect:Edit** (no Pages scope — CI never
+touches Cloudflare); the Vercel token is team-scoped; the GitHub token needs
 classic `repo` or fine-grained Secrets+Variables read/write. Non-automatable steps
-(OAuth clients, tokens, Resend domain, VAPID, `legal-info` secrets) in
-`BOOTSTRAP.md`.
+(OAuth clients, tokens, Resend domain, VAPID, `APP_URL`/`legal-info` secrets,
+Vercel protection-off) in `BOOTSTRAP.md`.
+
+### D-vercel — Frontend on Vercel, DNS stays on Cloudflare
+The frontend moved from **Cloudflare Pages to Vercel** (static Vite build shipped
+by CI with `vercel build` + `vercel deploy --prebuilt`). Cloudflare keeps the DNS
+zone and Turnstile; the app host is a **DNS-only** CNAME to Vercel's edge so
+Vercel terminates TLS (proxying it would stack two CDNs and break cert issuance).
+Vercel Deployment Protection is pinned **off** for production — its login
+interstitial would break the service worker and manifest fetches of a public PWA.
+On Hobby only static hosting is used (no server functions, no Vercel crons; all
+scheduling stays in Supabase pg_cron), keeping it free. (This reverses the earlier
+"Vercel discarded → Cloudflare Pages" note.)
 
 ### D-rls — Direct-to-Supabase with RLS as the trust boundary
 The frontend talks to Supabase directly with the **public anon key**; all
@@ -134,10 +150,25 @@ earlier focus-refetch-only approach.
 | D-promote-icons | Role change button with icon: `UserCog` (make director), `UserMinus` (make actor). |
 | D-agenda-views | The week grid (`WeekGrid`/`AvailabilityPage`) is **read-only** (scroll only). The day header is a **carousel of day-buttons**: tap a day to open an editable single-day view; a corner button returns to the week; horizontal swipe on the header changes week (replacing the old prev/next selector). Editing availability happens **only** in day view. Rehearsal cells in week view show the group avatar. Day hour range is **09:00–22:00** (`SLOTS_PER_DAY=26`, derived from `DAY_START_HOUR`/`DAY_END_HOUR`/`SLOT_MINUTES`). |
 | D-attendance-collapse | Once a user answers, the Going/Can't-make-it buttons collapse to a "Voy/No voy" badge + a "Change" button (session detail and the agenda `ParticipationCard`). |
-| D-upcoming-card | Upcoming card leads with group avatar+name, then title, then time; shows a going/declined/pending tally that opens a "Convocados" modal (full list, sorted by response then name); border green (attending) / red (declined). |
+| D-upcoming-card | Upcoming card leads with group avatar+name, then time (sessions have no title); shows a going/declined/pending tally that opens a "Convocados" modal (full list, sorted by response then name); border green (attending) / red (declined). |
 | D-cancel-modal | Cancelling a rehearsal uses the in-app modal, not native `confirm()`. |
 | D-facebook-gate | The Facebook/Meta login button is hidden unless configured (`VITE_FACEBOOK_ENABLED`, set by Terraform from `facebook_oauth_client_id`). |
 | D-leave-confirm | Leave group relabeled "Salir del grupo" (WhatsApp-style `LogOut` icon), red/danger styling, bold irreversible warning, requires typing "SALIR" to confirm. |
+| D-session-pages | The create/edit session form is no longer a modal: it's its own routed pages (`/g/:gid/planner/new`, `…/sessions/:id/edit`) backed by a shared `SessionForm` + `useSessionGrid`. Time is set by **start + end time inputs** (end-time replaced the duration chips); arrows carry the hour when stepping. Creating returns to the group view. |
+| D-sessions-list | The group/upcoming session lists bucket by **Today / Tomorrow / This week / Next week / Month** with a calendar date block and an attendance dots+counts glance (`SessionCard`). A list/month **`ViewToggle`** switches to a swipeable **`MonthCalendar`** (3-panel carousel, sliding month label, past-day shading, weekday header, tap-on-pointerup to avoid the swipe race). |
+| D-session-detail | Session detail: plain-text location (no maps link), the date card opens the agenda and flashes the rehearsal, attendee responses as colored dots + per-list tally, and "Recordar a pendientes" is a full-width button with a confirm modal listing the pending participants (calls `nudge_pending_participants`). Add-to-calendar via an `.ics` export (`lib/ics.ts`). |
+| D-onboarding | First-login `/welcome` wizard (name, pronoun, email preferences, availability pitch, PWA install step) gated by `profiles.onboarded_at`; rolled out to **every** existing user once (doubles as the announcement of the new settings). |
+| D-whatsnew | Cross-device "what's new" callouts (`FeatureCallout`) driven by `profiles.seen_features` + `mark_feature_seen`, decoupled from onboarding and reinstall-proof (unlike the localStorage `Tip`). Used to announce push, the PWA install entry and the profile photo. |
+| D-reminder-optin | Reminder **emails** are opt-in for new accounts (signup seeds a `REMINDER`/`PUSH` preference); in-app/device alerts unaffected. The profile page exposes per-event email opt-outs. |
+| D-member-events | New notification types: `MEMBER_JOINED` (every other member when someone joins — instructors can bulk-summon the newcomer to upcoming sessions via `add_member_to_future_sessions`), `MEMBER_PROMOTED` (when made director), and `NUDGE` (remind-pending). |
+| D-profile-photo | Users set a personal photo (gallery or camera, round crop → data URL in `profiles.avatar_url`); the identity card avatar carries a pencil edit badge opening a modal with the large avatar + change/camera/remove. Falls back to an initials avatar. |
+| D-pwa-install | In-app install: an `InstallBanner`/button (captured `beforeinstallprompt`), a dedicated wizard install step and a profile install section; iOS standalone metas; the SW auto-updates on window focus; a stable shell height keeps the bottom nav from vanishing on auto-reload. |
+| D-push-toggle | Web Push can be enabled **and** disabled per device from the profile; the device-alerts section hides until VAPID is configured. Push notifications deep-link to the rehearsal / group members / group home by type. |
+| D-notif-archive | Notifications are archived by **swiping right** (hover icon on desktop), with mark-all-read / archive-all header actions and an archived-toggle; the calm empty state shows a random theatre fragment. Archived rows stay in the table (`archived_at`). |
+| D-group-image-input | The group image upload accepts gallery **or** camera on touch devices and **drag & drop** on the card; avatar/photo changes autosave. |
+| D-invite-delivery | Pending invitations show their per-invite email delivery state (`email_sent_at` / `email_send_error`) and can be **resent or deleted** from the members page. |
+| D-auth-affordances | Login/signup gained a password visibility toggle and clearer, localized rejection reasons. |
+| D-admin-recent | The superadmin user list shows newest users first, with their join date. |
 
 ## Relevant modeling decisions
 - Time ranges as `tstzrange` + GiST indexes; overlaps with `&&`.

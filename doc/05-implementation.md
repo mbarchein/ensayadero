@@ -4,24 +4,29 @@
 
 ```
 auth/          AuthContext (session + profile + refreshProfile), LoginPage
-               (Google/Facebook/password + legal-policy footer links),
+               (Google/Facebook/password, visibility toggle, legal footer links),
                SignupPage, ForgotPasswordPage, ResetPasswordPage, GoodbyePage,
                AuthCallback, Turnstile, LegalDoc (privacy/legal/cookies pages)
-components/    Layout (bottom nav), ui.tsx (Button/Badge/Modal/Spinner/EmptyState/
-               BackButton/useBackClose)
+components/    Layout (bottom nav + active-tab indicator), Tip (first-visit hint),
+               ui.tsx (Button/Badge/Modal[body portal]/Spinner/EmptyState/
+               BackButton/InitialsAvatar/useBackClose)
 features/
   groups/      HomePage, NewGroupPage, EditGroupPage, AvatarPicker, JoinPage,
-               MembersPage, InvitePanel,
+               MembersPage, InvitePanel, ConvokeMemberPage (bulk summon),
                GroupAvatar, useGroup
   availability/ AvailabilityPage, WeekGrid (generic paintable grid)
-  planner/     PlannerPage (heatmap), CreateSessionModal (full-page session
-               form: create/edit/cancel)
-  sessions/    SessionsPage (list + nav), SessionDetailPage
+  planner/     PlannerPage (heatmap), NewSessionPage, EditSessionPage,
+               SessionForm (shared create/edit form), useSessionGrid
+  sessions/    SessionsPage (buckets + view toggle), SessionCard, MonthCalendar,
+               ViewToggle, SessionDetailPage, ShortLinkPage
   agenda/      UpcomingPage, ParticipationCard, useMyAgenda
   notifications/ NotificationsPage
-  profile/     ProfilePage
+  onboarding/  WelcomePage (first-login wizard)
+  pwa/         InstallBanner, installPrompt (beforeinstallprompt capture)
+  whatsnew/    FeatureCallout (seen_features-driven "what's new")
+  profile/     ProfilePage, AvatarEditor
   admin/       AdminPage (superadmin)
-lib/           supabase, types, ranges, slots, push, roleLabel, dateLocale,
+lib/           supabase, types, ranges, slots, push, ics, roleLabel, dateLocale,
                plays, useRealtime (live updates → react-query invalidation)
 i18n/          index.ts + es.json/en.json
 sw.ts          service worker (precache + runtime cache + Web Push)
@@ -36,9 +41,10 @@ react-query also refetches on window focus and after your own mutations.
 ## Auth (`auth/`)
 - `LoginPage`: Google + (when configured) Meta/Facebook OAuth buttons
   (`signInWithOAuth`, Facebook gated on `VITE_FACEBOOK_ENABLED`) and an
-  email+password form (`signInWithPassword`); friendly localized errors for
-  invalid credentials / email-not-confirmed / rate limit. Footer links to the
-  privacy / legal / cookie policies (middle-dot separated).
+  email+password form (`signInWithPassword`) with a password **visibility
+  toggle**; friendly localized errors for invalid credentials /
+  email-not-confirmed / rate limit. Footer links to the privacy / legal / cookie
+  policies (middle-dot separated).
 - `SignupPage`: open sign-up (`signUp`) with email activation; shows a
   "check your email" screen.
 - `ForgotPasswordPage` / `ResetPasswordPage`: recovery. Forgot is
@@ -104,7 +110,7 @@ because the `pointermove` handler runs synchronously after `pointerdown` and a
   the rehearsal details and options (only the selected part / the whole slot),
   each option showing its start–end time. The warning runs on gesture end.
 
-### Planner (`PlannerPage` + `CreateSessionModal`)
+### Planner (`PlannerPage`, `SessionForm`, `NewSessionPage`/`EditSessionPage`)
 - Weekly heatmap with people-selection chips; intensity by % available; border
   if 100% of required. Rehearsal cells are enclosed boxes (violet=scheduled,
   amber=draft; first slot shows the start time); tapping one in week view opens
@@ -112,80 +118,133 @@ because the `pointermove` handler runs synchronously after `pointerdown` and a
   fetched over a 3-week window).
 - Dragging selects consecutive slots; the detail shows chips of
   available/busy/unavailable (own chip highlighted "(tú)").
-- `CreateSessionModal` (a full page, not a modal) creates or edits. Sessions
-  have **no title** — they are identified by group + date/time everywhere
-  (cards, notifications, email subjects, share text). Fields: comments,
-  location, start time + duration (derived from the drag), required/optional
-  participants; red/amber warnings if outside availability; reconciles
-  participants (add/remove/upsert) on edit; cancel (confirmed→CANCELLED with
-  notification, draft→delete).
-- Overlay of the week's sessions in the grid + editable list. Edit button only
-  for the creator or the director. Opening via `?d=&edit=<id>` link.
+- Session creation/editing are **routed pages** (`/g/:gid/sessions/new`,
+  `…/sessions/:id/edit`), not a modal: `NewSessionPage`/`EditSessionPage` wrap a
+  shared `SessionForm` over `useSessionGrid`. Sessions have **no title** — they
+  are identified by group + date/time everywhere (cards, notifications, email
+  subjects, share text). Fields: comments, location, **start + end time inputs**
+  (end-time replaced the duration chips; arrows carry the hour when stepping),
+  required/optional participants; red/amber warnings if outside availability;
+  reconciles participants (add/remove/upsert) on edit; cancel (confirmed→CANCELLED
+  with notification, draft→delete). Creating returns to the group view.
+- Overlay of the week's sessions in the grid + editable list. Edit only for the
+  creator or the director. The planner deep-links to the edit page (`?edit=<id>`
+  consumed on open so back returns correctly).
 
-### Group view (`SessionsPage`)
+### Group view (`SessionsPage`, `SessionCard`, `MonthCalendar`, `ViewToggle`)
 Header (back + avatar + name). Equal-width action **buttons** ("Programar"
-director, "Miembros", "Editar" director), not tabs. Cards show date/time as the
-primary line (sessions have no title); rehearsals where I'm not summoned get a
-muted background. "Ensayos" title above the upcoming
-list; collapsible past/cancelled with a per-card archive button.
+director, "Miembros", "Editar" director), not tabs. A list/month **`ViewToggle`**
+switches between:
+- **List** — sessions bucketed by **Today / Tomorrow / This week / Next week /
+  Month**, each `SessionCard` showing a calendar date block and an attendance
+  dots+counts glance; rehearsals where I'm not summoned get a muted background.
+- **Month** — `MonthCalendar`, a 3-panel swipe carousel (strip width 300%,
+  translateX center, imperative drag, snap on release, `useLayoutEffect` recenter,
+  keyed panels to avoid swap flicker). Sliding month/year label, past-day shading,
+  weekday header, selection cleared on month change, tap detected on `pointerup`
+  via `elementFromPoint`+`data-date` to avoid the swipe race. Reused in "Upcoming".
+
+Collapsible past/cancelled with a per-card archive button.
 
 ### Agenda (`useMyAgenda`, `UpcomingPage`, `ParticipationCard`)
 - `useMyAgenda`: my participations (non-cancelled, non-archived) with all
   participants for the tally; `respond` mutation. `tallyResponses` counts
   going/not-going/pending and total.
-- Upcoming: ordered future list; cards lead with group avatar+name, then
-  time (with a small "view in my agenda" icon button); border green (attending) /
-  red (declined). A right-floating block on the group-name line holds the
-  "Voy/No voy" badge with the summoned count below (opens the "Convocados" modal
-  — full list, "Yo" highlighted and always first). Pending rehearsals keep inline
-  accept/decline buttons; responses are otherwise changed from the detail. The
-  whole card opens the session detail.
+- Upcoming: list (bucketed by week) **or** the shared month-calendar view
+  (`ViewToggle`); cards lead with group avatar+name, then time (with a small
+  "view in my agenda" icon button); border green (attending) / red (declined). A
+  right-floating block on the group-name line holds the "Voy/No voy" badge with
+  the summoned count below (opens the "Convocados" modal — full list, "Yo"
+  highlighted and always first). Pending rehearsals keep inline accept/decline
+  buttons; responses are otherwise changed from the detail. The whole card opens
+  the session detail.
 
 ### Session (`SessionDetailPage`)
-Header with group avatar+name; participants with a **role chip** (gendered) and a
-**partial availability** note (the hours they can) or no-availability, computed
-with `expandAvailability` ∩ range. The attendance buttons collapse to a "Voy/No
-voy" badge + "Change" button once answered. Director actions: edit, confirm,
-cancel (in-app modal), delete draft. Sharing a rehearsal uses the short link
-`/s/<short_code>` (6-char code on `sessions`); `ShortLinkPage` resolves it for
-members and, if logged out, stashes the code and resumes after login (same
-pattern as `/join/:code`).
+Header with group avatar+name; **plain-text location** (no maps link); a date card
+that opens the agenda and flashes the rehearsal (same `?d=&s=` pattern as
+Upcoming). Participants with a **role chip** (gendered) and a **partial
+availability** note (the hours they can) or no-availability, computed with
+`expandAvailability` ∩ range; responses render as colored dots with a per-list
+tally. The attendance buttons collapse to a "Voy/No voy" badge + "Change" button
+once answered (with a note the answer can change later). Director actions: edit,
+confirm, cancel (in-app modal), delete draft, and a full-width **"Recordar a
+pendientes"** that opens a confirm modal listing the pending participants and
+calls `nudge_pending_participants`. Add-to-calendar via an `.ics` download
+(`lib/ics.ts`). Sharing uses the short link `/s/<short_code>` (6-char code on
+`sessions`); `ShortLinkPage` resolves it for members and, if logged out, stashes
+the code and resumes after login (same pattern as `/join/:code`).
 
-### Invite (`InvitePanel`, `JoinPage`)
+### Invite / members (`InvitePanel`, `JoinPage`, `MembersPage`, `ConvokeMemberPage`)
 Group code, link (Web Share API + copy), QR (canvas), regenerate /
 enable-disable, bulk email. When the code is **disabled**, the code and actions
-are hidden; only the note and re-enable toggle remain. `JoinPage` joins by code;
-if there's no session, it stashes the code and resumes after login
-(`AuthCallback`).
+are hidden; only the note and re-enable toggle remain. Pending invitations show
+their **email delivery state** (`email_sent_at` / `email_send_error` → "sent on
+X" / "never sent") and can be **resent or deleted**. A `MEMBER_JOINED`
+notification lets a director jump to `ConvokeMemberPage` to **bulk-summon** the
+newcomer to chosen upcoming sessions in one call
+(`add_member_to_future_sessions`). `JoinPage` joins by code; if there's no
+session, it stashes the code and resumes after login (`AuthCallback`).
 
 ### Group management (`NewGroupPage`, `EditGroupPage`, `AvatarPicker`)
 Create/edit group are standalone pages (no modals). `AvatarPicker`: two
 side-by-side cards — generated avatar (default, reroll dice) vs uploaded image
-(camera icon; react-easy-crop square crop with bounded zoom/pan → 256px webp
-data URL persisted in `groups.avatar_image`; the cropped image is cached so
-switching modes doesn't force a re-upload). On New Group the avatar follows the
-typed name until a custom seed is rolled. Leaving a group as the only director
-forces picking a successor in the leave modal (random preselected); a DB
-trigger backs it up by promoting a random member if a group is left with no
-director. Home cards show member + upcoming-rehearsal (from today 00:00)
-counters.
+(on touch devices a gallery/camera chooser; the card also accepts **drag &
+drop**; react-easy-crop square crop with bounded zoom/pan → 256px webp data URL
+persisted in `groups.avatar_image`; the cropped image is cached so switching
+modes doesn't force a re-upload). Avatar/photo changes **autosave**. On New Group
+the avatar follows the typed name until a custom seed is rolled. Leaving a group
+as the only director forces picking a successor in the leave modal (random
+preselected); a DB trigger backs it up by promoting a random member if a group is
+left with no director (and the promoted member gets a `MEMBER_PROMOTED`
+notification). Home cards show member + upcoming-rehearsal (from today 00:00)
+counters, plus the install and "what's new" callouts.
 
 ### Navigation & modals
 `BackButton` is history-aware: `location.key !== 'default'` → `navigate(-1)`,
 else the route's parent fallback. Every main tab header (agenda, upcoming,
-notifications, profile) has one. `useBackClose` (used by `Modal` and the
-session form) pushes a history entry on open so the device back button closes
-the overlay instead of leaving the page; entries inherit react-router's `idx`
-and are consumed on UI close only when still on top (StrictMode-safe,
-transition-based — no effect cleanup). Notifications mark themselves read on
-click and link to the session detail.
+notifications, profile) has one. The bottom nav shows an **active-tab indicator**.
+`useBackClose` (used by `Modal` and the routed forms) pushes a history entry on
+open so the device back button closes the overlay instead of leaving the page;
+entries inherit react-router's `idx` and are consumed on UI close only when still
+on top (StrictMode-safe, transition-based — no effect cleanup). `Modal` renders in
+a **body portal**. First-visit `Tip` hints appear on every main view (localStorage,
+resettable from the profile).
 
-## PWA (`sw.ts`, `vite.config.ts`)
+### Onboarding & "what's new"
+- `WelcomePage` (`/welcome`): first-login wizard (name, pronoun, email
+  preferences, availability pitch, optional PWA install step) shown until
+  `profiles.onboarded_at` is set; rolled out once to every existing user.
+- `FeatureCallout` (`features/whatsnew/`): cross-device "what's new" banner driven
+  by `profiles.seen_features`; shows for any feature key the user hasn't dismissed
+  and appends it via `mark_feature_seen` on dismiss (reinstall-proof, unlike the
+  localStorage `Tip`). Used for push, the install entry and the profile photo.
+
+### Notifications (`NotificationsPage`)
+List of alerts; **swipe right to archive** (hover icon on desktop), header actions
+to mark-all-read / archive-all, and an archived toggle. Notifications mark
+themselves read on click and deep-link by type (session detail, group members,
+group home). A calm empty state shows a random theatre fragment.
+
+### Profile (`ProfilePage`, `AvatarEditor`)
+Name, phone (optional), pronoun as **inline segmented pills**, the linked sign-in
+methods, **per-event email opt-outs**, the device push enable/disable section
+(hidden until VAPID is configured), the PWA install section, and account deletion.
+`AvatarEditor` is the identity-card avatar with a pencil edit badge; tapping it
+opens a modal showing the large current avatar plus gallery / camera / remove
+(round crop → data URL in `profiles.avatar_url`, initials fallback).
+
+## PWA (`sw.ts`, `vite.config.ts`, `features/pwa/`)
 - `injectManifest`: asset precache, runtime `NetworkFirst` for `/rest/v1/`
-  (offline reads), SPA navigation with `/auth/` denylist.
-- Web Push: `push` shows a notification; `notificationclick` focuses/opens the
-  URL.
-- `lib/push.ts` subscribes (VAPID) and stores in `push_subscriptions`.
+  (offline reads), SPA navigation with `/auth/` denylist. The SW checks for
+  updates when the window regains focus; a stable shell height keeps the bottom
+  nav from vanishing on auto-reload.
+- Install: `installPrompt` captures `beforeinstallprompt`; `InstallBanner` (+ the
+  home/wizard/profile entries) triggers it, with iOS standalone metas and an
+  "add to home screen" hint where the prompt isn't available.
+- Web Push: `push` shows a notification (monochrome status-bar badge);
+  `notificationclick` focuses/opens the deep-link URL.
+- `lib/push.ts` subscribes (VAPID) and stores in `push_subscriptions`; push can be
+  **disabled** again per device from the profile.
 
 ## i18n
 `i18next` + language detection, fallback `es`. Plurals (`_one/_other`).

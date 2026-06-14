@@ -12,8 +12,8 @@
 │  - Realtime (useRealtime) │        │  - Edge Functions (Deno)    │
 └──────────────────────────┘        └─────────────────────────────┘
         │                                   │            │
-   Cloudflare Pages                    Resend (email)  Web Push (VAPID)
-        │                                   ▲
+   Vercel (static host)                Resend (email)  Web Push (VAPID)
+        │   DNS in Cloudflare                ▲
    GitHub Actions (CI/CD) ─ migrations ─────┘ (Edge Function delivers)
 ```
 
@@ -32,25 +32,27 @@
 | Jobs | pg_cron (reminders) → pg_net → Edge Function |
 | Email | Resend (Edge Function) |
 | Push | Standard Web Push (VAPID), no Firebase |
-| Avatars | DiceBear "shapes" (client) or uploaded square-cropped image (data URL in `groups.avatar_image`; emails fall back to DiceBear's HTTP API) |
+| Avatars | DiceBear "shapes" (groups) or uploaded square-cropped image (data URL): `groups.avatar_image` for groups, `profiles.avatar_url` for users; emails fall back to DiceBear's HTTP API |
 | QR | qrcode (client) |
-| Infra | Managed: Terraform + Cloudflare Pages + GitHub Actions. Self-hosted: Docker Swarm (`docker-stack.yml`) |
+| Infra | Managed: Terraform + Vercel (frontend) + Cloudflare (DNS/Turnstile) + GitHub Actions. Self-hosted: Docker Swarm (`docker-stack.yml`) |
 
 ## Data model (core)
 
 ```
-profiles(id↔auth.users, email, name, phone, gender F|M, avatar_url, platform_role)
+profiles(id↔auth.users, email, name, phone, gender F|M, avatar_url, platform_role,
+         onboarded_at, seen_features jsonb)
 groups(id, name, archived_at, created_by, join_code, join_enabled, avatar_seed,
        avatar_image)
 memberships(user_id, group_id, role INSTRUCTOR|ACTOR)            PK(user,group)
-invitations(id, group_id, email, role, token, expires_at, accepted_at, created_by)
+invitations(id, group_id, email, role, token, expires_at, accepted_at, created_by,
+            email_sent_at, email_send_error)
 availabilities(id, user_id, time_range tstzrange, kind, rrule, exception_dates[])
 subgroups(id, group_id, name) · subgroup_members(subgroup_id, user_id)
 sessions(id, group_id, short_code, comments, location, time_range tstzrange,
          status DRAFT|CONFIRMED|CANCELLED, created_by, updated_at)
 session_participants(session_id, user_id, required, response)    PK(session,user)
 session_archives(user_id, session_id, archived_at)               PK(user,session)
-notifications(id, user_id, group_id, type, payload jsonb, read_at,
+notifications(id, user_id, group_id, type, payload jsonb, read_at, archived_at,
               sent_email_at, sent_push_at)
 notification_preferences(user_id, event_type, channel)
 push_subscriptions(id, user_id, endpoint, keys jsonb)
@@ -93,21 +95,36 @@ Policy summary:
 
 Operations that must bypass scoping use **security-definer RPCs** with explicit
 role checks: `join_by_code`, `regenerate_join_code`, `set_join_enabled`,
-`update_group_meta`, `delete_my_account`, `group_busy_ranges`.
+`update_group_meta`, `delete_my_account`, `group_busy_ranges`,
+`nudge_pending_participants` (instructor queues a NUDGE to non-responders),
+`add_member_to_future_sessions` (instructor bulk-summons a member to chosen
+upcoming sessions), `mark_feature_seen` (atomic append to the caller's own
+`seen_features`).
 
 ## Notification flow
 
-1. Triggers `notify_session_change` (INSERT/UPDATE on `sessions`) and
-   `notify_participant_added` insert rows into `notifications`.
+1. Triggers insert rows into `notifications`: `notify_session_change`
+   (INSERT/UPDATE on `sessions`), `notify_participant_added` (added to a
+   confirmed session), `notify_member_joined` (someone joins a group → every
+   other member) and `notify_member_promoted` (membership role → INSTRUCTOR).
+   The instructor's "remind pending" action calls `nudge_pending_participants`,
+   which queues a NUDGE for every non-responder.
 2. `generate_reminders` (pg_cron */15) creates 24h reminders.
 3. The Edge Function `send-notifications` (invoked by pg_cron and by the app
    after confirm/cancel) delivers email (Resend in production, mailpit locally
    via `MAILPIT_URL`) and Web Push (VAPID) per `notification_preferences`, and
    stamps `sent_email_at`/`sent_push_at`. Emails share a branded mobile-first
    layout (logo, name, ignore-notice footer) in the user's language
-   (`user_metadata.lang`); subjects label sessions as "group · short date/time"
-   (sessions have no title). REMINDER emails render the full rehearsal card
-   (group avatar/name, time, location, comments, summoned participants).
+   (`user_metadata.lang`), with a deep-link CTA built from the `APP_URL` secret;
+   subjects label sessions as "group · short date/time" (sessions have no title).
+   REMINDER/NUDGE emails render the full rehearsal card (group avatar/name, time,
+   location, comments, summoned participants); MEMBER_JOINED/MEMBER_PROMOTED get
+   their own card and link to the group's members page / group home. Web Push
+   notifications deep-link to the rehearsal, group members page or group home by
+   type. Pending email invitations are sent here too, stamping
+   `invitations.email_sent_at` on success or `email_send_error` on failure.
+   Reminder emails are **opt-in** for new accounts (a `REMINDER`/`PUSH`
+   preference is seeded at signup).
 
 ## Edge Functions
 - `send-notifications` — delivers email + Web Push (above).

@@ -30,7 +30,8 @@ Details:
 - `docker/migrate.sh` waits for GoTrue to create `auth.users`, applies migrations
   in order once each, then `seed.sql`.
 - `docker/gateway.conf` routes and adds CORS for auth and functions (GoTrue/Deno
-  don't emit them; PostgREST does). Without this, browser login fails.
+  don't emit them; PostgREST does). Without this, browser login fails. Hitting the
+  gateway root (`/`) in a browser returns a small JSON status listing the routes.
 - Local JWT: anon/service pair signed with the compose `JWT_SECRET` (local only).
 - Realtime: the WS route forces the `realtime-dev` tenant Host in the gateway.
   `make seed-users` aligns the tenant `jwt_secret` with `JWT_SECRET` (the tenant

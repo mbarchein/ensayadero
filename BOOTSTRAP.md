@@ -1,9 +1,10 @@
 # BOOTSTRAP — Manual steps to ship Ensayadero to production
 
 This guide takes Ensayadero from an empty repo to a live production deployment on
-the **managed stack**: the frontend on Cloudflare Pages and the backend on
-Supabase (Postgres, Auth, API, Realtime, Edge Functions). The infrastructure is
-provisioned by Terraform (`infra/`) and deployed by GitHub Actions on push.
+the **managed stack**: the frontend on **Vercel**, the DNS + CAPTCHA on
+Cloudflare, and the backend on Supabase (Postgres, Auth, API, Realtime, Edge
+Functions). The infrastructure is provisioned by Terraform (`infra/`) and deployed
+by GitHub Actions on push.
 
 > Prefer to self-host the whole backend instead of using Supabase/Cloudflare?
 > See `DEPLOY.md` (Docker Swarm).
@@ -56,6 +57,7 @@ so `export` it first.)
 | Service | URL | Plan |
 |---------|-----|------|
 | Supabase | https://supabase.com | Free |
+| Vercel | https://vercel.com | Free (Hobby; frontend hosting) |
 | Cloudflare | https://dash.cloudflare.com | Free (the domain must be in a CF zone) |
 | Resend | https://resend.com | Free |
 | Google Cloud | https://console.cloud.google.com | Free (OAuth only) |
@@ -77,15 +79,17 @@ cd infra && cp terraform.tfvars.example terraform.tfvars
 |----------|----------------------|
 | `supabase_access_token` | https://supabase.com/dashboard/account/tokens → "Generate new token" |
 | `supabase_org_id` | Dashboard → org settings → organization slug |
+| `vercel_token` | https://vercel.com/account/tokens → create a token (team-scoped) |
+| `vercel_org_id` | Vercel **Team Settings → General**, or `vercel teams ls` |
 | `cloudflare_api_token` | https://dash.cloudflare.com/profile/api-tokens → **Create Custom Token** (permissions listed below the table) |
 | `cloudflare_account_id` | Step 2.3 |
 | `github_token` | https://github.com/settings/tokens (scopes/permissions listed below the table) |
 | `github_owner` / `github_repo` | Create an empty GitHub repo and put owner/name here |
 | `domain` / `app_subdomain` | Your domain from step 2 |
 
-**`cloudflare_api_token`** — Custom Token permissions (each row is *scope → group → access*):
+**`cloudflare_api_token`** — Custom Token permissions (each row is *scope → group → access*).
+Cloudflare now only does DNS + Turnstile (hosting is on Vercel), so **no Pages scope**:
 
-- **Account** → Cloudflare Pages → **Edit**
 - **Account** → Turnstile → **Edit** (only if you enable CAPTCHA, step 6b)
 - **Zone** → DNS → **Edit**
 - **Zone** → Zone → **Read** (the domain's zone)
@@ -110,7 +114,27 @@ terraform init
 terraform apply
 ```
 
-Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_uri`.
+Note the outputs: `supabase_project_ref`, `supabase_url`, `google_oauth_redirect_uri`,
+`vercel_project_id`.
+
+## 4b. Vercel frontend (custom domain + protection)
+
+Terraform creates the Vercel project (`vercel_project`, framework `vite`, root
+`app/`) and attaches the custom domain. Two manual touches:
+
+1. **Domain ownership TXT.** Vercel shows a `_vercel` TXT under **Project →
+   Domains** (value `vc-domain-verify=…`). Put it in `terraform.tfvars` as
+   `vercel_domain_verification` (without quotes) → `terraform apply`; Terraform
+   writes the Cloudflare record. **Do not** click Vercel's "Authorize DNS records
+   from Cloudflare" — it writes records directly and fights the TF-managed zone.
+   If Vercel recommends a project-specific CNAME target, set `vercel_cname_target`.
+2. **Disable Deployment Protection.** Vercel dashboard → Project → Settings →
+   **Deployment Protection → Off** for production. Left on, its login interstitial
+   sits in front of the site and breaks the service worker / manifest (the public
+   PWA can't load). Terraform pins `vercel_authentication = none`, but verify it.
+
+The app host is a **DNS-only** (grey-cloud) CNAME to Vercel's edge — Vercel
+terminates TLS; proxying it through Cloudflare would break cert issuance.
 
 ## 5. Google OAuth client (manual — Google doesn't expose it via Terraform)
 
@@ -235,6 +259,13 @@ npx web-push generate-vapid-keys
   supabase secrets set VAPID_SUBJECT=mailto:admin@yourdomain.es --project-ref <project-ref>
   ```
 
+Also set **`APP_URL`** so notification emails and push notifications deep-link to
+the live app (without it the CTAs and `notificationclick` targets are wrong):
+
+```bash
+supabase secrets set APP_URL=https://app.yourdomain.es --project-ref <project-ref>
+```
+
 ## 7b. Legal documents (Edge Function secrets)
 
 Legal document data (controller name, tax ID, address, contact emails) is **not**
@@ -260,31 +291,31 @@ already in CI).
 
 ## 8. GitHub Actions variables — automatic
 
-Terraform creates every GitHub Actions variable the pipeline needs, nothing to do
-by hand:
+Terraform creates every GitHub Actions secret and variable the pipeline needs,
+nothing to do by hand:
 
+- `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (secrets) — the deploy job
+  uses them with the `vercel` CLI. Cloudflare creds are deliberately **not** in
+  CI — DNS/Turnstile are Terraform-only.
 - `VITE_SUPABASE_URL`, `VITE_APP_URL` — from the project + domain.
 - `VITE_SUPABASE_ANON_KEY` — read from the project via the `supabase_apikeys`
   data source (anon key is public).
 - `VITE_VAPID_PUBLIC_KEY`, `VITE_TURNSTILE_SITE_KEY` — created when their
   `terraform.tfvars` values are set (steps 6b and 7).
-- `CLOUDFLARE_PROJECT_NAME` — the Cloudflare Pages project name (`project_name`),
-  read by the wrangler deploy step so `--project-name` always matches the project
-  Terraform created. (A mismatch fails the deploy with *"Project not found"*.)
 
 ## 9. First deploy
 
 Make sure your last `terraform apply` succeeded first — the build/deploy reads the
-GitHub Actions variables from step 8 (including `CLOUDFLARE_PROJECT_NAME`), so they
-must exist *before* the pipeline runs, or it fails.
+GitHub Actions secrets/variables from step 8 (including the `VERCEL_*` secrets), so
+they must exist *before* the pipeline runs, or it fails.
 
 ```bash
 git remote add origin git@github.com:<owner>/<repo>.git
 git push -u origin main
 ```
 
-GitHub Actions: tests → migrations + Edge Functions → build → Cloudflare Pages.
-Verify at `https://app.yourdomain.es`.
+GitHub Actions: tests → migrations + Edge Functions → build + deploy to Vercel
+(`vercel pull/build/deploy --prebuilt --prod`). Verify at `https://app.yourdomain.es`.
 
 ## 10. Superadmin bootstrap
 
@@ -379,12 +410,17 @@ consider upgrading to Pro ($25/month).
 ## Quick checklist
 
 - [ ] Domain in Cloudflare, nameservers OK
-- [ ] tfvars with all tokens
+- [ ] tfvars with all tokens (Supabase, **Vercel** token + org id, Cloudflare, GitHub)
 - [ ] Initial `terraform apply`
+- [ ] Vercel: `_vercel` TXT → `vercel_domain_verification` + re-apply; Deployment
+      Protection **off** for production (§4b)
 - [ ] Google OAuth client + redirect URI + re-apply
 - [ ] Resend: domain verified + API key + Edge Functions secrets
-- [ ] VAPID: public in tfvars (TF → GH var), private in Edge Functions secrets
-- [ ] frontend `VITE_*` vars present in GH (Terraform creates them — verify)
+- [ ] VAPID: public in tfvars (TF → GH var) **and** `VAPID_PUBLIC_KEY` Edge secret;
+      private + subject in Edge Functions secrets
+- [ ] `APP_URL` Edge secret set (deep-links)
+- [ ] frontend `VITE_*` vars + `VERCEL_*` secrets present in GH (Terraform creates
+      them — verify)
 - [ ] push to main → green deploy
 - [ ] own login + promotion to SUPERADMIN
 - [ ] `process-notifications` cron alive (Terraform creates it — verify per §11)
