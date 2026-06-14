@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App'
+import './features/pwa/installPrompt' // attach beforeinstallprompt listener on load
 import './i18n'
 import './index.css'
 

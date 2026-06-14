@@ -30,6 +30,7 @@
   "pwa": {
     "installHint": "Instala Ensayadero en tu móvil para acceso rápido y notificaciones.",
     "installBtn": "Instalar",
+    "installApp": "Instalar app",
     "iosHint": "Para instalar: pulsa Compartir y «Añadir a pantalla de inicio»."
   },
   "roles": {

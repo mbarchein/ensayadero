@@ -9,10 +9,11 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { BellRing, CalendarHeart, Drama } from 'lucide-react'
+import { BellRing, CalendarHeart, Download, Drama } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush } from '../../lib/push'
+import { useInstallPrompt, promptInstall } from '../pwa/installPrompt'
 import { Button, InitialsAvatar, Spinner, Toggle } from '../../components/ui'
 import quotesEs from '../../data/quotes.es.json'
 import quotesEn from '../../data/quotes.en.json'
@@ -31,6 +32,7 @@ export default function WelcomePage() {
   const [emailReminders, setEmailReminders] = useState(false) // current signup default
   const [emailMembers, setEmailMembers] = useState(true)
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>('idle')
+  const { canInstall } = useInstallPrompt()
 
   const [quote] = useState(() => {
     const list = i18n.language?.startsWith('en') ? quotesEn : quotesEs
@@ -203,6 +205,16 @@ export default function WelcomePage() {
             )}
             {pushState === 'ok' && (
               <p className="text-center text-sm text-green-600">{t('welcome.pushOk')}</p>
+            )}
+            {canInstall && (
+              <Button
+                variant="secondary"
+                className="inline-flex w-full items-center justify-center gap-2"
+                onClick={() => promptInstall()}
+              >
+                <Download size={18} aria-hidden />
+                {t('pwa.installApp')}
+              </Button>
             )}
           </div>
         )}

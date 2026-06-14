@@ -30,6 +30,7 @@
   "pwa": {
     "installHint": "Install Ensayadero on your phone for quick access and notifications.",
     "installBtn": "Install",
+    "installApp": "Install app",
     "iosHint": "To install: tap Share and \"Add to Home Screen\"."
   },
   "roles": {
