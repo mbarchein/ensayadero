@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -6,7 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
-import { CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
+import { enablePush } from '../../lib/push'
+import { Bell, CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import InstallBanner from '../pwa/InstallBanner'
@@ -25,7 +27,9 @@ export default function HomePage() {
 
   // Announce push to already-onboarded users: only when the feature is enabled
   // (VAPID configured) and notifications aren't granted yet on this device.
+  const [pushEnabled, setPushEnabled] = useState(false)
   const canOfferPush =
+    !pushEnabled &&
     !!import.meta.env.VITE_VAPID_PUBLIC_KEY &&
     typeof Notification !== 'undefined' &&
     Notification.permission !== 'granted'
@@ -107,9 +111,14 @@ export default function HomePage() {
       {!canInstall && !isIOS && !isStandalone() && <FeatureCallout id="install-app" />}
       {canOfferPush && (
         <FeatureCallout id="push-notifications">
-          <Link to="/profile" className="mt-1 inline-block font-medium text-violet-700 underline">
-            {t('whatsnew.push-notifications.cta')}
-          </Link>
+          <Button
+            className="mt-2 inline-flex items-center gap-1.5 !py-1.5"
+            onClick={async () => {
+              if (await enablePush()) setPushEnabled(true)
+            }}
+          >
+            <Bell size={16} /> {t('profile.pushEnable')}
+          </Button>
         </FeatureCallout>
       )}
       <Tip id="home" />

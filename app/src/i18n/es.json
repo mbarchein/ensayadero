@@ -41,8 +41,7 @@
     },
     "push-notifications": {
       "title": "Novedad: avisos en el móvil",
-      "body": "Ya puedes recibir notificaciones de tus ensayos en este dispositivo. Actívalas desde tu perfil.",
-      "cta": "Ir al perfil"
+      "body": "Ya puedes recibir notificaciones de tus ensayos en este dispositivo."
     }
   },
   "roles": {

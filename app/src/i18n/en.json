@@ -41,8 +41,7 @@
     },
     "push-notifications": {
       "title": "New: phone notifications",
-      "body": "You can now get rehearsal notifications on this device. Enable them from your profile.",
-      "cta": "Go to profile"
+      "body": "You can now get rehearsal notifications on this device."
     }
   },
   "roles": {
