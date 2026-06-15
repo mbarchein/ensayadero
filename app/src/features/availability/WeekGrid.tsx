@@ -29,7 +29,7 @@ interface Props {
   onPaintEnd?: () => void
   onCellTap?: (pos: CellPos) => void
   /** Tap (no swipe) on a cell in week view. */
-  onWeekCellTap?: (pos: CellPos) => void
+  onWeekCellTap?: (pos: CellPos, sessionId?: string) => void
   /** Fill the parent's height (flex child) instead of capping at 70vh. */
   fill?: boolean
   /** Horizontal swipe on the day header or the cells changes week. */
@@ -188,11 +188,13 @@ export default function WeekGrid({
     }
   }
 
-  const posFromEvent = (e: React.PointerEvent): CellPos | null => {
+  const posFromEvent = (e: React.PointerEvent): (CellPos & { sessionId?: string }) | null => {
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
     const cell = el?.closest('[data-day]') as HTMLElement | null
     if (!cell) return null
-    return { day: Number(cell.dataset.day), slot: Number(cell.dataset.slot) }
+    // which rehearsal lane was tapped (when several overlap in the slot)
+    const lane = el?.closest('[data-session]') as HTMLElement | null
+    return { day: Number(cell.dataset.day), slot: Number(cell.dataset.slot), sessionId: lane?.dataset.session }
   }
 
   const hours = Array.from({ length: SLOTS_PER_DAY / 2 }, (_, i) => DAY_START_HOUR + i)
@@ -246,7 +248,7 @@ export default function WeekGrid({
         )
         if (moved < MOVE_THRESHOLD && onWeekCellTap) {
           const pos = posFromEvent(e)
-          if (pos) onWeekCellTap(pos)
+          if (pos) onWeekCellTap(pos, pos.sessionId)
         }
       }
       weekSwipeRef.current = 'idle'

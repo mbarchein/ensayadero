@@ -617,6 +617,7 @@ export default function AvailabilityPage() {
                   <span
                     key={p.session_id}
                     title={title}
+                    data-session={p.session_id}
                     className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
                   >
                     {firstOfRun && (
@@ -648,10 +649,11 @@ export default function AvailabilityPage() {
         }}
         onPaintMove={(pos) => applyCell(pos, paintValue)}
         onPaintEnd={onPaintEnd}
-        onWeekCellTap={(pos) => {
-          // tap on a rehearsal in the week view opens its detail (the first one
-          // when several overlap in the slot)
-          const ses = sessionCells.get(`${pos.day}:${pos.slot}`)?.[0]
+        onWeekCellTap={(pos, sessionId) => {
+          // tap on a rehearsal in the week view opens its detail — the exact lane
+          // tapped when several overlap (fall back to the first in the slot)
+          const slotList = sessionCells.get(`${pos.day}:${pos.slot}`)
+          const ses = slotList?.find((p) => p.session_id === sessionId) ?? slotList?.[0]
           if (ses) {
             navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
             return
