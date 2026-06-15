@@ -514,15 +514,21 @@ export default function AvailabilityPage() {
           return (
             <div className="flex h-full">
               {list.map((p) => {
-                const stripe =
+                // full border set per response, so the rehearsal renders as an
+                // enclosed box (left stripe + right edge, top/bottom on the run
+                // boundaries). Literal class names so Tailwind keeps them.
+                const c =
                   p.sessions.status !== 'CONFIRMED'
-                    ? 'border-l-gray-400'
+                    ? { l: 'border-l-gray-400', r: 'border-r-gray-400', t: 'border-t-gray-400', b: 'border-b-gray-400' }
                     : p.response === 'ACCEPTED'
-                      ? 'border-l-violet-700'
+                      ? { l: 'border-l-violet-700', r: 'border-r-violet-700', t: 'border-t-violet-700', b: 'border-b-violet-700' }
                       : p.response === 'DECLINED'
-                        ? 'border-l-red-500'
-                        : 'border-l-orange-500'
+                        ? { l: 'border-l-red-500', r: 'border-r-red-500', t: 'border-t-red-500', b: 'border-b-red-500' }
+                        : { l: 'border-l-orange-500', r: 'border-r-orange-500', t: 'border-t-orange-500', b: 'border-b-orange-500' }
                 const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
+                  (x) => x.session_id === p.session_id,
+                )
+                const lastOfRun = !(cells.get(`${day}:${slot + 1}`) ?? []).some(
                   (x) => x.session_id === p.session_id,
                 )
                 const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
@@ -536,7 +542,7 @@ export default function AvailabilityPage() {
                   <span
                     key={p.session_id}
                     title={title}
-                    className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 pl-0.5 ${stripe}`}
+                    className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
                   >
                     {firstOfRun && (
                       <>
