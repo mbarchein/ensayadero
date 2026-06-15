@@ -41,6 +41,64 @@ const CELL_STYLE: Record<SlotState, string> = {
   PREFERRED: 'bg-violet-400',
 }
 
+// Assign every rehearsal a fixed sub-column (lane) and the lane count of its
+// overlap cluster, so its box keeps the SAME width along its whole run — even on
+// slots where it happens not to overlap. Built from the "day:slot" → list cells
+// map: per day, derive each session's slot run, cluster the runs that overlap
+// (transitively), then greedy-assign lanes within each cluster.
+function computeLanes(
+  cells: Map<string, MyParticipation[]>,
+): Map<string, { lane: number; lanes: number }> {
+  // session_id → { day, min slot, max slot } (rehearsals sit within one day)
+  const spans = new Map<string, { day: number; a: number; b: number }>()
+  for (const [key, arr] of cells) {
+    const [day, slot] = key.split(':').map(Number)
+    for (const p of arr) {
+      const e = spans.get(p.session_id)
+      if (!e) spans.set(p.session_id, { day, a: slot, b: slot })
+      else {
+        e.a = Math.min(e.a, slot)
+        e.b = Math.max(e.b, slot)
+      }
+    }
+  }
+  const byDay = new Map<number, { id: string; a: number; b: number }[]>()
+  for (const [id, s] of spans) {
+    const list = byDay.get(s.day) ?? []
+    list.push({ id, a: s.a, b: s.b })
+    byDay.set(s.day, list)
+  }
+  const out = new Map<string, { lane: number; lanes: number }>()
+  for (const list of byDay.values()) {
+    list.sort((x, y) => x.a - y.a || x.b - y.b || x.id.localeCompare(y.id))
+    let i = 0
+    while (i < list.length) {
+      // collect the connected cluster (overlap = start <= running max end)
+      let maxEnd = list[i].b
+      let j = i + 1
+      const comp = [list[i]]
+      while (j < list.length && list[j].a <= maxEnd) {
+        comp.push(list[j])
+        maxEnd = Math.max(maxEnd, list[j].b)
+        j++
+      }
+      // greedy: place each in the first lane whose last end is before its start
+      const laneEnd: number[] = []
+      for (const it of comp) {
+        let lane = laneEnd.findIndex((end) => end < it.a)
+        if (lane < 0) {
+          lane = laneEnd.length
+          laneEnd.push(it.b)
+        } else laneEnd[lane] = it.b
+        out.set(it.id, { lane, lanes: 0 })
+      }
+      for (const it of comp) out.get(it.id)!.lanes = laneEnd.length
+      i = j
+    }
+  }
+  return out
+}
+
 export default function AvailabilityPage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
@@ -132,6 +190,10 @@ export default function AvailabilityPage() {
     [agenda.data],
   )
   const sessionCells = useMemo(() => buildSessionCells(monday), [buildSessionCells, monday])
+  // Fixed sub-column layout per rehearsal: if a rehearsal overlaps another at
+  // ANY slot, its box is narrowed for its WHOLE extent (constant lane/width),
+  // not just on the overlapping cells. Computed per week from the cells map.
+  const sessionLanes = useMemo(() => computeLanes(sessionCells), [sessionCells])
 
   // confirmed rehearsals in the visible week — clearing the week wipes the
   // availability that overlaps them, so we list them in the confirm modal.
@@ -171,12 +233,21 @@ export default function AvailabilityPage() {
   // read-only availability + rehearsal maps for the carousel's adjacent weeks,
   // so the incoming week shows its real occupation mid-swipe
   const adjacentWeeks = useMemo(() => {
-    const map = new Map<number, { grid: SlotState[][] | null; cells: Map<string, MyParticipation[]> }>()
+    const map = new Map<
+      number,
+      {
+        grid: SlotState[][] | null
+        cells: Map<string, MyParticipation[]>
+        lanes: Map<string, { lane: number; lanes: number }>
+      }
+    >()
     for (const off of [-7, 7]) {
       const m = addDays(monday, off)
+      const cells = buildSessionCells(m)
       map.set(m.getTime(), {
         grid: availabilities ? weekGrid(availabilities, m) : null,
-        cells: buildSessionCells(m),
+        cells,
+        lanes: computeLanes(cells),
       })
     }
     return map
@@ -501,19 +572,23 @@ export default function AvailabilityPage() {
           return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
         }}
         renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
-          const cells =
-            wm.getTime() === monday.getTime()
-              ? sessionCells
-              : adjacentWeeks.get(wm.getTime())?.cells
+          const current = wm.getTime() === monday.getTime()
+          const cells = current ? sessionCells : adjacentWeeks.get(wm.getTime())?.cells
+          const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
           const list = cells?.get(`${day}:${slot}`)
-          if (!list || !cells) return null
-          // overlapping rehearsals share the cell as equal-width sub-columns,
-          // each a left stripe colored by my response (violet=going, red=not,
-          // orange=pending, grey=draft); the avatar/name shows on the first slot
-          // of each rehearsal's run.
+          if (!list || !cells || !lanes) return null
+          // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
+          // its box width is 1/laneCount on every slot, even where it doesn't
+          // overlap. laneCount is shared by the whole overlap cluster, so it's the
+          // same for every rehearsal present in this cell.
+          const laneCount = lanes.get(list[0].session_id)?.lanes ?? 1
+          const byLane = new Map(list.map((p) => [lanes.get(p.session_id)?.lane ?? 0, p]))
           return (
             <div className="flex h-full">
-              {list.map((p) => {
+              {Array.from({ length: laneCount }, (_, lane) => {
+                const p = byLane.get(lane)
+                // empty lane: a spacer that holds the column width
+                if (!p) return <span key={lane} className="min-w-0 flex-1" />
                 // full border set per response, so the rehearsal renders as an
                 // enclosed box (left stripe + right edge, top/bottom on the run
                 // boundaries). Literal class names so Tailwind keeps them.
@@ -551,7 +626,7 @@ export default function AvailabilityPage() {
                           image={p.sessions.groups.avatar_image}
                           size={14}
                         />
-                        {(dayView || list.length === 1) && (
+                        {(dayView || laneCount === 1) && (
                           <span
                             className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
                           >
