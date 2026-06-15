@@ -243,6 +243,7 @@ export function BackButton({
   }
   return (
     <button
+      type="button"
       onClick={goBack}
       aria-label={label ?? t('common.back')}
       className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-violet-700 transition hover:bg-violet-50"
