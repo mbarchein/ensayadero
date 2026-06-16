@@ -8,13 +8,13 @@ import { supabase } from '../../lib/supabase'
 import { LogOut, Users, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
-import { roleLabel } from '../../lib/roleLabel'
+import { roleLabel, roleActionLabel } from '../../lib/roleLabel'
 import { parseRange } from '../../lib/ranges'
 import type { GroupRole, MembershipWithProfile } from '../../lib/types'
 
 export default function MembersPage() {
   const { t } = useTranslation()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -212,7 +212,7 @@ export default function MembersPage() {
                 {m.profiles.name || m.profiles.email}
               </p>
               <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                {roleLabel(t, m.role, m.profiles.gender)}
+                {roleLabel(t, m.role, m.profiles.gender, group?.group_type)}
               </Badge>
             </>
           )
@@ -264,7 +264,7 @@ export default function MembersPage() {
       <Modal
         open={!!roleTarget}
         onClose={() => setRoleTarget(null)}
-        title={roleTarget?.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+        title={roleTarget ? roleActionLabel(t, roleTarget.role, group?.group_type) : ''}
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
@@ -290,7 +290,7 @@ export default function MembersPage() {
               }}
             >
               {roleTarget?.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
-              {roleTarget?.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+              {roleTarget ? roleActionLabel(t, roleTarget.role, group?.group_type) : ''}
             </Button>
           </div>
         </div>
@@ -403,7 +403,7 @@ export default function MembersPage() {
               )}
               <div className="mt-2">
                 <Badge color={sheetTarget.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                  {roleLabel(t, sheetTarget.role, sheetTarget.profiles.gender)}
+                  {roleLabel(t, sheetTarget.role, sheetTarget.profiles.gender, group?.group_type)}
                 </Badge>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function MembersPage() {
                 }}
               >
                 {sheetTarget.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
-                {sheetTarget.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+                {roleActionLabel(t, sheetTarget.role, group?.group_type)}
               </Button>
               <Button
                 variant="danger"

@@ -197,7 +197,7 @@ export default function HomePage() {
                         <p className="font-medium">{m.groups.name}</p>
                         <div className="flex items-center gap-2">
                           <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                            {roleLabel(t, m.role, profile?.gender)}
+                            {roleLabel(t, m.role, profile?.gender, m.groups.group_type)}
                           </Badge>
                           {groupStats?.has(m.group_id) && (
                             <span className="flex items-center gap-2 text-xs text-gray-600">

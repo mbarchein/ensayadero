@@ -58,7 +58,43 @@
     "ACTOR_M": "Actor",
     "SUPERADMIN": "Superadmin",
     "toInstructor": "Make director",
-    "toActor": "Make actor"
+    "toActor": "Make actor",
+    "MUSIC": {
+      "ACTOR": "Musician",
+      "ACTOR_F": "Musician",
+      "ACTOR_M": "Musician",
+      "toActor": "Make musician"
+    },
+    "DANCE": {
+      "INSTRUCTOR": "Choreographer",
+      "INSTRUCTOR_F": "Choreographer",
+      "INSTRUCTOR_M": "Choreographer",
+      "ACTOR": "Dancer",
+      "ACTOR_F": "Dancer",
+      "ACTOR_M": "Dancer",
+      "toInstructor": "Make choreographer",
+      "toActor": "Make dancer"
+    },
+    "SPORTS": {
+      "INSTRUCTOR": "Coach",
+      "INSTRUCTOR_F": "Coach",
+      "INSTRUCTOR_M": "Coach",
+      "ACTOR": "Player",
+      "ACTOR_F": "Player",
+      "ACTOR_M": "Player",
+      "toInstructor": "Make coach",
+      "toActor": "Make player"
+    },
+    "OTHER": {
+      "INSTRUCTOR": "Coordinator",
+      "INSTRUCTOR_F": "Coordinator",
+      "INSTRUCTOR_M": "Coordinator",
+      "ACTOR": "Member",
+      "ACTOR_F": "Member",
+      "ACTOR_M": "Member",
+      "toInstructor": "Make coordinator",
+      "toActor": "Make member"
+    }
   },
   "nav": {
     "home": "Home",

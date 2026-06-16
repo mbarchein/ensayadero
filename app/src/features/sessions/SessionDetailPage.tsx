@@ -27,7 +27,7 @@ import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
-import type { Availability, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
+import type { Availability, GroupType, ParticipantResponse, SessionWithParticipants } from '../../lib/types'
 
 /** A user's available (painted) sub-intervals within range `r`, merged. */
 function availableWithin(avails: Availability[], r: TimeRange): TimeRange[] {
@@ -392,6 +392,7 @@ export default function SessionDetailPage() {
         availInfo={availInfo}
         roleOf={roleOf}
         myId={profile?.id}
+        groupType={group?.group_type}
       />
       {optional.length > 0 && (
         <ParticipantList
@@ -400,6 +401,7 @@ export default function SessionDetailPage() {
           availInfo={availInfo}
           roleOf={roleOf}
           myId={profile?.id}
+          groupType={group?.group_type}
         />
       )}
 
@@ -536,12 +538,14 @@ function ParticipantList({
   availInfo,
   roleOf,
   myId,
+  groupType,
 }: {
   title: string
   list: SessionWithParticipants['session_participants']
   availInfo: Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>
   roleOf: (userId: string) => 'INSTRUCTOR' | 'ACTOR' | null
   myId?: string
+  groupType?: GroupType
 }) {
   const { t } = useTranslation()
   const going = list.filter((p) => p.response === 'ACCEPTED').length
@@ -595,7 +599,7 @@ function ParticipantList({
                     )}
                     {role && (
                       <Badge color={role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                        {roleLabel(t, role, p.profiles.gender)}
+                        {roleLabel(t, role, p.profiles.gender, groupType)}
                       </Badge>
                     )}
                   </span>
