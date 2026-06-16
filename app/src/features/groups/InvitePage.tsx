@@ -280,7 +280,12 @@ function InviteForm({ group }: { group: Group }) {
                       </p>
                     ) : i.email_sent_at ? (
                       <p className="text-gray-500">
-                        {t('invite.sentAt', { date: new Date(i.email_sent_at).toLocaleString() })}
+                        {t('invite.sentAt', {
+                          date: new Date(i.email_sent_at).toLocaleString(undefined, {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                          }),
+                        })}
                       </p>
                     ) : (
                       <p className="text-amber-600">{t('invite.neverSent')}</p>
