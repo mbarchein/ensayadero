@@ -231,13 +231,11 @@ function InviteForm({ group }: { group: Group }) {
               {group.join_code}
             </p>
           </button>
-          <p aria-live="polite" className="flex h-5 items-center justify-center gap-1 text-sm text-green-600">
-            {copied && (
-              <>
-                <Check size={14} /> {t('invite.copied')}
-              </>
-            )}
-          </p>
+          {copied && (
+            <p aria-live="polite" className="flex items-center justify-center gap-1 text-sm text-green-600">
+              <Check size={14} /> {t('invite.copied')}
+            </p>
+          )}
 
           {shareError && (
             <p className="break-all text-xs text-gray-600">
