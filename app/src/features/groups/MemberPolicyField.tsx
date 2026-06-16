@@ -10,6 +10,13 @@ const LABEL: Record<MemberInclusionPolicy, string> = {
   OPTIONAL: 'group.newMemberOptional',
   NONE: 'group.newMemberNone',
 }
+// Distinct active color per option: violet = required (app accent), amber =
+// optional, gray = left out.
+const ACTIVE: Record<MemberInclusionPolicy, string> = {
+  MANDATORY: 'bg-violet-600 text-white',
+  OPTIONAL: 'bg-amber-500 text-white',
+  NONE: 'bg-gray-500 text-white',
+}
 
 export default function MemberPolicyField({
   value,
@@ -35,7 +42,7 @@ export default function MemberPolicyField({
                 i > 0 ? 'border-l border-violet-200' : ''
               } ${
                 active
-                  ? 'bg-violet-600 font-medium text-white'
+                  ? `${ACTIVE[opt]} font-medium`
                   : 'bg-white text-gray-700 hover:bg-violet-50'
               }`}
             >
