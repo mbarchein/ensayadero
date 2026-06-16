@@ -2,7 +2,7 @@
 // (was a modal; instructor only).
 
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
@@ -22,10 +22,9 @@ export default function EditGroupPage() {
 
 function EditGroupForm({ group }: { group: Group }) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const qc = useQueryClient()
   const [name, setName] = useState(group.name)
-  // avatar changes autosave; the save button only persists the name
+  // avatar and policy autosave; the save button only persists the name
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
   const [image, setImage] = useState<string | null>(group.avatar_image)
   const [policy, setPolicy] = useState<MemberInclusionPolicy>(
@@ -38,21 +37,19 @@ function EditGroupForm({ group }: { group: Group }) {
     qc.invalidateQueries({ queryKey: ['my-memberships'] })
   }
 
-  const save = useMutation({
+  // The save button persists ONLY the name; seed/image/policy autosave on
+  // change, so they are passed at their current (already-saved) value here.
+  const saveName = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc('update_group_meta', {
         gid: group.id,
         new_name: name,
         new_seed: seed,
         new_image: image,
-        new_policy: policy,
       })
       if (error) throw error
     },
-    onSuccess: () => {
-      invalidate()
-      navigate(`/g/${group.id}`, { replace: true })
-    },
+    onSuccess: invalidate,
   })
 
   // avatar/photo autosave: persists seed+image right away, keeping the
@@ -74,6 +71,21 @@ function EditGroupForm({ group }: { group: Group }) {
     },
   })
 
+  // policy autosave: keeps the SERVER name for the same reason as the avatar
+  const savePolicy = useMutation({
+    mutationFn: async (next: MemberInclusionPolicy) => {
+      const { error } = await supabase.rpc('update_group_meta', {
+        gid: group.id,
+        new_name: group.name,
+        new_seed: seed,
+        new_image: image,
+        new_policy: next,
+      })
+      if (error) throw error
+    },
+    onSuccess: invalidate,
+  })
+
   const regenerate = () => {
     const next = `${group.id}-${Math.floor(Math.random() * 1e9)}`
     setSeed(next)
@@ -83,6 +95,10 @@ function EditGroupForm({ group }: { group: Group }) {
     setImage(next)
     saveAvatar.mutate({ seed, image: next })
   }
+  const changePolicy = (next: MemberInclusionPolicy) => {
+    setPolicy(next)
+    savePolicy.mutate(next)
+  }
 
   return (
     <div className="space-y-4 pb-6">
@@ -90,13 +106,7 @@ function EditGroupForm({ group }: { group: Group }) {
         <BackButton to={`/g/${group.id}`} />
         <h1 className="text-xl font-bold">{t('group.editGroup')}</h1>
       </header>
-      <form
-        className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault()
-          save.mutate()
-        }}
-      >
+      <div className="space-y-4">
         <AvatarPicker seed={seed} image={image} onRollSeed={regenerate} onImageChange={changeImage} />
         <p aria-live="polite" className="h-4 text-right text-sm text-green-600">
           {saveAvatar.isPending ? t('availability.saving') : avatarSaved ? t('availability.saved') : ''}
@@ -104,21 +114,40 @@ function EditGroupForm({ group }: { group: Group }) {
         {saveAvatar.isError && (
           <p className="text-sm text-red-600">{(saveAvatar.error as Error).message}</p>
         )}
-        <label className="block text-sm">
-          {t('admin.groupName')}
-          <input
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2"
-          />
-        </label>
-        <MemberPolicyField value={policy} onChange={setPolicy} />
-        {save.isError && <p className="text-sm text-red-600">{(save.error as Error).message}</p>}
-        <Button type="submit" disabled={save.isPending} className="w-full">
-          {save.isPending ? t('admin.creating') : t('common.save')}
-        </Button>
-      </form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            saveName.mutate()
+          }}
+        >
+          <label className="block text-sm">
+            {t('admin.groupName')}
+            <div className="mt-1 flex gap-2">
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              <Button
+                type="submit"
+                disabled={saveName.isPending || !name.trim() || name.trim() === group.name}
+              >
+                {saveName.isPending ? t('availability.saving') : t('common.save')}
+              </Button>
+            </div>
+          </label>
+          {saveName.isError && (
+            <p className="mt-1 text-sm text-red-600">{(saveName.error as Error).message}</p>
+          )}
+        </form>
+        <div>
+          <MemberPolicyField value={policy} onChange={changePolicy} />
+          {savePolicy.isError && (
+            <p className="mt-1 text-sm text-red-600">{(savePolicy.error as Error).message}</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
