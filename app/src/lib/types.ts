@@ -4,6 +4,7 @@ export type AvailabilityKind = 'AVAILABLE' | 'PREFERRED'
 export type SessionStatus = 'DRAFT' | 'CONFIRMED' | 'CANCELLED'
 export type ParticipantResponse = 'PENDING' | 'ACCEPTED' | 'DECLINED'
 export type MemberInclusionPolicy = 'MANDATORY' | 'OPTIONAL' | 'NONE'
+export type GroupType = 'THEATRE' | 'MUSIC' | 'DANCE' | 'SPORTS' | 'OTHER'
 
 export interface Profile {
   id: string
@@ -27,6 +28,7 @@ export interface Group {
   avatar_seed: string | null
   avatar_image: string | null
   new_member_policy: MemberInclusionPolicy
+  group_type: GroupType
 }
 
 export interface Membership {
