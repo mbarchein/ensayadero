@@ -8,8 +8,9 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
 import AvatarPicker from './AvatarPicker'
+import MemberPolicyField from './MemberPolicyField'
 import { useGroup } from './useGroup'
-import type { Group } from '../../lib/types'
+import type { Group, MemberInclusionPolicy } from '../../lib/types'
 
 export default function EditGroupPage() {
   const { group, isInstructor, loading } = useGroup()
@@ -27,6 +28,7 @@ function EditGroupForm({ group }: { group: Group }) {
   // avatar changes autosave; the save button only persists the name
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
   const [image, setImage] = useState<string | null>(group.avatar_image)
+  const [policy, setPolicy] = useState<MemberInclusionPolicy>(group.new_member_policy)
   const [avatarSaved, setAvatarSaved] = useState(false)
 
   const invalidate = () => {
@@ -41,6 +43,7 @@ function EditGroupForm({ group }: { group: Group }) {
         new_name: name,
         new_seed: seed,
         new_image: image,
+        new_policy: policy,
       })
       if (error) throw error
     },
@@ -108,6 +111,7 @@ function EditGroupForm({ group }: { group: Group }) {
             className="mt-1 w-full rounded-lg border px-3 py-2"
           />
         </label>
+        <MemberPolicyField value={policy} onChange={setPolicy} />
         {save.isError && <p className="text-sm text-red-600">{(save.error as Error).message}</p>}
         <Button type="submit" disabled={save.isPending} className="w-full">
           {save.isPending ? t('admin.creating') : t('common.save')}

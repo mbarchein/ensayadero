@@ -3,6 +3,7 @@ export type GroupRole = 'INSTRUCTOR' | 'ACTOR'
 export type AvailabilityKind = 'AVAILABLE' | 'PREFERRED'
 export type SessionStatus = 'DRAFT' | 'CONFIRMED' | 'CANCELLED'
 export type ParticipantResponse = 'PENDING' | 'ACCEPTED' | 'DECLINED'
+export type MemberInclusionPolicy = 'MANDATORY' | 'OPTIONAL' | 'NONE'
 
 export interface Profile {
   id: string
@@ -25,6 +26,7 @@ export interface Group {
   join_enabled: boolean
   avatar_seed: string | null
   avatar_image: string | null
+  new_member_policy: MemberInclusionPolicy
 }
 
 export interface Membership {

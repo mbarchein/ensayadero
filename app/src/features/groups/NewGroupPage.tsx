@@ -8,6 +8,8 @@ import { supabase } from '../../lib/supabase'
 import { randomPlay } from '../../lib/plays'
 import { BackButton, Button } from '../../components/ui'
 import AvatarPicker from './AvatarPicker'
+import MemberPolicyField from './MemberPolicyField'
+import type { MemberInclusionPolicy } from '../../lib/types'
 
 export default function NewGroupPage() {
   const { t } = useTranslation()
@@ -18,6 +20,7 @@ export default function NewGroupPage() {
   // avatar follows the typed name until the user rolls a custom seed
   const [customSeed, setCustomSeed] = useState<string | null>(null)
   const [image, setImage] = useState<string | null>(null)
+  const [policy, setPolicy] = useState<MemberInclusionPolicy>('MANDATORY')
   const seed = customSeed ?? (name || placeholder)
 
   const createGroup = useMutation({
@@ -25,7 +28,12 @@ export default function NewGroupPage() {
       // created_by defaults to auth.uid(); trigger adds the creator as director
       const { error } = await supabase
         .from('groups')
-        .insert({ name: name.trim(), avatar_seed: seed, avatar_image: image })
+        .insert({
+          name: name.trim(),
+          avatar_seed: seed,
+          avatar_image: image,
+          new_member_policy: policy,
+        })
       if (error) throw error
     },
     onSuccess: () => {
@@ -65,6 +73,7 @@ export default function NewGroupPage() {
           />
         </label>
         <p className="text-xs text-gray-600">{t('home.newGroupHint')}</p>
+        <MemberPolicyField value={policy} onChange={setPolicy} />
         {createGroup.isError && (
           <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>
         )}
