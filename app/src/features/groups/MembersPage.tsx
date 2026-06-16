@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { AlertCircle, Check, LayoutGrid, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import Tip from '../../components/Tip'
@@ -22,7 +22,8 @@ export default function MembersPage() {
   const [removeTarget, setRemoveTarget] = useState<MembershipWithProfile | null>(null)
   const [roleTarget, setRoleTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveOpen, setLeaveOpen] = useState(false)
-  const [galleryOpen, setGalleryOpen] = useState(false)
+  // member tapped in the orla → action sheet (instructor only, not self)
+  const [sheetTarget, setSheetTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveText, setLeaveText] = useState('')
   const [successor, setSuccessor] = useState<string | null>(null)
   // per-invitation resend feedback: id → ok/error (cleared after a few seconds)
@@ -177,20 +178,22 @@ export default function MembersPage() {
 
   if (loading) return <Spinner />
 
+  // directors first, then alphabetical by name (fallback email)
+  const sortedMembers = [...members].sort((a, b) => {
+    if ((a.role === 'INSTRUCTOR') !== (b.role === 'INSTRUCTOR'))
+      return a.role === 'INSTRUCTOR' ? -1 : 1
+    return (a.profiles.name || a.profiles.email).localeCompare(
+      b.profiles.name || b.profiles.email,
+      undefined,
+      { sensitivity: 'base' },
+    )
+  })
+
   return (
     <div className="space-y-6 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
-        <Button
-          variant="ghost"
-          className="ml-auto inline-flex items-center gap-1.5 p-2"
-          title={t('group.gallery')}
-          aria-label={t('group.gallery')}
-          onClick={() => setGalleryOpen(true)}
-        >
-          <LayoutGrid size={18} />
-        </Button>
       </header>
 
       <Tip id="members" />
@@ -228,48 +231,51 @@ export default function MembersPage() {
         </div>
       ))}
 
-      <ul className="space-y-2">
-        {members.map((m) => (
-          <li key={m.user_id} className="flex items-center justify-between rounded-xl border bg-white p-3">
-            <div className="flex items-center gap-3">
-              {m.profiles.avatar_url ? (
-                <img src={m.profiles.avatar_url} alt="" className="h-9 w-9 rounded-full" />
+      {/* members shown as the orla; tapping a face (instructor only, not self)
+          opens an action sheet to promote/demote or remove */}
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+        {sortedMembers.map((m) => {
+          const actionable = isInstructor && m.user_id !== profile?.id
+          const face = m.profiles.avatar_url ? (
+            <img
+              src={m.profiles.avatar_url}
+              alt=""
+              className="h-24 w-24 rounded-full object-cover ring-2 ring-violet-100"
+            />
+          ) : (
+            <InitialsAvatar name={m.profiles.name || m.profiles.email} size={96} />
+          )
+          const label = (
+            <>
+              <p className="mt-2 text-sm font-medium leading-tight">
+                {m.profiles.name || m.profiles.email}
+              </p>
+              <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                {roleLabel(t, m.role, m.profiles.gender)}
+              </Badge>
+            </>
+          )
+          return (
+            <li key={m.user_id} className="flex flex-col items-center text-center">
+              {actionable ? (
+                <button
+                  type="button"
+                  onClick={() => setSheetTarget(m)}
+                  aria-label={m.profiles.name || m.profiles.email}
+                  className="flex flex-col items-center rounded-xl p-1 transition hover:bg-violet-50"
+                >
+                  {face}
+                  {label}
+                </button>
               ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 font-semibold text-violet-700">
-                  {(m.profiles.name || m.profiles.email)[0].toUpperCase()}
-                </div>
+                <>
+                  {face}
+                  {label}
+                </>
               )}
-              <div>
-                <p className="text-sm font-medium">{m.profiles.name || m.profiles.email}</p>
-                <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                  {roleLabel(t, m.role, m.profiles.gender)}
-                </Badge>
-              </div>
-            </div>
-            {isInstructor && m.user_id !== profile?.id && (
-              <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  className="p-2"
-                  title={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
-                  aria-label={m.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
-                  onClick={() => setRoleTarget(m)}
-                >
-                  {m.role === 'INSTRUCTOR' ? <UserMinus size={18} /> : <UserCog size={18} />}
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="p-2 text-red-600"
-                  title={t('group.remove')}
-                  aria-label={t('group.remove')}
-                  onClick={() => setRemoveTarget(m)}
-                >
-                  <Trash2 size={18} />
-                </Button>
-              </div>
-            )}
-          </li>
-        ))}
+            </li>
+          )
+        })}
       </ul>
 
       {isInstructor && (invitations?.length ?? 0) > 0 && (
@@ -478,40 +484,37 @@ export default function MembersPage() {
         </div>
       </Modal>
 
-      {/* member gallery (orla): every avatar large with the name below */}
-      <Modal open={galleryOpen} onClose={() => setGalleryOpen(false)} title={t('group.galleryTitle')}>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-          {[...members]
-            .sort((a, b) => {
-              // directors first, then alphabetical by name (fallback email)
-              if ((a.role === 'INSTRUCTOR') !== (b.role === 'INSTRUCTOR'))
-                return a.role === 'INSTRUCTOR' ? -1 : 1
-              return (a.profiles.name || a.profiles.email).localeCompare(
-                b.profiles.name || b.profiles.email,
-                undefined,
-                { sensitivity: 'base' },
-              )
-            })
-            .map((m) => (
-            <li key={m.user_id} className="flex flex-col items-center text-center">
-              {m.profiles.avatar_url ? (
-                <img
-                  src={m.profiles.avatar_url}
-                  alt=""
-                  className="h-24 w-24 rounded-full object-cover ring-2 ring-violet-100"
-                />
-              ) : (
-                <InitialsAvatar name={m.profiles.name || m.profiles.email} size={96} />
-              )}
-              <p className="mt-2 text-sm font-medium leading-tight">
-                {m.profiles.name || m.profiles.email}
-              </p>
-              <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
-                {roleLabel(t, m.role, m.profiles.gender)}
-              </Badge>
-            </li>
-          ))}
-        </ul>
+      {/* action sheet for a tapped member */}
+      <Modal
+        open={!!sheetTarget}
+        onClose={() => setSheetTarget(null)}
+        title={sheetTarget ? sheetTarget.profiles.name || sheetTarget.profiles.email : ''}
+      >
+        {sheetTarget && (
+          <div className="space-y-2">
+            <Button
+              variant="secondary"
+              className="inline-flex w-full items-center justify-center gap-1.5"
+              onClick={() => {
+                setRoleTarget(sheetTarget)
+                setSheetTarget(null)
+              }}
+            >
+              {sheetTarget.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
+              {sheetTarget.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+            </Button>
+            <Button
+              variant="danger"
+              className="inline-flex w-full items-center justify-center gap-1.5"
+              onClick={() => {
+                setRemoveTarget(sheetTarget)
+                setSheetTarget(null)
+              }}
+            >
+              <Trash2 size={16} /> {t('group.remove')}
+            </Button>
+          </div>
+        )}
       </Modal>
     </div>
   )
