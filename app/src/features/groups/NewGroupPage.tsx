@@ -9,7 +9,8 @@ import { randomPlay } from '../../lib/plays'
 import { BackButton, Button } from '../../components/ui'
 import AvatarPicker from './AvatarPicker'
 import MemberPolicyField from './MemberPolicyField'
-import type { MemberInclusionPolicy } from '../../lib/types'
+import GroupTypeField from './GroupTypeField'
+import type { GroupType, MemberInclusionPolicy } from '../../lib/types'
 
 export default function NewGroupPage() {
   const { t } = useTranslation()
@@ -21,6 +22,7 @@ export default function NewGroupPage() {
   const [customSeed, setCustomSeed] = useState<string | null>(null)
   const [image, setImage] = useState<string | null>(null)
   const [policy, setPolicy] = useState<MemberInclusionPolicy>('MANDATORY')
+  const [type, setType] = useState<GroupType>('THEATRE')
   const seed = customSeed ?? (name || placeholder)
 
   const createGroup = useMutation({
@@ -33,6 +35,7 @@ export default function NewGroupPage() {
           avatar_seed: seed,
           avatar_image: image,
           new_member_policy: policy,
+          group_type: type,
         })
       if (error) throw error
     },
@@ -73,6 +76,7 @@ export default function NewGroupPage() {
           />
         </label>
         <p className="text-xs text-gray-600">{t('home.newGroupHint')}</p>
+        <GroupTypeField value={type} onChange={setType} />
         <MemberPolicyField value={policy} onChange={setPolicy} />
         {createGroup.isError && (
           <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>

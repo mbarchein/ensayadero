@@ -257,6 +257,15 @@
     "backToGroups": "‹ Mis grupos",
     "editGroup": "Editar grupo",
     "edit": "Editar grupo",
+    "typeLabel": "Tipo de grupo",
+    "typeHint": "Adapta los textos de la app (rol, ensayos…) a tu actividad.",
+    "type": {
+      "THEATRE": "Teatro",
+      "MUSIC": "Música",
+      "DANCE": "Danza",
+      "SPORTS": "Deportes",
+      "OTHER": "Otro"
+    },
     "newMemberLabel": "Nuevos miembros en ensayos futuros",
     "newMemberMandatory": "Obligatorios",
     "newMemberOptional": "Opcionales",

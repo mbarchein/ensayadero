@@ -257,6 +257,15 @@
     "backToGroups": "‹ My groups",
     "editGroup": "Edit group",
     "edit": "Edit group",
+    "typeLabel": "Group type",
+    "typeHint": "Adapts the app wording (roles, sessions…) to your activity.",
+    "type": {
+      "THEATRE": "Theatre",
+      "MUSIC": "Music",
+      "DANCE": "Dance",
+      "SPORTS": "Sports",
+      "OTHER": "Other"
+    },
     "newMemberLabel": "New members in future rehearsals",
     "newMemberMandatory": "Required",
     "newMemberOptional": "Optional",

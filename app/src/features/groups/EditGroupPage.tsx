@@ -9,8 +9,9 @@ import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
 import AvatarPicker from './AvatarPicker'
 import MemberPolicyField from './MemberPolicyField'
+import GroupTypeField from './GroupTypeField'
 import { useGroup } from './useGroup'
-import type { Group, MemberInclusionPolicy } from '../../lib/types'
+import type { Group, GroupType, MemberInclusionPolicy } from '../../lib/types'
 
 export default function EditGroupPage() {
   const { group, isInstructor, loading } = useGroup()
@@ -30,6 +31,7 @@ function EditGroupForm({ group }: { group: Group }) {
   const [policy, setPolicy] = useState<MemberInclusionPolicy>(
     group.new_member_policy ?? 'MANDATORY',
   )
+  const [type, setType] = useState<GroupType>(group.group_type ?? 'THEATRE')
   const [avatarSaved, setAvatarSaved] = useState(false)
 
   const invalidate = () => {
@@ -86,6 +88,21 @@ function EditGroupForm({ group }: { group: Group }) {
     onSuccess: invalidate,
   })
 
+  // type autosave: keeps the SERVER name for the same reason as the avatar
+  const saveType = useMutation({
+    mutationFn: async (next: GroupType) => {
+      const { error } = await supabase.rpc('update_group_meta', {
+        gid: group.id,
+        new_name: group.name,
+        new_seed: seed,
+        new_image: image,
+        new_type: next,
+      })
+      if (error) throw error
+    },
+    onSuccess: invalidate,
+  })
+
   const regenerate = () => {
     const next = `${group.id}-${Math.floor(Math.random() * 1e9)}`
     setSeed(next)
@@ -98,6 +115,10 @@ function EditGroupForm({ group }: { group: Group }) {
   const changePolicy = (next: MemberInclusionPolicy) => {
     setPolicy(next)
     savePolicy.mutate(next)
+  }
+  const changeType = (next: GroupType) => {
+    setType(next)
+    saveType.mutate(next)
   }
 
   return (
@@ -141,6 +162,12 @@ function EditGroupForm({ group }: { group: Group }) {
             <p className="mt-1 text-sm text-red-600">{(saveName.error as Error).message}</p>
           )}
         </form>
+        <div>
+          <GroupTypeField value={type} onChange={changeType} />
+          {saveType.isError && (
+            <p className="mt-1 text-sm text-red-600">{(saveType.error as Error).message}</p>
+          )}
+        </div>
         <div>
           <MemberPolicyField value={policy} onChange={changePolicy} />
           {savePolicy.isError && (
