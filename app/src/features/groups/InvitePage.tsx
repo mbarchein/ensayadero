@@ -85,7 +85,7 @@ function InviteForm({ group }: { group: Group }) {
       if (list.length === 0) return 0
       const { error } = await supabase
         .from('invitations')
-        .insert(list.map((email) => ({ group_id: group.id, email, role: 'ACTOR', created_by: profile!.id })))
+        .insert(list.map((email) => ({ group_id: group.id, email, created_by: profile!.id })))
       if (error) throw error
       const { data: created } = await supabase
         .from('invitations')

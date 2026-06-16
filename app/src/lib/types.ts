@@ -48,7 +48,6 @@ export interface Invitation {
   id: string
   group_id: string
   email: string
-  role: GroupRole
   token: string
   expires_at: string
   accepted_at: string | null
