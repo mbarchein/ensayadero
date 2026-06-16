@@ -1,0 +1,25 @@
+# End-to-end tests, fully containerized — nothing is installed on the host.
+# The main stack (docker-compose.yml) must be up first (app :5173, API :54321).
+#
+#   docker compose up -d                                                 # app + backend
+#   docker compose -p ensayo-e2e -f docker-compose.e2e.yml run --rm e2e  # run the suite
+#   (or simply: make e2e)
+#
+# network_mode: host so the browser reaches localhost:5173 (app) and the app's
+# calls to localhost:54321 (gateway) resolve exactly as they do on the host.
+# @playwright/test is installed into a named volume, never the host tree.
+services:
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.49.1-jammy
+    network_mode: host
+    working_dir: /e2e
+    environment:
+      APP_URL: http://localhost:5173
+      CI: "true"
+    volumes:
+      - ./e2e:/e2e
+      - e2e_node_modules:/e2e/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npx playwright test"
+
+volumes:
+  e2e_node_modules:

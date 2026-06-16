@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down reset logs ps psql seed-users test db-test typecheck build preview clean infra-plan infra-apply
+.PHONY: help up down reset logs ps psql seed-users seed-e2e e2e test db-test typecheck build preview clean infra-plan infra-apply
 
 help: ## List of commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -29,6 +29,14 @@ psql: ## SQL shell on the local DB
 
 seed-users: ## Create test users + demo group (password123)
 	bash docker/seed-users.sh
+
+seed-e2e: ## Seed the e2e fixtures (superadmin + one group per type)
+	bash docker/seed-e2e.sh
+
+e2e: ## Run the Playwright e2e suite in Docker (brings up stack + seeds first)
+	docker compose up -d
+	bash docker/seed-e2e.sh
+	docker compose -p ensayo-e2e -f docker-compose.e2e.yml run --rm e2e
 
 test: ## Frontend tests
 	docker compose exec app npm test

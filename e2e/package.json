@@ -1,0 +1,12 @@
+{
+  "name": "ensayo-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Playwright e2e for group-type wording. Runs only inside the Playwright Docker image (see docker-compose.e2e.yml) — nothing is installed on the host.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
