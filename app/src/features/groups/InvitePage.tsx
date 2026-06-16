@@ -268,64 +268,63 @@ function InviteForm({ group }: { group: Group }) {
       {(invitations?.length ?? 0) > 0 && (
         <section>
           <h2 className="mb-2 font-semibold">{t('group.pendingInvites')}</h2>
-          <ul className="space-y-1 text-sm text-gray-600">
+          <ul className="space-y-2 text-sm text-gray-600">
             {invitations!.map((i) => (
-              <li
-                key={i.id}
-                className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2"
-              >
-                <span className="min-w-0">
-                  <span className="break-all">{i.email}</span>{' '}
+              <li key={i.id} className="space-y-1 rounded-lg bg-gray-50 px-3 py-2">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="break-all font-medium text-gray-800">{i.email}</span>
                   <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
-                  <span className="block text-xs">
+                </div>
+                <div className="flex items-end justify-between gap-2">
+                  <div className="min-w-0 text-xs">
                     {i.email_send_error ? (
-                      <span className="text-red-600" title={i.email_send_error}>
+                      <p className="text-red-600" title={i.email_send_error}>
                         {t('invite.lastSendFailed')}
-                      </span>
+                      </p>
                     ) : i.email_sent_at ? (
-                      <span className="text-gray-500">
+                      <p className="text-gray-500">
                         {t('invite.sentAt', { date: new Date(i.email_sent_at).toLocaleString() })}
-                      </span>
+                      </p>
                     ) : (
-                      <span className="text-amber-600">{t('invite.neverSent')}</span>
+                      <p className="text-amber-600">{t('invite.neverSent')}</p>
                     )}
-                  </span>
-                </span>
-                <span className="flex shrink-0 items-center gap-1">
-                  <span className="text-xs">
-                    {t('group.expires', { date: new Date(i.expires_at).toLocaleDateString() })}
-                  </span>
-                  {resendState[i.id] === 'ok' ? (
-                    <Check size={16} className="mx-1.5 text-green-600" aria-label={t('invite.resendOk')} />
-                  ) : resendState[i.id] === 'error' ? (
-                    <AlertCircle size={16} className="mx-1.5 text-red-600" aria-label={t('invite.resendError')} />
-                  ) : (
+                    <p className="text-gray-500">
+                      {t('group.expires', { date: new Date(i.expires_at).toLocaleDateString() })}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    {resendState[i.id] === 'ok' ? (
+                      <Check size={16} className="mx-1.5 text-green-600" aria-label={t('invite.resendOk')} />
+                    ) : resendState[i.id] === 'error' ? (
+                      <AlertCircle size={16} className="mx-1.5 text-red-600" aria-label={t('invite.resendError')} />
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        className="p-1.5"
+                        title={t('invite.resendEmail')}
+                        aria-label={t('invite.resendEmail')}
+                        disabled={resendInvite.isPending}
+                        onClick={() => resendInvite.mutate(i)}
+                      >
+                        {resendInvite.isPending && resendInvite.variables?.id === i.id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Mail size={16} />
+                        )}
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
-                      className="p-1.5"
-                      title={t('invite.resendEmail')}
-                      aria-label={t('invite.resendEmail')}
-                      disabled={resendInvite.isPending}
-                      onClick={() => resendInvite.mutate(i)}
+                      className="p-1.5 text-red-600"
+                      title={t('invite.deleteInvite')}
+                      aria-label={t('invite.deleteInvite')}
+                      disabled={deleteInvite.isPending}
+                      onClick={() => deleteInvite.mutate(i.id)}
                     >
-                      {resendInvite.isPending && resendInvite.variables?.id === i.id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Mail size={16} />
-                      )}
+                      <Trash2 size={16} />
                     </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    className="p-1.5 text-red-600"
-                    title={t('invite.deleteInvite')}
-                    aria-label={t('invite.deleteInvite')}
-                    disabled={deleteInvite.isPending}
-                    onClick={() => deleteInvite.mutate(i.id)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </span>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
