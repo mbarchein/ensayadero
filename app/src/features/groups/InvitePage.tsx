@@ -173,7 +173,9 @@ function InviteForm({ group }: { group: Group }) {
       <div className="flex items-center justify-between gap-3 rounded-xl border bg-white p-4">
         <div>
           <p className="font-medium">{t('invite.joinLabel')}</p>
-          <p className="text-sm text-gray-600">{t('invite.joinHint')}</p>
+          {group.join_enabled && (
+            <p className="text-sm text-gray-600">{t('invite.joinHint')}</p>
+          )}
         </div>
         <Toggle
           checked={group.join_enabled}

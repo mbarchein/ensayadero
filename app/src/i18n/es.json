@@ -269,7 +269,7 @@
     "qrTitle": "Escanea para unirte",
     "qrHint": "Escanea el QR o introduce el código.",
     "joinLabel": "Entrada al grupo",
-    "joinHint": "Cuando está activada, cualquiera con el código o el enlace puede unirse al grupo.",
+    "joinHint": "Grupo abierto: cualquiera con el código o el enlace puede unirse.",
     "shareTitle": "Compartir código",
     "byEmail": "Email",
     "byEmailTitle": "Invitar por email",
@@ -286,7 +286,7 @@
     "regenerate": "Regenerar código",
     "enable": "Activar código",
     "disable": "Desactivar código",
-    "disabledNote": "El código está desactivado. Nadie puede unirse con él.",
+    "disabledNote": "Entrada cerrada: el código y el enlace no funcionan.",
     "disableConfirm": "Si apagas el código, nadie podrá unirse con él hasta que lo vuelvas a activar. ¿Apagar?",
     "enableConfirm": "Se reactivará el código y cualquiera con él podrá volver a unirse. ¿Activar?",
     "regenerateConfirm": "Se generará un código nuevo. Los enlaces y QR compartidos antes dejarán de funcionar y tendrás que volver a compartirlos. Las invitaciones por email y los miembros actuales no se ven afectados. ¿Regenerar?"

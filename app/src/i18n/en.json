@@ -269,7 +269,7 @@
     "qrTitle": "Scan to join",
     "qrHint": "Scan the QR or enter the code.",
     "joinLabel": "Group join",
-    "joinHint": "When on, anyone with the code or link can join the group.",
+    "joinHint": "Group open: anyone with the code or link can join.",
     "shareTitle": "Share code",
     "byEmail": "Email",
     "byEmailTitle": "Invite by email",
@@ -286,7 +286,7 @@
     "regenerate": "Regenerate code",
     "enable": "Enable code",
     "disable": "Disable code",
-    "disabledNote": "The code is disabled. No one can join with it.",
+    "disabledNote": "Group entry is closed: the code and link don't work.",
     "disableConfirm": "If you turn the code off, no one can join with it until you turn it back on. Turn off?",
     "enableConfirm": "This re-enables the code and anyone with it can join again. Turn on?",
     "regenerateConfirm": "A new code will be generated. Previously shared links and QR codes will stop working and you'll need to share them again. Email invitations and current members are unaffected. Regenerate?"
