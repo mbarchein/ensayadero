@@ -6,6 +6,48 @@
     "SPORTS": { "act": "practice", "actPl": "practices", "Act": "Practice", "ActPl": "Practices", "leader": "coach", "member": "player" },
     "OTHER": { "act": "event", "actPl": "events", "Act": "Event", "ActPl": "Events", "leader": "coordinator", "member": "member" }
   },
+  "byType": {
+    "MUSIC": {
+      "welcome": {
+        "title0": "Welcome to the ensemble",
+        "sub0": "Tell us how to introduce you to the rest of your music group.",
+        "pronounHint": "To introduce you as a musician, director.",
+        "title1": "Don't get caught without your part",
+        "title2": "Your availability is the score",
+        "sub2": "Mark when you can rehearse. Whoever directs your group plans rehearsals with the whole ensemble’s availability: without yours, there is no concert."
+      }
+    },
+    "DANCE": {
+      "welcome": {
+        "title0": "Welcome to the company",
+        "sub0": "Tell us how to introduce you to the rest of your dance group.",
+        "pronounHint": "To introduce you as a dancer, choreographer.",
+        "title1": "Don't get caught offstage",
+        "title2": "Your availability is the choreography",
+        "sub2": "Mark when you can rehearse. Whoever leads your group plans rehearsals with the whole company’s availability: without yours, there is no show."
+      }
+    },
+    "SPORTS": {
+      "welcome": {
+        "title0": "Welcome to the team",
+        "sub0": "Tell us how to introduce you to the rest of your team.",
+        "pronounHint": "To introduce you as a player, coach.",
+        "title1": "Don't get caught offside",
+        "title2": "Your availability is the game plan",
+        "sub2": "Mark when you can train. Whoever coaches your team plans practices with the whole squad’s availability: without yours, there is no match."
+      }
+    },
+    "OTHER": {
+      "welcome": {
+        "title0": "Welcome to the group",
+        "sub0": "Tell us how to introduce you to the rest of your group.",
+        "pronounHint": "To introduce you to the rest of the group.",
+        "title1": "Don't get caught off guard",
+        "title2": "Your availability is the key",
+        "sub2": "Mark when you can attend. Whoever coordinates your group plans events with the whole team’s availability: without yours, there is no event."
+      }
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -21,16 +63,16 @@
     "hidePassword": "Hide password"
   },
   "tips": {
-    "home": "These are your groups. Open one to see its rehearsals, or join another with a code.",
-    "upcoming": "Your upcoming rehearsals across all groups. Answer Going / Can't make it, and tap a card for the detail.",
+    "home": "These are your groups. Open one to see its {{actPl}}, or join another with a code.",
+    "upcoming": "Your upcoming {{actPl}} across all groups. Answer Going / Can't make it, and tap a card for the detail.",
     "agenda": "Your weekly schedule. Tap a day in the header to paint your availability; swipe sideways to change week.",
     "agendaEdit": "Tap or drag over the slots to mark when you're available. It saves itself.",
     "notifications": "Alerts from your groups. Swipe one to the right to archive it (on desktop, use the hover icon).",
-    "group": "This group's rehearsals. Tap one to see the detail and confirm your attendance.",
-    "groupJoined": "You're in! Mark your availability in Agenda so you can be summoned to rehearsals.",
-    "sessionDetail": "Here you confirm whether you're going to this rehearsal and see who else is.",
-    "sessionShared": "Someone shared this rehearsal with you. If you're on the list, answer Going / Can't make it.",
-    "planner": "The group's availability map: greener = more people can make it. Tap a day and pick a slot to create the rehearsal.",
+    "group": "This group's {{actPl}}. Tap one to see the detail and confirm your attendance.",
+    "groupJoined": "You're in! Mark your availability in Agenda so you can be summoned to {{actPl}}.",
+    "sessionDetail": "Here you confirm whether you're going to this {{act}} and see who else is.",
+    "sessionShared": "Someone shared this {{act}} with you. If you're on the list, answer Going / Can't make it.",
+    "planner": "The group's availability map: greener = more people can make it. Tap a day and pick a slot to create the {{act}}.",
     "members": "Group members. Directors can invite by email, code or QR.",
     "profile": "Your details, email alerts and session. Changes here apply to all your groups."
   },
@@ -48,7 +90,7 @@
     },
     "push-notifications": {
       "title": "New: phone notifications",
-      "body": "You can now get rehearsal notifications on this device."
+      "body": "You can now get {{act}} notifications on this device."
     },
     "profile-photo": {
       "title": "New: your profile photo",
@@ -118,10 +160,10 @@
     "invalid": "Invalid or disabled code."
   },
   "upcoming": {
-    "title": "My upcoming rehearsals",
-    "empty": "You have no upcoming rehearsals.",
-    "pendingNotice_one": "You have {{count}} rehearsal to confirm.",
-    "pendingNotice_other": "You have {{count}} rehearsals to confirm.",
+    "title": "My upcoming {{actPl}}",
+    "empty": "You have no upcoming {{actPl}}.",
+    "pendingNotice_one": "You have {{count}} {{act}} to confirm.",
+    "pendingNotice_other": "You have {{count}} {{actPl}} to confirm.",
     "group": {
       "thisWeek": "This week",
       "nextWeek": "Next week",
@@ -197,14 +239,14 @@
   "home": {
     "greeting": "Hi, {{name}} 👋",
     "admin": "Admin",
-    "pendingTitle_one": "You have {{count}} rehearsal to confirm",
-    "pendingTitle_other": "You have {{count}} rehearsals to confirm",
+    "pendingTitle_one": "You have {{count}} {{act}} to confirm",
+    "pendingTitle_other": "You have {{count}} {{actPl}} to confirm",
     "myGroups": "My groups",
     "newGroup": "Create group",
     "joinByCode": "Join a group",
     "joinByCodeHint": "Use the code or link your group's director shared with you.",
     "membersCount": "Members",
-    "upcomingCount": "Scheduled rehearsals",
+    "upcomingCount": "Scheduled {{actPl}}",
     "newGroupExplain": "Create a new group: you'll be its director and can invite the others.",
     "newGroupTitle": "New group",
     "newGroupHint": "You'll be the director of this group and can invite the others.",
@@ -231,17 +273,17 @@
     "copyWeeksLabel": "How many following weeks?",
     "copyConfirm_one": "Copy to next week",
     "copyConfirm_other": "Copy to the next {{count}} weeks",
-    "clearScheduledConfirm": "This slot has a scheduled rehearsal. Remove your availability anyway?",
-    "clearScheduledTitle": "Remove availability from a rehearsal",
-    "clearScheduledBody": "You're about to remove your availability on slots with a scheduled rehearsal. Removing all of a rehearsal's availability marks you as \"Not going\". What do you want to remove?",
+    "clearScheduledConfirm": "This slot has a scheduled {{act}}. Remove your availability anyway?",
+    "clearScheduledTitle": "Remove availability from a {{act}}",
+    "clearScheduledBody": "You're about to remove your availability on slots with a scheduled {{act}}. Removing all of a {{act}}'s availability marks you as \"Not going\". What do you want to remove?",
     "clearSelected": "Remove only the selected part",
-    "clearFull": "Remove the whole rehearsal (marks me \"Not going\")",
+    "clearFull": "Remove the whole {{act}} (marks me \"Not going\")",
     "slotsCount_one": "{{count}} 30-min slot",
     "slotsCount_other": "{{count}} 30-min slots",
     "clearWeek": "Clear week",
     "clearWeekTitle": "Clear this week's availability",
     "clearWeekConfirm": "All the availability you marked this week will be removed. This can't be undone.",
-    "clearAffects": "Removes your availability and marks you \"Not going\" for these scheduled rehearsals:",
+    "clearAffects": "Removes your availability and marks you \"Not going\" for these scheduled {{actPl}}:",
     "saveError": "Error saving: {{message}}",
     "gridFooter": "{{minutes}} min slots · {{start}}:00–{{end}}:00"
   },
@@ -472,8 +514,8 @@
     "emptyTitle": "All calm",
     "empty": "No alerts. Enjoy the quiet.",
     "types": {
-      "SESSION_CONFIRMED": "Rehearsal confirmed",
-      "SESSION_CANCELLED": "Rehearsal cancelled",
+      "SESSION_CONFIRMED": "{{Act}} confirmed",
+      "SESSION_CANCELLED": "{{Act}} cancelled",
       "SESSION_CHANGED": "Time change",
       "SESSION_CHANGED_LOCATION": "Location change",
       "SESSION_CHANGED_BOTH": "Time and location change",
@@ -507,22 +549,22 @@
     "emailPrefsTitle": "Email alerts",
     "emailPrefsDescription": "Choose which emails you want to receive. In-app alerts are unaffected.",
     "emailPrefs": {
-      "reminders": "Rehearsal reminders",
-      "remindersHint": "24 hours before each rehearsal",
+      "reminders": "{{Act}} reminders",
+      "remindersHint": "24 hours before each {{act}}",
       "sessions": "Confirmations, changes and cancellations",
-      "sessionsHint": "When a rehearsal is confirmed, changed or cancelled",
+      "sessionsHint": "When a {{act}} is confirmed, changed or cancelled",
       "members": "New group members",
       "membersHint": "When someone joins your groups or you are made a director"
     },
     "pushTitle": "Alerts on this device",
-    "pushDescription": "Get alerts for confirmed rehearsals, changes and cancellations on this device.",
+    "pushDescription": "Get alerts for confirmed {{actPl}}, changes and cancellations on this device.",
     "pushEnabled": "✓ Enabled on this device",
     "pushEnable": "Enable notifications",
     "pushDisable": "Disable",
     "pushError": "Could not enable. Check browser permissions or install the app (iOS requires installing it).",
     "signOut": "Sign out",
     "dangerZone": "Danger zone",
-    "deleteDescription": "Deletes your account and all your data: availability, groups, rehearsal responses and notifications. This cannot be undone.",
+    "deleteDescription": "Deletes your account and all your data: availability, groups, {{act}} responses and notifications. This cannot be undone.",
     "deleteAccount": "Delete my account",
     "deleteKeyword": "DELETE",
     "deleteConfirm": "This action is irreversible. Type {{keyword}} to confirm:",

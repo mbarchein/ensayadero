@@ -16,6 +16,7 @@ import { useInstallPrompt, isIOS, isStandalone } from '../pwa/installPrompt'
 import FeatureCallout from '../whatsnew/FeatureCallout'
 import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
+import { tg } from '../../lib/glossary'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
 export default function HomePage() {
@@ -130,12 +131,12 @@ export default function HomePage() {
           {t('whatsnew.profile-photo.cta')}
         </Link>
       </FeatureCallout>
-      <Tip id="home" />
+      <Tip id="home" type="OTHER" />
 
       {(pending?.length ?? 0) > 0 && (
         <section className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <h2 className="mb-2 font-semibold text-amber-900">
-            {t('home.pendingTitle', { count: pending!.length })}
+            {tg(t, 'home.pendingTitle', 'OTHER', { count: pending!.length })}
           </h2>
           <ul className="space-y-1 text-sm">
             {pending!.map((p) => (
@@ -204,7 +205,7 @@ export default function HomePage() {
                               <span className="flex items-center gap-1" title={t('home.membersCount')}>
                                 <Users size={13} aria-hidden /> {groupStats.get(m.group_id)!.members}
                               </span>
-                              <span className="flex items-center gap-1" title={t('home.upcomingCount')}>
+                              <span className="flex items-center gap-1" title={tg(t, 'home.upcomingCount', m.groups.group_type)}>
                                 <CalendarDays size={13} aria-hidden /> {groupStats.get(m.group_id)!.upcoming}
                               </span>
                             </span>

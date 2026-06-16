@@ -158,7 +158,7 @@ export default function MembersPage() {
         </div>
       </header>
 
-      <Tip id="members" />
+      <Tip id="members" type={group?.group_type} />
 
       {newJoiners.map(({ member: m, missing }) => (
         <div

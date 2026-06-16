@@ -270,8 +270,8 @@ export default function SessionDetailPage() {
         )}
       </header>
 
-      {viaShare && <Tip id="sessionShared" />}
-      <Tip id="sessionDetail" />
+      {viaShare && <Tip id="sessionShared" type={group?.group_type} />}
+      <Tip id="sessionDetail" type={group?.group_type} />
 
       {shareError && (
         <p className="break-all text-xs text-gray-600">

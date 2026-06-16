@@ -7,6 +7,8 @@ import { useState } from 'react'
 import { Lightbulb, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
+import { tg } from '../lib/glossary'
+import type { GroupType } from '../lib/types'
 
 const PREFIX = 'tip-seen:'
 
@@ -17,7 +19,7 @@ export function resetTips() {
   }
 }
 
-export default function Tip({ id }: { id: string }) {
+export default function Tip({ id, type }: { id: string; type?: GroupType }) {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const key = `${PREFIX}${profile?.id ?? 'anon'}:${id}`
@@ -30,7 +32,7 @@ export default function Tip({ id }: { id: string }) {
   return (
     <div className="flex items-start gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
       <Lightbulb size={16} className="mt-0.5 shrink-0 text-sky-600" aria-hidden />
-      <p className="flex-1">{t(`tips.${id}`)}</p>
+      <p className="flex-1">{tg(t, `tips.${id}`, type)}</p>
       <button
         onClick={dismiss}
         aria-label={t('common.close')}

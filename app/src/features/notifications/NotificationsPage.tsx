@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
+import { tg } from '../../lib/glossary'
 import {
   Archive,
   CheckCheck,
@@ -24,7 +25,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Modal, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
-import type { Notification } from '../../lib/types'
+import type { Notification, GroupType } from '../../lib/types'
 import quotesEs from '../../data/quotes.es.json'
 import quotesEn from '../../data/quotes.en.json'
 
@@ -66,14 +67,14 @@ export default function NotificationsPage() {
     queryFn: async () => {
       const base = supabase
         .from('notifications')
-        .select('*, groups(name)')
+        .select('*, groups(name, group_type)')
         .order('created_at', { ascending: false })
         .limit(50)
       const { data, error } = await (showArchived
         ? base.not('archived_at', 'is', null)
         : base.is('archived_at', null))
       if (error) throw error
-      return data as (Notification & { groups: { name: string } | null })[]
+      return data as (Notification & { groups: { name: string; group_type: GroupType } | null })[]
     },
   })
 
@@ -235,7 +236,9 @@ export default function NotificationsPage() {
                   : 'SESSION_CHANGED'
             }
             const label = meta
-              ? t(`notifications.types.${typeKey}`, { name: String(n.payload.member_name ?? '') })
+              ? tg(t, `notifications.types.${typeKey}`, n.groups?.group_type ?? 'OTHER', {
+                  name: String(n.payload.member_name ?? ''),
+                })
               : n.type
             const starts = n.payload.starts_at ? new Date(String(n.payload.starts_at)) : null
             const inner = (

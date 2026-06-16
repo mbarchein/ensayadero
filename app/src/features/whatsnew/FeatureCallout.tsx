@@ -12,6 +12,7 @@ import { Sparkles, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { tg } from '../../lib/glossary'
 
 export default function FeatureCallout({ id, children }: { id: string; children?: ReactNode }) {
   const { t } = useTranslation()
@@ -30,8 +31,8 @@ export default function FeatureCallout({ id, children }: { id: string; children?
     <div className="flex items-start gap-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-sm text-violet-900">
       <Sparkles size={16} className="mt-0.5 shrink-0 text-violet-600" aria-hidden />
       <div className="flex-1">
-        <p className="font-medium">{t(`whatsnew.${id}.title`)}</p>
-        <p className="text-violet-800">{t(`whatsnew.${id}.body`)}</p>
+        <p className="font-medium">{tg(t, `whatsnew.${id}.title`, 'OTHER')}</p>
+        <p className="text-violet-800">{tg(t, `whatsnew.${id}.body`, 'OTHER')}</p>
         {children}
       </div>
       <button

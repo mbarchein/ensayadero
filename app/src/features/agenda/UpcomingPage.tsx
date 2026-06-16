@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { addDays } from 'date-fns'
 import { parseRange } from '../../lib/ranges'
 import { isoDay, weekStart } from '../../lib/slots'
+import { tg } from '../../lib/glossary'
 import { BackButton, EmptyState, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
 import { useMyAgenda } from './useMyAgenda'
@@ -49,23 +50,24 @@ export default function UpcomingPage() {
     <div className="space-y-4 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to="/" />
-        <h1 className="text-xl font-bold">{t('upcoming.title')}</h1>
+        <h1 className="text-xl font-bold">{tg(t, 'upcoming.title', 'OTHER')}</h1>
         <div className="ml-auto">
           <ViewToggle value={view} onChange={switchView} />
         </div>
       </header>
 
-      <Tip id="upcoming" />
+      <Tip id="upcoming" type="OTHER" />
 
       {pendingCount > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          {t('upcoming.pendingNotice', { count: pendingCount })}
+          {tg(t, 'upcoming.pendingNotice', 'OTHER', { count: pendingCount })}
         </p>
       )}
 
       {view === 'month' ? (
         <MonthCalendar
           items={data ?? []}
+          emptyDayLabel={tg(t, 'sessions.noneThisDay', 'OTHER')}
           dateOf={(p) => parseRange(p.sessions.time_range).start}
           dotOf={(p) => responseDotColor(p.sessions.status, p.response)}
           renderAgenda={(items) => (
@@ -87,7 +89,7 @@ export default function UpcomingPage() {
           )}
         />
       ) : upcoming.length === 0 ? (
-        <EmptyState message={t('upcoming.empty')} />
+        <EmptyState message={tg(t, 'upcoming.empty', 'OTHER')} />
       ) : (
         sections.map((s) => (
           <section key={s.key} className="space-y-2">

@@ -7,11 +7,23 @@
 
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { BellRing, CalendarHeart, Download, Drama, type LucideIcon } from 'lucide-react'
+import {
+  BellRing,
+  CalendarHeart,
+  Download,
+  Drama,
+  Music,
+  PersonStanding,
+  Dumbbell,
+  Shapes,
+  type LucideIcon,
+} from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { tg, tByType } from '../../lib/glossary'
+import type { GroupType } from '../../lib/types'
 import { enablePush } from '../../lib/push'
 import { useInstallPrompt, promptInstall } from '../pwa/installPrompt'
 import { Button, InitialsAvatar, Spinner, Toggle } from '../../components/ui'
@@ -26,6 +38,14 @@ const SCREEN_ICON: Record<Screen, LucideIcon> = {
   install: Download,
   finish: CalendarHeart,
 }
+// Identity screen icon reflects the group type the user is onboarding into.
+const TYPE_ICON: Record<GroupType, LucideIcon> = {
+  THEATRE: Drama,
+  MUSIC: Music,
+  DANCE: PersonStanding,
+  SPORTS: Dumbbell,
+  OTHER: Shapes,
+}
 // suffix for the welcome.title<x> / welcome.sub<x> i18n keys, per screen
 const SCREEN_KEY: Record<Screen, string> = {
   identity: '0',
@@ -38,6 +58,24 @@ export default function WelcomePage() {
   const { t } = useTranslation()
   const { session, profile, loading, refreshProfile } = useAuth()
   const navigate = useNavigate()
+
+  // Onboarding copy adapts to the group the user just joined (via invitation).
+  // No group yet (plain sign-up) → OTHER, the neutral wording.
+  const { data: groupType } = useQuery({
+    queryKey: ['welcome-group-type', profile?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('memberships')
+        .select('groups(group_type)')
+        .eq('user_id', profile!.id)
+        .limit(1)
+        .maybeSingle()
+      const g = data?.groups as unknown as { group_type: GroupType } | null
+      return (g?.group_type ?? 'OTHER') as GroupType
+    },
+    enabled: !!profile,
+  })
+  const type: GroupType = groupType ?? 'OTHER'
 
   const [screen, setScreen] = useState<Screen>('identity')
   const [name, setName] = useState(profile?.name ?? '')
@@ -108,7 +146,7 @@ export default function WelcomePage() {
     return <Navigate to="/" replace />
   }
 
-  const Icon = SCREEN_ICON[screen]
+  const Icon = screen === 'identity' ? TYPE_ICON[type] : SCREEN_ICON[screen]
   const busy = saveIdentity.isPending || savePrefs.isPending || finish.isPending
 
   const install = async () => {
@@ -143,10 +181,10 @@ export default function WelcomePage() {
         <div className="mt-10 text-center">
           <Icon size={64} strokeWidth={1.25} className="mx-auto text-violet-600" aria-hidden />
           <h1 className="mt-4 text-2xl font-bold text-violet-900">
-            {t(`welcome.title${SCREEN_KEY[screen]}`)}
+            {tByType(t, `welcome.title${SCREEN_KEY[screen]}`, type)}
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-gray-600">
-            {t(`welcome.sub${SCREEN_KEY[screen]}`)}
+            {tByType(t, `welcome.sub${SCREEN_KEY[screen]}`, type)}
           </p>
         </div>
 
@@ -190,7 +228,7 @@ export default function WelcomePage() {
                   </button>
                 ))}
               </div>
-              <p className="mt-2 text-xs text-gray-600">{t('welcome.pronounHint')}</p>
+              <p className="mt-2 text-xs text-gray-600">{tByType(t, 'welcome.pronounHint', type)}</p>
             </div>
           </div>
         )}
@@ -207,8 +245,8 @@ export default function WelcomePage() {
                 className="flex items-center justify-between gap-3 rounded-xl border bg-white p-3"
               >
                 <div>
-                  <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
-                  <p className="text-xs text-gray-600">{t(`profile.emailPrefs.${group}Hint`)}</p>
+                  <p className="text-sm font-medium">{tg(t, `profile.emailPrefs.${group}`, type)}</p>
+                  <p className="text-xs text-gray-600">{tg(t, `profile.emailPrefs.${group}Hint`, type)}</p>
                 </div>
                 <Toggle
                   checked={checked}

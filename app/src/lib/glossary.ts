@@ -16,3 +16,17 @@ export function tg(
   const g = t(`glossary.${type ?? 'THEATRE'}`, { returnObjects: true }) as Record<string, string>
   return t(key, { ...g, ...opts }) as string
 }
+
+// Whole-sentence per-type override (used where interpolation can't keep Spanish
+// gender agreement, e.g. the welcome copy). Looks up byType.<TYPE>.<key> and
+// falls back to the THEATRE base <key>.
+export function tByType(
+  t: TFunction,
+  key: string,
+  type: GroupType | null | undefined,
+  opts?: Record<string, unknown>,
+): string {
+  return (
+    type && type !== 'THEATRE' ? t([`byType.${type}.${key}`, key], opts) : t(key, opts)
+  ) as string
+}

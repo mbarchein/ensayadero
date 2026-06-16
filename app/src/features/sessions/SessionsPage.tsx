@@ -112,8 +112,8 @@ export default function SessionsPage() {
         </div>
       </header>
 
-      {justJoined && <Tip id="groupJoined" />}
-      <Tip id="group" />
+      {justJoined && <Tip id="groupJoined" type={group?.group_type} />}
+      <Tip id="group" type={group?.group_type} />
 
       <div className="space-y-2">
         {isInstructor && (

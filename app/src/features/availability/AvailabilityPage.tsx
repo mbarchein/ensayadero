@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { formatRange } from '../../lib/ranges'
+import { tg } from '../../lib/glossary'
 import {
   SLOTS_PER_DAY,
   isoDay,
@@ -548,7 +549,7 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      {dayView ? <Tip id="agendaEdit" /> : <Tip id="agenda" />}
+      {dayView ? <Tip id="agendaEdit" type="OTHER" /> : <Tip id="agenda" type="OTHER" />}
 
       <WeekGrid
         weekMonday={monday}
@@ -684,7 +685,7 @@ export default function AvailabilityPage() {
           <p className="text-sm text-gray-600">{t('availability.clearWeekConfirm')}</p>
           {weekScheduled.length > 0 && (
             <div className="rounded-lg bg-amber-50 p-3 text-sm">
-              <p className="font-medium text-amber-800">{t('availability.clearAffects')}</p>
+              <p className="font-medium text-amber-800">{tg(t, 'availability.clearAffects', 'OTHER')}</p>
               <ul className="mt-1 space-y-0.5 text-amber-700">
                 {weekScheduled.map((p) => {
                   const r = parseRange(p.sessions.time_range)
@@ -756,10 +757,10 @@ export default function AvailabilityPage() {
       <Modal
         open={!!clearPrompt}
         onClose={() => resolveClear('cancel')}
-        title={t('availability.clearScheduledTitle')}
+        title={tg(t, 'availability.clearScheduledTitle', 'OTHER')}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">{t('availability.clearScheduledBody')}</p>
+          <p className="text-sm text-gray-600">{tg(t, 'availability.clearScheduledBody', 'OTHER')}</p>
           <ul className="space-y-2">
             {(clearPrompt?.sessionIds ?? []).map((sid) => {
               const p = (agenda.data ?? []).find((x) => x.session_id === sid)
@@ -809,7 +810,7 @@ export default function AvailabilityPage() {
                     <span className="text-xs font-normal opacity-80">{rangeOf(selectedCells)}</span>
                   </Button>
                   <Button variant="danger" className="w-full flex flex-col items-center gap-0.5 !py-2" onClick={() => resolveClear('full')}>
-                    <span>{t('availability.clearFull')}</span>
+                    <span>{tg(t, 'availability.clearFull', 'OTHER')}</span>
                     <span className="text-xs font-normal opacity-80">{rangeOf(fullCells)}</span>
                   </Button>
                 </>

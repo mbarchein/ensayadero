@@ -6,6 +6,48 @@
     "SPORTS": { "act": "entrenamiento", "actPl": "entrenamientos", "Act": "Entrenamiento", "ActPl": "Entrenamientos", "leader": "entrenador", "member": "jugador" },
     "OTHER": { "act": "evento", "actPl": "eventos", "Act": "Evento", "ActPl": "Eventos", "leader": "coordinador", "member": "miembro" }
   },
+  "byType": {
+    "MUSIC": {
+      "welcome": {
+        "title0": "Te damos la bienvenida al conjunto",
+        "sub0": "Cuéntanos cómo presentarte al resto de tu grupo de música.",
+        "pronounHint": "Para presentarte como música o músico, directora o director.",
+        "title1": "Que no te pillen sin tu parte",
+        "title2": "Tu disponibilidad es la partitura",
+        "sub2": "Marca cuándo puedes ensayar. Quien dirige tu grupo planifica los ensayos con la disponibilidad de todo el conjunto: sin la tuya, no hay concierto."
+      }
+    },
+    "DANCE": {
+      "welcome": {
+        "title0": "Te damos la bienvenida a la compañía",
+        "sub0": "Cuéntanos cómo presentarte al resto de tu grupo de danza.",
+        "pronounHint": "Para presentarte como bailarina o bailarín, coreógrafa o coreógrafo.",
+        "title1": "Que no te pillen fuera del escenario",
+        "title2": "Tu disponibilidad es la coreografía",
+        "sub2": "Marca cuándo puedes ensayar. Quien dirige tu grupo planifica los ensayos con la disponibilidad de toda la compañía: sin la tuya, no hay función."
+      }
+    },
+    "SPORTS": {
+      "welcome": {
+        "title0": "Te damos la bienvenida al equipo",
+        "sub0": "Cuéntanos cómo presentarte al resto de tu equipo.",
+        "pronounHint": "Para presentarte como jugadora o jugador, entrenadora o entrenador.",
+        "title1": "Que no te pillen fuera de juego",
+        "title2": "Tu disponibilidad es el plan de partido",
+        "sub2": "Marca cuándo puedes entrenar. Quien dirige tu equipo planifica los entrenamientos con la disponibilidad de toda la plantilla: sin la tuya, no hay partido."
+      }
+    },
+    "OTHER": {
+      "welcome": {
+        "title0": "Te damos la bienvenida al grupo",
+        "sub0": "Cuéntanos cómo presentarte al resto de tu grupo.",
+        "pronounHint": "Para presentarte ante el resto del grupo.",
+        "title1": "Que no te pillen desprevenido",
+        "title2": "Tu disponibilidad es la clave",
+        "sub2": "Marca cuándo puedes asistir. Quien coordina tu grupo planifica los eventos con la disponibilidad de todo el equipo: sin la tuya, no hay evento."
+      }
+    }
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -21,16 +63,16 @@
     "hidePassword": "Ocultar contraseña"
   },
   "tips": {
-    "home": "Estos son tus grupos. Entra en uno para ver sus ensayos, o únete a otro con un código.",
-    "upcoming": "Tus próximos ensayos, de todos tus grupos. Responde Voy / No puedo, y toca un card para ver el detalle.",
+    "home": "Estos son tus grupos. Entra en uno para ver sus {{actPl}}, o únete a otro con un código.",
+    "upcoming": "Tus próximos {{actPl}}, de todos tus grupos. Responde Voy / No puedo, y toca un card para ver el detalle.",
     "agenda": "Tu agenda semanal. Toca un día en la cabecera para pintar tu disponibilidad; desliza a los lados para cambiar de semana.",
     "agendaEdit": "Toca o arrastra sobre las franjas para marcar cuándo puedes. Se guarda solo.",
     "notifications": "Los avisos de tus grupos. Desliza uno a la derecha para archivarlo (en ordenador, con el icono al pasar el ratón).",
-    "group": "Los ensayos de este grupo. Toca uno para ver el detalle y confirmar tu asistencia.",
-    "groupJoined": "¡Ya estás dentro! Marca tu disponibilidad en Agenda para que te puedan convocar a los ensayos.",
-    "sessionDetail": "Aquí confirmas si vas a este ensayo y ves quién más va.",
-    "sessionShared": "Te han compartido este ensayo. Si estás en la lista, responde Voy / No puedo.",
-    "planner": "Mapa de disponibilidad del grupo: más verde = más gente puede. Toca un día y elige una franja para crear el ensayo.",
+    "group": "Los {{actPl}} de este grupo. Toca uno para ver el detalle y confirmar tu asistencia.",
+    "groupJoined": "¡Ya estás dentro! Marca tu disponibilidad en Agenda para que te puedan convocar a los {{actPl}}.",
+    "sessionDetail": "Aquí confirmas si vas a este {{act}} y ves quién más va.",
+    "sessionShared": "Te han compartido este {{act}}. Si estás en la lista, responde Voy / No puedo.",
+    "planner": "Mapa de disponibilidad del grupo: más verde = más gente puede. Toca un día y elige una franja para crear el {{act}}.",
     "members": "Miembros del grupo. Los directores pueden invitar por email, código o QR.",
     "profile": "Tus datos, tus avisos por email y tu sesión. Lo que cambies aquí aplica a todos tus grupos."
   },
@@ -48,7 +90,7 @@
     },
     "push-notifications": {
       "title": "Novedad: avisos en el móvil",
-      "body": "Ya puedes recibir notificaciones de tus ensayos en este dispositivo."
+      "body": "Ya puedes recibir notificaciones de tus {{actPl}} en este dispositivo."
     },
     "profile-photo": {
       "title": "Novedad: tu foto de perfil",
@@ -118,10 +160,10 @@
     "invalid": "Código no válido o desactivado."
   },
   "upcoming": {
-    "title": "Mis próximos ensayos",
-    "empty": "No tienes ensayos próximos.",
-    "pendingNotice_one": "Tienes {{count}} ensayo por confirmar.",
-    "pendingNotice_other": "Tienes {{count}} ensayos por confirmar.",
+    "title": "Mis próximos {{actPl}}",
+    "empty": "No tienes {{actPl}} próximos.",
+    "pendingNotice_one": "Tienes {{count}} {{act}} por confirmar.",
+    "pendingNotice_other": "Tienes {{count}} {{actPl}} por confirmar.",
     "group": {
       "thisWeek": "Esta semana",
       "nextWeek": "La semana que viene",
@@ -197,14 +239,14 @@
   "home": {
     "greeting": "Hola, {{name}} 👋",
     "admin": "Admin",
-    "pendingTitle_one": "Tienes {{count}} ensayo por confirmar",
-    "pendingTitle_other": "Tienes {{count}} ensayos por confirmar",
+    "pendingTitle_one": "Tienes {{count}} {{act}} por confirmar",
+    "pendingTitle_other": "Tienes {{count}} {{actPl}} por confirmar",
     "myGroups": "Mis grupos",
     "newGroup": "Crear grupo",
     "joinByCode": "Unirme a un grupo",
     "joinByCodeHint": "Usa el código o el enlace que te ha compartido el director de tu grupo.",
     "membersCount": "Miembros",
-    "upcomingCount": "Ensayos programados",
+    "upcomingCount": "{{ActPl}} programados",
     "newGroupExplain": "Crea un grupo nuevo: serás el director y podrás invitar a los demás.",
     "newGroupTitle": "Nuevo grupo",
     "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
@@ -231,17 +273,17 @@
     "copyWeeksLabel": "¿Cuántas semanas siguientes?",
     "copyConfirm_one": "Copiar a la próxima semana",
     "copyConfirm_other": "Copiar a las próximas {{count}} semanas",
-    "clearScheduledConfirm": "Esta franja tiene un ensayo programado. ¿Quitar tu disponibilidad igualmente?",
-    "clearScheduledTitle": "Quitar disponibilidad de un ensayo",
-    "clearScheduledBody": "Vas a quitar tu disponibilidad en franjas con un ensayo programado. Si quitas toda la de un ensayo, se te marcará como «No voy». ¿Qué quieres quitar?",
+    "clearScheduledConfirm": "Esta franja tiene un {{act}} programado. ¿Quitar tu disponibilidad igualmente?",
+    "clearScheduledTitle": "Quitar disponibilidad de un {{act}}",
+    "clearScheduledBody": "Vas a quitar tu disponibilidad en franjas con un {{act}} programado. Si quitas toda la de un {{act}}, se te marcará como «No voy». ¿Qué quieres quitar?",
     "clearSelected": "Quitar solo lo seleccionado",
-    "clearFull": "Quitar todo el ensayo (me marca «No voy»)",
+    "clearFull": "Quitar todo el {{act}} (me marca «No voy»)",
     "slotsCount_one": "{{count}} tramo de 30 min",
     "slotsCount_other": "{{count}} tramos de 30 min",
     "clearWeek": "Borrar semana",
     "clearWeekTitle": "Borrar disponibilidad de la semana",
     "clearWeekConfirm": "Se borrará toda tu disponibilidad marcada en esta semana. Esta acción no se puede deshacer.",
-    "clearAffects": "Quita tu disponibilidad y te marca como «No voy» en estos ensayos programados:",
+    "clearAffects": "Quita tu disponibilidad y te marca como «No voy» en estos {{actPl}} programados:",
     "saveError": "Error al guardar: {{message}}",
     "gridFooter": "Franjas de {{minutes}} min · {{start}}:00–{{end}}:00"
   },
@@ -472,8 +514,8 @@
     "emptyTitle": "Todo en calma",
     "empty": "No tienes avisos. Disfruta del descanso.",
     "types": {
-      "SESSION_CONFIRMED": "Ensayo confirmado",
-      "SESSION_CANCELLED": "Ensayo cancelado",
+      "SESSION_CONFIRMED": "{{Act}} confirmado",
+      "SESSION_CANCELLED": "{{Act}} cancelado",
       "SESSION_CHANGED": "Cambio de hora",
       "SESSION_CHANGED_LOCATION": "Cambio de lugar",
       "SESSION_CHANGED_BOTH": "Cambio de hora y lugar",
@@ -507,22 +549,22 @@
     "emailPrefsTitle": "Avisos por email",
     "emailPrefsDescription": "Elige qué emails quieres recibir. Los avisos dentro de la app no cambian.",
     "emailPrefs": {
-      "reminders": "Recordatorios de ensayo",
-      "remindersHint": "24 horas antes de cada ensayo",
+      "reminders": "Recordatorios de {{act}}",
+      "remindersHint": "24 horas antes de cada {{act}}",
       "sessions": "Convocatorias, cambios y cancelaciones",
-      "sessionsHint": "Cuando se confirma, cambia o cancela un ensayo",
+      "sessionsHint": "Cuando se confirma, cambia o cancela un {{act}}",
       "members": "Nuevos miembros del grupo",
       "membersHint": "Cuando alguien se une a tus grupos o te nombran director"
     },
     "pushTitle": "Avisos en este dispositivo",
-    "pushDescription": "Recibe avisos de ensayos confirmados, cambios y cancelaciones en este dispositivo.",
+    "pushDescription": "Recibe avisos de {{actPl}} confirmados, cambios y cancelaciones en este dispositivo.",
     "pushEnabled": "✓ Activadas en este dispositivo",
     "pushEnable": "Activar notificaciones",
     "pushDisable": "Desactivar",
     "pushError": "No se pudo activar. Revisa permisos del navegador o instala la app (iOS requiere instalarla).",
     "signOut": "Cerrar sesión",
     "dangerZone": "Zona peligrosa",
-    "deleteDescription": "Borra tu cuenta y todos tus datos: disponibilidad, grupos, respuestas a ensayos y notificaciones. No se puede deshacer.",
+    "deleteDescription": "Borra tu cuenta y todos tus datos: disponibilidad, grupos, respuestas a {{actPl}} y notificaciones. No se puede deshacer.",
     "deleteAccount": "Borrar mi cuenta",
     "deleteKeyword": "BORRAR",
     "deleteConfirm": "Esta acción es irreversible. Escribe {{keyword}} para confirmar:",

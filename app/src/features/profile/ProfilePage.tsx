@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { tg } from '../../lib/glossary'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Download, LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
@@ -153,7 +154,7 @@ export default function ProfilePage() {
           <LogOut size={18} /> {t('profile.signOut')}
         </Button>
       </header>
-      <Tip id="profile" />
+      <Tip id="profile" type="OTHER" />
       <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
         <AvatarEditor
           name={profile?.name || profile?.email || '?'}
@@ -246,8 +247,8 @@ export default function ProfilePage() {
           {(Object.keys(EMAIL_GROUPS) as EmailGroup[]).map((group) => (
             <div key={group} className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium">{t(`profile.emailPrefs.${group}`)}</p>
-                <p className="text-xs text-gray-600">{t(`profile.emailPrefs.${group}Hint`)}</p>
+                <p className="text-sm font-medium">{tg(t, `profile.emailPrefs.${group}`, 'OTHER')}</p>
+                <p className="text-xs text-gray-600">{tg(t, `profile.emailPrefs.${group}Hint`, 'OTHER')}</p>
               </div>
               {prefs ? (
                 <Toggle
@@ -272,7 +273,7 @@ export default function ProfilePage() {
       {!!import.meta.env.VITE_VAPID_PUBLIC_KEY && (
         <section className="rounded-xl border bg-white p-4">
           <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
-          <p className="mb-3 text-sm text-gray-600">{t('profile.pushDescription')}</p>
+          <p className="mb-3 text-sm text-gray-600">{tg(t, 'profile.pushDescription', 'OTHER')}</p>
           {pushState === 'ok' ? (
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
@@ -329,7 +330,7 @@ export default function ProfilePage() {
 
       <section className="rounded-xl border border-red-200 bg-red-50 p-4">
         <h2 className="mb-2 font-semibold text-red-900">{t('profile.dangerZone')}</h2>
-        <p className="mb-3 text-sm text-red-800">{t('profile.deleteDescription')}</p>
+        <p className="mb-3 text-sm text-red-800">{tg(t, 'profile.deleteDescription', 'OTHER')}</p>
         <Button
           variant="danger"
           className="inline-flex items-center gap-1.5"
@@ -348,7 +349,7 @@ export default function ProfilePage() {
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t('profile.deleteAccount')}>
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">{t('profile.deleteDescription')}</p>
+          <p className="text-sm text-gray-600">{tg(t, 'profile.deleteDescription', 'OTHER')}</p>
           <label className="block text-sm">
             {t('profile.deleteConfirm', { keyword: t('profile.deleteKeyword') })}
             <input

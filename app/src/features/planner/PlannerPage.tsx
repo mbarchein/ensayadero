@@ -185,7 +185,7 @@ export default function PlannerPage() {
         <h1 className="text-xl font-bold">{tg(t, 'planner.title', group?.group_type)}</h1>
       </header>
 
-      <Tip id="planner" />
+      <Tip id="planner" type={group?.group_type} />
 
       {/* people selector */}
       <div className="flex flex-wrap gap-1.5">
