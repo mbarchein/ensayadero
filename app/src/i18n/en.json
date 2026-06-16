@@ -214,7 +214,7 @@
     "sending": "Sending…",
     "pendingInvites": "Pending invitations",
     "expires": "expires {{date}}",
-    "remove": "Remove",
+    "remove": "Remove from group",
     "promoteConfirm": "Make {{name}} a director? They'll be able to schedule rehearsals, invite and manage the group.",
     "demoteConfirm": "Move {{name}} to actor? They'll no longer be able to manage the group.",
     "removeTitle": "Remove from group",
