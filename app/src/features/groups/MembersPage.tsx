@@ -343,9 +343,7 @@ export default function MembersPage() {
       )}
 
       <div className="border-t pt-4">
-        <Button
-          variant="danger"
-          className="inline-flex items-center gap-1.5"
+        <button
           disabled={leaveGroup.isPending}
           onClick={() => {
             setLeaveText('')
@@ -356,9 +354,10 @@ export default function MembersPage() {
             )
             setLeaveOpen(true)
           }}
+          className="block w-full py-2 text-center text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
         >
-          <LogOut size={16} /> {t('group.leave')}
-        </Button>
+          {t('group.leave')}
+        </button>
         {leaveGroup.isError && (
           <p className="text-sm text-red-600">{(leaveGroup.error as Error).message}</p>
         )}
