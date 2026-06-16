@@ -240,7 +240,9 @@ export default function MembersPage() {
           opens an action sheet to promote/demote or remove */}
       <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
         {sortedMembers.map((m) => {
-          const actionable = isInstructor && m.user_id !== profile?.id
+          // instructors can tap any face; own face opens the sheet too but its
+          // actions are disabled there
+          const tappable = isInstructor
           const face = m.profiles.avatar_url ? (
             <img
               src={m.profiles.avatar_url}
@@ -262,7 +264,7 @@ export default function MembersPage() {
           )
           return (
             <li key={m.user_id} className="flex flex-col items-center text-center">
-              {actionable ? (
+              {tappable ? (
                 <button
                   type="button"
                   onClick={() => setSheetTarget(m)}
@@ -518,7 +520,8 @@ export default function MembersPage() {
             <div className="space-y-2">
               <Button
                 variant="secondary"
-                className="inline-flex w-full items-center justify-center gap-1.5"
+                className="inline-flex w-full items-center justify-center gap-1.5 disabled:opacity-50"
+                disabled={sheetTarget.user_id === profile?.id}
                 onClick={() => {
                   setRoleTarget(sheetTarget)
                   setSheetTarget(null)
@@ -529,7 +532,8 @@ export default function MembersPage() {
               </Button>
               <Button
                 variant="danger"
-                className="inline-flex w-full items-center justify-center gap-1.5"
+                className="inline-flex w-full items-center justify-center gap-1.5 disabled:opacity-50"
+                disabled={sheetTarget.user_id === profile?.id}
                 onClick={() => {
                   setRemoveTarget(sheetTarget)
                   setSheetTarget(null)
