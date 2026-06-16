@@ -275,6 +275,8 @@
     "byEmailTitle": "Invite by email",
     "emailsLabel": "Emails (separated by comma, space or newline)",
     "sendEmails": "Send invitations",
+    "sendFailed": "Couldn't send {{count}} email. Resend it from the pending list.",
+    "sendFailed_other": "Couldn't send {{count}} emails. Resend them from the pending list.",
     "resendEmail": "Resend invitation email",
     "resendOk": "Email sent",
     "resendError": "Email could not be sent",

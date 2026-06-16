@@ -84,28 +84,29 @@ function InviteForm({ group }: { group: Group }) {
         ...new Set(emails.split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean)),
       ]
       if (list.length === 0) return 0
-      const { error } = await supabase
+      // insert and get back exactly the rows we created (no fragile re-select)
+      const { data: created, error } = await supabase
         .from('invitations')
         .insert(list.map((email) => ({ group_id: group.id, email, created_by: profile!.id })))
+        .select('id')
       if (error) throw error
-      const { data: created } = await supabase
-        .from('invitations')
-        .select('id, email')
-        .eq('group_id', group.id)
-        .is('accepted_at', null)
-        .in('email', list)
-      // send the emails right away (awaited so failures surface to the user)
-      await Promise.all(
+      // send every email right away; surface a failure so the user knows it
+      // didn't go out and can retry from the pending list
+      const results = await Promise.all(
         (created ?? []).map((inv) =>
           supabase.functions.invoke('send-notifications', { body: { invitation_id: inv.id } }),
         ),
       )
+      const failed = results.filter((r) => r.error).length
+      if (failed > 0) throw new Error(t('invite.sendFailed', { count: failed }))
       return list.length
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invitations', group.id] })
       setEmails('')
     },
+    // some sends failed: the invitations exist, show them so they can be resent
+    onError: () => qc.invalidateQueries({ queryKey: ['invitations', group.id] }),
   })
 
   const flashResend = (id: string, state: 'ok' | 'error') => {

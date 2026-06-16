@@ -275,6 +275,8 @@
     "byEmailTitle": "Invitar por email",
     "emailsLabel": "Emails (separados por coma, espacio o salto de línea)",
     "sendEmails": "Enviar invitaciones",
+    "sendFailed": "No se pudo enviar {{count}} email. Reenvíalo desde la lista de pendientes.",
+    "sendFailed_other": "No se pudieron enviar {{count}} emails. Reenvíalos desde la lista de pendientes.",
     "resendEmail": "Reenviar email de invitación",
     "resendOk": "Email enviado",
     "resendError": "No se pudo enviar el email",
