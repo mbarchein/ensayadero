@@ -284,7 +284,10 @@ function InviteForm({ group }: { group: Group }) {
           <h2 className="mb-2 font-semibold">{t('group.pendingInvites')}</h2>
           <ul className="space-y-2 text-sm text-gray-600">
             {invitations!.map((i) => (
-              <li key={i.id} className="space-y-1 rounded-lg bg-gray-50 px-3 py-2">
+              <li
+                key={i.id}
+                className="space-y-1 rounded-lg border border-gray-200 bg-white px-3 py-2.5 shadow-sm"
+              >
                 <p className="break-all font-medium text-gray-800">{i.email}</p>
                 <div className="flex items-end justify-between gap-2">
                   <div className="min-w-0 text-xs">
