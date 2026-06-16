@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { PENDING_SESSION_KEY } from '../features/sessions/ShortLinkPage'
+import { PENDING_JOIN_KEY } from '../features/groups/JoinPage'
 import { PasswordInput } from '../components/ui'
 import Turnstile, { captchaEnabled } from './Turnstile'
 
@@ -56,6 +57,13 @@ export default function LoginPage() {
       setCaptchaToken(null)
       setCaptchaKey((k) => k + 1) // single-use token → refresh the widget
     } else {
+      // resume a join-by-code link interrupted by login
+      const pendingJoin = localStorage.getItem(PENDING_JOIN_KEY)
+      if (pendingJoin) {
+        localStorage.removeItem(PENDING_JOIN_KEY)
+        navigate(`/join/${pendingJoin}`, { replace: true })
+        return
+      }
       // resume a shared session deep link (/s/:code) interrupted by login
       const pendingSession = localStorage.getItem(PENDING_SESSION_KEY)
       if (pendingSession) {

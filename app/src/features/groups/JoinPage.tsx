@@ -42,11 +42,10 @@ export default function JoinPage() {
     if (session) {
       join(codeParam)
     } else {
+      // no session: remember the code and let the user pick how to sign in
+      // (Google or email/password). Both paths resume the join afterwards.
       localStorage.setItem(PENDING_JOIN_KEY, codeParam)
-      supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${import.meta.env.VITE_APP_URL}/auth/callback` },
-      })
+      navigate('/login', { replace: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, session, codeParam])
