@@ -183,6 +183,13 @@ function InviteForm({ group }: { group: Group }) {
         />
       </div>
 
+      {!group.join_enabled && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <Power size={18} className="mt-0.5 shrink-0" aria-hidden />
+          <p>{t('invite.disabledNote')}</p>
+        </div>
+      )}
+
       {/* share code + link + QR (only when join is on) */}
       {group.join_enabled && (
         <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
@@ -330,12 +337,6 @@ function InviteForm({ group }: { group: Group }) {
             ))}
           </ul>
         </section>
-      )}
-
-      {!group.join_enabled && (
-        <p className="flex items-center justify-center gap-1.5 text-sm text-gray-500">
-          <Power size={14} aria-hidden /> {t('invite.disabledNote')}
-        </p>
       )}
 
       <Modal open={regenerateOpen} onClose={() => setRegenerateOpen(false)} title={t('invite.regenerate')}>
