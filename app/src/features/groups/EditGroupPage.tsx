@@ -28,7 +28,9 @@ function EditGroupForm({ group }: { group: Group }) {
   // avatar changes autosave; the save button only persists the name
   const [seed, setSeed] = useState(group.avatar_seed || group.id)
   const [image, setImage] = useState<string | null>(group.avatar_image)
-  const [policy, setPolicy] = useState<MemberInclusionPolicy>(group.new_member_policy)
+  const [policy, setPolicy] = useState<MemberInclusionPolicy>(
+    group.new_member_policy ?? 'MANDATORY',
+  )
   const [avatarSaved, setAvatarSaved] = useState(false)
 
   const invalidate = () => {
