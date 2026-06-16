@@ -1,5 +1,5 @@
 // Group setting: how members who join from now on are added to the group's
-// future rehearsals (MANDATORY default / OPTIONAL / NONE).
+// future rehearsals (MANDATORY default / OPTIONAL / NONE). Segmented control.
 
 import { useTranslation } from 'react-i18next'
 import type { MemberInclusionPolicy } from '../../lib/types'
@@ -20,22 +20,31 @@ export default function MemberPolicyField({
 }) {
   const { t } = useTranslation()
   return (
-    <fieldset className="block text-sm">
-      <legend>{t('group.newMemberLabel')}</legend>
-      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
-        {OPTIONS.map((opt) => (
-          <label key={opt} className="flex items-center gap-1.5">
-            <input
-              type="radio"
-              name="new-member-policy"
-              checked={value === opt}
-              onChange={() => onChange(opt)}
-            />
-            {t(LABEL[opt])}
-          </label>
-        ))}
+    <div className="text-sm">
+      <p className="mb-1">{t('group.newMemberLabel')}</p>
+      <div className="flex overflow-hidden rounded-lg border border-violet-200">
+        {OPTIONS.map((opt, i) => {
+          const active = value === opt
+          return (
+            <button
+              key={opt}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(opt)}
+              className={`flex-1 px-3 py-2 text-center transition-colors ${
+                i > 0 ? 'border-l border-violet-200' : ''
+              } ${
+                active
+                  ? 'bg-violet-600 font-medium text-white'
+                  : 'bg-white text-gray-700 hover:bg-violet-50'
+              }`}
+            >
+              {t(LABEL[opt])}
+            </button>
+          )
+        })}
       </div>
       <p className="mt-1 text-xs text-gray-600">{t('group.newMemberHint')}</p>
-    </fieldset>
+    </div>
   )
 }
