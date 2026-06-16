@@ -20,7 +20,7 @@ export default defineConfig({
     { name: 'setup', testMatch: /auth\.setup\.ts/ },
     {
       name: 'e2e',
-      testMatch: /group-types\.spec\.ts/,
+      testMatch: /\.spec\.ts$/,
       dependencies: ['setup'],
       use: { storageState: '.auth/admin.json' },
     },
