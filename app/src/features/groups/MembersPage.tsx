@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { AlertCircle, Check, Loader2, LogOut, Mail, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, LogOut, Mail, Users, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import InvitePanel from './InvitePanel'
 import Tip from '../../components/Tip'
@@ -194,6 +194,11 @@ export default function MembersPage() {
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
+        {members.length > 0 && (
+          <span className="ml-auto inline-flex items-center gap-1 text-sm text-gray-500">
+            <Users size={14} aria-hidden /> {members.length}
+          </span>
+        )}
       </header>
 
       <Tip id="members" />
