@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down reset logs ps psql seed-users test typecheck build preview clean infra-plan infra-apply
+.PHONY: help up down reset logs ps psql seed-users test db-test typecheck build preview clean infra-plan infra-apply
 
 help: ## List of commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,13 @@ seed-users: ## Create test users + demo group (password123)
 
 test: ## Frontend tests
 	docker compose exec app npm test
+
+db-test: ## Run SQL tests (supabase/tests/*.sql) against the local DB
+	@for f in supabase/tests/*.sql; do \
+	  echo "→ $$f"; \
+	  docker compose exec -T -e PGPASSWORD=postgres db \
+	    psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 -f - < "$$f" || exit 1; \
+	done
 
 typecheck: ## Frontend typecheck
 	docker compose exec app npm run typecheck
