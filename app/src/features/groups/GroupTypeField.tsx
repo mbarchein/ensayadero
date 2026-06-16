@@ -17,14 +17,16 @@ const ICON: Record<GroupType, LucideIcon> = {
 export default function GroupTypeField({
   value,
   onChange,
+  hideLabel = false,
 }: {
   value: GroupType
   onChange: (v: GroupType) => void
+  hideLabel?: boolean
 }) {
   const { t } = useTranslation()
   return (
     <div className="text-sm">
-      <p className="mb-1">{t('group.typeLabel')}</p>
+      {!hideLabel && <p className="mb-1">{t('group.typeLabel')}</p>}
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
         {OPTIONS.map((opt) => {
           const Icon = ICON[opt]

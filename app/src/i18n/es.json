@@ -62,6 +62,21 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña"
   },
+  "wizard": {
+    "stepType": "¿Qué tipo de grupo es?",
+    "stepTypeSub": "Elige la actividad; adaptaremos los textos de la app.",
+    "stepName": "¿Cómo se llama?",
+    "stepNameSub": "Podrás cambiarlo cuando quieras.",
+    "stepPolicy": "Nuevos miembros",
+    "stepPolicySub": "Cómo entran a los {{actPl}} ya planificados.",
+    "stepImage": "Ponle cara",
+    "stepImageSub": "Genera un avatar o sube una foto.",
+    "shuffle": "Otra sugerencia",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "create": "Crear grupo",
+    "creating": "Creando…"
+  },
   "tips": {
     "home": "Estos son tus grupos. Entra en uno para ver sus {{actPl}}, o únete a otro con un código.",
     "upcoming": "Tus próximos {{actPl}}, de todos tus grupos. Responde Voy / No puedo, y toca un card para ver el detalle.",

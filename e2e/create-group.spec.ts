@@ -19,8 +19,15 @@ test.describe('create group adopts type wording', () => {
       const name = `E2E Crear ${c.tile} ${RUN}`
 
       await page.goto('/new-group')
-      await page.getByLabel('Nombre del grupo').fill(name)
+      // Step 1 — type
       await page.getByRole('button', { name: c.tile, exact: true }).click()
+      await page.getByRole('button', { name: 'Siguiente' }).click()
+      // Step 2 — name
+      await page.getByLabel('Nombre del grupo').fill(name)
+      await page.getByRole('button', { name: 'Siguiente' }).click()
+      // Step 3 — new-member policy
+      await page.getByRole('button', { name: 'Siguiente' }).click()
+      // Step 4 — image → create
       await page.getByRole('button', { name: 'Crear grupo' }).click()
 
       // NewGroupPage navigates back to home; open the freshly created group.
