@@ -32,8 +32,6 @@ type Lang = 'es' | 'en'
 // Email copy per language; the user's language comes from auth user_metadata.lang.
 const T: Record<Lang, Record<string, string>> = {
   es: {
-    confirmed: 'Ensayo confirmado',
-    cancelled: 'Ensayo cancelado',
     timeChange: 'Cambio de hora',
     placeChange: 'Cambio de lugar',
     timePlaceChange: 'Cambio de hora y lugar',
@@ -45,7 +43,6 @@ const T: Record<Lang, Record<string, string>> = {
     promoted: 'Ahora diriges el grupo',
     promotedBy: 'te ha dado el rol de dirección en',
     promotedBody: 'Tienes el rol de dirección en',
-    promotedPerks: 'Ya puedes programar ensayos, convocar al grupo e invitar a nuevos miembros.',
     promotedCta: 'Abrir el grupo',
     when: 'Cuándo',
     where: 'Dónde',
@@ -60,8 +57,6 @@ const T: Record<Lang, Record<string, string>> = {
       'Recibes este correo porque formas parte de un grupo en Ensayadero. Si no esperabas este aviso, puedes ignorarlo.',
   },
   en: {
-    confirmed: 'Rehearsal confirmed',
-    cancelled: 'Rehearsal cancelled',
     timeChange: 'Time change',
     placeChange: 'Location change',
     timePlaceChange: 'Time and location change',
@@ -73,7 +68,6 @@ const T: Record<Lang, Record<string, string>> = {
     promoted: 'You now direct the group',
     promotedBy: 'has given you the director role in',
     promotedBody: 'You have the director role in',
-    promotedPerks: 'You can now plan rehearsals, summon the group and invite new members.',
     promotedCta: 'Open the group',
     when: 'When',
     where: 'Where',
@@ -89,6 +83,42 @@ const T: Record<Lang, Record<string, string>> = {
   },
 }
 
+type GroupType = 'THEATRE' | 'MUSIC' | 'DANCE' | 'SPORTS' | 'OTHER'
+
+// Per-type activity noun for the email copy, mirroring the app glossary. All
+// nouns are masculine in Spanish so the surrounding wording still agrees.
+const ACT: Record<Lang, Record<GroupType, { act: string; actPl: string; Act: string }>> = {
+  es: {
+    THEATRE: { act: 'ensayo', actPl: 'ensayos', Act: 'Ensayo' },
+    MUSIC: { act: 'ensayo', actPl: 'ensayos', Act: 'Ensayo' },
+    DANCE: { act: 'ensayo', actPl: 'ensayos', Act: 'Ensayo' },
+    SPORTS: { act: 'entrenamiento', actPl: 'entrenamientos', Act: 'Entrenamiento' },
+    OTHER: { act: 'evento', actPl: 'eventos', Act: 'Evento' },
+  },
+  en: {
+    THEATRE: { act: 'rehearsal', actPl: 'rehearsals', Act: 'Rehearsal' },
+    MUSIC: { act: 'rehearsal', actPl: 'rehearsals', Act: 'Rehearsal' },
+    DANCE: { act: 'rehearsal', actPl: 'rehearsals', Act: 'Rehearsal' },
+    SPORTS: { act: 'practice', actPl: 'practices', Act: 'Practice' },
+    OTHER: { act: 'event', actPl: 'events', Act: 'Event' },
+  },
+}
+
+// Per-type subject prefixes for session confirm/cancel (replaces the fixed
+// T[lang].confirmed / .cancelled, which were theatre-only).
+function confirmedLabel(lang: Lang, gt: GroupType): string {
+  return lang === 'es' ? `${ACT.es[gt].Act} confirmado` : `${ACT.en[gt].Act} confirmed`
+}
+function cancelledLabel(lang: Lang, gt: GroupType): string {
+  return lang === 'es' ? `${ACT.es[gt].Act} cancelado` : `${ACT.en[gt].Act} cancelled`
+}
+// "You can now plan <activities>, …" — the role-promotion perks line.
+function promotedPerks(lang: Lang, gt: GroupType): string {
+  return lang === 'es'
+    ? `Ya puedes programar ${ACT.es[gt].actPl}, convocar al grupo e invitar a nuevos miembros.`
+    : `You can now plan ${ACT.en[gt].actPl}, summon the group and invite new members.`
+}
+
 // Sessions have no title: the label is "<group> · <short date/time>".
 function sessionLabel(p: Record<string, unknown>, lang: Lang, group?: string): string {
   const en = lang === 'en'
@@ -101,9 +131,12 @@ function sessionLabel(p: Record<string, unknown>, lang: Lang, group?: string): s
   return [group, when].filter(Boolean).join(' · ')
 }
 
-const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: string) => string> = {
-  SESSION_CONFIRMED: (p, l, g) => `✅ ${T[l].confirmed}: ${sessionLabel(p, l, g)}`,
-  SESSION_CANCELLED: (p, l, g) => `❌ ${T[l].cancelled}: ${sessionLabel(p, l, g)}`,
+const SUBJECTS: Record<
+  string,
+  (p: Record<string, unknown>, lang: Lang, group: string | undefined, gt: GroupType) => string
+> = {
+  SESSION_CONFIRMED: (p, l, g, gt) => `✅ ${confirmedLabel(l, gt)}: ${sessionLabel(p, l, g)}`,
+  SESSION_CANCELLED: (p, l, g, gt) => `❌ ${cancelledLabel(l, gt)}: ${sessionLabel(p, l, g)}`,
   SESSION_CHANGED: (p, l, g) => {
     const time = !!p.old_starts_at
     const loc = !!p.old_location
@@ -118,7 +151,13 @@ const SUBJECTS: Record<string, (p: Record<string, unknown>, lang: Lang, group?: 
 
 // MEMBER_PROMOTED: who gave you the role (when known), what you can do now,
 // and a link to the group.
-function promotedBody(p: Record<string, unknown>, lang: Lang, groupId: unknown, group?: string): string {
+function promotedBody(
+  p: Record<string, unknown>,
+  lang: Lang,
+  groupId: unknown,
+  group: string | undefined,
+  gt: GroupType,
+): string {
   const t = T[lang]
   const intro = p.promoted_by
     ? `<strong>${p.promoted_by}</strong> ${t.promotedBy} "${group ?? ''}".`
@@ -126,7 +165,7 @@ function promotedBody(p: Record<string, unknown>, lang: Lang, groupId: unknown, 
   return [
     `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">🎬 ${t.promoted}</h2>`,
     `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${intro}</p>`,
-    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${t.promotedPerks}</p>`,
+    `<p style="color:#4b5563;font-size:15px;margin:0 0 8px">${promotedPerks(lang, gt)}</p>`,
     groupId
       ? `<p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/g/${groupId}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">${t.promotedCta}</a></p>`
       : '',
@@ -178,11 +217,17 @@ function layout(inner: string, lang: Lang): string {
 </html>`
 }
 
-function emailBody(type: string, p: Record<string, unknown>, lang: Lang, group?: string): string {
+function emailBody(
+  type: string,
+  p: Record<string, unknown>,
+  lang: Lang,
+  group: string | undefined,
+  gt: GroupType,
+): string {
   const t = T[lang]
   const when = fmtDate(p.starts_at, lang)
   const lines = [
-    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">${SUBJECTS[type]?.(p, lang, group) ?? type}</h2>`,
+    `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">${SUBJECTS[type]?.(p, lang, group, gt) ?? type}</h2>`,
     `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.when}:</strong> ${when}</p>`,
     p.location
       ? `<p style="color:#4b5563;font-size:15px;margin:0 0 8px"><strong>${t.where}:</strong> ${p.location}</p>`
@@ -419,7 +464,7 @@ Deno.serve(async (req) => {
   langCache.clear() // metadata may change between runs
   const { data: pending, error } = await supabase
     .from('notifications')
-    .select('id, user_id, group_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name), groups(name)')
+    .select('id, user_id, group_id, type, payload, sent_email_at, sent_push_at, profiles!inner(email, name), groups(name, group_type)')
     .or('sent_email_at.is.null,sent_push_at.is.null')
     .limit(50)
 
@@ -430,8 +475,10 @@ Deno.serve(async (req) => {
   for (const n of pending ?? []) {
     const payload = n.payload as Record<string, unknown>
     const lang = await userLang(n.user_id)
-    const groupName = (n.groups as unknown as { name: string } | null)?.name
-    const subject = SUBJECTS[n.type]?.(payload, lang, groupName) ?? n.type
+    const grp = n.groups as unknown as { name: string; group_type: GroupType } | null
+    const groupName = grp?.name
+    const gt: GroupType = grp?.group_type ?? 'OTHER'
+    const subject = SUBJECTS[n.type]?.(payload, lang, groupName, gt) ?? n.type
     const profile = n.profiles as unknown as { email: string; name: string }
     const updates: Record<string, string> = {}
 
@@ -450,9 +497,9 @@ Deno.serve(async (req) => {
           n.type === 'MEMBER_JOINED'
             ? memberJoinedBody(payload, lang, n.group_id, groupName)
             : n.type === 'MEMBER_PROMOTED'
-              ? promotedBody(payload, lang, n.group_id, groupName)
+              ? promotedBody(payload, lang, n.group_id, groupName, gt)
               : ((n.type === 'REMINDER' ? await reminderBody(payload, lang) : null) ??
-                emailBody(n.type, payload, lang, groupName))
+                emailBody(n.type, payload, lang, groupName, gt))
         if (await sendEmail(profile.email, subject, layout(inner, lang))) emails++
       }
       updates.sent_email_at = new Date().toISOString() // also mark even if the channel excludes it
