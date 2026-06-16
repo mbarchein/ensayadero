@@ -4,7 +4,7 @@
 import { clientsClaim } from 'workbox-core'
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
-import { NetworkFirst } from 'workbox-strategies'
+import { NetworkFirst, NetworkOnly } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 
 declare const self: ServiceWorkerGlobalScope
@@ -25,7 +25,12 @@ registerRoute(
   }),
 )
 
-// Supabase API: network-first → offline read of latest data
+// Per-user endpoints scoped by RLS (not by a user_id in the URL) share one
+// cache key across accounts, so a cached response could surface the previous
+// user's data after a switch. Never cache them — always go to the network.
+registerRoute(({ url }) => url.pathname.startsWith('/rest/v1/notifications'), new NetworkOnly())
+
+// Other Supabase API reads: network-first → offline read of latest data
 registerRoute(
   ({ url }) => url.pathname.startsWith('/rest/v1/'),
   new NetworkFirst({
