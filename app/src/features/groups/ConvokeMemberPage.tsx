@@ -17,6 +17,7 @@ import { expandAvailability } from '../../lib/slots'
 import { parseRange, type TimeRange } from '../../lib/ranges'
 import { Badge, BackButton, Button, InitialsAvatar, Spinner } from '../../components/ui'
 import { useGroup } from './useGroup'
+import { tg } from '../../lib/glossary'
 import type { Availability, Session } from '../../lib/types'
 
 type SessionWithIds = Session & { session_participants: { user_id: string }[] }
@@ -73,7 +74,7 @@ function coverageOf(range: TimeRange, avail: TimeRange[], busy: TimeRange[]): Co
 export default function ConvokeMemberPage() {
   const { t } = useTranslation()
   const { memberId } = useParams<{ memberId: string }>()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
   const qc = useQueryClient()
 
@@ -197,7 +198,7 @@ export default function ConvokeMemberPage() {
 
       {candidates.length === 0 ? (
         <div className="py-10 text-center text-sm text-gray-600">
-          <p>{t('convoke.allDone', { name })}</p>
+          <p>{tg(t, 'convoke.allDone', group?.group_type, { name })}</p>
           <Button
             variant="secondary"
             className="mt-4"
@@ -215,7 +216,7 @@ export default function ConvokeMemberPage() {
               ) : (
                 <InitialsAvatar name={name} size={24} />
               )}
-              {t('convoke.futureCount', { count: candidates.length })}
+              {tg(t, 'convoke.futureCount', group?.group_type, { count: candidates.length })}
             </div>
             <span className="flex items-center gap-2 text-xs">
               <button
@@ -334,11 +335,11 @@ export default function ConvokeMemberPage() {
               onClick={() => convoke.mutate()}
             >
               <Check size={16} />
-              {t('convoke.submit', { count: selected.length })}
+              {tg(t, 'convoke.submit', group?.group_type, { count: selected.length })}
             </Button>
             {confirmedCount > 0 && (
               <p className="text-center text-xs text-gray-600">
-                {t('convoke.confirmedNote', { count: confirmedCount })}
+                {tg(t, 'convoke.confirmedNote', group?.group_type, { count: confirmedCount })}
               </p>
             )}
           </div>

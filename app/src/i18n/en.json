@@ -179,7 +179,7 @@
     "all": "(all)"
   },
   "login": {
-    "tagline": "Plan your theatre group's rehearsals",
+    "tagline": "Organize your group's schedule",
     "googleButton": "Continue with Google",
     "facebookButton": "Continue with Facebook",
     "or": "or",
@@ -608,11 +608,11 @@
     },
     "data": {
       "title": "2. Data we process",
-      "body": "• Account data: name, email and, where applicable, photo and the sign-in provider identifier (Google/Meta).\n• Usage data: the groups you belong to, your time availability, rehearsals and your attendance.\n• Technical data: access and security logs needed to run the service."
+      "body": "• Account data: name, email and, where applicable, photo and the sign-in provider identifier (Google/Meta).\n• Usage data: the groups you belong to, your time availability, activities and your attendance.\n• Technical data: access and security logs needed to run the service."
     },
     "purpose": {
       "title": "3. Purpose",
-      "body": "We process your data to create and manage your account, enable rehearsal organisation and the coordination of availability and attendance within your groups, and send you service-related notifications."
+      "body": "We process your data to create and manage your account, enable activity organisation and the coordination of availability and attendance within your groups, and send you service-related notifications."
     },
     "legalBasis": {
       "title": "4. Legal basis",
@@ -658,7 +658,7 @@
     },
     "terms": {
       "title": "2. Terms of use",
-      "body": "Accessing Ensayadero implies acceptance of this legal notice. The app lets theatre groups organise rehearsals and coordinate availability and attendance. You agree to use the service lawfully and not to harm its operation or other users' rights."
+      "body": "Accessing Ensayadero implies acceptance of this legal notice. The app lets groups organise their activities and coordinate availability and attendance. You agree to use the service lawfully and not to harm its operation or other users' rights."
     },
     "ip": {
       "title": "3. Intellectual property",
@@ -705,16 +705,16 @@
   },
   "convoke": {
     "title": "Summon {{name}}",
-    "futureCount_one": "Upcoming rehearsals ({{count}})",
-    "futureCount_other": "Upcoming rehearsals ({{count}})",
+    "futureCount_one": "Upcoming {{actPl}} ({{count}})",
+    "futureCount_other": "Upcoming {{actPl}} ({{count}})",
     "convokeAs": "Summon as:",
     "asRequired": "Required",
     "asOptional": "Optional",
-    "submit_one": "Summon to {{count}} rehearsal",
-    "submit_other": "Summon to {{count}} rehearsals",
-    "confirmedNote_one": "They will receive the summons for the already-confirmed rehearsal.",
-    "confirmedNote_other": "They will receive the summons for the {{count}} already-confirmed rehearsals.",
-    "allDone": "{{name}} is already in every upcoming rehearsal.",
+    "submit_one": "Summon to {{count}} {{act}}",
+    "submit_other": "Summon to {{count}} {{actPl}}",
+    "confirmedNote_one": "They will receive the summons for the already-confirmed {{act}}.",
+    "confirmedNote_other": "They will receive the summons for the {{count}} already-confirmed {{actPl}}.",
+    "allDone": "{{name}} is already in every upcoming {{act}}.",
     "backToMembers": "Back to members",
     "memberGone": "This person is no longer a member of the group."
   },

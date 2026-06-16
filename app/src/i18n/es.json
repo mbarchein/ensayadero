@@ -179,7 +179,7 @@
     "all": "(todos)"
   },
   "login": {
-    "tagline": "Planifica los ensayos de tu grupo de teatro",
+    "tagline": "Organiza la agenda de tu grupo",
     "googleButton": "Continuar con Google",
     "facebookButton": "Continuar con Facebook",
     "or": "o",
@@ -608,11 +608,11 @@
     },
     "data": {
       "title": "2. Datos que tratamos",
-      "body": "• Datos de cuenta: nombre, correo electrónico y, en su caso, foto e identificador del proveedor de acceso (Google/Meta).\n• Datos de uso: grupos a los que perteneces, tu disponibilidad horaria, los ensayos y tu asistencia.\n• Datos técnicos: registros de acceso y seguridad necesarios para prestar el servicio."
+      "body": "• Datos de cuenta: nombre, correo electrónico y, en su caso, foto e identificador del proveedor de acceso (Google/Meta).\n• Datos de uso: grupos a los que perteneces, tu disponibilidad horaria, las actividades y tu asistencia.\n• Datos técnicos: registros de acceso y seguridad necesarios para prestar el servicio."
     },
     "purpose": {
       "title": "3. Finalidad",
-      "body": "Tratamos tus datos para crear y gestionar tu cuenta, permitir la organización de ensayos y la coordinación de disponibilidad y asistencia dentro de tus grupos, y enviarte notificaciones relacionadas con el servicio."
+      "body": "Tratamos tus datos para crear y gestionar tu cuenta, permitir la organización de actividades y la coordinación de disponibilidad y asistencia dentro de tus grupos, y enviarte notificaciones relacionadas con el servicio."
     },
     "legalBasis": {
       "title": "4. Base jurídica",
@@ -658,7 +658,7 @@
     },
     "terms": {
       "title": "2. Condiciones de uso",
-      "body": "El acceso a Ensayadero implica la aceptación de este aviso legal. La aplicación permite a grupos teatrales organizar ensayos y coordinar disponibilidad y asistencia. Te comprometes a hacer un uso lícito del servicio y a no perjudicar su funcionamiento ni los derechos de otros usuarios."
+      "body": "El acceso a Ensayadero implica la aceptación de este aviso legal. La aplicación permite a grupos organizar sus actividades y coordinar disponibilidad y asistencia. Te comprometes a hacer un uso lícito del servicio y a no perjudicar su funcionamiento ni los derechos de otros usuarios."
     },
     "ip": {
       "title": "3. Propiedad intelectual",
@@ -705,16 +705,16 @@
   },
   "convoke": {
     "title": "Convocar a {{name}}",
-    "futureCount_one": "Ensayos futuros ({{count}})",
-    "futureCount_other": "Ensayos futuros ({{count}})",
+    "futureCount_one": "{{ActPl}} futuros ({{count}})",
+    "futureCount_other": "{{ActPl}} futuros ({{count}})",
     "convokeAs": "Convocar como:",
     "asRequired": "Obligatorio",
     "asOptional": "Opcional",
-    "submit_one": "Convocar a {{count}} ensayo",
-    "submit_other": "Convocar a {{count}} ensayos",
-    "confirmedNote_one": "Recibirá la convocatoria del ensayo ya confirmado.",
-    "confirmedNote_other": "Recibirá la convocatoria de los {{count}} ensayos ya confirmados.",
-    "allDone": "{{name}} ya está en todos los ensayos futuros.",
+    "submit_one": "Convocar a {{count}} {{act}}",
+    "submit_other": "Convocar a {{count}} {{actPl}}",
+    "confirmedNote_one": "Recibirá la convocatoria del {{act}} ya confirmado.",
+    "confirmedNote_other": "Recibirá la convocatoria de los {{count}} {{actPl}} ya confirmados.",
+    "allDone": "{{name}} ya está en todos los {{actPl}} futuros.",
     "backToMembers": "Volver a miembros",
     "memberGone": "Esta persona ya no es miembro del grupo."
   },
