@@ -355,7 +355,7 @@ async function sendPush(
 async function processInvitation(invitationId: string): Promise<boolean> {
   const { data: inv } = await supabase
     .from('invitations')
-    .select('email, role, groups(name)')
+    .select('email, groups(name)')
     .eq('id', invitationId)
     .single()
   if (!inv) return false
@@ -368,8 +368,7 @@ async function processInvitation(invitationId: string): Promise<boolean> {
       `🎭 Invitación a "${groupName}" en Ensayadero`,
       layout(
         `<h2 style="color:#1f2937;font-size:18px;margin:0 0 12px">Te han invitado a "${groupName}"</h2>
-         <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Rol: ${inv.role === 'INSTRUCTOR' ? 'Instructor' : 'Actor'}.</p>
-         <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Entra con tu cuenta de Google usando este mismo email (${inv.email}):</p>
+         <p style="color:#4b5563;font-size:15px;margin:0 0 8px">Entra con tu cuenta usando este mismo email (${inv.email}):</p>
          <p style="text-align:center;margin:20px 0 0"><a href="${APP_URL}/login" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none">Aceptar invitación</a></p>
          <p style="color:#9ca3af;font-size:13px;margin:16px 0 0;text-align:center">La invitación caduca en 7 días.</p>`,
         'es',
