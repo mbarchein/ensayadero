@@ -286,7 +286,7 @@
     "regenerate": "Regenerate code",
     "enable": "Enable code",
     "disable": "Disable code",
-    "disabledNote": "Group entry is closed: the code and link don't work.",
+    "disabledNote": "Group entry is closed. No one can join with the code or link. Turn entry on to reopen it.",
     "disableConfirm": "If you turn the code off, no one can join with it until you turn it back on. Turn off?",
     "enableConfirm": "This re-enables the code and anyone with it can join again. Turn on?",
     "regenerateConfirm": "A new code will be generated. Previously shared links and QR codes will stop working and you'll need to share them again. Email invitations and current members are unaffected. Regenerate?"
