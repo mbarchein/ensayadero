@@ -495,28 +495,49 @@ export default function MembersPage() {
         title={sheetTarget ? sheetTarget.profiles.name || sheetTarget.profiles.email : ''}
       >
         {sheetTarget && (
-          <div className="space-y-2">
-            <Button
-              variant="secondary"
-              className="inline-flex w-full items-center justify-center gap-1.5"
-              onClick={() => {
-                setRoleTarget(sheetTarget)
-                setSheetTarget(null)
-              }}
-            >
-              {sheetTarget.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
-              {sheetTarget.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
-            </Button>
-            <Button
-              variant="danger"
-              className="inline-flex w-full items-center justify-center gap-1.5"
-              onClick={() => {
-                setRemoveTarget(sheetTarget)
-                setSheetTarget(null)
-              }}
-            >
-              <Trash2 size={16} /> {t('group.remove')}
-            </Button>
+          <div className="space-y-4">
+            <div className="flex flex-col items-center text-center">
+              {sheetTarget.profiles.avatar_url ? (
+                <img
+                  src={sheetTarget.profiles.avatar_url}
+                  alt=""
+                  className="h-24 w-24 rounded-full object-cover ring-2 ring-violet-100"
+                />
+              ) : (
+                <InitialsAvatar
+                  name={sheetTarget.profiles.name || sheetTarget.profiles.email}
+                  size={96}
+                />
+              )}
+              <div className="mt-2">
+                <Badge color={sheetTarget.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
+                  {roleLabel(t, sheetTarget.role, sheetTarget.profiles.gender)}
+                </Badge>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Button
+                variant="secondary"
+                className="inline-flex w-full items-center justify-center gap-1.5"
+                onClick={() => {
+                  setRoleTarget(sheetTarget)
+                  setSheetTarget(null)
+                }}
+              >
+                {sheetTarget.role === 'INSTRUCTOR' ? <UserMinus size={16} /> : <UserCog size={16} />}
+                {sheetTarget.role === 'INSTRUCTOR' ? t('roles.toActor') : t('roles.toInstructor')}
+              </Button>
+              <Button
+                variant="danger"
+                className="inline-flex w-full items-center justify-center gap-1.5"
+                onClick={() => {
+                  setRemoveTarget(sheetTarget)
+                  setSheetTarget(null)
+                }}
+              >
+                <Trash2 size={16} /> {t('group.remove')}
+              </Button>
+            </div>
           </div>
         )}
       </Modal>
