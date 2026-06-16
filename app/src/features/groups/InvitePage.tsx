@@ -10,7 +10,6 @@ import QRCode from 'qrcode'
 import {
   AlertCircle,
   Check,
-  Copy,
   Loader2,
   Mail,
   Power,
@@ -38,7 +37,6 @@ function InviteForm({ group }: { group: Group }) {
   const qc = useQueryClient()
   const [regenerateOpen, setRegenerateOpen] = useState(false)
   const [emails, setEmails] = useState('')
-  const [copied, setCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   // per-invitation resend feedback (cleared after a few seconds)
   const [resendState, setResendState] = useState<Record<string, 'ok' | 'error'>>({})
@@ -155,8 +153,6 @@ function InviteForm({ group }: { group: Group }) {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(link)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
     } catch {
       setShareError(link)
     }
@@ -227,11 +223,6 @@ function InviteForm({ group }: { group: Group }) {
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button variant="secondary" onClick={copy} className="inline-flex items-center gap-1.5">
-              <Copy size={16} /> {copied ? t('invite.copied') : t('invite.copyLink')}
-            </Button>
-          </div>
           {shareError && (
             <p className="break-all text-xs text-gray-600">
               {t('invite.copyManually')}: {shareError}
