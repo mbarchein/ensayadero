@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/AuthContext'
-import { BackButton, Badge, Button, Modal, Spinner, Toggle } from '../../components/ui'
+import { BackButton, Button, Modal, Spinner, Toggle } from '../../components/ui'
 import { useGroup } from './useGroup'
 import type { Group, Invitation } from '../../lib/types'
 
@@ -271,10 +271,7 @@ function InviteForm({ group }: { group: Group }) {
           <ul className="space-y-2 text-sm text-gray-600">
             {invitations!.map((i) => (
               <li key={i.id} className="space-y-1 rounded-lg bg-gray-50 px-3 py-2">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="break-all font-medium text-gray-800">{i.email}</span>
-                  <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
-                </div>
+                <p className="break-all font-medium text-gray-800">{i.email}</p>
                 <div className="flex items-end justify-between gap-2">
                   <div className="min-w-0 text-xs">
                     {i.email_send_error ? (
