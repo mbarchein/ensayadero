@@ -37,6 +37,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const id = s?.user.id ?? null
       if (id !== lastUserId.current) {
         queryClient.clear()
+        // The service worker caches /rest/v1/ responses by URL (NetworkFirst),
+        // so without this a new user could be served the previous user's cached
+        // API data offline / on a slow network. Drop it on every user switch.
+        if (typeof caches !== 'undefined') caches.delete('api-cache')
         lastUserId.current = id
       }
     }
