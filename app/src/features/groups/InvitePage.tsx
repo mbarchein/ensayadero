@@ -37,6 +37,7 @@ function InviteForm({ group }: { group: Group }) {
   const qc = useQueryClient()
   const [regenerateOpen, setRegenerateOpen] = useState(false)
   const [emails, setEmails] = useState('')
+  const [copied, setCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   // per-invitation resend feedback (cleared after a few seconds)
   const [resendState, setResendState] = useState<Record<string, 'ok' | 'error'>>({})
@@ -153,6 +154,8 @@ function InviteForm({ group }: { group: Group }) {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(link)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch {
       setShareError(link)
     }
@@ -216,12 +219,25 @@ function InviteForm({ group }: { group: Group }) {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={copy}
+            title={t('invite.copyLink')}
+            aria-label={t('invite.copyLink')}
+            className="flex w-full flex-col items-center gap-3 rounded-xl p-1 transition hover:bg-violet-100"
+          >
             <Qr link={link} />
             <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">
               {group.join_code}
             </p>
-          </div>
+          </button>
+          <p aria-live="polite" className="flex h-5 items-center justify-center gap-1 text-sm text-green-600">
+            {copied && (
+              <>
+                <Check size={14} /> {t('invite.copied')}
+              </>
+            )}
+          </p>
 
           {shareError && (
             <p className="break-all text-xs text-gray-600">
