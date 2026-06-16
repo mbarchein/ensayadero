@@ -170,7 +170,7 @@ function InviteForm({ group }: { group: Group }) {
       </header>
 
       {/* group-join toggle */}
-      <div className="flex items-center justify-between gap-3 rounded-xl border bg-white p-4">
+      <div className="flex items-start justify-between gap-3 rounded-xl border bg-white p-4">
         <div>
           <p className="font-medium">{t('invite.joinLabel')}</p>
           {group.join_enabled && (
