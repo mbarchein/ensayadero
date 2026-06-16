@@ -18,6 +18,7 @@ import GroupAvatar from '../groups/GroupAvatar'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
+import { tg } from '../../lib/glossary'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
@@ -191,7 +192,7 @@ export default function SessionDetailPage() {
     setShareError(null)
     const when = `${format(r.start, 'EEEE d MMMM, HH:mm', { locale: dateLocale() })}–${format(r.end, 'HH:mm')}`
     const lines = [
-      t('sessions.shareText', { group: group?.name ?? '' }),
+      tg(t, 'sessions.shareText', group?.group_type, { group: group?.name ?? '' }),
       when,
       session.location || null,
     ].filter(Boolean) as string[]
@@ -260,8 +261,8 @@ export default function SessionDetailPage() {
           <Button
             variant="ghost"
             className="p-2"
-            title={t('sessions.editBtn')}
-            aria-label={t('sessions.editBtn')}
+            title={tg(t, 'sessions.editBtn', group?.group_type)}
+            aria-label={tg(t, 'sessions.editBtn', group?.group_type)}
             onClick={() => navigate(`/g/${groupId}/sessions/${session.id}/edit`)}
           >
             <Pencil size={18} />
@@ -280,7 +281,7 @@ export default function SessionDetailPage() {
 
       {session.status === 'CANCELLED' && (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
-          {t('sessions.cancelledBanner')}
+          {tg(t, 'sessions.cancelledBanner', group?.group_type)}
         </p>
       )}
 
@@ -431,7 +432,7 @@ export default function SessionDetailPage() {
               downloadIcs({
                 uid: session.id,
                 range: r,
-                summary: t('sessions.icsSummary', { group: group?.name ?? '' }),
+                summary: tg(t, 'sessions.icsSummary', group?.group_type, { group: group?.name ?? '' }),
                 location: session.location,
                 description: session.comments,
                 url: shareUrl,
@@ -452,7 +453,7 @@ export default function SessionDetailPage() {
         )}
         {isInstructor && session.status === 'DRAFT' && (
           <Button onClick={() => setStatus.mutate('CONFIRMED')} className="w-full">
-            {t('sessions.confirmBtn')}
+            {tg(t, 'sessions.confirmBtn', group?.group_type)}
           </Button>
         )}
         {isInstructor && session.status === 'DRAFT' && (
@@ -471,7 +472,7 @@ export default function SessionDetailPage() {
             onClick={() => setCancelOpen(true)}
             className="block w-full py-2 text-center text-sm font-medium text-red-600 hover:underline"
           >
-            {t('sessions.cancelBtn')}
+            {tg(t, 'sessions.cancelBtn', group?.group_type)}
           </button>
         )}
       </section>
@@ -507,9 +508,9 @@ export default function SessionDetailPage() {
         </div>
       </Modal>
 
-      <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={t('sessions.cancelBtn')}>
+      <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={tg(t, 'sessions.cancelBtn', group?.group_type)}>
         <div className="space-y-4">
-          <p className="text-sm font-bold text-red-700">{t('sessions.cancelConfirm')}</p>
+          <p className="text-sm font-bold text-red-700">{tg(t, 'sessions.cancelConfirm', group?.group_type)}</p>
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={() => setCancelOpen(false)}>
               {t('common.cancel')}
@@ -523,7 +524,7 @@ export default function SessionDetailPage() {
                 setCancelOpen(false)
               }}
             >
-              {t('sessions.cancelBtn')}
+              {tg(t, 'sessions.cancelBtn', group?.group_type)}
             </Button>
           </div>
         </div>

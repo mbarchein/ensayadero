@@ -20,13 +20,15 @@ import { supabase } from '../../lib/supabase'
 import { formatRange } from '../../lib/ranges'
 import { isoDay, DAY_START_HOUR, DAY_END_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
 import { BackButton, Badge, Button, InitialsAvatar } from '../../components/ui'
-import type { MembershipWithProfile, SessionWithParticipants } from '../../lib/types'
+import { tg } from '../../lib/glossary'
+import type { GroupType, MembershipWithProfile, SessionWithParticipants } from '../../lib/types'
 
 // latest end the time input can hold on a 30-min grid (sessions end same day)
 const MAX_END_MIN = 23 * 60 + 30
 
 interface Props {
   groupId: string
+  groupType?: GroupType
   members: MembershipWithProfile[]
   /** ids included by default when creating (all required); ignored on edit */
   preselectedIds: string[]
@@ -51,6 +53,7 @@ interface ParticipantDraft {
 
 export default function SessionForm({
   groupId,
+  groupType,
   members,
   preselectedIds,
   initialDay,
@@ -361,7 +364,7 @@ export default function SessionForm({
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton onBack={onClose} />
         <h1 className="min-w-0 flex-1 truncate text-xl font-bold">
-          {editing ? t('planner.editSession') : t('planner.newSession')}
+          {editing ? tg(t, 'planner.editSession', groupType) : tg(t, 'planner.newSession', groupType)}
         </h1>
         <Button
           type="submit"

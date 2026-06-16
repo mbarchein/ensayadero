@@ -9,6 +9,7 @@ import { LogOut, Users, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-reac
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
 import { roleLabel, roleActionLabel } from '../../lib/roleLabel'
+import { tg } from '../../lib/glossary'
 import { parseRange } from '../../lib/ranges'
 import type { GroupRole, MembershipWithProfile } from '../../lib/types'
 
@@ -167,7 +168,7 @@ export default function MembersPage() {
           <div className="flex gap-2.5">
             <UserPlus size={18} className="mt-0.5 shrink-0 text-violet-700" aria-hidden />
             <p className="text-violet-900">
-              {t('group.joinedBanner', {
+              {tg(t, 'group.joinedBanner', group?.group_type, {
                 name: m.profiles.name || m.profiles.email,
                 count: missing,
               })}
@@ -268,7 +269,7 @@ export default function MembersPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            {t(roleTarget?.role === 'INSTRUCTOR' ? 'group.demoteConfirm' : 'group.promoteConfirm', {
+            {tg(t, roleTarget?.role === 'INSTRUCTOR' ? 'group.demoteConfirm' : 'group.promoteConfirm', group?.group_type, {
               name: roleTarget?.profiles.name || roleTarget?.profiles.email || '',
             })}
           </p>
@@ -330,7 +331,7 @@ export default function MembersPage() {
       {/* leave group */}
       <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('group.leaveTitle')}>
         <div className="space-y-4">
-          <p className="text-sm font-bold text-red-700">{t('group.leaveConfirm')}</p>
+          <p className="text-sm font-bold text-red-700">{tg(t, 'group.leaveConfirm', group?.group_type)}</p>
           {needsSuccessor && (
             <label className="block text-sm">
               {t('group.leaveSuccessor')}

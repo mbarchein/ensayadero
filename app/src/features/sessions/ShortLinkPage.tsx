@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { tg } from '../../lib/glossary'
 import { Spinner } from '../../components/ui'
 
 export const PENDING_SESSION_KEY = 'pendingSessionCode'
@@ -41,7 +42,7 @@ export default function ShortLinkPage() {
   if (notFound) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="max-w-xs text-sm text-gray-600">{t('sessions.shortLinkNotFound')}</p>
+        <p className="max-w-xs text-sm text-gray-600">{tg(t, 'sessions.shortLinkNotFound', 'OTHER')}</p>
         <Link to="/" className="text-sm text-violet-700 underline">
           {t('common.back')}
         </Link>

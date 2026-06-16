@@ -77,7 +77,7 @@ export default function NewGroupPage() {
         </label>
         <p className="text-xs text-gray-600">{t('home.newGroupHint')}</p>
         <GroupTypeField value={type} onChange={setType} />
-        <MemberPolicyField value={policy} onChange={setPolicy} />
+        <MemberPolicyField value={policy} onChange={setPolicy} type={type} />
         {createGroup.isError && (
           <p className="text-sm text-red-600">{(createGroup.error as Error).message}</p>
         )}

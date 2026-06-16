@@ -13,7 +13,7 @@ import { Spinner } from '../../components/ui'
 
 export default function NewSessionPage() {
   const { t } = useTranslation()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
   const location = useLocation()
   const [params] = useSearchParams()
@@ -45,6 +45,7 @@ export default function NewSessionPage() {
   return (
     <SessionForm
       groupId={groupId}
+      groupType={group?.group_type}
       members={members}
       // no explicit preselection → everyone summoned (and required) by default
       preselectedIds={initial.people ?? members.map((m) => m.user_id)}

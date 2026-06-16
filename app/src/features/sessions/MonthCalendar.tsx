@@ -34,11 +34,13 @@ export default function MonthCalendar<T>({
   dateOf,
   dotOf,
   renderAgenda,
+  emptyDayLabel,
 }: {
   items: T[]
   dateOf: (item: T) => Date
   dotOf: (item: T) => string
   renderAgenda: (dayItems: T[]) => ReactNode
+  emptyDayLabel?: string
 }) {
   const { t } = useTranslation()
   const today = new Date()
@@ -255,7 +257,7 @@ export default function MonthCalendar<T>({
           {selectedItems.length > 0 ? (
             renderAgenda(selectedItems)
           ) : (
-            <p className="text-sm text-gray-500">{t('sessions.noneThisDay')}</p>
+            <p className="text-sm text-gray-500">{emptyDayLabel ?? t('sessions.noneThisDay')}</p>
           )}
         </div>
       )}

@@ -2,7 +2,8 @@
 // future rehearsals (MANDATORY default / OPTIONAL / NONE). Segmented control.
 
 import { useTranslation } from 'react-i18next'
-import type { MemberInclusionPolicy } from '../../lib/types'
+import { tg } from '../../lib/glossary'
+import type { GroupType, MemberInclusionPolicy } from '../../lib/types'
 
 const OPTIONS: MemberInclusionPolicy[] = ['MANDATORY', 'OPTIONAL', 'NONE']
 const LABEL: Record<MemberInclusionPolicy, string> = {
@@ -21,14 +22,16 @@ const ACTIVE: Record<MemberInclusionPolicy, string> = {
 export default function MemberPolicyField({
   value,
   onChange,
+  type,
 }: {
   value: MemberInclusionPolicy
   onChange: (v: MemberInclusionPolicy) => void
+  type?: GroupType
 }) {
   const { t } = useTranslation()
   return (
     <div className="text-sm">
-      <p className="mb-1">{t('group.newMemberLabel')}</p>
+      <p className="mb-1">{tg(t, 'group.newMemberLabel', type)}</p>
       <div className="flex overflow-hidden rounded-lg border border-violet-200">
         {OPTIONS.map((opt, i) => {
           const active = value === opt
@@ -51,7 +54,7 @@ export default function MemberPolicyField({
           )
         })}
       </div>
-      <p className="mt-1 text-xs text-gray-600">{t('group.newMemberHint')}</p>
+      <p className="mt-1 text-xs text-gray-600">{tg(t, 'group.newMemberHint', type)}</p>
     </div>
   )
 }

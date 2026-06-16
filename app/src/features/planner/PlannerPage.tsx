@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
+import { tg } from '../../lib/glossary'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
@@ -16,11 +17,11 @@ import { SLOTS_PER_DAY, heatmap, isoDay, slotRange, weekStart, type HeatCell } f
 import WeekGrid from '../availability/WeekGrid'
 import { Spinner, Button, Modal, BackButton } from '../../components/ui'
 import Tip from '../../components/Tip'
-import type { Availability, SessionWithParticipants } from '../../lib/types'
+import type { Availability, GroupType, SessionWithParticipants } from '../../lib/types'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
   const { profile } = useAuth()
   const [params] = useSearchParams()
@@ -181,7 +182,7 @@ export default function PlannerPage() {
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="-mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
-        <h1 className="text-xl font-bold">{t('planner.title')}</h1>
+        <h1 className="text-xl font-bold">{tg(t, 'planner.title', group?.group_type)}</h1>
       </header>
 
       <Tip id="planner" />
@@ -322,9 +323,10 @@ export default function PlannerPage() {
               activeIds={activeIds}
               nameOf={nameOf}
               meId={profile?.id}
+              groupType={group?.group_type}
             />
             <Button className="w-full" onClick={openCreate}>
-              {t('planner.createHere')}
+              {tg(t, 'planner.createHere', group?.group_type)}
             </Button>
           </div>
         )}
@@ -406,11 +408,13 @@ function CellDetail({
   activeIds,
   nameOf,
   meId,
+  groupType,
 }: {
   cell: MergedCell
   activeIds: string[]
   nameOf: (id: string) => string
   meId?: string
+  groupType?: GroupType
 }) {
   const { t } = useTranslation()
   const unavailable = activeIds.filter(
@@ -440,7 +444,7 @@ function CellDetail({
       )}
       {cell.busy.length > 0 && (
         <div>
-          <span className="font-medium text-amber-700">{t('planner.busyLabel')}</span>
+          <span className="font-medium text-amber-700">{tg(t, 'planner.busyLabel', groupType)}</span>
           <div className="mt-1 flex flex-wrap gap-1">
             {cell.busy.map((id) => (
               <NameChip key={id} name={nameOf(id)} me={id === meId} variant="busy" />

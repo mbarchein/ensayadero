@@ -169,7 +169,7 @@ function EditGroupForm({ group }: { group: Group }) {
           )}
         </div>
         <div>
-          <MemberPolicyField value={policy} onChange={changePolicy} />
+          <MemberPolicyField value={policy} onChange={changePolicy} type={type} />
           {savePolicy.isError && (
             <p className="mt-1 text-sm text-red-600">{(savePolicy.error as Error).message}</p>
           )}

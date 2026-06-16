@@ -5,6 +5,7 @@ import { format, isToday, isTomorrow, differenceInCalendarWeeks } from 'date-fns
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
+import { tg } from '../../lib/glossary'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
@@ -120,7 +121,7 @@ export default function SessionsPage() {
             onClick={() => navigate(`/g/${groupId}/planner`)}
             className="inline-flex w-full items-center justify-center gap-1.5"
           >
-            <CalendarPlus size={16} /> {t('group.tabs.planner')}
+            <CalendarPlus size={16} /> {tg(t, 'group.tabs.planner', group?.group_type)}
           </Button>
         )}
         <Button
@@ -142,13 +143,14 @@ export default function SessionsPage() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{t('group.tabs.sessions')}</h2>
+        <h2 className="text-lg font-semibold">{tg(t, 'group.tabs.sessions', group?.group_type)}</h2>
         <ViewToggle value={view} onChange={switchView} />
       </div>
 
       {view === 'month' ? (
         <MonthCalendar
           items={visible}
+          emptyDayLabel={tg(t, 'sessions.noneThisDay', group?.group_type)}
           dateOf={(s) => parseRange(s.time_range).start}
           dotOf={(s) =>
             responseDotColor(s.status, s.session_participants.find((p) => p.user_id === profile!.id)?.response)
@@ -165,11 +167,11 @@ export default function SessionsPage() {
         <>
           {upcoming.length === 0 ? (
             <EmptyState
-              message={t('sessions.empty')}
+              message={tg(t, 'sessions.empty', group?.group_type)}
               action={
                 isInstructor ? (
                   <Link to={`/g/${groupId}/planner`} className="font-medium text-violet-700 underline">
-                    {t('sessions.planOne')}
+                    {tg(t, 'sessions.planOne', group?.group_type)}
                   </Link>
                 ) : undefined
               }

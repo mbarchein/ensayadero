@@ -18,7 +18,7 @@ import type { SessionWithParticipants } from '../../lib/types'
 export default function EditSessionPage() {
   const { t } = useTranslation()
   const { sessionId } = useParams<{ sessionId: string }>()
-  const { groupId, members, isInstructor, loading } = useGroup()
+  const { groupId, group, members, isInstructor, loading } = useGroup()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -57,6 +57,7 @@ export default function EditSessionPage() {
   return (
     <SessionForm
       groupId={groupId}
+      groupType={group?.group_type}
       members={members}
       preselectedIds={[]}
       initialDay={r.start}
