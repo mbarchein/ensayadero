@@ -22,7 +22,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/AuthContext'
 import { BackButton, Badge, Button, Modal, Spinner, Toggle } from '../../components/ui'
 import { useGroup } from './useGroup'
-import type { Group, GroupRole, Invitation } from '../../lib/types'
+import type { Group, Invitation } from '../../lib/types'
 
 export default function InvitePage() {
   const { group, isInstructor, loading } = useGroup()
@@ -38,7 +38,6 @@ function InviteForm({ group }: { group: Group }) {
   const qc = useQueryClient()
   const [regenerateOpen, setRegenerateOpen] = useState(false)
   const [emails, setEmails] = useState('')
-  const [role, setRole] = useState<GroupRole>('ACTOR')
   const [copied, setCopied] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   // per-invitation resend feedback (cleared after a few seconds)
@@ -88,7 +87,7 @@ function InviteForm({ group }: { group: Group }) {
       if (list.length === 0) return 0
       const { error } = await supabase
         .from('invitations')
-        .insert(list.map((email) => ({ group_id: group.id, email, role, created_by: profile!.id })))
+        .insert(list.map((email) => ({ group_id: group.id, email, role: 'ACTOR', created_by: profile!.id })))
       if (error) throw error
       const { data: created } = await supabase
         .from('invitations')
@@ -96,9 +95,12 @@ function InviteForm({ group }: { group: Group }) {
         .eq('group_id', group.id)
         .is('accepted_at', null)
         .in('email', list)
-      for (const inv of created ?? []) {
-        supabase.functions.invoke('send-notifications', { body: { invitation_id: inv.id } }).catch(() => {})
-      }
+      // send the emails right away (awaited so failures surface to the user)
+      await Promise.all(
+        (created ?? []).map((inv) =>
+          supabase.functions.invoke('send-notifications', { body: { invitation_id: inv.id } }),
+        ),
+      )
       return list.length
     },
     onSuccess: () => {
@@ -248,17 +250,6 @@ function InviteForm({ group }: { group: Group }) {
               className="mt-1 w-full rounded-lg border px-3 py-2"
               placeholder="ana@x.com, benito@y.com…"
             />
-          </label>
-          <label className="block text-sm">
-            {t('group.role')}
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as GroupRole)}
-              className="mt-1 w-full rounded-lg border bg-white px-3 py-2"
-            >
-              <option value="ACTOR">{t('roles.ACTOR')}</option>
-              <option value="INSTRUCTOR">{t('roles.INSTRUCTOR')}</option>
-            </select>
           </label>
           {bulkInvite.isError && (
             <p className="text-sm text-red-600">{(bulkInvite.error as Error).message}</p>
