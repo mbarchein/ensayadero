@@ -5,17 +5,16 @@ import { useTranslation } from 'react-i18next'
 import { useGroup } from './useGroup'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { AlertCircle, Check, Loader2, LogOut, Mail, Users, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
+import { LogOut, Users, UserCog, UserMinus, UserPlus, Trash2 } from 'lucide-react'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
-import InvitePanel from './InvitePanel'
 import Tip from '../../components/Tip'
 import { roleLabel } from '../../lib/roleLabel'
 import { parseRange } from '../../lib/ranges'
-import type { GroupRole, Invitation, MembershipWithProfile } from '../../lib/types'
+import type { GroupRole, MembershipWithProfile } from '../../lib/types'
 
 export default function MembersPage() {
   const { t } = useTranslation()
-  const { groupId, group, members, isInstructor, loading } = useGroup()
+  const { groupId, members, isInstructor, loading } = useGroup()
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -26,8 +25,6 @@ export default function MembersPage() {
   const [sheetTarget, setSheetTarget] = useState<MembershipWithProfile | null>(null)
   const [leaveText, setLeaveText] = useState('')
   const [successor, setSuccessor] = useState<string | null>(null)
-  // per-invitation resend feedback: id → ok/error (cleared after a few seconds)
-  const [resendState, setResendState] = useState<Record<string, 'ok' | 'error'>>({})
 
   // leaving as the only director with other members left → a successor must be
   // chosen in the leave modal (one is preselected at random)
@@ -75,57 +72,6 @@ export default function MembersPage() {
           ).length,
         }))
         .filter((x) => x.missing > 0)
-
-  const { data: invitations } = useQuery({
-    queryKey: ['invitations', groupId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('invitations')
-        .select('*')
-        .eq('group_id', groupId)
-        .is('accepted_at', null)
-        .gt('expires_at', new Date().toISOString())
-      if (error) throw error
-      return data as Invitation[]
-    },
-    enabled: isInstructor,
-  })
-
-  const flashResend = (id: string, state: 'ok' | 'error') => {
-    setResendState((s) => ({ ...s, [id]: state }))
-    setTimeout(
-      () => setResendState(({ [id]: _, ...rest }) => rest),
-      4000,
-    )
-  }
-
-  // manual re-delivery of the invitation email; unlike the best-effort send on
-  // creation, failures are surfaced to the user
-  const resendInvite = useMutation({
-    mutationFn: async (inv: Invitation) => {
-      const { error } = await supabase.functions.invoke('send-notifications', {
-        body: { invitation_id: inv.id },
-      })
-      if (error) throw error
-    },
-    onSuccess: (_, inv) => {
-      flashResend(inv.id, 'ok')
-      // refresh email_sent_at / email_send_error stamped by the function
-      qc.invalidateQueries({ queryKey: ['invitations', groupId] })
-    },
-    onError: (_, inv) => {
-      flashResend(inv.id, 'error')
-      qc.invalidateQueries({ queryKey: ['invitations', groupId] })
-    },
-  })
-
-  const deleteInvite = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('invitations').delete().eq('id', id)
-      if (error) throw error
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['invitations', groupId] }),
-  })
 
   const leaveGroup = useMutation({
     mutationFn: async () => {
@@ -194,16 +140,24 @@ export default function MembersPage() {
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
         <h1 className="text-xl font-bold">{t('group.membersTitle')}</h1>
-        {members.length > 0 && (
-          <span className="ml-auto inline-flex items-center gap-1 text-sm text-gray-500">
-            <Users size={14} aria-hidden /> {members.length}
-          </span>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {members.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-sm text-gray-500">
+              <Users size={14} aria-hidden /> {members.length}
+            </span>
+          )}
+          {isInstructor && (
+            <Button
+              className="inline-flex items-center gap-1.5"
+              onClick={() => navigate(`/g/${groupId}/invite`)}
+            >
+              <UserPlus size={16} /> {t('group.inviteAction')}
+            </Button>
+          )}
+        </div>
       </header>
 
       <Tip id="members" />
-
-      {isInstructor && group && <InvitePanel group={group} />}
 
       {newJoiners.map(({ member: m, missing }) => (
         <div
@@ -284,70 +238,6 @@ export default function MembersPage() {
           )
         })}
       </ul>
-
-      {isInstructor && (invitations?.length ?? 0) > 0 && (
-        <section>
-          <h2 className="mb-2 font-semibold">{t('group.pendingInvites')}</h2>
-          <ul className="space-y-1 text-sm text-gray-600">
-            {invitations!.map((i) => (
-              <li key={i.id} className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2">
-                <span className="min-w-0">
-                  <span className="break-all">{i.email}</span>{' '}
-                  <Badge color="gray">{t(`roles.${i.role}`)}</Badge>
-                  <span className="block text-xs">
-                    {i.email_send_error ? (
-                      <span className="text-red-600" title={i.email_send_error}>
-                        {t('invite.lastSendFailed')}
-                      </span>
-                    ) : i.email_sent_at ? (
-                      <span className="text-gray-500">
-                        {t('invite.sentAt', { date: new Date(i.email_sent_at).toLocaleString() })}
-                      </span>
-                    ) : (
-                      <span className="text-amber-600">{t('invite.neverSent')}</span>
-                    )}
-                  </span>
-                </span>
-                <span className="flex shrink-0 items-center gap-1">
-                  <span className="text-xs">
-                    {t('group.expires', { date: new Date(i.expires_at).toLocaleDateString() })}
-                  </span>
-                  {resendState[i.id] === 'ok' ? (
-                    <Check size={16} className="mx-1.5 text-green-600" aria-label={t('invite.resendOk')} />
-                  ) : resendState[i.id] === 'error' ? (
-                    <AlertCircle size={16} className="mx-1.5 text-red-600" aria-label={t('invite.resendError')} />
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      className="p-1.5"
-                      title={t('invite.resendEmail')}
-                      aria-label={t('invite.resendEmail')}
-                      disabled={resendInvite.isPending}
-                      onClick={() => resendInvite.mutate(i)}
-                    >
-                      {resendInvite.isPending && resendInvite.variables?.id === i.id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Mail size={16} />
-                      )}
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    className="p-1.5 text-red-600"
-                    title={t('invite.deleteInvite')}
-                    aria-label={t('invite.deleteInvite')}
-                    disabled={deleteInvite.isPending}
-                    onClick={() => deleteInvite.mutate(i.id)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <div className="border-t pt-4">
         <button
