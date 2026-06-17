@@ -40,7 +40,7 @@ test.describe('create group adopts type wording', () => {
 
       // Edit form reflects the type chosen at creation time.
       const base = new URL(page.url()).pathname
-      await page.goto(`${base}/edit`)
+      await page.goto(`${base}/edit/type`)
       await expect(page.getByRole('button', { name: c.tile, pressed: true })).toBeVisible()
     })
   }

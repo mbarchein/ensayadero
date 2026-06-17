@@ -46,6 +46,19 @@ from adm, (values
   ('E2E Otro','OTHER')
 ) as v(name, gt)
 where not exists (select 1 from public.groups g where g.name = v.name);
+
+-- Authoritative: correct the type of the fixtures even if a prior test run
+-- changed it, so the suite is deterministic on a long-lived dev database.
+update public.groups g
+set group_type = v.gt::group_type
+from (values
+  ('E2E Teatro','THEATRE'),
+  ('E2E Música','MUSIC'),
+  ('E2E Danza','DANCE'),
+  ('E2E Deportes','SPORTS'),
+  ('E2E Otro','OTHER')
+) as v(name, gt)
+where g.name = v.name and g.group_type <> v.gt::group_type;
 SQL
 
 echo "e2e seed ready (admin@local.test / password123, 5 typed groups)"

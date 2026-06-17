@@ -6,13 +6,14 @@ import { Drama, Music, PersonStanding, Dumbbell, Shapes, type LucideIcon } from 
 import type { GroupType } from '../../lib/types'
 
 const OPTIONS: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'OTHER']
-const ICON: Record<GroupType, LucideIcon> = {
+export const GROUP_TYPE_ICON: Record<GroupType, LucideIcon> = {
   THEATRE: Drama,
   MUSIC: Music,
   DANCE: PersonStanding,
   SPORTS: Dumbbell,
   OTHER: Shapes,
 }
+const ICON = GROUP_TYPE_ICON
 
 export default function GroupTypeField({
   value,

@@ -11,6 +11,7 @@ import Layout from './components/Layout'
 import HomePage from './features/groups/HomePage'
 import NewGroupPage from './features/groups/NewGroupPage'
 import EditGroupPage from './features/groups/EditGroupPage'
+import EditGroupTypePage from './features/groups/EditGroupTypePage'
 import MembersPage from './features/groups/MembersPage'
 import InvitePage from './features/groups/InvitePage'
 import ConvokeMemberPage from './features/groups/ConvokeMemberPage'
@@ -83,6 +84,7 @@ export default function App() {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/g/:groupId" element={<SessionsPage />} />
           <Route path="/g/:groupId/edit" element={<EditGroupPage />} />
+          <Route path="/g/:groupId/edit/type" element={<EditGroupTypePage />} />
           <Route path="/g/:groupId/planner" element={<PlannerPage />} />
           <Route path="/g/:groupId/members" element={<MembersPage />} />
           <Route path="/g/:groupId/invite" element={<InvitePage />} />

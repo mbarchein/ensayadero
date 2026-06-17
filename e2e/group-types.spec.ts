@@ -59,8 +59,8 @@ test.describe('group-type wording', () => {
       await expect(page.getByText(c.leader, { exact: true }).first()).toBeVisible()
       await expectNoPlaceholder(page)
 
-      // Edit: the GroupTypeField tile for this type is selected.
-      await page.goto(`${base}/edit`)
+      // Edit → type screen: the tile for this type is selected.
+      await page.goto(`${base}/edit/type`)
       await expect(page.getByRole('button', { name: c.typeLabel, pressed: true })).toBeVisible()
       await expectNoPlaceholder(page)
     })
