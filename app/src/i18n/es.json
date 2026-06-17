@@ -74,8 +74,8 @@
     "create": "Crear grupo",
     "creating": "Creando…",
     "doneTitle": "¡Grupo creado!",
-    "doneSub": "Tu grupo ya está listo. Invita a la gente y empieza a planificar.",
-    "inviteHint": "Comparte el código o el QR para que se unan al grupo.",
+    "doneSub": "Ya puedes invitar y planificar.",
+    "inviteHint": "Comparte para que se unan.",
     "plan": "Planificar {{actPl}}",
     "goToGroup": "Ir al grupo"
   },

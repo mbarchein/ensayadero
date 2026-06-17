@@ -191,49 +191,44 @@ function ThanksScreen({
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-5 px-2 py-6 text-center">
-      <Check size={56} strokeWidth={1.5} className="text-green-600" aria-hidden />
-      <div>
-        <h1 className="text-2xl font-bold text-violet-900">{t('wizard.doneTitle')}</h1>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-gray-600">{t('wizard.doneSub')}</p>
+    <div className="mx-auto flex max-w-md flex-col gap-3 px-2 py-4">
+      <div className="text-center">
+        <h1 className="text-xl font-bold text-violet-900">{t('wizard.doneTitle')}</h1>
+        <p className="text-sm text-gray-600">{t('wizard.doneSub')}</p>
       </div>
 
-      {/* created group summary */}
-      <div className="flex items-center gap-3 rounded-xl border bg-white px-4 py-3">
+      {/* created group summary, with share on the same row */}
+      <div className="flex items-center gap-3 rounded-xl border bg-white px-3 py-2">
         <GroupAvatar seed={seed} image={image} />
-        <div className="text-left">
-          <p className="font-semibold">{created.name}</p>
+        <div className="min-w-0 flex-1 text-left">
+          <p className="truncate font-semibold">{created.name}</p>
           <p className="text-sm text-gray-600">{t(`group.type.${type}`)}</p>
         </div>
-      </div>
-
-      {/* invite: QR + code + share */}
-      <section className="w-full space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
-        <p className="text-sm text-violet-900">{t('wizard.inviteHint')}</p>
-        <Qr link={link} />
-        <p className="font-mono text-2xl font-bold tracking-[0.2em] text-violet-900">{created.join_code}</p>
-        <Button onClick={share} className="inline-flex w-full items-center justify-center gap-1.5">
+        <Button onClick={share} className="inline-flex shrink-0 items-center gap-1.5">
           <Share2 size={16} aria-hidden /> {t('invite.share')}
         </Button>
+      </div>
+
+      {/* invite: QR + code */}
+      <section className="flex flex-col items-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 p-3">
+        <p className="text-xs text-violet-900">{t('wizard.inviteHint')}</p>
+        <Qr link={link} size={132} />
+        <p className="font-mono text-lg font-bold tracking-[0.2em] text-violet-900">{created.join_code}</p>
         {copied && (
-          <p aria-live="polite" className="flex items-center justify-center gap-1 text-sm text-green-600">
+          <p aria-live="polite" className="flex items-center gap-1 text-sm text-green-600">
             <Check size={14} /> {t('invite.copied')}
           </p>
         )}
       </section>
 
-      <div className="flex w-full flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <Button
           onClick={() => navigate(`/g/${created.id}/planner`)}
           className="inline-flex w-full items-center justify-center gap-1.5"
         >
           <CalendarPlus size={16} aria-hidden /> {tg(t, 'wizard.plan', type)}
         </Button>
-        <Button
-          variant="secondary"
-          onClick={() => navigate(`/g/${created.id}`)}
-          className="w-full"
-        >
+        <Button variant="secondary" onClick={() => navigate(`/g/${created.id}`)} className="w-full">
           {t('wizard.goToGroup')}
         </Button>
       </div>
@@ -241,11 +236,11 @@ function ThanksScreen({
   )
 }
 
-function Qr({ link }: { link: string }) {
+function Qr({ link, size = 200 }: { link: string; size?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
-    if (canvasRef.current) QRCode.toCanvas(canvasRef.current, link, { width: 200, margin: 1 }).catch(() => {})
-  }, [link])
+    if (canvasRef.current) QRCode.toCanvas(canvasRef.current, link, { width: size, margin: 1 }).catch(() => {})
+  }, [link, size])
   return <canvas ref={canvasRef} className="mx-auto rounded-lg bg-white p-2" />
 }
 
