@@ -25,14 +25,13 @@ test.describe('create group adopts type wording', () => {
       // Step 2 — name
       await page.getByLabel('Nombre del grupo').fill(name)
       await page.getByRole('button', { name: 'Siguiente' }).click()
-      // Step 3 — new-member policy
-      await page.getByRole('button', { name: 'Siguiente' }).click()
-      // Step 4 — image → create
+      // Step 3 — image → create
       await page.getByRole('button', { name: 'Crear grupo' }).click()
 
-      // NewGroupPage navigates back to home; open the freshly created group.
-      await page.waitForURL('http://localhost:5173/')
-      await page.getByText(name, { exact: true }).click()
+      // "Thanks" screen shows the created group; go into it.
+      await expect(page.getByRole('heading', { name: '¡Grupo creado!' })).toBeVisible()
+      await expect(page.getByText(name, { exact: true })).toBeVisible()
+      await page.getByRole('button', { name: 'Ir al grupo' }).click()
       await page.waitForURL(/\/g\/[0-9a-f-]+$/)
 
       // The new group already speaks its type's language.
@@ -45,4 +44,17 @@ test.describe('create group adopts type wording', () => {
       await expect(page.getByRole('button', { name: c.tile, pressed: true })).toBeVisible()
     })
   }
+
+  test('back navigation preserves earlier choices', async ({ page }) => {
+    await page.goto('/new-group')
+    await page.getByRole('button', { name: 'Deportes', exact: true }).click()
+    await page.getByRole('button', { name: 'Siguiente' }).click()
+    await page.getByLabel('Nombre del grupo').fill('Atrás Test')
+    await page.getByRole('button', { name: 'Siguiente' }).click() // now on image step
+
+    await page.getByRole('button', { name: 'Atrás' }).click() // back to name
+    await expect(page.getByLabel('Nombre del grupo')).toHaveValue('Atrás Test')
+    await page.getByRole('button', { name: 'Atrás' }).click() // back to type
+    await expect(page.getByRole('button', { name: 'Deportes', pressed: true })).toBeVisible()
+  })
 })

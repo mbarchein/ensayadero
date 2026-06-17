@@ -67,15 +67,17 @@
     "stepTypeSub": "Elige la actividad; adaptaremos los textos de la app.",
     "stepName": "¿Cómo se llama?",
     "stepNameSub": "Podrás cambiarlo cuando quieras.",
-    "stepPolicy": "Nuevos miembros",
-    "stepPolicySub": "Cómo entran a los {{actPl}} ya planificados.",
     "stepImage": "Ponle cara",
     "stepImageSub": "Genera un avatar o sube una foto.",
-    "shuffle": "Otra sugerencia",
     "back": "Atrás",
     "next": "Siguiente",
     "create": "Crear grupo",
-    "creating": "Creando…"
+    "creating": "Creando…",
+    "doneTitle": "¡Grupo creado!",
+    "doneSub": "Tu grupo ya está listo. Invita a la gente y empieza a planificar.",
+    "inviteHint": "Comparte el código o el QR para que se unan al grupo.",
+    "plan": "Planificar {{actPl}}",
+    "goToGroup": "Ir al grupo"
   },
   "tips": {
     "home": "Estos son tus grupos. Entra en uno para ver sus {{actPl}}, o únete a otro con un código.",

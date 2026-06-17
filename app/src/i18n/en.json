@@ -67,15 +67,17 @@
     "stepTypeSub": "Pick the activity; we'll adapt the app's wording.",
     "stepName": "What's it called?",
     "stepNameSub": "You can change it anytime.",
-    "stepPolicy": "New members",
-    "stepPolicySub": "How they join the already-planned {{actPl}}.",
     "stepImage": "Give it a face",
     "stepImageSub": "Generate an avatar or upload a photo.",
-    "shuffle": "Another suggestion",
     "back": "Back",
     "next": "Next",
     "create": "Create group",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "doneTitle": "Group created!",
+    "doneSub": "Your group is ready. Invite people and start planning.",
+    "inviteHint": "Share the code or QR so others can join the group.",
+    "plan": "Plan {{actPl}}",
+    "goToGroup": "Go to the group"
   },
   "tips": {
     "home": "These are your groups. Open one to see its {{actPl}}, or join another with a code.",
