@@ -8,8 +8,9 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush, disablePush, isPushSubscribed } from '../../lib/push'
 import { useInstallPrompt, promptInstall, isIOS, isStandalone } from '../pwa/installPrompt'
-import { BackButton, Button, Modal, Toggle } from '../../components/ui'
+import { BackButton, Button, Modal, PasswordInput, Toggle } from '../../components/ui'
 import Tip, { resetTips } from '../../components/Tip'
+import { PASSWORD_MIN } from '../../auth/SignupPage'
 import AvatarEditor from './AvatarEditor'
 
 // Email opt-out groups → notification event types (notification_preferences).
@@ -75,6 +76,36 @@ export default function ProfilePage() {
     saveField.isPending && saveField.variables?.field === field
   const nameDirty = name.trim() !== (profile?.name ?? '') && !!name.trim()
   const phoneDirty = phone.trim() !== (profile?.phone ?? '')
+
+  // Account password. OAuth users have no email identity until they set one;
+  // doing so adds email+password as another way into the same account (Supabase
+  // auto-links identities sharing a verified email).
+  const hasPassword = !!session?.user.identities?.some((i) => i.identity_data?.email && i.provider === 'email')
+  const [password, setPassword] = useState('')
+  const [pwSaved, setPwSaved] = useState(false)
+  const [pwError, setPwError] = useState<string | null>(null)
+  const savePassword = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.updateUser({ password })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      setPassword('')
+      setPwError(null)
+      setPwSaved(true)
+      setTimeout(() => setPwSaved(false), 2000)
+    },
+    onError: (error) => {
+      const weak = error as { code?: string; reasons?: string[] }
+      if (weak.code === 'weak_password') {
+        setPwError(
+          weak.reasons?.includes('pwned')
+            ? t('signup.passwordPwned')
+            : t('signup.passwordTooShort', { min: PASSWORD_MIN }),
+        )
+      } else setPwError((error as Error).message)
+    },
+  })
 
   // profile photo: cropped data URL (or null = initials avatar), saved on change
   const saveAvatar = useMutation({
@@ -264,6 +295,42 @@ export default function ProfilePage() {
         {saveField.isError && (
           <p className="text-sm text-red-600">{(saveField.error as Error).message}</p>
         )}
+      </fieldset>
+
+      <fieldset className="space-y-2 rounded-xl border bg-white px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+          {t('profile.passwordTitle')}
+        </legend>
+        <p className="text-sm text-gray-600">
+          {hasPassword
+            ? t('profile.passwordChangeDescription')
+            : t('profile.passwordSetDescription')}
+        </p>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <PasswordInput
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-lg border px-3 py-2 text-sm"
+              placeholder={t('profile.passwordPlaceholder')}
+              autoComplete="new-password"
+              minLength={PASSWORD_MIN}
+            />
+          </div>
+          <Button
+            type="button"
+            disabled={password.length < PASSWORD_MIN || savePassword.isPending}
+            onClick={() => savePassword.mutate()}
+          >
+            {savePassword.isPending
+              ? t('profile.savingDetails')
+              : hasPassword
+                ? t('profile.passwordChange')
+                : t('profile.passwordSet')}
+          </Button>
+        </div>
+        {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+        {pwSaved && <span className="text-xs text-green-600">{t('profile.detailsSaved')}</span>}
       </fieldset>
 
       <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
