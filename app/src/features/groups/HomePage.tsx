@@ -237,8 +237,13 @@ export default function HomePage() {
       </section>
 
       <DidYouKnow
-        groupId={memberships?.[0]?.group_id ?? null}
-        instrGroupId={memberships?.find((m) => m.role === 'INSTRUCTOR')?.group_id ?? null}
+        groups={(memberships ?? []).map((m) => ({
+          id: m.group_id,
+          name: m.groups.name,
+          role: m.role,
+          avatar_seed: m.groups.avatar_seed,
+          avatar_image: m.groups.avatar_image,
+        }))}
       />
     </div>
   )
