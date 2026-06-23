@@ -10,6 +10,7 @@ import { dateLocale } from '../../lib/dateLocale'
 import { Archive } from 'lucide-react'
 import { Badge, InitialsAvatar } from '../../components/ui'
 import { parseRange } from '../../lib/ranges'
+import { visibleParticipants } from '../../lib/participants'
 import type {
   ParticipantResponse,
   Profile,
@@ -61,10 +62,9 @@ export default function SessionCard({
   const r = parseRange(s.time_range)
   const mine = s.session_participants.find((p) => p.user_id === userId)
 
-  // Skip participants whose profile we can't see (profiles RLS hides users we no
-  // longer share a group with — e.g. removed members still on an old session);
-  // the embedded `profiles` is null and they're not renderable.
-  const parts = s.session_participants.filter((p) => p.profiles)
+  // Skip participants whose profile RLS hides (removed members still on an old
+  // session); the embedded profile is null and they're not renderable.
+  const parts = visibleParticipants(s.session_participants)
   // attendance breakdown (data already loaded with the session)
   const going = parts.filter((p) => p.response === 'ACCEPTED')
   const pending = parts.filter((p) => p.response === 'PENDING')

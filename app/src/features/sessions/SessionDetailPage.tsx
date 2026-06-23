@@ -24,6 +24,7 @@ import { supabase } from '../../lib/supabase'
 import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { downloadIcs } from '../../lib/ics'
+import { visibleParticipants } from '../../lib/participants'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
@@ -152,11 +153,9 @@ export default function SessionDetailPage() {
   if (isLoading || !session) return <Spinner />
 
   const r = parseRange(session.time_range)
-  // Drop participants whose profile we can't see: profiles RLS hides users we no
-  // longer share a group with (e.g. removed from the group but still on an old
-  // session), so the embedded `profiles` comes back null. Rendering them would
-  // crash and they're not actionable anyway.
-  const participants = session.session_participants.filter((p) => p.profiles)
+  // Drop participants whose profile RLS hides (removed from the group but still
+  // on an old session): their embedded profile is null and would crash render.
+  const participants = visibleParticipants(session.session_participants)
   const mine = participants.find((p) => p.user_id === profile?.id)
   // Sort each list: me first, then by response (going → not going → pending),
   // then alphabetically.
