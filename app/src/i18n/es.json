@@ -550,6 +550,7 @@
     "addPhoto": "Añadir foto",
     "changePhoto": "Cambiar foto",
     "removePhoto": "Quitar foto",
+    "detailsTitle": "Datos personales",
     "name": "Nombre",
     "phone": "Teléfono",
     "gender": "Pronombre (opcional)",

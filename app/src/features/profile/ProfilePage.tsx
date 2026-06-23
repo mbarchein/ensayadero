@@ -45,7 +45,7 @@ export default function ProfilePage() {
   const [name, setName] = useState(profile?.name ?? '')
   const [phone, setPhone] = useState(profile?.phone ?? '')
   const [gender, setGender] = useState<'' | 'F' | 'M'>(profile?.gender ?? '')
-  const [savedAt, setSavedAt] = useState(false)
+  const [savedField, setSavedField] = useState<'name' | 'phone' | 'gender' | null>(null)
   useEffect(() => {
     // keep in sync if the profile refreshes while the page is open
     setName(profile?.name ?? '')
@@ -53,24 +53,28 @@ export default function ProfilePage() {
     setGender(profile?.gender ?? '')
   }, [profile])
 
-  const saveDetails = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ name: name.trim(), phone: phone.trim() || null, gender: gender || null })
-        .eq('id', profile!.id)
+  // each field saves on its own: name/phone via an inline button, pronoun on
+  // change. No global save — the mutation patches just the touched column.
+  const saveField = useMutation({
+    mutationFn: async ({
+      patch,
+    }: {
+      field: 'name' | 'phone' | 'gender'
+      patch: Partial<{ name: string; phone: string | null; gender: 'F' | 'M' | null }>
+    }) => {
+      const { error } = await supabase.from('profiles').update(patch).eq('id', profile!.id)
       if (error) throw error
       await refreshProfile()
     },
-    onSuccess: () => {
-      setSavedAt(true)
-      setTimeout(() => setSavedAt(false), 2000)
+    onSuccess: (_data, { field }) => {
+      setSavedField(field)
+      setTimeout(() => setSavedField((f) => (f === field ? null : f)), 2000)
     },
   })
-  const dirty =
-    name.trim() !== (profile?.name ?? '') ||
-    phone.trim() !== (profile?.phone ?? '') ||
-    gender !== (profile?.gender ?? '')
+  const savingField = (field: 'name' | 'phone' | 'gender') =>
+    saveField.isPending && saveField.variables?.field === field
+  const nameDirty = name.trim() !== (profile?.name ?? '') && !!name.trim()
+  const phoneDirty = phone.trim() !== (profile?.phone ?? '')
 
   // profile photo: cropped data URL (or null = initials avatar), saved on change
   const saveAvatar = useMutation({
@@ -97,6 +101,7 @@ export default function ProfilePage() {
   // Reflect the real subscription state (not just the OS permission): a device
   // can have permission granted but be unsubscribed after disabling here.
   const [pushState, setPushState] = useState<'idle' | 'ok' | 'fail'>('idle')
+  const [pushBusy, setPushBusy] = useState(false)
   useEffect(() => {
     isPushSubscribed().then((on) => on && setPushState('ok'))
   }, [])
@@ -172,31 +177,54 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <form
-        className="space-y-3 rounded-xl border bg-white p-4"
-        onSubmit={(e) => {
-          e.preventDefault()
-          saveDetails.mutate()
-        }}
-      >
+      <fieldset className="space-y-3 rounded-xl border bg-white px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+          {t('profile.detailsTitle')}
+        </legend>
         <label className="block text-sm">
           {t('profile.name')}
-          <input
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2"
-          />
+          <div className="mt-1 flex gap-2">
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+            <Button
+              type="button"
+              disabled={!nameDirty || savingField('name')}
+              onClick={() => saveField.mutate({ field: 'name', patch: { name: name.trim() } })}
+            >
+              {savingField('name') ? t('profile.savingDetails') : t('common.save')}
+            </Button>
+          </div>
+          {savedField === 'name' && (
+            <span className="mt-1 block text-xs text-green-600">{t('profile.detailsSaved')}</span>
+          )}
         </label>
         <label className="block text-sm">
           {t('profile.phone')} <span className="text-gray-500">{t('common.optionalField')}</span>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2"
-            placeholder="+34 600 000 000"
-          />
+          <div className="mt-1 flex gap-2">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2"
+              placeholder="+34 600 000 000"
+            />
+            <Button
+              type="button"
+              disabled={!phoneDirty || savingField('phone')}
+              onClick={() =>
+                saveField.mutate({ field: 'phone', patch: { phone: phone.trim() || null } })
+              }
+            >
+              {savingField('phone') ? t('profile.savingDetails') : t('common.save')}
+            </Button>
+          </div>
+          {savedField === 'phone' && (
+            <span className="mt-1 block text-xs text-green-600">{t('profile.detailsSaved')}</span>
+          )}
         </label>
         <div className="text-sm">
           <div className="flex items-center justify-between gap-3">
@@ -215,7 +243,11 @@ export default function ProfilePage() {
                   role="radio"
                   aria-checked={gender === value}
                   aria-label={aria}
-                  onClick={() => setGender(value)}
+                  disabled={savingField('gender')}
+                  onClick={() => {
+                    setGender(value)
+                    saveField.mutate({ field: 'gender', patch: { gender: value || null } })
+                  }}
                   className={`rounded-full border px-3 py-1 transition ${
                     gender === value
                       ? 'border-violet-600 bg-violet-600 text-white'
@@ -229,19 +261,15 @@ export default function ProfilePage() {
           </div>
           <span className="mt-1 block text-xs text-gray-600">{t('profile.genderHint')}</span>
         </div>
-        {saveDetails.isError && (
-          <p className="text-sm text-red-600">{(saveDetails.error as Error).message}</p>
+        {saveField.isError && (
+          <p className="text-sm text-red-600">{(saveField.error as Error).message}</p>
         )}
-        <div className="flex items-center gap-3">
-          <Button type="submit" disabled={!dirty || saveDetails.isPending}>
-            {saveDetails.isPending ? t('profile.savingDetails') : t('common.save')}
-          </Button>
-          {savedAt && <span className="text-sm text-green-600">{t('profile.detailsSaved')}</span>}
-        </div>
-      </form>
+      </fieldset>
 
-      <section className="rounded-xl border bg-white p-4">
-        <h2 className="mb-1 font-semibold">{t('profile.emailPrefsTitle')}</h2>
+      <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+          {t('profile.emailPrefsTitle')}
+        </legend>
         <p className="mb-3 text-sm text-gray-600">{t('profile.emailPrefsDescription')}</p>
         <div className="space-y-3">
           {(Object.keys(EMAIL_GROUPS) as EmailGroup[]).map((group) => (
@@ -267,38 +295,38 @@ export default function ProfilePage() {
         <p aria-live="polite" className="mt-2 h-4 text-right text-sm text-green-600">
           {prefsSaved ? t('profile.detailsSaved') : ''}
         </p>
-      </section>
+      </fieldset>
 
       {/* hidden until Web Push is configured (VAPID keys, BOOTSTRAP §7) */}
       {!!import.meta.env.VITE_VAPID_PUBLIC_KEY && (
-        <section className="rounded-xl border bg-white p-4">
-          <h2 className="mb-2 font-semibold">{t('profile.pushTitle')}</h2>
-          <p className="mb-3 text-sm text-gray-600">{tg(t, 'profile.pushDescription', 'OTHER')}</p>
-          {pushState === 'ok' ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm font-medium text-green-700">{t('profile.pushEnabled')}</p>
-              <Button
-                variant="secondary"
-                onClick={async () => {
-                  if (await disablePush()) setPushState('idle')
-                }}
-              >
-                {t('profile.pushDisable')}
-              </Button>
-            </div>
-          ) : (
-            <Button onClick={async () => setPushState((await enablePush()) ? 'ok' : 'fail')}>
-              {t('profile.pushEnable')}
-            </Button>
-          )}
+        <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
+          <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+            {t('profile.pushTitle')}
+          </legend>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-gray-600">{tg(t, 'profile.pushDescription', 'OTHER')}</p>
+            <Toggle
+              checked={pushState === 'ok'}
+              disabled={pushBusy}
+              ariaLabel={t('profile.pushTitle')}
+              onChange={async (on) => {
+                setPushBusy(true)
+                if (on) setPushState((await enablePush()) ? 'ok' : 'fail')
+                else if (await disablePush()) setPushState('idle')
+                setPushBusy(false)
+              }}
+            />
+          </div>
           {pushState === 'fail' && (
             <p className="mt-2 text-sm text-red-600">{t('profile.pushError')}</p>
           )}
-        </section>
+        </fieldset>
       )}
 
-      <section className="rounded-xl border bg-white p-4">
-        <h2 className="mb-1 font-semibold">{t('profile.tipsTitle')}</h2>
+      <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+          {t('profile.tipsTitle')}
+        </legend>
         <p className="mb-3 text-sm text-gray-600">{t('profile.tipsDescription')}</p>
         <div className="flex items-center gap-3">
           <Button variant="secondary" onClick={() => { resetTips(); setTipsReset(true); setTimeout(() => setTipsReset(false), 2000) }}>
@@ -306,14 +334,16 @@ export default function ProfilePage() {
           </Button>
           {tipsReset && <span className="text-sm text-green-600">{t('profile.tipsResetDone')}</span>}
         </div>
-      </section>
+      </fieldset>
 
       {/* Install the PWA. Only shown when actionable: Chromium offered the
           prompt (canInstall) or iOS (manual Share → Add to Home Screen). Hidden
           when already running as an installed app. */}
       {!isStandalone() && (canInstall || isIOS) && (
-        <section className="rounded-xl border bg-white p-4">
-          <h2 className="mb-1 font-semibold">{t('pwa.sectionTitle')}</h2>
+        <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
+          <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">
+            {t('pwa.sectionTitle')}
+          </legend>
           <p className="mb-3 text-sm text-gray-600">{t('pwa.installHint')}</p>
           {canInstall ? (
             <Button
@@ -325,11 +355,13 @@ export default function ProfilePage() {
           ) : (
             <p className="text-sm text-gray-600">{t('pwa.iosHint')}</p>
           )}
-        </section>
+        </fieldset>
       )}
 
-      <section className="rounded-xl border border-red-200 bg-red-50 p-4">
-        <h2 className="mb-2 font-semibold text-red-900">{t('profile.dangerZone')}</h2>
+      <fieldset className="rounded-xl border border-red-200 bg-red-50 px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-red-900">
+          {t('profile.dangerZone')}
+        </legend>
         <p className="mb-3 text-sm text-red-800">{tg(t, 'profile.deleteDescription', 'OTHER')}</p>
         <Button
           variant="danger"
@@ -345,7 +377,7 @@ export default function ProfilePage() {
         {deleteAccount.isError && (
           <p className="mt-2 text-sm text-red-700">{(deleteAccount.error as Error).message}</p>
         )}
-      </section>
+      </fieldset>
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t('profile.deleteAccount')}>
         <div className="space-y-4">
