@@ -25,7 +25,8 @@ export default function MemberPolicyField({
   return (
     <fieldset className="rounded-xl border bg-white p-4 text-sm">
       <legend className="px-1 font-medium">{t('group.newMemberTitle')}</legend>
-      <div className="mt-1 space-y-2">
+      <p className="px-1 text-xs text-gray-600">{tg(t, 'group.newMemberDescription', type)}</p>
+      <div className="mt-2 space-y-2">
         {OPTIONS.map((opt) => {
           const active = value === opt.value
           return (
