@@ -62,12 +62,14 @@ where g.name = v.name and g.group_type <> v.gt::group_type;
 SQL
 
 # ── Null-profile regression fixture ──────────────────────────────────────────
-# Eva is added to directora's group and to a CONFIRMED session, then removed
-# from the group while kept on the session. profiles RLS then hides her from
-# directora (no shared group, and directora is NOT superadmin), so the session
-# embeds profiles=null — the exact shape that crashed SessionDetailPage. Viewed
-# as directora, not admin: a superadmin sees every profile and wouldn't repro.
-# Idempotent.
+# Eva is a participant of directora's CONFIRMED session but not a member of the
+# group (the shape an ex-member left on a PAST session ends up in — the
+# drop_future_participations trigger only purges future sessions). profiles RLS
+# then hides her from directora (no shared group, and directora is NOT
+# superadmin), so the session embeds profiles=null — the exact shape that
+# crashed SessionDetailPage. We insert her participation directly (no membership)
+# so the leave trigger doesn't remove it. Viewed as directora, not admin: a
+# superadmin sees every profile and wouldn't reproduce. Idempotent.
 curl -s "$API/auth/v1/admin/users" \
   -H "Authorization: Bearer $SERVICE_KEY" -H "apikey: $SERVICE_KEY" \
   -H "Content-Type: application/json" \
@@ -94,13 +96,6 @@ from public.profiles d, public.groups g
 where d.email='directora@local.test' and g.name='E2E Sesiones'
 on conflict (user_id, group_id) do nothing;
 
--- exmember joins (temporarily) as ACTOR
-insert into public.memberships (user_id, group_id, role)
-select e.id, g.id, 'ACTOR'
-from public.profiles e, public.groups g
-where e.email='exmember@local.test' and g.name='E2E Sesiones'
-on conflict (user_id, group_id) do nothing;
-
 -- a CONFIRMED session tomorrow 18:00–20:00 (marker in comments for idempotency)
 insert into public.sessions (group_id, location, comments, time_range, status, created_by)
 select g.id, 'Sala 1', 'E2E orphan fixture',
@@ -125,12 +120,6 @@ select s.id, e.id, true, 'ACCEPTED'
 from public.sessions s join public.profiles e on e.email='exmember@local.test'
 where s.comments='E2E orphan fixture'
 on conflict (session_id, user_id) do nothing;
-
--- remove exmember from the group, KEEP her session_participant row → orphan
-delete from public.memberships m
-using public.groups g, public.profiles e
-where m.group_id=g.id and m.user_id=e.id
-  and g.name='E2E Sesiones' and e.email='exmember@local.test';
 SQL
 
 echo "e2e seed ready (admin@local.test / password123, 5 typed groups, orphan-session fixture)"
