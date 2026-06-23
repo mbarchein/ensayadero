@@ -15,6 +15,7 @@ import InstallBanner from '../pwa/InstallBanner'
 import { useInstallPrompt, isIOS, isStandalone } from '../pwa/installPrompt'
 import FeatureCallout from '../whatsnew/FeatureCallout'
 import Tip from '../../components/Tip'
+import DidYouKnow from '../../components/DidYouKnow'
 import { roleLabel } from '../../lib/roleLabel'
 import { tg } from '../../lib/glossary'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
@@ -235,6 +236,7 @@ export default function HomePage() {
         )}
       </section>
 
+      <DidYouKnow />
     </div>
   )
 }

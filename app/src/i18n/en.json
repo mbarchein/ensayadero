@@ -269,7 +269,21 @@
     "newGroupTitle": "New group",
     "newGroupHint": "You'll be the director of this group and can invite the others.",
     "signOut": "Sign out",
-    "noGroups": "You don't belong to any group yet. Join with a code or create your own."
+    "noGroups": "You don't belong to any group yet. Join with a code or create your own.",
+    "didYouKnow": {
+      "title": "Did you know…?",
+      "next": "Another tip",
+      "facts": [
+        "You can sign in with Google, Facebook or email. With the same address it's always the same account.",
+        "Signed in with Google? From your profile you can set a password to also sign in with email.",
+        "You can join a group instantly with its invite code or link.",
+        "Mark your availability and the group will know when you're free without having to ask.",
+        "Install the app on your phone and open it like any other app.",
+        "Turn on alerts on this device to hear about changes and cancellations right away.",
+        "When someone new joins, you decide whether they're summoned, invited or left out of the {{actPl}} already scheduled.",
+        "You can show all the tips again from your profile."
+      ]
+    }
   },
   "availability": {
     "title": "My availability",

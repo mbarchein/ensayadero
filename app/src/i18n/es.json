@@ -269,7 +269,21 @@
     "newGroupTitle": "Nuevo grupo",
     "newGroupHint": "Serás el director de este grupo y podrás invitar a los demás.",
     "signOut": "Salir",
-    "noGroups": "Aún no perteneces a ningún grupo. Únete con un código o crea el tuyo."
+    "noGroups": "Aún no perteneces a ningún grupo. Únete con un código o crea el tuyo.",
+    "didYouKnow": {
+      "title": "¿Sabías que…?",
+      "next": "Otro consejo",
+      "facts": [
+        "Puedes entrar con Google, Facebook o email. Si usas el mismo correo, siempre es la misma cuenta.",
+        "¿Entraste con Google? Desde tu perfil puedes crear una contraseña para entrar también con email.",
+        "Puedes unirte a un grupo al instante con su código o enlace de invitación.",
+        "Marca tu disponibilidad y el grupo sabrá cuándo puedes sin tener que preguntarte.",
+        "Instala la app en tu móvil y ábrela como cualquier otra aplicación.",
+        "Activa los avisos en este dispositivo para enterarte al momento de cambios y cancelaciones.",
+        "Cuando se une alguien nuevo, decides si se le convoca, se le invita o no, en los {{actPl}} ya programados.",
+        "Puedes volver a ver todos los consejos desde tu perfil."
+      ]
+    }
   },
   "availability": {
     "title": "Mi disponibilidad",
