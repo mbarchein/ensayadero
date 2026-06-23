@@ -152,11 +152,17 @@ export default function SessionDetailPage() {
   if (isLoading || !session) return <Spinner />
 
   const r = parseRange(session.time_range)
-  const mine = session.session_participants.find((p) => p.user_id === profile?.id)
+  // Drop participants whose profile we can't see: profiles RLS hides users we no
+  // longer share a group with (e.g. removed from the group but still on an old
+  // session), so the embedded `profiles` comes back null. Rendering them would
+  // crash and they're not actionable anyway.
+  const participants = session.session_participants.filter((p) => p.profiles)
+  const mine = participants.find((p) => p.user_id === profile?.id)
   // Sort each list: me first, then by response (going → not going → pending),
   // then alphabetically.
   const respOrder: Record<string, number> = { ACCEPTED: 0, DECLINED: 1, PENDING: 2 }
-  const partName = (p: (typeof session.session_participants)[number]) => p.profiles.name || p.profiles.email
+  const partName = (p: (typeof session.session_participants)[number]) =>
+    p.profiles?.name || p.profiles?.email || ''
   const sortParticipants = (list: typeof session.session_participants) =>
     [...list].sort(
       (a, b) =>
@@ -164,12 +170,12 @@ export default function SessionDetailPage() {
         (respOrder[a.response] ?? 9) - (respOrder[b.response] ?? 9) ||
         partName(a).localeCompare(partName(b)),
     )
-  const required = sortParticipants(session.session_participants.filter((p) => p.required))
-  const optional = sortParticipants(session.session_participants.filter((p) => !p.required))
+  const required = sortParticipants(participants.filter((p) => p.required))
+  const optional = sortParticipants(participants.filter((p) => !p.required))
 
   // each participant's availability within the session's range
   const availInfo = new Map<string, { coverage: 'full' | 'partial' | 'none'; label: string }>()
-  for (const p of session.session_participants) {
+  for (const p of participants) {
     const intervals = availableWithin(
       (avails ?? []).filter((a) => a.user_id === p.user_id),
       r,
@@ -232,7 +238,7 @@ export default function SessionDetailPage() {
   const durationLabel = [durH ? `${durH} h` : null, durM ? `${durM} min` : null]
     .filter(Boolean)
     .join(' ')
-  const tally = session.session_participants.reduce(
+  const tally = participants.reduce(
     (a, p) => {
       a[p.response] = (a[p.response] ?? 0) + 1
       return a
@@ -481,12 +487,12 @@ export default function SessionDetailPage() {
         <div className="space-y-4">
           <p className="text-sm text-gray-600">{t('sessions.nudgeConfirm')}</p>
           <ul className="max-h-48 space-y-1 overflow-y-auto">
-            {session.session_participants
+            {participants
               .filter((p) => p.response === 'PENDING')
               .map((p) => (
                 <li key={p.user_id} className="flex items-center gap-2 text-sm">
                   <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" aria-hidden />
-                  <span className="truncate">{p.profiles.name || p.profiles.email}</span>
+                  <span className="truncate">{p.profiles?.name || p.profiles?.email}</span>
                 </li>
               ))}
           </ul>
