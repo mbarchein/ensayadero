@@ -273,16 +273,41 @@
     "didYouKnow": {
       "title": "¿Sabías que…?",
       "next": "Otro consejo",
-      "facts": [
-        "Puedes entrar con Google, Facebook o email. Si usas el mismo correo, siempre es la misma cuenta.",
-        "¿Entraste con Google? Desde tu perfil puedes crear una contraseña para entrar también con email.",
-        "Puedes unirte a un grupo al instante con su código o enlace de invitación.",
-        "Marca tu disponibilidad y el grupo sabrá cuándo puedes sin tener que preguntarte.",
-        "Instala la app en tu móvil y ábrela como cualquier otra aplicación.",
-        "Activa los avisos en este dispositivo para enterarte al momento de cambios y cancelaciones.",
-        "Cuando se une alguien nuevo, decides si se le convoca, se le invita o no, en los {{actPl}} ya programados.",
-        "Puedes volver a ver todos los consejos desde tu perfil."
-      ]
+      "facts": {
+        "multiLogin": "Puedes entrar con Google, Facebook o email. Si usas el mismo correo, siempre es la misma cuenta.",
+        "setPassword": "¿Entraste con Google? Desde tu perfil puedes crear una contraseña para entrar también con email.",
+        "createGroup": "Cualquier persona puede crear un grupo y convertirse en su director.",
+        "profilePhoto": "Puedes cambiar tu foto de perfil cuando quieras.",
+        "agendaViews": "Tu agenda tiene varios modos de visualización: lista o calendario mensual.",
+        "emailPrefs": "Puedes configurar qué avisos recibes por email.",
+        "members": "Puedes ver la lista de compañeros de cada grupo.",
+        "calendar": "Puedes añadir los {{actPl}} programados al calendario de tu teléfono.",
+        "archiveNotifications": "Puedes archivar los avisos y volver a verlos cuando quieras.",
+        "rsvpChange": "Puedes cambiar de idea al confirmar asistencia tantas veces como quieras.",
+        "namePronoun": "Puedes cambiar cómo te llaman y tu pronombre desde tu perfil.",
+        "joinCode": "Puedes unirte a un grupo al instante con su código o enlace de invitación.",
+        "install": "Instala la app en tu móvil y ábrela como cualquier otra aplicación.",
+        "deviceAlerts": "Activa los avisos en este dispositivo para enterarte al momento de cambios y cancelaciones.",
+        "availability": "Marca tu disponibilidad y el grupo sabrá cuándo puedes sin tener que preguntarte.",
+        "resetTips": "Puedes volver a ver todos los consejos desde tu perfil.",
+        "slotAvailability": "Como director, puedes ver cuánta gente está disponible en cada franja antes de convocar.",
+        "convokeSome": "Como director, puedes convocar {{actPl}} solo para las personas que quieras del grupo.",
+        "mandatoryOptional": "Como director, puedes marcar a cada persona como obligatoria u opcional en un {{act}}.",
+        "newMemberPolicy": "Como director, decides qué pasa con los nuevos miembros en los {{actPl}} ya programados."
+      },
+      "cta": {
+        "profile": "Ver perfil",
+        "createGroup": "Crear grupo",
+        "agenda": "Ver agenda",
+        "emailPrefs": "Ajustar avisos",
+        "members": "Ver compañeros",
+        "notifications": "Ver avisos",
+        "sessions": "Ver {{actPl}}",
+        "join": "Unirme a un grupo",
+        "availability": "Ver disponibilidad",
+        "planner": "Ver planificador",
+        "editGroup": "Editar grupo"
+      }
     }
   },
   "availability": {

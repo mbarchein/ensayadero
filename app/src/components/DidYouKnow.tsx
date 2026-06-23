@@ -1,19 +1,60 @@
 // Rotating "Did you know…?" card for the home page: shows one random app tip
-// from the i18n list, with a button to cycle to the next. Facts live under the
-// "home.didYouKnow.facts" array; glossary terms ({{actPl}}…) use the neutral
-// 'OTHER' vocabulary since the home page spans every group type.
+// with a link to the matching section, and a button to cycle to the next.
+// Facts and CTA labels live under "home.didYouKnow". Some facts are per-group
+// (link to the user's first group) and some are director-only (link to the
+// first group where the user is INSTRUCTOR) — those are hidden otherwise.
 
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Lightbulb, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tg } from '../lib/glossary'
 
-export default function DidYouKnow() {
+type Ctx = { groupId: string | null; instrGroupId: string | null }
+
+type Fact = {
+  id: string
+  cta: string
+  director?: boolean
+  to: (c: Ctx) => string | null
+  state?: Record<string, unknown>
+}
+
+// `to` returning null hides the fact (no group to link to). Director facts link
+// to the first instructor group and are dropped when the user isn't a director.
+const FACTS: Fact[] = [
+  { id: 'multiLogin', cta: 'profile', to: () => '/profile' },
+  { id: 'setPassword', cta: 'profile', to: () => '/profile' },
+  { id: 'createGroup', cta: 'createGroup', to: () => '/new-group' },
+  { id: 'profilePhoto', cta: 'profile', to: () => '/profile', state: { openAvatar: true } },
+  { id: 'agendaViews', cta: 'agenda', to: () => '/upcoming' },
+  { id: 'emailPrefs', cta: 'emailPrefs', to: () => '/profile' },
+  { id: 'members', cta: 'members', to: (c) => (c.groupId ? `/g/${c.groupId}/members` : null) },
+  { id: 'calendar', cta: 'agenda', to: () => '/upcoming' },
+  { id: 'archiveNotifications', cta: 'notifications', to: () => '/notifications' },
+  { id: 'rsvpChange', cta: 'sessions', to: (c) => (c.groupId ? `/g/${c.groupId}` : null) },
+  { id: 'namePronoun', cta: 'profile', to: () => '/profile' },
+  { id: 'joinCode', cta: 'join', to: () => '/join' },
+  { id: 'install', cta: 'profile', to: () => '/profile' },
+  { id: 'deviceAlerts', cta: 'emailPrefs', to: () => '/profile' },
+  { id: 'availability', cta: 'availability', to: () => '/availability' },
+  { id: 'resetTips', cta: 'profile', to: () => '/profile' },
+  { id: 'slotAvailability', cta: 'planner', director: true, to: (c) => (c.instrGroupId ? `/g/${c.instrGroupId}/planner` : null) },
+  { id: 'convokeSome', cta: 'planner', director: true, to: (c) => (c.instrGroupId ? `/g/${c.instrGroupId}/planner` : null) },
+  { id: 'mandatoryOptional', cta: 'planner', director: true, to: (c) => (c.instrGroupId ? `/g/${c.instrGroupId}/planner` : null) },
+  { id: 'newMemberPolicy', cta: 'editGroup', director: true, to: (c) => (c.instrGroupId ? `/g/${c.instrGroupId}/edit` : null) },
+]
+
+export default function DidYouKnow({ groupId, instrGroupId }: Ctx) {
   const { t } = useTranslation()
-  const facts = t('home.didYouKnow.facts', { returnObjects: true })
-  const count = Array.isArray(facts) ? facts.length : 0
+  const ctx: Ctx = { groupId, instrGroupId }
+  const available = FACTS.filter((f) => (!f.director || instrGroupId) && f.to(ctx) !== null)
+  const count = available.length
   const [index, setIndex] = useState(() => (count ? Math.floor(Math.random() * count) : 0))
   if (count === 0) return null
+
+  const fact = available[index % count]
+  const to = fact.to(ctx)!
 
   return (
     <section className="rounded-xl border border-violet-200 bg-violet-50 p-4">
@@ -33,8 +74,15 @@ export default function DidYouKnow() {
         )}
       </div>
       <p className="mt-1 text-sm text-violet-800">
-        {tg(t, `home.didYouKnow.facts.${index}`, 'OTHER')}
+        {tg(t, `home.didYouKnow.facts.${fact.id}`, 'OTHER')}
       </p>
+      <Link
+        to={to}
+        state={fact.state}
+        className="mt-2 inline-block text-sm font-medium text-violet-700 underline"
+      >
+        {tg(t, `home.didYouKnow.cta.${fact.cta}`, 'OTHER')}
+      </Link>
     </section>
   )
 }

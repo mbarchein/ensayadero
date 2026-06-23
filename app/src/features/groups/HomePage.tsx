@@ -236,7 +236,10 @@ export default function HomePage() {
         )}
       </section>
 
-      <DidYouKnow />
+      <DidYouKnow
+        groupId={memberships?.[0]?.group_id ?? null}
+        instrGroupId={memberships?.find((m) => m.role === 'INSTRUCTOR')?.group_id ?? null}
+      />
     </div>
   )
 }

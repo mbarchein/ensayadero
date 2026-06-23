@@ -273,16 +273,41 @@
     "didYouKnow": {
       "title": "Did you know…?",
       "next": "Another tip",
-      "facts": [
-        "You can sign in with Google, Facebook or email. With the same address it's always the same account.",
-        "Signed in with Google? From your profile you can set a password to also sign in with email.",
-        "You can join a group instantly with its invite code or link.",
-        "Mark your availability and the group will know when you're free without having to ask.",
-        "Install the app on your phone and open it like any other app.",
-        "Turn on alerts on this device to hear about changes and cancellations right away.",
-        "When someone new joins, you decide whether they're summoned, invited or left out of the {{actPl}} already scheduled.",
-        "You can show all the tips again from your profile."
-      ]
+      "facts": {
+        "multiLogin": "You can sign in with Google, Facebook or email. With the same address it's always the same account.",
+        "setPassword": "Signed in with Google? From your profile you can set a password to also sign in with email.",
+        "createGroup": "Anyone can create a group and become its director.",
+        "profilePhoto": "You can change your profile photo whenever you like.",
+        "agendaViews": "Your agenda has several view modes: list or monthly calendar.",
+        "emailPrefs": "You can choose which alerts you get by email.",
+        "members": "You can see the list of members in each group.",
+        "calendar": "You can add the scheduled {{actPl}} to your phone's calendar.",
+        "archiveNotifications": "You can archive alerts and view them again whenever you want.",
+        "rsvpChange": "You can change your mind when confirming attendance as many times as you like.",
+        "namePronoun": "You can change how you're called and your pronoun from your profile.",
+        "joinCode": "You can join a group instantly with its invite code or link.",
+        "install": "Install the app on your phone and open it like any other app.",
+        "deviceAlerts": "Turn on alerts on this device to hear about changes and cancellations right away.",
+        "availability": "Mark your availability and the group will know when you're free without having to ask.",
+        "resetTips": "You can show all the tips again from your profile.",
+        "slotAvailability": "As a director, you can see how many people are free in each slot before summoning.",
+        "convokeSome": "As a director, you can summon {{actPl}} only for the people you choose from the group.",
+        "mandatoryOptional": "As a director, you can mark each person as mandatory or optional for an {{act}}.",
+        "newMemberPolicy": "As a director, you decide what happens to new members in the {{actPl}} already scheduled."
+      },
+      "cta": {
+        "profile": "View profile",
+        "createGroup": "Create group",
+        "agenda": "View agenda",
+        "emailPrefs": "Adjust alerts",
+        "members": "View members",
+        "notifications": "View alerts",
+        "sessions": "View {{actPl}}",
+        "join": "Join a group",
+        "availability": "View availability",
+        "planner": "View planner",
+        "editGroup": "Edit group"
+      }
     }
   },
   "availability": {
