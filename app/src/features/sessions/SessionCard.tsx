@@ -61,10 +61,14 @@ export default function SessionCard({
   const r = parseRange(s.time_range)
   const mine = s.session_participants.find((p) => p.user_id === userId)
 
+  // Skip participants whose profile we can't see (profiles RLS hides users we no
+  // longer share a group with — e.g. removed members still on an old session);
+  // the embedded `profiles` is null and they're not renderable.
+  const parts = s.session_participants.filter((p) => p.profiles)
   // attendance breakdown (data already loaded with the session)
-  const going = s.session_participants.filter((p) => p.response === 'ACCEPTED')
-  const pending = s.session_participants.filter((p) => p.response === 'PENDING')
-  const declined = s.session_participants.filter((p) => p.response === 'DECLINED')
+  const going = parts.filter((p) => p.response === 'ACCEPTED')
+  const pending = parts.filter((p) => p.response === 'PENDING')
+  const declined = parts.filter((p) => p.response === 'DECLINED')
 
   // calendar-style date block, colored like the Upcoming cards: cancelled/draft
   // by status, otherwise by my own response.
@@ -127,7 +131,7 @@ export default function SessionCard({
           </div>
 
           {/* attendance at a glance: avatars of who's going + per-response counts */}
-          {s.status !== 'CANCELLED' && s.session_participants.length > 0 && (
+          {s.status !== 'CANCELLED' && parts.length > 0 && (
             <div className="mt-2 flex items-center gap-3">
               {going.length > 0 && (
                 <div className="flex -space-x-2">
