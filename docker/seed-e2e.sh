@@ -61,4 +61,70 @@ from (values
 where g.name = v.name and g.group_type <> v.gt::group_type;
 SQL
 
-echo "e2e seed ready (admin@local.test / password123, 5 typed groups)"
+# ── Null-profile regression fixture ──────────────────────────────────────────
+# A third user is added to a group and to a CONFIRMED session, then removed from
+# the group while kept on the session. profiles RLS then hides her from the
+# admin (no shared group), so the session embeds profiles=null — the exact shape
+# that crashed SessionDetailPage. Idempotent.
+curl -s "$API/auth/v1/admin/users" \
+  -H "Authorization: Bearer $SERVICE_KEY" -H "apikey: $SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"exmember@local.test","password":"password123","email_confirm":true,"user_metadata":{"full_name":"Eva Exmiembro"}}' \
+  -o /dev/null -w 'exmember user: http=%{http_code}\n' || true
+
+$PSQL -c "update public.profiles set onboarded_at=now(), name='Eva Exmiembro' where email='exmember@local.test';"
+
+$PSQL <<'SQL'
+-- group owned by admin (on_group_created adds admin as INSTRUCTOR)
+with adm as (select id from public.profiles where email='admin@local.test')
+insert into public.groups (name, group_type, created_by, join_enabled)
+select 'E2E Sesiones', 'THEATRE'::group_type, adm.id, true from adm
+where not exists (select 1 from public.groups where name='E2E Sesiones');
+
+-- safety: ensure admin INSTRUCTOR membership
+insert into public.memberships (user_id, group_id, role)
+select a.id, g.id, 'INSTRUCTOR'
+from public.profiles a, public.groups g
+where a.email='admin@local.test' and g.name='E2E Sesiones'
+on conflict (user_id, group_id) do nothing;
+
+-- exmember joins (temporarily) as ACTOR
+insert into public.memberships (user_id, group_id, role)
+select e.id, g.id, 'ACTOR'
+from public.profiles e, public.groups g
+where e.email='exmember@local.test' and g.name='E2E Sesiones'
+on conflict (user_id, group_id) do nothing;
+
+-- a CONFIRMED session tomorrow 18:00–20:00 (marker in comments for idempotency)
+insert into public.sessions (group_id, location, comments, time_range, status, created_by)
+select g.id, 'Sala 1', 'E2E orphan fixture',
+       tstzrange((now()::date + interval '1 day' + interval '18 hour'),
+                 (now()::date + interval '1 day' + interval '20 hour'), '[)'),
+       'CONFIRMED', a.id
+from public.groups g, public.profiles a
+where g.name='E2E Sesiones' and a.email='admin@local.test'
+  and not exists (
+    select 1 from public.sessions s
+    where s.group_id=g.id and s.comments='E2E orphan fixture');
+
+-- participants: admin (pending) + exmember (accepted)
+insert into public.session_participants (session_id, user_id, required, response)
+select s.id, a.id, true, 'PENDING'
+from public.sessions s join public.profiles a on a.email='admin@local.test'
+where s.comments='E2E orphan fixture'
+on conflict (session_id, user_id) do nothing;
+
+insert into public.session_participants (session_id, user_id, required, response)
+select s.id, e.id, true, 'ACCEPTED'
+from public.sessions s join public.profiles e on e.email='exmember@local.test'
+where s.comments='E2E orphan fixture'
+on conflict (session_id, user_id) do nothing;
+
+-- remove exmember from the group, KEEP her session_participant row → orphan
+delete from public.memberships m
+using public.groups g, public.profiles e
+where m.group_id=g.id and m.user_id=e.id
+  and g.name='E2E Sesiones' and e.email='exmember@local.test';
+SQL
+
+echo "e2e seed ready (admin@local.test / password123, 5 typed groups, orphan-session fixture)"
