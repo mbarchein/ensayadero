@@ -62,10 +62,12 @@ where g.name = v.name and g.group_type <> v.gt::group_type;
 SQL
 
 # ── Null-profile regression fixture ──────────────────────────────────────────
-# A third user is added to a group and to a CONFIRMED session, then removed from
-# the group while kept on the session. profiles RLS then hides her from the
-# admin (no shared group), so the session embeds profiles=null — the exact shape
-# that crashed SessionDetailPage. Idempotent.
+# Eva is added to directora's group and to a CONFIRMED session, then removed
+# from the group while kept on the session. profiles RLS then hides her from
+# directora (no shared group, and directora is NOT superadmin), so the session
+# embeds profiles=null — the exact shape that crashed SessionDetailPage. Viewed
+# as directora, not admin: a superadmin sees every profile and wouldn't repro.
+# Idempotent.
 curl -s "$API/auth/v1/admin/users" \
   -H "Authorization: Bearer $SERVICE_KEY" -H "apikey: $SERVICE_KEY" \
   -H "Content-Type: application/json" \
@@ -75,17 +77,21 @@ curl -s "$API/auth/v1/admin/users" \
 $PSQL -c "update public.profiles set onboarded_at=now(), name='Eva Exmiembro' where email='exmember@local.test';"
 
 $PSQL <<'SQL'
--- group owned by admin (on_group_created adds admin as INSTRUCTOR)
-with adm as (select id from public.profiles where email='admin@local.test')
+-- rebuild authoritatively: drop any prior fixture (cascades to its sessions,
+-- participants and memberships) so owner/participants are deterministic
+delete from public.groups where name='E2E Sesiones';
+
+-- group owned by directora (on_group_created adds her as INSTRUCTOR)
+with dir as (select id from public.profiles where email='directora@local.test')
 insert into public.groups (name, group_type, created_by, join_enabled)
-select 'E2E Sesiones', 'THEATRE'::group_type, adm.id, true from adm
+select 'E2E Sesiones', 'THEATRE'::group_type, dir.id, true from dir
 where not exists (select 1 from public.groups where name='E2E Sesiones');
 
--- safety: ensure admin INSTRUCTOR membership
+-- safety: ensure directora INSTRUCTOR membership
 insert into public.memberships (user_id, group_id, role)
-select a.id, g.id, 'INSTRUCTOR'
-from public.profiles a, public.groups g
-where a.email='admin@local.test' and g.name='E2E Sesiones'
+select d.id, g.id, 'INSTRUCTOR'
+from public.profiles d, public.groups g
+where d.email='directora@local.test' and g.name='E2E Sesiones'
 on conflict (user_id, group_id) do nothing;
 
 -- exmember joins (temporarily) as ACTOR
@@ -100,17 +106,17 @@ insert into public.sessions (group_id, location, comments, time_range, status, c
 select g.id, 'Sala 1', 'E2E orphan fixture',
        tstzrange((now()::date + interval '1 day' + interval '18 hour'),
                  (now()::date + interval '1 day' + interval '20 hour'), '[)'),
-       'CONFIRMED', a.id
-from public.groups g, public.profiles a
-where g.name='E2E Sesiones' and a.email='admin@local.test'
+       'CONFIRMED', d.id
+from public.groups g, public.profiles d
+where g.name='E2E Sesiones' and d.email='directora@local.test'
   and not exists (
     select 1 from public.sessions s
     where s.group_id=g.id and s.comments='E2E orphan fixture');
 
--- participants: admin (pending) + exmember (accepted)
+-- participants: directora (pending) + exmember (accepted)
 insert into public.session_participants (session_id, user_id, required, response)
-select s.id, a.id, true, 'PENDING'
-from public.sessions s join public.profiles a on a.email='admin@local.test'
+select s.id, d.id, true, 'PENDING'
+from public.sessions s join public.profiles d on d.email='directora@local.test'
 where s.comments='E2E orphan fixture'
 on conflict (session_id, user_id) do nothing;
 
