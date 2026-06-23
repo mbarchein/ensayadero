@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { MailCheck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { PasswordInput } from '../components/ui'
@@ -113,7 +113,12 @@ export default function SignupPage() {
       <Link to="/login" className="text-sm text-violet-700 underline">
         {t('signup.haveAccount')}
       </Link>
-      <p className="max-w-xs text-center text-xs text-violet-500">{t('signup.oauthHint')}</p>
+      <p className="max-w-xs text-center text-xs text-violet-500">
+        <Trans
+          i18nKey="signup.oauthHint"
+          components={{ 1: <Link to="/login" className="underline" /> }}
+        />
+      </p>
     </main>
   )
 }
