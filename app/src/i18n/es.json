@@ -229,6 +229,7 @@
     "passwordTooShort": "La contraseña debe tener al menos {{min}} caracteres.",
     "passwordPwned": "Esa contraseña aparece en filtraciones de datos conocidas; elige una diferente.",
     "haveAccount": "Ya tengo cuenta",
+    "oauthHint": "¿Ya entraste con Google o Facebook con este email? Inicia sesión con ese método y crea una contraseña desde tu perfil.",
     "checkEmailTitle": "Revisa tu correo",
     "checkEmailBody": "Te hemos enviado un enlace de activación a {{email}}. Ábrelo para activar tu cuenta.",
     "backToLogin": "Volver al inicio de sesión"

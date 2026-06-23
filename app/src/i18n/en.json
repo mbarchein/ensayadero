@@ -229,6 +229,7 @@
     "passwordTooShort": "The password must be at least {{min}} characters long.",
     "passwordPwned": "That password appears in known data breaches; please choose a different one.",
     "haveAccount": "I already have an account",
+    "oauthHint": "Already signed in with Google or Facebook using this email? Sign in with that method and set a password from your profile.",
     "checkEmailTitle": "Check your email",
     "checkEmailBody": "We've sent an activation link to {{email}}. Open it to activate your account.",
     "backToLogin": "Back to sign in"

@@ -113,6 +113,7 @@ export default function SignupPage() {
       <Link to="/login" className="text-sm text-violet-700 underline">
         {t('signup.haveAccount')}
       </Link>
+      <p className="max-w-xs text-center text-xs text-violet-500">{t('signup.oauthHint')}</p>
     </main>
   )
 }
