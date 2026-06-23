@@ -31,7 +31,7 @@ export function responseDotColor(status: SessionStatus, response?: ParticipantRe
   if (status === 'CANCELLED') return 'bg-red-400'
   if (status === 'DRAFT') return 'bg-gray-300'
   if (response === 'ACCEPTED') return 'bg-violet-500'
-  if (response === 'DECLINED') return 'bg-red-400'
+  if (response === 'DECLINED') return 'bg-red-600'
   if (response) return 'bg-amber-400' // PENDING (summoned)
   return 'bg-gray-300' // not summoned
 }
