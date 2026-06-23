@@ -47,6 +47,13 @@ check, single-use 15-min OTP links, neutral enumeration-resistant recovery
 responses, and an optional **Cloudflare Turnstile** CAPTCHA (enabled when a site
 key is configured). Account self-deletion via `delete_my_account` (GDPR).
 
+**One account per email, any method.** GoTrue auto-links identities that share a
+**verified** email, so signing in with Google, Facebook or email+password on the
+same address always lands on the same account. OAuth-only users (no password yet)
+can **set a password** from the profile (`updateUser({ password })` adds the email
+identity); the signup screen shows a hint — linking to login — for an email
+already registered via OAuth (GoTrue obfuscates that case, so the hint is static).
+
 ## Infrastructure
 
 ### D-stack — Two deployment paths
@@ -170,6 +177,13 @@ earlier focus-refetch-only approach.
 | D-auth-affordances | Login/signup gained a password visibility toggle and clearer, localized rejection reasons. |
 | D-admin-recent | The superadmin user list shows newest users first, with their join date. |
 | D-member-gallery | The members page has a gallery ("orla") action: a modal grid of every member's avatar large with name + role below, sorted directors-first then alphabetically by name. |
+| D-login-any | Any login method maps to the **same account when the email matches** (GoTrue verified-email auto-linking). OAuth-only users **set a password** from the profile to also use email login; signup shows a static hint (linking to login) for an email already registered via OAuth. See **D-auth**. |
+| D-profile-per-field | Profile fields save **independently**: name & phone have inline Save buttons, the **pronoun auto-saves** on selection, and the global save button is gone. Each section is a `<fieldset>` with an inset legend. Push is a **toggle** (extends D-push-toggle). |
+| D-member-guest | The new-member policy option "opcional" → **"Añadirlo como invitado"** (subtext "Recibe la invitación y decide si asiste"); the policy box gained an explanatory intro (with **nuevos miembros** in bold). |
+| D-leave-drop-future | Leaving/being removed from a group **drops the user's participation in future sessions** (trigger `drop_future_participations`); past sessions keep the row as attendance history. |
+| D-orphan-profile | Session views **skip participants whose profile RLS hides** (e.g. an ex-member left on a past session — `profiles` embeds null) via `visibleParticipants`, instead of crashing on `profiles.name`. |
+| D-didyouknow | Home shows a rotating **"¿Sabías que…?"** tips card (`DidYouKnow`): prev/next + counter, each tip links to its section, **per-group** facts render **clickable group thumbnails** (director-only facts gated to instructor groups), and the last-seen tip is remembered per user so a reload resumes at the **next** one. |
+| D-declined-dot | The "No voy" (declined) calendar dot darkened to `red-600` so it reads apart from the amber "pending" dot. |
 
 ## Relevant modeling decisions
 - Time ranges as `tstzrange` + GiST indexes; overlaps with `&&`.

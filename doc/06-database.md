@@ -35,6 +35,10 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
 | `…20260612000002_onboarding_flag` | `profiles.onboarded_at`: the `/welcome` wizard shows until set; existing users backfilled to now (only new accounts see it — reversed next). |
 | `…20260612000003_onboarding_for_everyone` | Product reversal: nulls `onboarded_at` for **everyone**, so all existing users run the wizard once (doubles as the announcement of the new pronoun/email settings). |
 | `…20260614000000_seen_features` | `profiles.seen_features jsonb` + `mark_feature_seen(feature)` (security definer, atomic idempotent append): per-user "what's new" flags, decoupled from `onboarded_at`, cross-device and reinstall-proof (unlike the localStorage Tip). |
+| `…20260616000000_new_member_policy` | `groups.new_member_policy` (MANDATORY/OPTIONAL/NONE): how members who join from now on are auto-included in already-planned future sessions; `add_member_to_future_sessions` honors it. |
+| `…20260616000001_drop_invitation_role` | Drops the unused per-invitation role (joiners are always ACTOR). |
+| `…20260617000000_group_type` | `groups.group_type` enum (THEATRE/MUSIC/DANCE/SPORTS/OTHER) driving the per-type vocabulary (glossary). |
+| `…20260624000000_drop_future_participations_on_leave` | After-delete trigger on `memberships`: removes the user's `session_participants` for the group's **future** sessions (`lower(time_range) > now()`); past sessions keep the row for history. Covers every removal path (director removes, member leaves, admin/API). |
 
 ## Helper functions (RLS)
 `is_superadmin(uid)`, `is_member(uid, gid)`, `is_instructor(uid, gid)` —
@@ -68,6 +72,11 @@ PostgreSQL (`supabase/postgres` image). Extensions: `btree_gist`, `pg_cron`,
   notifies every other group member (MEMBER_JOINED).
 - `trg_notify_member_promoted` → `notify_member_promoted`: on a membership role
   change to INSTRUCTOR, notifies the promoted user (MEMBER_PROMOTED).
+- `memberships_ensure_director` → `ensure_group_director`: after a membership
+  delete, if members remain but none is INSTRUCTOR, promote one at random.
+- `memberships_drop_future_participations` → `drop_future_participations`: after a
+  membership delete, drop that user's `session_participants` for the group's
+  future sessions (past kept).
 
 ## Jobs (pg_cron)
 - `generate-reminders` (`*/15 * * * *`) → `generate_reminders()`: 24h reminders

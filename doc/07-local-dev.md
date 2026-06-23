@@ -79,7 +79,20 @@ make psql                       # SQL shell
 docker compose up migrate       # re-apply new migrations
 docker compose exec app npm run typecheck
 docker compose exec app npm test
+make seed-e2e                   # seed the e2e fixtures only
+make e2e                        # stack up + seed + run the Playwright suite
 ```
+
+## End-to-end tests
+`make e2e` brings the stack up, runs `docker/seed-e2e.sh`, then runs the
+Playwright suite (`e2e/`) inside the official Playwright image (nothing installed
+on the host; see `docker-compose.e2e.yml`). The seed adds e2e users (all
+`password123`): `admin@local.test` (superadmin), `directora@local.test`
+(non-superadmin director) and `exmember@local.test`, plus one group per type and a
+**null-profile orphan fixture** — a participant on directora's confirmed session
+who isn't a group member, so `profiles` embeds null when viewed as the director
+(the shape that regressed `SessionDetailPage`). The seed is idempotent and
+rebuilds that fixture authoritatively each run.
 
 ## Notes
 - Node 24 locally; the `app` container uses its own `node_modules` volume (when

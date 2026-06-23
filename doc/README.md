@@ -25,11 +25,13 @@ managed-deploy steps) and `DEPLOY.md` (self-hosting on Docker Swarm).
 - Frontend: React + Vite + TypeScript + Tailwind, PWA (Workbox/injectManifest).
 - Backend: Supabase (Postgres + GoTrue + PostgREST + Realtime + Edge Functions).
 - Auth: open sign-up — Google, Meta/Facebook, email+password (activation +
-  recovery); optional Turnstile CAPTCHA. Group access via join code/link/QR + email
-  invites.
+  recovery); optional Turnstile CAPTCHA. **Same email = same account** across
+  methods (verified-email auto-linking); OAuth users can set a password from the
+  profile. Group access via join code/link/QR + email invites.
 - Live updates via Supabase Realtime.
 - Public legal pages (`/privacy`, `/legal`, `/cookies`); controller/contact data
   served by a Turnstile-gated `legal-info` Edge Function (kept out of the bundle).
 - Two Edge Functions: `send-notifications`, `legal-info`. MIT licensed.
-- 15 SQL migrations, 17 unit tests of core logic.
-- i18n es/en. Verified E2E with Playwright throughout development.
+- 32 SQL migrations; 28 `vitest` unit tests of core logic.
+- i18n es/en. **Playwright e2e suite in `e2e/`** (dockerized, `make e2e`) covering
+  the main flows + a null-profile session-detail regression.

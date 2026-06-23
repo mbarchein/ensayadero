@@ -10,7 +10,9 @@ Status: ✅ implemented · 🟡 partial · ⬜ pending.
   native Instagram provider), and email + password with **email activation**
   (confirmation required) and **password recovery**. Hardened: GoTrue rate limits,
   password min length + HIBP leaked-password check, single-use 15-min OTP links,
-  enumeration-resistant recovery, optional Cloudflare Turnstile CAPTCHA.
+  enumeration-resistant recovery, optional Cloudflare Turnstile CAPTCHA. Any
+  method on the **same (verified) email is one account** (GoTrue auto-linking);
+  OAuth-only users can set a password from the profile to also use email login.
 - 🟡 FR2. Group access: by reusable **group code** (link + QR) and by **email
   invitation** (auto-accepted on sign-up). Registration is open; the invitation/
   code only adds you to a group.

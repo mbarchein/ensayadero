@@ -165,7 +165,10 @@ that opens the agenda and flashes the rehearsal (same `?d=&s=` pattern as
 Upcoming). Participants with a **role chip** (gendered) and a **partial
 availability** note (the hours they can) or no-availability, computed with
 `expandAvailability` ∩ range; responses render as colored dots with a per-list
-tally. The attendance buttons collapse to a "Voy/No voy" badge + "Change" button
+tally. Participants whose embedded `profiles` is null (RLS hides users you no
+longer share a group with) are dropped via `lib/participants.visibleParticipants`
+(same in `SessionCard`) — see **D-orphan-profile**. The declined dot is `red-600`
+to read apart from the amber pending dot (`responseDotColor`, **D-declined-dot**). The attendance buttons collapse to a "Voy/No voy" badge + "Change" button
 once answered (with a note the answer can change later). Director actions: edit,
 confirm, cancel (in-app modal), delete draft, and a full-width **"Recordar a
 pendientes"** that opens a confirm modal listing the pending participants and
@@ -227,13 +230,28 @@ to mark-all-read / archive-all, and an archived toggle. Notifications mark
 themselves read on click and deep-link by type (session detail, group members,
 group home). A calm empty state shows a random theatre fragment.
 
+### Home (`HomePage`, `DidYouKnow`)
+Greeting, pending-confirmations callout, the group cards (avatar, role, member &
+upcoming counts), join/create actions, and the **"¿Sabías que…?"** rotating tips
+card. `DidYouKnow` shows one tip with prev/next + a counter; global tips link to
+their section, while **per-group** tips render up to four **clickable group
+thumbnails** (each → that group's members/planner/edit…). Director-only tips are
+hidden unless the user instructs some group. The last tip shown is stored per user
+in `localStorage` (`dyk-last:<uid>`) so a reload/return advances to the next one.
+
 ### Profile (`ProfilePage`, `AvatarEditor`)
-Name, phone (optional), pronoun as **inline segmented pills**, the linked sign-in
-methods, **per-event email opt-outs**, the device push enable/disable section
-(hidden until VAPID is configured), the PWA install section, and account deletion.
-`AvatarEditor` is the identity-card avatar with a pencil edit badge; tapping it
-opens a modal showing the large current avatar plus gallery / camera / remove
-(round crop → data URL in `profiles.avatar_url`, initials fallback).
+Sections are `<fieldset>`s with an inset `<legend>`. Fields save **per field**:
+name & phone have inline **Save** buttons (enabled only when dirty), the pronoun
+(inline segmented pills) **auto-saves** on selection, and there is no global save
+button — one mutation patches just the touched column. A **password** section lets
+OAuth-only users set a password (or any user change it; `updateUser({ password })`,
+button reads "Crear"/"Cambiar" by whether an email identity exists — see
+**D-login-any**). Plus the linked sign-in methods, **per-event email opt-outs**,
+the device push **toggle** (hidden until VAPID is configured), the PWA install
+section, and account deletion. `AvatarEditor` is the identity-card avatar with a
+pencil edit badge; tapping it opens a modal showing the large current avatar plus
+gallery / camera / remove (round crop → data URL in `profiles.avatar_url`,
+initials fallback).
 
 ## PWA (`sw.ts`, `vite.config.ts`, `features/pwa/`)
 - `injectManifest`: asset precache, runtime `NetworkFirst` for `/rest/v1/`
@@ -254,5 +272,13 @@ opens a modal showing the large current avatar plus gallery / camera / remove
 Dates with dynamic locale (`lib/dateLocale.ts`). Spanish UI uses "Programar".
 
 ## Tests
-`vitest` over pure logic (`ranges`, `slots`): 17 cases. The UI was verified with
-Playwright during development (not in the repo).
+- **`vitest`** over pure logic — `ranges`, `slots`, the `i18n/groupType` wording
+  guard, and `lib/participants` (the null-profile filter, regression guard for the
+  session-detail crash): 28 cases. Run with `npm test` in `app/`.
+- **Playwright e2e** in `e2e/` (dockerized — `make e2e` brings the stack up, runs
+  `docker/seed-e2e.sh`, then the suite in the Playwright image; nothing installed
+  on the host). Logs in as the seeded users and covers home/did-you-know, profile
+  (per-field save), group screens, members, planner, the personal screens
+  (availability/upcoming/notifications/admin), the public auth pages, group
+  creation/edit per type, user-switch, and the **null-profile session-detail
+  regression** (a seeded orphan participant viewed as a non-superadmin director).
