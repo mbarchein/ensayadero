@@ -334,7 +334,7 @@
       "OTHER": "Otro"
     },
     "newMemberTitle": "Cuando alguien se une al grupo",
-    "newMemberDescription": "Esto decide cómo tratar a los nuevos miembros en los {{actPl}} que ya están en el calendario: convocarlos, invitarlos sin compromiso, o dejarlos fuera hasta que tú los añadas.",
+    "newMemberDescription": "Esto decide cómo tratar a los <1>nuevos miembros</1> en los {{actPl}} que ya están en el calendario: convocarlos, invitarlos sin compromiso, o dejarlos fuera hasta que tú los añadas.",
     "newMemberMandatory": "Convocarlo a los próximos {{actPl}}",
     "newMemberMandatoryHint": "Contará como asistente y recibirá aviso.",
     "newMemberOptional": "Añadirlo como invitado",

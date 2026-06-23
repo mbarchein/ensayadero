@@ -334,7 +334,7 @@
       "OTHER": "Other"
     },
     "newMemberTitle": "When someone joins the group",
-    "newMemberDescription": "This decides how new members are handled in the {{actPl}} already on the calendar: summon them, invite them with no commitment, or leave them out until you add them.",
+    "newMemberDescription": "This decides how <1>new members</1> are handled in the {{actPl}} already on the calendar: summon them, invite them with no commitment, or leave them out until you add them.",
     "newMemberMandatory": "Summon them to upcoming {{actPl}}",
     "newMemberMandatoryHint": "They count as an attendee and get notified.",
     "newMemberOptional": "Add them as a guest",

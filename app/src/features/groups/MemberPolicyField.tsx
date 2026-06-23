@@ -2,7 +2,7 @@
 // group's already-planned future sessions. A titled radio list with a short
 // explanation under each option, so the behaviour is unambiguous.
 
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { tg } from '../../lib/glossary'
 import type { GroupType, MemberInclusionPolicy } from '../../lib/types'
 
@@ -22,10 +22,20 @@ export default function MemberPolicyField({
   type?: GroupType
 }) {
   const { t } = useTranslation()
+  const glossary = t(`glossary.${type ?? 'THEATRE'}`, { returnObjects: true }) as Record<
+    string,
+    string
+  >
   return (
     <fieldset className="rounded-xl border bg-white p-4 text-sm">
       <legend className="px-1 font-medium">{t('group.newMemberTitle')}</legend>
-      <p className="px-1 text-xs text-gray-600">{tg(t, 'group.newMemberDescription', type)}</p>
+      <p className="px-1 text-xs text-gray-600">
+        <Trans
+          i18nKey="group.newMemberDescription"
+          values={glossary}
+          components={{ 1: <strong className="font-semibold" /> }}
+        />
+      </p>
       <div className="mt-2 space-y-2">
         {OPTIONS.map((opt) => {
           const active = value === opt.value
