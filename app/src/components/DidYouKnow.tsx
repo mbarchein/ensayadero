@@ -4,10 +4,11 @@
 // (link to the user's first group) and some are director-only (link to the
 // first group where the user is INSTRUCTOR) — those are hidden otherwise.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../auth/AuthContext'
 import { tg } from '../lib/glossary'
 
 type Ctx = { groupId: string | null; instrGroupId: string | null }
@@ -47,13 +48,27 @@ const FACTS: Fact[] = [
 
 export default function DidYouKnow({ groupId, instrGroupId }: Ctx) {
   const { t } = useTranslation()
+  const { profile } = useAuth()
   const ctx: Ctx = { groupId, instrGroupId }
   const available = FACTS.filter((f) => (!f.director || instrGroupId) && f.to(ctx) !== null)
   const count = available.length
-  const [index, setIndex] = useState(() => (count ? Math.floor(Math.random() * count) : 0))
-  if (count === 0) return null
 
-  const fact = available[index % count]
+  // Resume one past the last fact shown (per user), so a reload/return advances
+  // to the next tip instead of repeating. Falls back to the first if unseen.
+  const storeKey = `dyk-last:${profile?.id ?? 'anon'}`
+  const [index, setIndex] = useState(() => {
+    if (!count) return 0
+    const last = localStorage.getItem(storeKey)
+    const pos = last ? available.findIndex((f) => f.id === last) : -1
+    return pos >= 0 ? (pos + 1) % count : 0
+  })
+
+  const fact = count ? available[index % count] : null
+  useEffect(() => {
+    if (fact) localStorage.setItem(storeKey, fact.id)
+  }, [fact, storeKey])
+
+  if (!fact) return null
   const to = fact.to(ctx)!
 
   return (
