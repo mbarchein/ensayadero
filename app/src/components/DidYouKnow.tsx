@@ -6,7 +6,7 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Lightbulb, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tg } from '../lib/glossary'
 
@@ -64,13 +64,25 @@ export default function DidYouKnow({ groupId, instrGroupId }: Ctx) {
           {t('home.didYouKnow.title')}
         </h2>
         {count > 1 && (
-          <button
-            onClick={() => setIndex((i) => (i + 1) % count)}
-            aria-label={t('home.didYouKnow.next')}
-            className="rounded-full p-1 text-violet-500 transition hover:bg-violet-100 hover:text-violet-700"
-          >
-            <RefreshCw size={16} />
-          </button>
+          <div className="flex items-center gap-1 text-violet-500">
+            <button
+              onClick={() => setIndex((i) => (i - 1 + count) % count)}
+              aria-label={t('home.didYouKnow.prev')}
+              className="rounded-full p-1 transition hover:bg-violet-100 hover:text-violet-700"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="text-xs tabular-nums">
+              {(index % count) + 1} / {count}
+            </span>
+            <button
+              onClick={() => setIndex((i) => (i + 1) % count)}
+              aria-label={t('home.didYouKnow.next')}
+              className="rounded-full p-1 transition hover:bg-violet-100 hover:text-violet-700"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         )}
       </div>
       <p className="mt-1 text-sm text-violet-800">

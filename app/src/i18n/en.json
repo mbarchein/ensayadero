@@ -272,7 +272,8 @@
     "noGroups": "You don't belong to any group yet. Join with a code or create your own.",
     "didYouKnow": {
       "title": "Did you know…?",
-      "next": "Another tip",
+      "prev": "Previous",
+      "next": "Next",
       "facts": {
         "multiLogin": "You can sign in with Google, Facebook or email. With the same address it's always the same account.",
         "setPassword": "Signed in with Google? From your profile you can set a password to also sign in with email.",

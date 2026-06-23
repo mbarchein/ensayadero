@@ -272,7 +272,8 @@
     "noGroups": "Aún no perteneces a ningún grupo. Únete con un código o crea el tuyo.",
     "didYouKnow": {
       "title": "¿Sabías que…?",
-      "next": "Otro consejo",
+      "prev": "Anterior",
+      "next": "Siguiente",
       "facts": {
         "multiLogin": "Puedes entrar con Google, Facebook o email. Si usas el mismo correo, siempre es la misma cuenta.",
         "setPassword": "¿Entraste con Google? Desde tu perfil puedes crear una contraseña para entrar también con email.",
