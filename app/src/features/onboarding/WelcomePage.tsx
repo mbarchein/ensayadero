@@ -17,6 +17,7 @@ import {
   Music,
   PersonStanding,
   Dumbbell,
+  PartyPopper,
   Shapes,
   type LucideIcon,
 } from 'lucide-react'
@@ -44,6 +45,7 @@ const TYPE_ICON: Record<GroupType, LucideIcon> = {
   MUSIC: Music,
   DANCE: PersonStanding,
   SPORTS: Dumbbell,
+  PARTY: PartyPopper,
   OTHER: Shapes,
 }
 // suffix for the welcome.title<x> / welcome.sub<x> i18n keys, per screen

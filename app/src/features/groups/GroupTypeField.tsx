@@ -2,15 +2,16 @@
 // Drives the per-type wording across the app. Icon grid, one tile per type.
 
 import { useTranslation } from 'react-i18next'
-import { Drama, Music, PersonStanding, Dumbbell, Shapes, type LucideIcon } from 'lucide-react'
+import { Drama, Music, PersonStanding, Dumbbell, PartyPopper, Shapes, type LucideIcon } from 'lucide-react'
 import type { GroupType } from '../../lib/types'
 
-const OPTIONS: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'OTHER']
+const OPTIONS: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'PARTY', 'OTHER']
 export const GROUP_TYPE_ICON: Record<GroupType, LucideIcon> = {
   THEATRE: Drama,
   MUSIC: Music,
   DANCE: PersonStanding,
   SPORTS: Dumbbell,
+  PARTY: PartyPopper,
   OTHER: Shapes,
 }
 const ICON = GROUP_TYPE_ICON

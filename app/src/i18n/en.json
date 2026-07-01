@@ -4,6 +4,7 @@
     "MUSIC": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "director", "member": "musician" },
     "DANCE": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "choreographer", "member": "dancer" },
     "SPORTS": { "act": "practice", "actPl": "practices", "Act": "Practice", "ActPl": "Practices", "leader": "coach", "member": "player" },
+    "PARTY": { "act": "party", "actPl": "parties", "Act": "Party", "ActPl": "Parties", "leader": "host", "member": "guest" },
     "OTHER": { "act": "event", "actPl": "events", "Act": "Event", "ActPl": "Events", "leader": "coordinator", "member": "member" }
   },
   "byType": {
@@ -35,6 +36,16 @@
         "title1": "Don't get caught offside",
         "title2": "Your availability is the game plan",
         "sub2": "Mark when you can train. Whoever coaches your team plans practices with the whole squad’s availability: without yours, there is no match."
+      }
+    },
+    "PARTY": {
+      "welcome": {
+        "title0": "Welcome to the party",
+        "sub0": "Tell us how to introduce you to the other guests.",
+        "pronounHint": "To introduce you as a host, guest.",
+        "title1": "Don't get caught without plans",
+        "title2": "Your availability sets the date",
+        "sub2": "Mark when you can attend. Whoever hosts plans the parties with everyone’s availability: without yours, there is no party."
       }
     },
     "OTHER": {
@@ -150,6 +161,16 @@
       "ACTOR_M": "Player",
       "toInstructor": "Make coach",
       "toActor": "Make player"
+    },
+    "PARTY": {
+      "INSTRUCTOR": "Host",
+      "INSTRUCTOR_F": "Host",
+      "INSTRUCTOR_M": "Host",
+      "ACTOR": "Guest",
+      "ACTOR_F": "Guest",
+      "ACTOR_M": "Guest",
+      "toInstructor": "Make host",
+      "toActor": "Make guest"
     },
     "OTHER": {
       "INSTRUCTOR": "Coordinator",
@@ -371,6 +392,7 @@
       "MUSIC": "Music",
       "DANCE": "Dance",
       "SPORTS": "Sports",
+      "PARTY": "Party",
       "OTHER": "Other"
     },
     "newMemberTitle": "When someone joins the group",

@@ -4,7 +4,7 @@ export type AvailabilityKind = 'AVAILABLE' | 'PREFERRED'
 export type SessionStatus = 'DRAFT' | 'CONFIRMED' | 'CANCELLED'
 export type ParticipantResponse = 'PENDING' | 'ACCEPTED' | 'DECLINED'
 export type MemberInclusionPolicy = 'MANDATORY' | 'OPTIONAL' | 'NONE'
-export type GroupType = 'THEATRE' | 'MUSIC' | 'DANCE' | 'SPORTS' | 'OTHER'
+export type GroupType = 'THEATRE' | 'MUSIC' | 'DANCE' | 'SPORTS' | 'PARTY' | 'OTHER'
 
 export interface Profile {
   id: string

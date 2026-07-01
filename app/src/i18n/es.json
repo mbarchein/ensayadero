@@ -4,6 +4,7 @@
     "MUSIC": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "director", "member": "músico" },
     "DANCE": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "coreógrafo", "member": "bailarín" },
     "SPORTS": { "act": "entrenamiento", "actPl": "entrenamientos", "Act": "Entrenamiento", "ActPl": "Entrenamientos", "leader": "entrenador", "member": "jugador" },
+    "PARTY": { "act": "festejo", "actPl": "festejos", "Act": "Festejo", "ActPl": "Festejos", "leader": "anfitrión", "member": "invitado" },
     "OTHER": { "act": "evento", "actPl": "eventos", "Act": "Evento", "ActPl": "Eventos", "leader": "coordinador", "member": "miembro" }
   },
   "byType": {
@@ -35,6 +36,16 @@
         "title1": "Que no te pillen fuera de juego",
         "title2": "Tu disponibilidad es el plan de partido",
         "sub2": "Marca cuándo puedes entrenar. Quien dirige tu equipo planifica los entrenamientos con la disponibilidad de toda la plantilla: sin la tuya, no hay partido."
+      }
+    },
+    "PARTY": {
+      "welcome": {
+        "title0": "Te damos la bienvenida a la fiesta",
+        "sub0": "Cuéntanos cómo presentarte al resto de invitados.",
+        "pronounHint": "Para presentarte como anfitriona o anfitrión, invitada o invitado.",
+        "title1": "Que no te pillen sin plan",
+        "title2": "Tu disponibilidad marca la fecha",
+        "sub2": "Marca cuándo puedes asistir. Quien organiza planifica los festejos con la disponibilidad de todos: sin la tuya, no hay fiesta."
       }
     },
     "OTHER": {
@@ -150,6 +161,16 @@
       "ACTOR_M": "Jugador",
       "toInstructor": "Hacer entrenador",
       "toActor": "Pasar a jugador"
+    },
+    "PARTY": {
+      "INSTRUCTOR": "Anfitrión",
+      "INSTRUCTOR_F": "Anfitriona",
+      "INSTRUCTOR_M": "Anfitrión",
+      "ACTOR": "Invitado",
+      "ACTOR_F": "Invitada",
+      "ACTOR_M": "Invitado",
+      "toInstructor": "Hacer anfitrión",
+      "toActor": "Pasar a invitado"
     },
     "OTHER": {
       "INSTRUCTOR": "Coordinador",
@@ -371,6 +392,7 @@
       "MUSIC": "Música",
       "DANCE": "Danza",
       "SPORTS": "Deportes",
+      "PARTY": "Fiesta",
       "OTHER": "Otro"
     },
     "newMemberTitle": "Cuando alguien se une al grupo",

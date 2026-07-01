@@ -13,7 +13,7 @@ import { tg, tByType } from '../lib/glossary'
 import { roleLabel, roleActionLabel } from '../lib/roleLabel'
 import type { GroupType, GroupRole } from '../lib/types'
 
-const TYPES: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'OTHER']
+const TYPES: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'PARTY', 'OTHER']
 const LANGS = ['es', 'en'] as const
 // The only placeholders our feature injects; {{count}}/{{name}}/{{group}} are
 // legitimately left for the caller and must NOT be flagged.
