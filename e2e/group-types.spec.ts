@@ -23,6 +23,7 @@ const CASES: Case[] = [
     leader: 'Entrenador',
     typeLabel: 'Deportes',
   },
+  { name: 'E2E Fiesta', actPl: 'Festejos', plannerWord: 'Nuevo festejo', leader: 'Anfitrión', typeLabel: 'Fiesta' },
   { name: 'E2E Otro', actPl: 'Eventos', plannerWord: 'Nuevo evento', leader: 'Coordinador', typeLabel: 'Otro' },
 ]
 

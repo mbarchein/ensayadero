@@ -8,6 +8,7 @@ const TYPES = [
   { tile: 'Música', actPl: 'Ensayos' },
   { tile: 'Danza', actPl: 'Ensayos' },
   { tile: 'Deportes', actPl: 'Entrenamientos' },
+  { tile: 'Fiesta', actPl: 'Festejos' },
   { tile: 'Otro', actPl: 'Eventos' },
 ]
 // Unique per run so repeated runs don't collide and the new card is findable.

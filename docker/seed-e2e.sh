@@ -43,6 +43,7 @@ from adm, (values
   ('E2E Música','MUSIC'),
   ('E2E Danza','DANCE'),
   ('E2E Deportes','SPORTS'),
+  ('E2E Fiesta','PARTY'),
   ('E2E Otro','OTHER')
 ) as v(name, gt)
 where not exists (select 1 from public.groups g where g.name = v.name);
@@ -56,6 +57,7 @@ from (values
   ('E2E Música','MUSIC'),
   ('E2E Danza','DANCE'),
   ('E2E Deportes','SPORTS'),
+  ('E2E Fiesta','PARTY'),
   ('E2E Otro','OTHER')
 ) as v(name, gt)
 where g.name = v.name and g.group_type <> v.gt::group_type;
@@ -122,4 +124,4 @@ where s.comments='E2E orphan fixture'
 on conflict (session_id, user_id) do nothing;
 SQL
 
-echo "e2e seed ready (admin@local.test / password123, 5 typed groups, orphan-session fixture)"
+echo "e2e seed ready (admin@local.test / password123, 6 typed groups, orphan-session fixture)"
