@@ -1,11 +1,11 @@
 {
   "glossary": {
-    "THEATRE": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "director", "member": "actor" },
-    "MUSIC": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "director", "member": "músico" },
-    "DANCE": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "coreógrafo", "member": "bailarín" },
-    "SPORTS": { "act": "entrenamiento", "actPl": "entrenamientos", "Act": "Entrenamiento", "ActPl": "Entrenamientos", "leader": "entrenador", "member": "jugador" },
-    "PARTY": { "act": "festejo", "actPl": "festejos", "Act": "Festejo", "ActPl": "Festejos", "leader": "anfitrión", "member": "invitado" },
-    "OTHER": { "act": "evento", "actPl": "eventos", "Act": "Evento", "ActPl": "Eventos", "leader": "coordinador", "member": "miembro" }
+    "THEATRE": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "director", "leaderPl": "directores", "member": "actor" },
+    "MUSIC": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "director", "leaderPl": "directores", "member": "músico" },
+    "DANCE": { "act": "ensayo", "actPl": "ensayos", "Act": "Ensayo", "ActPl": "Ensayos", "leader": "coreógrafo", "leaderPl": "coreógrafos", "member": "bailarín" },
+    "SPORTS": { "act": "entrenamiento", "actPl": "entrenamientos", "Act": "Entrenamiento", "ActPl": "Entrenamientos", "leader": "entrenador", "leaderPl": "entrenadores", "member": "jugador" },
+    "PARTY": { "act": "festejo", "actPl": "festejos", "Act": "Festejo", "ActPl": "Festejos", "leader": "anfitrión", "leaderPl": "anfitriones", "member": "invitado" },
+    "OTHER": { "act": "evento", "actPl": "eventos", "Act": "Evento", "ActPl": "Eventos", "leader": "coordinador", "leaderPl": "coordinadores", "member": "miembro" }
   },
   "byType": {
     "MUSIC": {
@@ -101,7 +101,7 @@
     "sessionDetail": "Aquí confirmas si vas a este {{act}} y ves quién más va.",
     "sessionShared": "Te han compartido este {{act}}. Si estás en la lista, responde Voy / No puedo.",
     "planner": "Mapa de disponibilidad del grupo: más verde = más gente puede. Toca un día y elige una franja para crear el {{act}}.",
-    "members": "Miembros del grupo. Los directores pueden invitar por email, código o QR.",
+    "members": "Miembros del grupo. Los {{leaderPl}} pueden invitar por email, código o QR.",
     "profile": "Tus datos, tus avisos por email y tu sesión. Lo que cambies aquí aplica a todos tus grupos."
   },
   "pwa": {

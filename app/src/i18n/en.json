@@ -1,11 +1,11 @@
 {
   "glossary": {
-    "THEATRE": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "director", "member": "actor" },
-    "MUSIC": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "director", "member": "musician" },
-    "DANCE": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "choreographer", "member": "dancer" },
-    "SPORTS": { "act": "practice", "actPl": "practices", "Act": "Practice", "ActPl": "Practices", "leader": "coach", "member": "player" },
-    "PARTY": { "act": "party", "actPl": "parties", "Act": "Party", "ActPl": "Parties", "leader": "host", "member": "guest" },
-    "OTHER": { "act": "event", "actPl": "events", "Act": "Event", "ActPl": "Events", "leader": "coordinator", "member": "member" }
+    "THEATRE": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "director", "leaderPl": "directors", "member": "actor" },
+    "MUSIC": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "director", "leaderPl": "directors", "member": "musician" },
+    "DANCE": { "act": "rehearsal", "actPl": "rehearsals", "Act": "Rehearsal", "ActPl": "Rehearsals", "leader": "choreographer", "leaderPl": "choreographers", "member": "dancer" },
+    "SPORTS": { "act": "practice", "actPl": "practices", "Act": "Practice", "ActPl": "Practices", "leader": "coach", "leaderPl": "coaches", "member": "player" },
+    "PARTY": { "act": "party", "actPl": "parties", "Act": "Party", "ActPl": "Parties", "leader": "host", "leaderPl": "hosts", "member": "guest" },
+    "OTHER": { "act": "event", "actPl": "events", "Act": "Event", "ActPl": "Events", "leader": "coordinator", "leaderPl": "coordinators", "member": "member" }
   },
   "byType": {
     "MUSIC": {
@@ -101,7 +101,7 @@
     "sessionDetail": "Here you confirm whether you're going to this {{act}} and see who else is.",
     "sessionShared": "Someone shared this {{act}} with you. If you're on the list, answer Going / Can't make it.",
     "planner": "The group's availability map: greener = more people can make it. Tap a day and pick a slot to create the {{act}}.",
-    "members": "Group members. Directors can invite by email, code or QR.",
+    "members": "Group members. Only {{leaderPl}} can invite by email, code or QR.",
     "profile": "Your details, email alerts and session. Changes here apply to all your groups."
   },
   "pwa": {

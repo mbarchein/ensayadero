@@ -9,22 +9,24 @@ type Case = {
   actPl: string // group.tabs.sessions  ({{ActPl}})
   plannerWord: string // group.tabs.planner / planner.title ("Nuevo {{act}}")
   leader: string // roleLabel INSTRUCTOR (no gender)
+  leaderPl: string // tips.members ("Los {{leaderPl}} pueden invitar…")
   typeLabel: string // GroupTypeField selected tile
 }
 
 const CASES: Case[] = [
-  { name: 'E2E Teatro', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Director', typeLabel: 'Teatro' },
-  { name: 'E2E Música', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Director', typeLabel: 'Música' },
-  { name: 'E2E Danza', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Coreógrafo', typeLabel: 'Danza' },
+  { name: 'E2E Teatro', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Director', leaderPl: 'directores', typeLabel: 'Teatro' },
+  { name: 'E2E Música', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Director', leaderPl: 'directores', typeLabel: 'Música' },
+  { name: 'E2E Danza', actPl: 'Ensayos', plannerWord: 'Nuevo ensayo', leader: 'Coreógrafo', leaderPl: 'coreógrafos', typeLabel: 'Danza' },
   {
     name: 'E2E Deportes',
     actPl: 'Entrenamientos',
     plannerWord: 'Nuevo entrenamiento',
     leader: 'Entrenador',
+    leaderPl: 'entrenadores',
     typeLabel: 'Deportes',
   },
-  { name: 'E2E Fiesta', actPl: 'Festejos', plannerWord: 'Nuevo festejo', leader: 'Anfitrión', typeLabel: 'Fiesta' },
-  { name: 'E2E Otro', actPl: 'Eventos', plannerWord: 'Nuevo evento', leader: 'Coordinador', typeLabel: 'Otro' },
+  { name: 'E2E Fiesta', actPl: 'Festejos', plannerWord: 'Nuevo festejo', leader: 'Anfitrión', leaderPl: 'anfitriones', typeLabel: 'Fiesta' },
+  { name: 'E2E Otro', actPl: 'Eventos', plannerWord: 'Nuevo evento', leader: 'Coordinador', leaderPl: 'coordinadores', typeLabel: 'Otro' },
 ]
 
 // No screen may render a literal i18n placeholder.
@@ -55,9 +57,11 @@ test.describe('group-type wording', () => {
       await expect(page.getByRole('heading', { name: c.plannerWord })).toBeVisible()
       await expectNoPlaceholder(page)
 
-      // Members: the admin's role badge uses the per-type leader label.
+      // Members: the admin's role badge uses the per-type leader label, and
+      // the coach tip pluralizes it ("Los anfitriones pueden invitar…").
       await page.goto(`${base}/members`)
       await expect(page.getByText(c.leader, { exact: true }).first()).toBeVisible()
+      await expect(page.getByText(`Los ${c.leaderPl} pueden invitar`)).toBeVisible()
       await expectNoPlaceholder(page)
 
       // Edit → type screen: the tile for this type is selected.

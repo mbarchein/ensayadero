@@ -17,7 +17,7 @@ const TYPES: GroupType[] = ['THEATRE', 'MUSIC', 'DANCE', 'SPORTS', 'PARTY', 'OTH
 const LANGS = ['es', 'en'] as const
 // The only placeholders our feature injects; {{count}}/{{name}}/{{group}} are
 // legitimately left for the caller and must NOT be flagged.
-const GLOSSARY_TOKENS = /\{\{(act|actPl|Act|ActPl|leader|member)\}\}/
+const GLOSSARY_TOKENS = /\{\{(act|actPl|Act|ActPl|leader|leaderPl|member)\}\}/
 
 function makeI18n(lng: string): I18n {
   const inst = createInstance()
@@ -64,7 +64,7 @@ describe('group-type wording', () => {
     for (const lang of LANGS) {
       const g = (lang === 'es' ? es : en).glossary as Record<string, Record<string, string>>
       for (const type of TYPES) {
-        for (const form of ['act', 'actPl', 'Act', 'ActPl', 'leader', 'member']) {
+        for (const form of ['act', 'actPl', 'Act', 'ActPl', 'leader', 'leaderPl', 'member']) {
           expect(g[type]?.[form], `glossary.${type}.${form} (${lang})`).toBeTruthy()
         }
       }
