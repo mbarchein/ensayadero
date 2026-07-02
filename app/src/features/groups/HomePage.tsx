@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -8,7 +8,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { enablePush } from '../../lib/push'
-import { Bell, CalendarDays, KeyRound, Plus, Users } from 'lucide-react'
+import { Bell, CalendarDays, KeyRound, Plus, Search, Users, X } from 'lucide-react'
 import { Badge, Button, Spinner } from '../../components/ui'
 import GroupAvatar from './GroupAvatar'
 import InstallBanner from '../pwa/InstallBanner'
@@ -18,6 +18,7 @@ import Tip from '../../components/Tip'
 import DidYouKnow from '../../components/DidYouKnow'
 import { roleLabel } from '../../lib/roleLabel'
 import { tg } from '../../lib/glossary'
+import { fuzzyRank } from '../../lib/fuzzy'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
 export default function HomePage() {
@@ -76,6 +77,19 @@ export default function HomePage() {
     },
     enabled: groupIds.length > 0,
   })
+
+  // Quick fuzzy filter over the group cards, only worth showing past 3 groups.
+  // Substring hits rank before looser subsequence hits; ties keep list order.
+  const [groupQuery, setGroupQuery] = useState('')
+  const showGroupFilter = (memberships?.length ?? 0) > 3
+  const visibleMemberships = useMemo(() => {
+    const all = memberships ?? []
+    if (!showGroupFilter || !groupQuery.trim()) return all
+    const ranked = all
+      .map((m) => ({ m, rank: fuzzyRank(groupQuery, m.groups.name) }))
+      .filter((x) => x.rank > 0)
+    return [...ranked.filter((x) => x.rank === 2), ...ranked.filter((x) => x.rank === 1)].map((x) => x.m)
+  }, [memberships, groupQuery, showGroupFilter])
 
   const { data: pending } = useQuery({
     queryKey: ['my-pending'],
@@ -186,8 +200,37 @@ export default function HomePage() {
           </div>
         ) : (
           <>
+            {showGroupFilter && (
+              <div className="relative">
+                <Search
+                  size={16}
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  value={groupQuery}
+                  onChange={(e) => setGroupQuery(e.target.value)}
+                  placeholder={t('home.filterGroups')}
+                  aria-label={t('home.filterGroups')}
+                  className="w-full rounded-lg border py-2 pl-9 pr-9"
+                />
+                {groupQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setGroupQuery('')}
+                    aria-label={t('home.filterClear')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-700"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            )}
+            {visibleMemberships.length === 0 && (
+              <p className="text-sm text-gray-600">{t('home.filterNoMatch', { q: groupQuery.trim() })}</p>
+            )}
             <ul className="space-y-3">
-              {memberships?.map((m) => (
+              {visibleMemberships.map((m) => (
                 <li key={m.group_id}>
                   <Link
                     to={`/g/${m.group_id}`}

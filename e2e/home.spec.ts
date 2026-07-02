@@ -45,3 +45,28 @@ test.describe('home did-you-know card', () => {
     await expect(page.getByRole('heading', { name: 'Miembros' })).toBeVisible()
   })
 })
+
+// Quick fuzzy filter over the group cards (only rendered past 3 groups; the
+// seeded admin is in 6+). Accent-insensitive, and clearing restores the list.
+test.describe('home group filter', () => {
+  test('filters the cards and clears back to the full list', async ({ page }) => {
+    await page.goto('/')
+    const input = page.getByLabel('Buscar grupo…')
+    await expect(input).toBeVisible()
+
+    // accent-insensitive: "musica" finds "E2E Música", hides "E2E Teatro"
+    await input.fill('musica')
+    await expect(page.getByText('E2E Música', { exact: true })).toBeVisible()
+    await expect(page.getByText('E2E Teatro', { exact: true })).not.toBeVisible()
+
+    // no matches → friendly empty message
+    await input.fill('zzzz no existe')
+    await expect(page.getByText(/Ningún grupo coincide/)).toBeVisible()
+
+    // the X clears the filter and the full list returns
+    await page.getByRole('button', { name: 'Limpiar búsqueda' }).click()
+    await expect(input).toHaveValue('')
+    await expect(page.getByText('E2E Teatro', { exact: true })).toBeVisible()
+    await expect(page.getByText('E2E Música', { exact: true })).toBeVisible()
+  })
+})
