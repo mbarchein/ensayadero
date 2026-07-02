@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -18,7 +18,7 @@ import Tip from '../../components/Tip'
 import DidYouKnow from '../../components/DidYouKnow'
 import { roleLabel } from '../../lib/roleLabel'
 import { tg } from '../../lib/glossary'
-import { fuzzyRank } from '../../lib/fuzzy'
+import { fuzzyMatch } from '../../lib/fuzzy'
 import type { MembershipWithGroup, Session, SessionParticipant } from '../../lib/types'
 
 export default function HomePage() {
@@ -80,15 +80,18 @@ export default function HomePage() {
 
   // Quick fuzzy filter over the group cards, only worth showing past 3 groups.
   // Substring hits rank before looser subsequence hits; ties keep list order.
+  // Each visible card carries the matched positions so the name highlights them.
   const [groupQuery, setGroupQuery] = useState('')
   const showGroupFilter = (memberships?.length ?? 0) > 3
   const visibleMemberships = useMemo(() => {
     const all = memberships ?? []
-    if (!showGroupFilter || !groupQuery.trim()) return all
+    if (!showGroupFilter || !groupQuery.trim()) return all.map((m) => ({ m, indices: [] as number[] }))
     const ranked = all
-      .map((m) => ({ m, rank: fuzzyRank(groupQuery, m.groups.name) }))
+      .map((m) => ({ m, ...fuzzyMatch(groupQuery, m.groups.name) }))
       .filter((x) => x.rank > 0)
-    return [...ranked.filter((x) => x.rank === 2), ...ranked.filter((x) => x.rank === 1)].map((x) => x.m)
+    return [...ranked.filter((x) => x.rank === 2), ...ranked.filter((x) => x.rank === 1)].map(
+      ({ m, indices }) => ({ m, indices }),
+    )
   }, [memberships, groupQuery, showGroupFilter])
 
   const { data: pending } = useQuery({
@@ -230,7 +233,7 @@ export default function HomePage() {
               <p className="text-sm text-gray-600">{t('home.filterNoMatch', { q: groupQuery.trim() })}</p>
             )}
             <ul className="space-y-3">
-              {visibleMemberships.map((m) => (
+              {visibleMemberships.map(({ m, indices }) => (
                 <li key={m.group_id}>
                   <Link
                     to={`/g/${m.group_id}`}
@@ -239,7 +242,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-3">
                       <GroupAvatar seed={m.groups.avatar_seed || m.group_id} image={m.groups.avatar_image} />
                       <div>
-                        <p className="font-medium">{m.groups.name}</p>
+                        <p className="font-medium">{highlightMatch(m.groups.name, indices)}</p>
                         <div className="flex items-center gap-2">
                           <Badge color={m.role === 'INSTRUCTOR' ? 'violet' : 'gray'}>
                             {roleLabel(t, m.role, profile?.gender, m.groups.group_type)}
@@ -290,4 +293,37 @@ export default function HomePage() {
       />
     </div>
   )
+}
+
+// Wrap the filter-matched code points of a group name in <mark>, merging
+// contiguous matches into a single run (fuzzy hits can be scattered).
+function highlightMatch(name: string, indices: number[]): ReactNode {
+  if (indices.length === 0) return name
+  const matched = new Set(indices)
+  const chars = [...name]
+  const out: ReactNode[] = []
+  let buf = ''
+  let marking = false
+  const flush = (endIndex: number) => {
+    if (!buf) return
+    out.push(
+      marking ? (
+        <mark key={endIndex - buf.length} className="rounded-sm bg-violet-200/70 text-inherit">
+          {buf}
+        </mark>
+      ) : (
+        buf
+      ),
+    )
+    buf = ''
+  }
+  chars.forEach((ch, i) => {
+    if (matched.has(i) !== marking) {
+      flush(i)
+      marking = matched.has(i)
+    }
+    buf += ch
+  })
+  flush(chars.length)
+  return out
 }

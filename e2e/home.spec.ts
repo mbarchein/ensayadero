@@ -54,10 +54,12 @@ test.describe('home group filter', () => {
     const input = page.getByLabel('Buscar grupo…')
     await expect(input).toBeVisible()
 
-    // accent-insensitive: "musica" finds "E2E Música", hides "E2E Teatro"
+    // accent-insensitive: "musica" finds "E2E Música", hides "E2E Teatro",
+    // and the matched letters are highlighted (accents included)
     await input.fill('musica')
     await expect(page.getByText('E2E Música', { exact: true })).toBeVisible()
     await expect(page.getByText('E2E Teatro', { exact: true })).not.toBeVisible()
+    await expect(page.locator('mark', { hasText: 'Música' }).first()).toBeVisible()
 
     // no matches → friendly empty message
     await input.fill('zzzz no existe')
