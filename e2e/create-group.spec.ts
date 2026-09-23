@@ -59,3 +59,30 @@ test.describe('create group adopts type wording', () => {
     await expect(page.getByRole('button', { name: 'Deportes', pressed: true })).toBeVisible()
   })
 })
+
+// Regression: creating a group as a plain user (not superadmin). The admin
+// storage state masks RLS mistakes because is_superadmin() short-circuits the
+// groups policies; directora only passes through the regular member path.
+test.describe('create group as a regular user', () => {
+  test.use({ storageState: { cookies: [], origins: [] } })
+
+  test('a non-superadmin can create a group', async ({ page }) => {
+    const name = `E2E Crear Directora ${RUN}`
+    await page.goto('/login')
+    await page.locator('input[type=email]').fill('directora@local.test')
+    await page.locator('input[type=password]').fill('password123')
+    await page.locator('button[type=submit]').click()
+    await expect(page.getByText('E2E Solo Directora')).toBeVisible({ timeout: 20_000 })
+
+    await page.goto('/new-group')
+    await page.getByRole('button', { name: 'Teatro', exact: true }).click()
+    await page.getByRole('button', { name: 'Siguiente' }).click()
+    await page.getByLabel('Nombre del grupo').fill(name)
+    await page.getByRole('button', { name: 'Siguiente' }).click()
+    await page.getByRole('button', { name: 'Crear grupo' }).click()
+
+    await expect(page.getByRole('heading', { name: '¡Grupo creado!' })).toBeVisible()
+    await expect(page.getByText(name, { exact: true })).toBeVisible()
+    await expect(page.locator('body')).not.toContainText('row-level security')
+  })
+})

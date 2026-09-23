@@ -42,12 +42,22 @@ export default function NewGroupPage() {
     mutationFn: async () => {
       // created_by defaults to auth.uid(); a trigger adds the creator as director.
       // new_member_policy keeps its DB default (editable later from the group).
-      const { data, error } = await supabase
+      //
+      // No RETURNING on the insert: Postgres applies the SELECT policy to the
+      // returned row before the AFTER trigger has created the membership, so
+      // a regular user would hit "new row violates row-level security policy".
+      // The id is generated client-side so the row can be read back afterwards.
+      const id = crypto.randomUUID()
+      const { error } = await supabase
         .from('groups')
-        .insert({ name: name.trim(), avatar_seed: seed, avatar_image: image, group_type: type })
-        .select('id, join_code, name')
-        .single()
+        .insert({ id, name: name.trim(), avatar_seed: seed, avatar_image: image, group_type: type })
       if (error) throw error
+      const { data, error: readError } = await supabase
+        .from('groups')
+        .select('id, join_code, name')
+        .eq('id', id)
+        .single()
+      if (readError) throw readError
       return data as Created
     },
     onSuccess: (data) => {
