@@ -212,7 +212,7 @@ export default function MonthCalendar<T>({
     <div className="space-y-4">
       {/* arrows fixed at the corners; the month label lives inside each panel so
           it slides with the grid */}
-      <div className="relative">
+      <div className="relative select-none">
         <button
           type="button"
           onClick={() => goMonth(-1)}

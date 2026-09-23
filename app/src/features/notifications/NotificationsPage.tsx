@@ -205,10 +205,10 @@ export default function NotificationsPage() {
             strokeWidth={1}
             aria-hidden
           />
-          <p className="relative mt-10 text-lg font-semibold text-violet-900">
+          <p className="relative mt-10 select-none text-lg font-semibold text-violet-900">
             {t('notifications.emptyTitle')}
           </p>
-          <p className="relative mt-1 text-sm text-violet-700">{t('notifications.empty')}</p>
+          <p className="relative mt-1 select-none text-sm text-violet-700">{t('notifications.empty')}</p>
           <figure className="relative mx-auto mt-8 max-w-md">
             <blockquote className="whitespace-pre-line font-serif text-base italic leading-relaxed text-violet-900">
               “{quote.q}”

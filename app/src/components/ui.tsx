@@ -243,7 +243,7 @@ export function Spinner() {
 export function EmptyState({ message, action }: { message: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
-      <p className="text-sm text-gray-600">{message}</p>
+      <p className="select-none text-sm text-gray-600">{message}</p>
       {action}
     </div>
   )
