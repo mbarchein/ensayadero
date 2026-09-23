@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* App chrome is not selectable: a tap-and-hold (or a slightly long tap) on a
+   title, tab, button or label on mobile would otherwise highlight the text.
+   Content (paragraphs, lists, notes) stays selectable; form controls are
+   re-enabled explicitly because Safari resolves `auto` inside a `none`
+   ancestor to `none`. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  button,
+  label,
+  nav,
+  summary,
+  [role='button'],
+  [role='tab'],
+  [role='switch'] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input,
+  textarea,
+  select,
+  [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
 /* Stable full-height app shell: the Layout anchors to this html/body/#root
    chain (h-full) instead of 100dvh. dvh is recomputed dynamically and can be
    momentarily wrong right after the service-worker auto-update reload, which
