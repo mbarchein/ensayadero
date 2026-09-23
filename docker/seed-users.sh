@@ -34,14 +34,16 @@ insert into public.groups (id, name)
 values ('00000000-0000-0000-0000-000000000001', 'La Tempestad (demo)')
 on conflict do nothing;
 
-insert into public.invitations (group_id, email, role, created_by)
-select '00000000-0000-0000-0000-000000000001', e.email, e.role::group_role, p.id
+-- Invitations carry no role: everyone joins as ACTOR and directora is
+-- promoted to INSTRUCTOR below, once her account (and membership) exists.
+insert into public.invitations (group_id, email, created_by)
+select '00000000-0000-0000-0000-000000000001', e.email, p.id
 from (values
-  ('directora@local.test', 'INSTRUCTOR'),
-  ('actor1@local.test', 'ACTOR'),
-  ('actor2@local.test', 'ACTOR'),
-  ('actor3@local.test', 'ACTOR')
-) as e(email, role)
+  ('directora@local.test'),
+  ('actor1@local.test'),
+  ('actor2@local.test'),
+  ('actor3@local.test')
+) as e(email)
 cross join (select id from public.profiles where email='admin@local.test') p
 where not exists (              -- no PENDING invitation…
   select 1 from public.invitations i
@@ -56,6 +58,12 @@ and not exists (                -- …and no account already created
 SQL
 
 create_user "directora@local.test" "Lola Directora"
+$PSQL <<'SQL' > /dev/null
+update public.memberships m set role='INSTRUCTOR'
+from public.profiles p
+where p.id = m.user_id and p.email='directora@local.test'
+  and m.group_id='00000000-0000-0000-0000-000000000001';
+SQL
 create_user "actor1@local.test" "Ana Actriz"
 create_user "actor2@local.test" "Benito Actor"
 create_user "actor3@local.test" "Carmen Actriz"
