@@ -5,6 +5,12 @@ import { useMemo } from 'react'
 import { createAvatar } from '@dicebear/core'
 import { shapes } from '@dicebear/collection'
 
+// Resolved avatar source (uploaded image or generated shapes), for callers
+// that render it outside GroupAvatar, e.g. a full-screen viewer.
+export function groupAvatarSrc(seed: string, image: string | null | undefined, size = 512) {
+  return image ?? createAvatar(shapes, { seed, size, radius: 12 }).toDataUri()
+}
+
 export default function GroupAvatar({
   seed,
   image = null,

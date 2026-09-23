@@ -197,6 +197,41 @@ export function Modal({
   )
 }
 
+// Full-screen image viewer: tap anywhere (or the close button / back
+// gesture) to dismiss.
+export function Lightbox({
+  src,
+  open,
+  onClose,
+}: {
+  src: string
+  open: boolean
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  useBackClose(open, onClose)
+
+  if (!open) return null
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <button
+        onClick={onClose}
+        aria-label={t('common.close')}
+        className="absolute right-3 top-3 rounded-full p-2 text-white/80 hover:bg-white/10 hover:text-white"
+      >
+        <X size={24} />
+      </button>
+      <img src={src} alt="" className="max-h-full max-w-full rounded-2xl object-contain" />
+    </div>,
+    document.body,
+  )
+}
+
 export function Spinner() {
   return (
     <div className="flex justify-center py-10">

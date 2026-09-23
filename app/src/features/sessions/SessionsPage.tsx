@@ -10,8 +10,8 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { parseRange } from '../../lib/ranges'
 import { Pencil, CalendarPlus, Users } from 'lucide-react'
-import { BackButton, Button, EmptyState, Spinner } from '../../components/ui'
-import GroupAvatar from '../groups/GroupAvatar'
+import { BackButton, Button, EmptyState, Lightbox, Spinner } from '../../components/ui'
+import GroupAvatar, { groupAvatarSrc } from '../groups/GroupAvatar'
 import Tip from '../../components/Tip'
 import SessionCard, { responseDotColor } from './SessionCard'
 import MonthCalendar from './MonthCalendar'
@@ -35,6 +35,7 @@ export default function SessionsPage() {
     localStorage.setItem('sessions-view', v)
     setView(v)
   }
+  const [avatarOpen, setAvatarOpen] = useState(false)
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions', groupId],
@@ -107,10 +108,22 @@ export default function SessionsPage() {
       <header className="sticky top-0 z-10 -mx-4 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <div className="flex items-center gap-3">
           <BackButton to="/" />
-          <GroupAvatar seed={group?.avatar_seed || groupId} image={group?.avatar_image} />
+          <button
+            type="button"
+            onClick={() => setAvatarOpen(true)}
+            aria-label={t('group.viewAvatar')}
+            className="shrink-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+          >
+            <GroupAvatar seed={group?.avatar_seed || groupId} image={group?.avatar_image} />
+          </button>
           <h1 className="flex-1 text-xl font-bold">{group?.name}</h1>
         </div>
       </header>
+      <Lightbox
+        open={avatarOpen}
+        onClose={() => setAvatarOpen(false)}
+        src={groupAvatarSrc(group?.avatar_seed || groupId, group?.avatar_image)}
+      />
 
       {justJoined && <Tip id="groupJoined" type={group?.group_type} />}
       <Tip id="group" type={group?.group_type} />
