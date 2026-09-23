@@ -34,7 +34,11 @@ seed-e2e: ## Seed the e2e fixtures (superadmin + one group per type)
 	bash docker/seed-e2e.sh
 
 e2e: ## Run the Playwright e2e suite in Docker (brings up stack + seeds first)
-	docker compose up -d
+	@# DEV_HOST is forced to localhost: the e2e container runs with
+	@# network_mode host and cannot reach a LAN IP set in .env.
+	DEV_HOST=localhost docker compose up -d
+	@# Recreating the app container restarts Vite; wait until it answers.
+	@for i in $$(seq 1 30); do curl -sf -o /dev/null http://localhost:5173/ && break; sleep 2; done
 	bash docker/seed-e2e.sh
 	docker compose -p ensayo-e2e -f docker-compose.e2e.yml run --rm e2e
 
