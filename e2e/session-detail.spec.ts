@@ -39,6 +39,16 @@ test.describe('session detail', () => {
     await expect(page.locator('body')).not.toContainText('{{')
   })
 
+  test('header avatar opens full screen and closes', async ({ page }) => {
+    await loginAndOpenSession(page)
+    await page.getByRole('button', { name: 'Ver imagen del grupo' }).click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    await expect(dialog.locator('img')).toBeVisible()
+    await dialog.getByRole('button', { name: 'Cerrar' }).click()
+    await expect(dialog).toHaveCount(0)
+  })
+
   test('RSVP can be set and persists across reload', async ({ page }) => {
     await loginAndOpenSession(page)
 

@@ -22,6 +22,16 @@ test.describe('group screens', () => {
     await expect(page.locator('body')).not.toContainText('{{')
   })
 
+  test('header avatar opens full screen and closes', async ({ page }) => {
+    await openGroup(page, 'E2E Teatro')
+    await page.getByRole('button', { name: 'Ver imagen del grupo' }).click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    await expect(dialog.locator('img')).toBeVisible()
+    await dialog.getByRole('button', { name: 'Cerrar' }).click()
+    await expect(dialog).toHaveCount(0)
+  })
+
   test('group activity tab speaks its type wording', async ({ page }) => {
     await openGroup(page, 'E2E Deportes')
     await expect(page.getByRole('heading', { name: 'Entrenamientos', exact: true })).toBeVisible()

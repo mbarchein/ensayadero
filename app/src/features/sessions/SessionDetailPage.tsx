@@ -14,7 +14,7 @@ import {
   X,
   Pencil,
 } from 'lucide-react'
-import GroupAvatar from '../groups/GroupAvatar'
+import GroupAvatarButton from '../groups/GroupAvatarButton'
 import { dateLocale } from '../../lib/dateLocale'
 import { useTranslation } from 'react-i18next'
 import { useGroup } from '../groups/useGroup'
@@ -249,7 +249,7 @@ export default function SessionDetailPage() {
     <div className="space-y-5 pb-6">
       <header className="sticky top-0 z-10 -mx-4 flex items-center gap-3 border-b border-violet-100 bg-violet-50 px-4 py-2">
         <BackButton to={`/g/${groupId}`} />
-        <GroupAvatar seed={group?.avatar_seed || groupId} image={group?.avatar_image} />
+        <GroupAvatarButton seed={group?.avatar_seed || groupId} image={group?.avatar_image} />
         <h1 className="min-w-0 flex-1 truncate text-xl font-bold">{group?.name}</h1>
         {isInstructor && session.status === 'CONFIRMED' && (
           <Button
