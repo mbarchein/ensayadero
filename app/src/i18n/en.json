@@ -339,6 +339,7 @@
     "title": "My availability",
     "agendaTitle": "My schedule",
     "editTitle": "Edit availability",
+    "pastLocked": "Past times can't be marked",
     "prevWeek": "Previous week",
     "nextWeek": "Next week",
     "thisWeek": "(this week)",

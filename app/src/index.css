@@ -121,3 +121,28 @@ body,
     animation: none;
   }
 }
+
+/* WeekGrid day view: past cells are locked (can't be marked) */
+.past-locked {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(156 163 175 / 0.45) 0 1px,
+    transparent 1px 6px
+  );
+}
+.past-denied {
+  animation: past-denied 0.3s ease-in-out;
+}
+@keyframes past-denied {
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .past-denied {
+    animation: none;
+  }
+}

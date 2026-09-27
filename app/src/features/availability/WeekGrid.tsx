@@ -11,7 +11,7 @@ import { addDays, format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
-import { DAY_START_HOUR, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
+import { DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, slotRange } from '../../lib/slots'
 
 export interface CellPos {
   day: number
@@ -48,6 +48,29 @@ interface Props {
 }
 
 const HOUR_COL = '2.25rem'
+/** Row height in rem (matches the cells' h-5). */
+const ROW_REM = 1.25
+const DENIED_TOAST_MS = 2000
+
+/** Offset (rem) of `now` from the top of the grid, or null outside the grid hours. */
+function nowOffsetRem(now: Date): number | null {
+  const mins = (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes()
+  if (mins < 0 || mins >= SLOTS_PER_DAY * SLOT_MINUTES) return null
+  return (mins / SLOT_MINUTES) * ROW_REM
+}
+
+/** Violet "now" marker across one day column. */
+function NowLine({ top, left, width }: { top: number; left: string; width: string }) {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute z-10 h-0.5 bg-violet-600"
+      style={{ top: `${top}rem`, left, width }}
+    >
+      <span className="absolute -top-[3px] -left-1 h-2 w-2 rounded-full bg-violet-600" />
+    </div>
+  )
+}
 
 export default function WeekGrid({
   weekMonday,
@@ -77,6 +100,13 @@ export default function WeekGrid({
     onDayChange?.(value)
   }
   const editing = selectedDay != null
+
+  // Re-render every minute so the "now" line and the past lock keep moving.
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -171,9 +201,23 @@ export default function WeekGrid({
     }, 200)
   }
 
-  const now = new Date()
   const isPast = (pos: CellPos, monday: Date = weekMonday) =>
     slotRange(monday, pos.day, pos.slot).end <= now
+
+  // Tap on a locked (past) cell while editing → shake it + brief toast.
+  const [denied, setDenied] = useState<(CellPos & { n: number }) | null>(null)
+  const [deniedToast, setDeniedToast] = useState(false)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pastTapRef = useRef<{ x: number; y: number; pos: CellPos } | null>(null)
+  const deny = (pos: CellPos) => {
+    setDenied((cur) => ({ ...pos, n: (cur?.n ?? 0) + 1 }))
+    setDeniedToast(true)
+    if (toastTimer.current != null) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setDeniedToast(false), DENIED_TOAST_MS)
+  }
+  useEffect(() => () => {
+    if (toastTimer.current != null) clearTimeout(toastTimer.current)
+  }, [])
   const sameCell = (a: CellPos | null, b: CellPos | null) =>
     !!a && !!b && a.day === b.day && a.slot === b.slot
   const clearLp = () => {
@@ -198,7 +242,8 @@ export default function WeekGrid({
   }
 
   const hours = Array.from({ length: SLOTS_PER_DAY / 2 }, (_, i) => DAY_START_HOUR + i)
-  const todayKey = format(new Date(), 'yyyyMMdd')
+  const todayKey = format(now, 'yyyyMMdd')
+  const nowTop = nowOffsetRem(now)
 
   // week-view swipe gesture on the cell area (vertical drags keep native scroll)
   const weekSwipeHandlers = {
@@ -262,7 +307,7 @@ export default function WeekGrid({
   }
 
   return (
-    <div className={`select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
+    <div className={`relative select-none ${fill ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
       {/* week navigation (week view only): explicit prev/next for desktop;
           on touch the swipe carousel is the gesture, so hide below md */}
       {!editing && onPrevWeek && onNextWeek && (
@@ -366,13 +411,15 @@ export default function WeekGrid({
               touchAction: 'none',
               gridTemplateColumns: `${HOUR_COL} minmax(0, 1fr)`,
             }}
-            className="grid"
+            className="relative grid"
             onPointerDown={(e) => {
               const pos = posFromEvent(e)
               const ok = !!pos && !isPast(pos)
               movedRef.current = false
               lastClient.current = { x: e.clientX, y: e.clientY }
+              pastTapRef.current = pos && !ok ? { x: e.clientX, y: e.clientY, pos } : null
               if (e.pointerType !== 'touch') {
+                if (pos && !ok) deny(pos)
                 if (ok && onPaintStart) {
                   paintingRef.current = true
                   capture(e)
@@ -439,7 +486,10 @@ export default function WeekGrid({
                 paintingRef.current = false
                 onPaintEnd?.()
               } else if (e.pointerType === 'touch') {
-                if (modeRef.current === 'paint') {
+                const pt = pastTapRef.current
+                if (pt && Math.hypot(e.clientX - pt.x, e.clientY - pt.y) < MOVE_THRESHOLD) {
+                  deny(pt.pos)
+                } else if (modeRef.current === 'paint') {
                   onPaintEnd?.()
                 } else if (modeRef.current === 'pending' && !movedRef.current) {
                   const pos = posFromEvent(e)
@@ -454,6 +504,7 @@ export default function WeekGrid({
               }
               modeRef.current = 'idle'
               startRef.current = null
+              pastTapRef.current = null
             }}
             onPointerCancel={() => {
               clearLp()
@@ -478,8 +529,12 @@ export default function WeekGrid({
                 renderCell={renderCell}
                 cellClass={cellClass}
                 isPast={isPast}
+                denied={denied}
               />
             ))}
+            {nowTop != null && format(addDays(weekMonday, selectedDay!), 'yyyyMMdd') === todayKey && (
+              <NowLine top={nowTop} left={HOUR_COL} width={`calc(100% - ${HOUR_COL})`} />
+            )}
           </div>
         ) : (
           /* week view: fixed hour column + 3-week cell carousel in sync with
@@ -508,6 +563,8 @@ export default function WeekGrid({
                       renderCell={renderCell}
                       cellClass={cellClass}
                       isPast={isPast}
+                      todayKey={todayKey}
+                      nowTop={nowTop}
                     />
                   </div>
                 ))}
@@ -516,6 +573,15 @@ export default function WeekGrid({
           </div>
         )}
       </div>
+      {/* overlay (never content below the grid): tap on a past cell */}
+      {editing && deniedToast && (
+        <div
+          role="status"
+          className="pointer-events-none absolute top-14 left-1/2 z-20 -translate-x-1/2 rounded-full bg-gray-900/90 px-3 py-1.5 text-xs whitespace-nowrap text-white shadow-lg"
+        >
+          {t('availability.pastLocked')}
+        </div>
+      )}
     </div>
   )
 }
@@ -526,14 +592,21 @@ function WeekCellsPanel({
   renderCell,
   cellClass,
   isPast,
+  todayKey,
+  nowTop,
 }: {
   monday: Date
   renderCell: Props['renderCell']
   cellClass: Props['cellClass']
   isPast: (pos: CellPos, monday: Date) => boolean
+  todayKey: string
+  nowTop: number | null
 }) {
+  const todayIdx = Array.from({ length: 7 }, (_, d) => format(addDays(monday, d), 'yyyyMMdd')).indexOf(
+    todayKey,
+  )
   return (
-    <div className="grid grid-cols-7">
+    <div className="relative grid grid-cols-7">
       {Array.from({ length: SLOTS_PER_DAY }, (_, slot) =>
         Array.from({ length: 7 }, (_, dayIdx) => {
           const pos = { day: dayIdx, slot }
@@ -551,6 +624,9 @@ function WeekCellsPanel({
             </div>
           )
         }),
+      )}
+      {nowTop != null && todayIdx >= 0 && (
+        <NowLine top={nowTop} left={`${(todayIdx * 100) / 7}%`} width={`${100 / 7}%`} />
       )}
     </div>
   )
@@ -633,6 +709,7 @@ function Row({
   renderCell,
   cellClass,
   isPast,
+  denied,
 }: {
   slot: number
   days: number[]
@@ -642,6 +719,7 @@ function Row({
   renderCell: Props['renderCell']
   cellClass: Props['cellClass']
   isPast: (pos: CellPos) => boolean
+  denied: (CellPos & { n: number }) | null
 }) {
   const isHourStart = slot % 2 === 0
   return (
@@ -651,14 +729,18 @@ function Row({
       </div>
       {days.map((day) => {
         const past = isPast({ day, slot })
+        const shake = !!denied && denied.day === day && denied.slot === slot
         return (
           <div
-            key={day}
+            // n in the key restarts the shake on every denied tap
+            key={shake ? `${day}:${denied.n}` : day}
             data-day={day}
             data-slot={slot}
             className={`h-5 overflow-hidden border-b border-r border-gray-100 ${
               isHourStart ? 'border-t border-t-gray-200' : ''
-            } ${cellClass({ day, slot }, weekMonday)} ${past ? 'opacity-35 grayscale' : ''}`}
+            } ${cellClass({ day, slot }, weekMonday)} ${
+              past ? (dayView ? 'past-locked opacity-60 grayscale' : 'opacity-35 grayscale') : ''
+            } ${shake ? 'past-denied' : ''}`}
           >
             {renderCell({ day, slot }, { dayView, weekMonday })}
           </div>
