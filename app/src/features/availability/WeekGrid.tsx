@@ -242,12 +242,26 @@ export default function WeekGrid({
   const [deniedToast, setDeniedToast] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pastTapRef = useRef<{ x: number; y: number; pos: CellPos } | null>(null)
-  const deny = (pos: CellPos) => {
-    setDenied((cur) => ({ ...pos, n: (cur?.n ?? 0) + 1 }))
+  const showDeniedToast = () => {
     setDeniedToast(true)
     if (toastTimer.current != null) clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setDeniedToast(false), DENIED_TOAST_MS)
   }
+  const deny = (pos: CellPos) => {
+    setDenied((cur) => ({ ...pos, n: (cur?.n ?? 0) + 1 }))
+    showDeniedToast()
+  }
+  /** Whole day already over: day view (editing) can't be opened for it. */
+  const isDayPast = (d: number) => isPast({ day: d, slot: SLOTS_PER_DAY - 1 })
+  // Swiping to an earlier week in day view (or the day running out) leaves a
+  // past day selected → back to the week view with the same notice.
+  const selectedPast = selectedDay != null && isDayPast(selectedDay)
+  useEffect(() => {
+    if (!selectedPast) return
+    setSelectedDay(null)
+    showDeniedToast()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPast])
   useEffect(() => () => {
     if (toastTimer.current != null) clearTimeout(toastTimer.current)
   }, [])
@@ -414,10 +428,15 @@ export default function WeekGrid({
                 todayKey={todayKey}
                 interactive
                 wave={hintPulse + pullPulse}
+                isDayPast={isDayPast}
                 selectedDay={selectedDay}
                 onSelect={(d) => {
                   if (swiped.current) {
                     swiped.current = false
+                    return
+                  }
+                  if (isDayPast(d) && selectedDay !== d) {
+                    showDeniedToast()
                     return
                   }
                   setSelectedDay((cur) => (cur === d ? null : d))
@@ -611,8 +630,8 @@ export default function WeekGrid({
           </div>
         )}
       </div>
-      {/* overlay (never content below the grid): tap on a past cell */}
-      {editing && deniedToast && (
+      {/* overlay (never content below the grid): tap on a past cell / day */}
+      {deniedToast && (
         <div
           role="status"
           className="pointer-events-none absolute top-14 left-1/2 z-20 -translate-x-1/2 rounded-full bg-gray-900/90 px-3 py-1.5 text-xs whitespace-nowrap text-white shadow-lg"
@@ -679,6 +698,7 @@ function DayStripView({
   todayKey,
   interactive = false,
   wave = 0,
+  isDayPast,
   selectedDay = null,
   onSelect,
 }: {
@@ -687,6 +707,8 @@ function DayStripView({
   interactive?: boolean
   /** Re-runs the staggered violet pulse on every increment (key change). */
   wave?: number
+  /** Days already over are skipped by the wave (they can't be edited). */
+  isDayPast?: (day: number) => boolean
   selectedDay?: number | null
   onSelect?: (day: number) => void
 }) {
@@ -694,12 +716,15 @@ function DayStripView({
   const letters = (dateLocale().code ?? 'en').startsWith('es')
     ? ['L', 'M', 'X', 'J', 'V', 'S', 'D']
     : ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+  // the wave's stagger starts at the first day that can still be edited
+  const firstOpen = Array.from({ length: 7 }, (_, d) => d).find((d) => !isDayPast?.(d)) ?? 7
   return (
     <div className="grid w-full grid-cols-7">
       {Array.from({ length: 7 }, (_, d) => {
         const date = addDays(weekMonday, d)
         const isToday = format(date, 'yyyyMMdd') === todayKey
         const isSel = interactive && selectedDay === d
+        const waves = wave > 0 && !isDayPast?.(d)
         const cls = `flex flex-col items-center pb-0.5 text-center leading-tight ${
           isSel
             ? 'bg-violet-600 font-bold text-white'
@@ -727,8 +752,8 @@ function DayStripView({
             // wave in the key restarts the CSS animation on each pulse
             key={`${d}:${wave}`}
             onClick={() => onSelect?.(d)}
-            className={`${cls} ${wave > 0 ? 'day-wave' : ''}`}
-            style={wave > 0 ? { animationDelay: `${d * 70}ms` } : undefined}
+            className={`${cls} ${waves ? 'day-wave' : ''}`}
+            style={waves ? { animationDelay: `${(d - firstOpen) * 70}ms` } : undefined}
           >
             {inner}
           </button>
