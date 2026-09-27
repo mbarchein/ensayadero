@@ -32,6 +32,15 @@ import quotesEn from '../../data/quotes.en.json'
 // authors of quotes.en.json who wrote in Spanish: the es app shows them in the original only
 const SPANISH_AUTHORS = new Set(['Calderón de la Barca', 'Federico García Lorca'])
 
+// l/u: Creative Commons licence and source link, required for attribution
+type Quote = { q: string; w: string; a: string; l?: string; u?: string }
+
+// "CC BY-NC-SA 4.0" -> https://creativecommons.org/licenses/by-nc-sa/4.0/
+const licenseUrl = (l: string) => {
+  const [, kind, version] = l.split(' ')
+  return `https://creativecommons.org/licenses/${kind.toLowerCase()}/${version}/`
+}
+
 const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   SESSION_CONFIRMED: { Icon: CheckCircle2, color: 'text-green-600' },
   SESSION_CANCELLED: { Icon: XCircle, color: 'text-red-600' },
@@ -50,8 +59,8 @@ export default function NotificationsPage() {
 
   // one random famous theatre fragment per visit; the Spanish app mixes in
   // the English quotes too, except translations of Spanish authors
-  const [quote] = useState(() => {
-    const list = i18n.language?.startsWith('en')
+  const [quote] = useState<Quote>(() => {
+    const list: Quote[] = i18n.language?.startsWith('en')
       ? quotesEn
       : [...quotesEs, ...quotesEn.filter((q) => !SPANISH_AUTHORS.has(q.a))]
     return list[Math.floor(Math.random() * list.length)]
@@ -220,7 +229,15 @@ export default function NotificationsPage() {
               “{quote.q}”
             </blockquote>
             <figcaption className="mt-2 text-xs text-violet-600">
-              — {quote.w} · {quote.a}
+              — {quote.u ? <a href={quote.u} target="_blank" rel="noreferrer" className="underline">{quote.w}</a> : quote.w} · {quote.a}
+              {quote.l && (
+                <>
+                  {' · '}
+                  <a href={licenseUrl(quote.l)} target="_blank" rel="noreferrer" className="underline">
+                    {quote.l}
+                  </a>
+                </>
+              )}
             </figcaption>
           </figure>
         </div>
