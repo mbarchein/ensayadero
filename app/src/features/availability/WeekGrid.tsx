@@ -48,12 +48,16 @@ interface Props {
   /** Increment to run a violet wave down the open (non-past) slots of the
       day view — e.g. on entering a blank day. */
   cellWave?: number
+  /** Brief floating notice over the grid (never pushes it down); shown again
+      whenever `n` changes, gone after a few seconds or on tap. */
+  hint?: { text: string; n: number } | null
 }
 
 const HOUR_COL = '2.25rem'
 /** Row height in rem (matches the cells' h-5). */
 const ROW_REM = 1.25
 const DENIED_TOAST_MS = 2000
+const HINT_TOAST_MS = 4000
 
 /** Offset (rem) of `now` from the top of the grid, or null outside the grid hours. */
 function nowOffsetRem(now: Date): number | null {
@@ -125,6 +129,7 @@ export default function WeekGrid({
   onDayChange,
   hintPulse = 0,
   cellWave = 0,
+  hint = null,
 }: Props) {
   const { t } = useTranslation()
   // null = week view (all days, read-only); number = day view (editable).
@@ -246,7 +251,19 @@ export default function WeekGrid({
   const [deniedToast, setDeniedToast] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pastTapRef = useRef<{ x: number; y: number; pos: CellPos } | null>(null)
+  const [hintVisible, setHintVisible] = useState(false)
+  const hintN = hint?.n ?? 0
+  useEffect(() => {
+    if (!hintN) {
+      setHintVisible(false)
+      return
+    }
+    setHintVisible(true)
+    const id = setTimeout(() => setHintVisible(false), HINT_TOAST_MS)
+    return () => clearTimeout(id)
+  }, [hintN])
   const showDeniedToast = () => {
+    setHintVisible(false) // one notice at a time
     setDeniedToast(true)
     if (toastTimer.current != null) clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setDeniedToast(false), DENIED_TOAST_MS)
@@ -644,6 +661,16 @@ export default function WeekGrid({
         >
           {t('availability.pastLocked')}
         </div>
+      )}
+      {hint && hintVisible && !deniedToast && (
+        <button
+          type="button"
+          role="status"
+          onClick={() => setHintVisible(false)}
+          className="absolute top-14 left-1/2 z-20 -translate-x-1/2 w-max max-w-[calc(100%-2rem)] rounded-2xl bg-violet-600/95 px-3 py-1.5 text-center text-xs text-white shadow-lg"
+        >
+          {hint.text}
+        </button>
       )}
     </div>
   )

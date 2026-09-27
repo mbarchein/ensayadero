@@ -149,7 +149,7 @@ export default function AvailabilityPage() {
   const [editDay, setEditDay] = useState<number | null>(null)
   const dayView = editDay != null
   // entering a blank day (no availability in its open slots) → wave down its
-  // hours + a contextual tip, to show that painting is the thing to do
+  // hours + a brief floating hint, to show that painting is the thing to do
   const [cellWave, setCellWave] = useState(0)
   const [blankDay, setBlankDay] = useState(false)
   const [copyOpen, setCopyOpen] = useState(false)
@@ -266,7 +266,7 @@ export default function AvailabilityPage() {
     !!draft && !!serverGrid && draft.some((col, d) => col.some((v, s) => v !== serverGrid[d][s]))
 
   // Blank-day check runs once per entry into a day (not on every edit), as
-  // soon as the grid is loaded: the tip stays until the day is left.
+  // soon as the grid is loaded.
   const gridReady = !!grid
   useEffect(() => {
     if (editDay == null || !grid) {
@@ -570,13 +570,7 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      {dayView && blankDay ? (
-        <Tip key={`${monday.getTime()}:${editDay}`} id="agendaEditEmpty" type="OTHER" once={false} />
-      ) : dayView ? (
-        <Tip id="agendaEdit" type="OTHER" />
-      ) : (
-        <Tip id="agenda" type="OTHER" />
-      )}
+      {dayView ? <Tip id="agendaEdit" type="OTHER" /> : <Tip id="agenda" type="OTHER" />}
 
       <WeekGrid
         weekMonday={monday}
@@ -705,6 +699,7 @@ export default function AvailabilityPage() {
         onDayChange={setEditDay}
         hintPulse={hintPulse}
         cellWave={blankDay ? cellWave : 0}
+        hint={blankDay && cellWave > 0 ? { text: t('availability.blankDayHint'), n: cellWave } : null}
         fill
       />
 
