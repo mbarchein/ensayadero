@@ -122,8 +122,9 @@ body,
   }
 }
 
-/* WeekGrid: past cells are locked (can't be marked). An overlay, so the cell's
-   dimming (grayscale + white wash) doesn't fade the hatching itself. */
+/* WeekGrid: past cells are locked (can't be marked). Cells get a gray wash;
+   the hatching is a single overlay per grid (PastHatch) so stripes run
+   continuously across cells instead of restarting in each one. */
 .past-locked {
   position: relative;
   filter: grayscale(1);
@@ -133,9 +134,14 @@ body,
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    repeating-linear-gradient(-45deg, rgb(107 114 128 / 0.55) 0 1.5px, transparent 1.5px 7px),
-    linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.55));
+  background-color: rgb(255 255 255 / 0.55);
+}
+.past-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(107 114 128 / var(--hatch-alpha)) 0 1px,
+    transparent 1px 6px
+  );
 }
 .past-denied {
   animation: past-denied 0.3s ease-in-out;

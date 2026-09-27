@@ -59,6 +59,39 @@ function nowOffsetRem(now: Date): number | null {
   return (mins / SLOT_MINUTES) * ROW_REM
 }
 
+/** Past slots at the top of a day column (past-ness only moves forward in time). */
+function pastSlots(isPast: (slot: number) => boolean): number {
+  let n = 0
+  while (n < SLOTS_PER_DAY && isPast(n)) n++
+  return n
+}
+
+/** One continuous hatch over the past cells, clipped to the staircase shape
+    of the past slots per column (heights are non-increasing left to right). */
+function PastHatch({
+  counts,
+  left = '0px',
+  alpha,
+}: {
+  counts: number[]
+  left?: string
+  alpha: number
+}) {
+  const last = counts.filter((c) => c > 0).length - 1
+  if (last < 0) return null
+  const x = (d: number) => `${(d * 100) / counts.length}%`
+  const y = (c: number) => `${(c * 100) / SLOTS_PER_DAY}%`
+  const pts = ['0% 0%', `${x(last + 1)} 0%`]
+  for (let d = last; d >= 0; d--) pts.push(`${x(d + 1)} ${y(counts[d])}`, `${x(d)} ${y(counts[d])}`)
+  return (
+    <div
+      aria-hidden
+      className="past-hatch pointer-events-none absolute top-0 right-0 bottom-0"
+      style={{ left, clipPath: `polygon(${pts.join(', ')})`, ['--hatch-alpha' as string]: alpha }}
+    />
+  )
+}
+
 /** Violet "now" marker across one day column. */
 function NowLine({ top, left, width }: { top: number; left: string; width: string }) {
   return (
@@ -532,6 +565,11 @@ export default function WeekGrid({
                 denied={denied}
               />
             ))}
+            <PastHatch
+              counts={[pastSlots((slot) => isPast({ day: selectedDay!, slot }))]}
+              left={HOUR_COL}
+              alpha={0.55}
+            />
             {nowTop != null && format(addDays(weekMonday, selectedDay!), 'yyyyMMdd') === todayKey && (
               <NowLine top={nowTop} left={HOUR_COL} width={`calc(100% - ${HOUR_COL})`} />
             )}
@@ -625,6 +663,10 @@ function WeekCellsPanel({
           )
         }),
       )}
+      <PastHatch
+        counts={Array.from({ length: 7 }, (_, day) => pastSlots((slot) => isPast({ day, slot }, monday)))}
+        alpha={0.3}
+      />
       {nowTop != null && todayIdx >= 0 && (
         <NowLine top={nowTop} left={`${(todayIdx * 100) / 7}%`} width={`${100 / 7}%`} />
       )}
