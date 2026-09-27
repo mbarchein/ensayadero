@@ -29,6 +29,9 @@ import type { Notification, GroupType } from '../../lib/types'
 import quotesEs from '../../data/quotes.es.json'
 import quotesEn from '../../data/quotes.en.json'
 
+// authors of quotes.en.json who wrote in Spanish: the es app shows them in the original only
+const SPANISH_AUTHORS = new Set(['Calderón de la Barca', 'Federico García Lorca'])
+
 const TYPE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   SESSION_CONFIRMED: { Icon: CheckCircle2, color: 'text-green-600' },
   SESSION_CANCELLED: { Icon: XCircle, color: 'text-red-600' },
@@ -46,9 +49,11 @@ export default function NotificationsPage() {
   const [archiveAllOpen, setArchiveAllOpen] = useState(false)
 
   // one random famous theatre fragment per visit; the Spanish app mixes in
-  // the English quotes too
+  // the English quotes too, except translations of Spanish authors
   const [quote] = useState(() => {
-    const list = i18n.language?.startsWith('en') ? quotesEn : [...quotesEs, ...quotesEn]
+    const list = i18n.language?.startsWith('en')
+      ? quotesEn
+      : [...quotesEs, ...quotesEn.filter((q) => !SPANISH_AUTHORS.has(q.a))]
     return list[Math.floor(Math.random() * list.length)]
   })
 
