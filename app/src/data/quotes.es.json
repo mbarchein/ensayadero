@@ -1,148 +1,68 @@
 [
   {
-    "q": "¿Qué es la vida? Un frenesí. ¿Qué es la vida? Una ficción, una sombra, una ilusión, y el mayor bien es pequeño; que toda la vida es sueño, y los sueños, sueños son.",
-    "w": "La vida es sueño",
-    "a": "Calderón de la Barca"
+    "q": "MAX.— Los ultraístas son unos farsantes. El esperpentismo lo ha inventado Goya. Los héroes clásicos han ido a pasearse en el callejón del Gato.\nDON LATINO.— ¡Estás completamente curda!\nMAX.— Los héroes clásicos reflejados en los espejos cóncavos dan el Esperpento. El sentido trágico de la vida española solo puede darse con una estética sistemáticamente deformada.\nDON LATINO.— ¡Miau! ¡Te estás contagiando!\nMAX.— España es una deformación grotesca de la civilización europea.\nDON LATINO.— ¡Pudiera! Yo me inhibo.",
+    "w": "Luces de bohemia",
+    "a": "Ramón del Valle-Inclán"
   },
   {
-    "q": "¡Ay, mísero de mí, y ay infelice!",
-    "w": "La vida es sueño",
-    "a": "Calderón de la Barca"
+    "q": "El autor sólo pide que aniñéis cuanto sea posible vuestro espíritu. El mundo está ya viejo y chochea; el Arte no se resigna a envejecer, y por parecer niño finge balbuceos... Y he aquí cómo estos viejos polichinelas pretenden hoy divertiros con sus niñerías.",
+    "w": "Los intereses creados",
+    "a": "Jacinto Benavente"
   },
   {
-    "q": "pues el delito mayor del hombre es haber nacido.",
-    "w": "La vida es sueño",
-    "a": "Calderón de la Barca"
+    "q": "LEANDRO.— ¿Quieres dejarme, Crispín? No será sin tristeza de mi parte.\nCRISPÍN.— No la tengáis, que ya de nada puedo serviros y conmigo dejáis la piel del hombre viejo... ¿Qué os dije, señor? Que entre todos habían de salvarnos... Creedlo. Para salir adelante con todo, mejor que crear afectos es crear intereses...\nLEANDRO.— Te engañas, que sin el amor de Silvia, nunca me hubiera salvado.\nCRISPÍN.— ¿Y es poco interés ese amor? Yo di siempre su parte al ideal y conté con él siempre. Y ahora, acabó la farsa.",
+    "w": "Los intereses creados",
+    "a": "Jacinto Benavente"
   },
   {
-    "q": "¿Quién mató al comendador? PASCUALA: Fuenteovejuna, señor.",
+    "q": "¡Ah!... ¡de modo que una burla!... ¡que todo ha sido una burla!... ¿Y por el placer de una grosera carcajada no han vacilado en amargar con el ridículo el fracaso de una vida?... ¡Y para este escarnio cien veces infame, escogen a mi hermana, a mi pobre hermana, alma sencilla cuyo único delito es que se resiste a perder el derecho a una felicidad que ha visto disfrutar fácilmente a otras mujeres, sólo porque la naturaleza ha sido más piadosa con ellas! ¡Pues no, no será!",
+    "w": "La señorita de Trevélez",
+    "a": "Carlos Arniches"
+  },
+  {
+    "q": "DON GONZALO.— Y una noche que mi pariente rondaba la finca para oírla cantar, se presentó de improviso aquel hombre.\nDOÑA LAURA.— Y le provocó.\nDON GONZALO.— Y se enzarzaron.\nDOÑA LAURA.— Y hubo desafío.\nDON GONZALO.— Al amanecer: en la playa. Y allí se quedó malamente herido el provocador. Mi pariente tuvo que esconderse primero, y luego que huir.\nDOÑA LAURA.— Conoce usted al dedillo la historia.\nDON GONZALO.— Y usted también.\nDOÑA LAURA.— Ya le he dicho a usted que ella me la contó.\nDON GONZALO.— Y mi pariente a mí... (Esta mujer es Laura... ¡Qué cosas hace Dios!)\nDOÑA LAURA.— (No sospecha quién soy: ¿para qué decírselo? Que conserve aquella ilusión...)",
+    "w": "Mañana de sol",
+    "a": "Serafín y Joaquín Álvarez Quintero"
+  },
+  {
+    "q": "MÁXIMO (en la puerta de la izquierda).— ¡Electra!\nELECTRA (corriendo hacia Máximo).— ¡Ah!\nPANTOJA (por la derecha).— Hija mía, ¿dónde estás?\nMARQUÉS.— Aquí, con nosotros.\nMÁXIMO.— Es nuestra.\nPANTOJA.— ¿Huyes de mí?\nMÁXIMO.— No huye, no... Resucita.",
+    "w": "Electra",
+    "a": "Benito Pérez Galdós"
+  },
+  {
+    "q": "M.ª JUANA.— ¡Bien lo sabes! ¡Si es que parece que pa ti es un orgullo que no haya mujer que no haya tenío que ver con tu marido! ¿Es que quieres ser tú la única honrada? Pues no eres tú sola, que otras han sabío despreciarle y ya que no han podido ser su mujer como tú... no han querío ser como esas otras...\nDOMINICA.— Ya te explicas... Como esas otras... no, porque querían ser más, tanto como yo... lo mismo que yo... ¡Y eso no ha habío quién! Que él se divierte con toas y se ríe de toas, pero su mujer no hay más que una... ¡Yo!, ¡yo!..., y naa más que yo, por cima de toas...\nM.ª JUANA.— ¡Porque no ha llegao una que ha sabío quitártelo!\nDOMINICA.— ¿Quién iba a ser esa?\nM.ª JUANA.— Yo lo hubiera sido, pa que lo sepas, pa que no lo agradezcas ahora...\nDOMINICA.— ¡Falta que él hubiera querío!",
+    "w": "Señora ama",
+    "a": "Jacinto Benavente"
+  },
+  {
+    "q": "LAURENCIA.— Dejadme entrar, que bien puedo\nen consejo de los hombres;\nque bien puede una mujer,\nsi no a dar voto a dar voces.\n¿Conocéisme?\nESTEBAN.— ¡Santo cielo!\n¿No es mi hija?\nJUAN.— ¿No conoces\nA Laurencia?\nLAURENCIA.— Vengo tal,\nque mi diferencia os pone\nen contingencia quién soy.\nESTEBAN.— ¡Hija mía!\nLAURENCIA.— No me nombres\ntu hija.\nESTEBAN.— ¿Por qué, mis ojos?\n¿Por qué?\nLAURENCIA.— Por muchas razones,\ny sean las principales,\nporque dejas que me roben\ntiranos sin que me vengues,\ntraidores sin que me cobres.",
     "w": "Fuenteovejuna",
     "a": "Lope de Vega"
   },
   {
-    "q": "MENGO: Fuenteovejuna lo hizo.",
-    "w": "Fuenteovejuna",
-    "a": "Lope de Vega"
+    "q": "¡Ah! ¿No es cierto, ángel de amor,\nque en esta apartada orilla\nmás pura la luna brilla\ny se respira mejor?\nEsta aura que vaga llena\nde los sencillos olores\nde las campesinas flores\nque brota esa orilla amena;\nesa agua limpia y serena\nque atraviesa sin temor\nla barca del pescador\nque espera cantando al día,\n¿no es cierto, paloma mía,\nque están respirando amor?\nEsa armonía que el viento\nrecoge entre esos millares\nde floridos olivares,\nque agita con manso aliento;\nese dulcísimo acento\ncon que trina el ruiseñor\nde sus copas morador\nllamando al cercano día,\n¿no es verdad, gacela mía,\nque están respirando amor?",
+    "w": "Don Juan Tenorio",
+    "a": "José Zorrilla"
   },
   {
-    "q": "la gala de Medina, la flor de Olmedo",
-    "w": "El caballero de Olmedo",
-    "a": "Lope de Vega"
+    "q": "¡Qué carga tan insufrible\nes el ambiente vital,\npara el mezquino mortal\nque nace en signo terrible!\n¡Qué eternidad tan horrible\nla breve vida! Este mundo\n¡qué calabozo profundo,\npara el hombre desdichado\ná quien mira el cielo airado\ncon su ceño furibundo!\nParece, sí, que á medida\nque es más dura y más amarga,\nmás extiende, más alarga\nel destino nuestra vida.\nSi nos está concedida\nsolo para padecer,\ny debe muy breve ser\nla del feliz, como en pena\nde que su objeto no llena;\n¡terrible cosa es nacer!\nAl que tranquilo, gozoso\nvive entre aplausos y honores,\ny de inocentes amores\napura el cáliz sabroso;\ncuando es más fuerte y brioso,\nla muerte sus dichas huella,\nsus venturas atropella;\ny yo que infelice soy,\nyo que buscándola voy,\nno puedo encontrar con ella.",
+    "w": "Don Álvaro o la fuerza del sino",
+    "a": "Ángel de Saavedra, Duque de Rivas"
   },
   {
-    "q": "Los que fingís y engañáis las mujeres de esa suerte, lo pagaréis en la muerte. JUAN: ¡Qué largo me lo fiáis!",
-    "w": "El burlador de Sevilla",
-    "a": "Tirso de Molina"
+    "q": "D.ª FRANCISCA.— Y daré gusto á mi madre.\nD. DIEGO.— Y vivirá usted infeliz.\nD.ª FRANCISCA.— Ya lo sé.\nD. DIEGO.— He aquí los frutos de la educación. Esto es lo que se llama criar bien á una niña: enseñarla á que desmienta y oculte las pasiones más inocentes con una pérfida disimulación. Las juzgan honestas luégo que las ven instruídas en el arte de callar y mentir. Se obstinan en que el temperamento, la edad ni el genio no han de tener influencia alguna en sus inclinaciones, ó en que su voluntad ha de torcerse al capricho de quien las gobierna. Todo se las permite, menos la sinceridad. Con tal que no digan lo que sienten, con tal que finjan aborrecer lo que más desean, con tal que se presten á pronunciar, cuando se lo manden, un sí perjuro, sacrílego, origen de tantos escándalos, ya están bien criadas; y se llama excelente educación la que inspira en ellas el temor, la astucia y el silencio de un esclavo.",
+    "w": "El sí de las niñas",
+    "a": "Leandro Fernández de Moratín"
   },
   {
-    "q": "Ser o no ser, de eso se trata: Si para nuestro espíritu es más noble sufrir Las pedradas y dardos de la atroz Fortuna O levantarse en armas contra un mar de aflicciones Y oponiéndose a ellas darles fin.",
+    "q": "Existir o no existir, ésta es la cuestión. ¿Cuál es más digna acción del ánimo: sufrir los tiros penetrantes de la fortuna injusta, ú oponer los brazos a este torrente de calamidades, y darles fin con atrevida resistencia? Morir es dormir. ¿No más? ¿Y por un sueño, diremos, las aflicciones se acabaron y los dolores sin número, patrimonio de nuestra débil naturaleza?... Este es un término que deberíamos solicitar con ansia. Morir es dormir... y tal vez soñar. Sí, y ved aquí el grande obstáculo; porque el considerar qué sueños podrán ocurrir en el silencio del sepulcro, cuando hayamos abandonado este despojo mortal, es razón harto poderosa para detenernos. Esta es la consideración que hace nuestra infelicidad tan larga.",
     "w": "Hamlet",
     "a": "William Shakespeare"
   },
   {
-    "q": "Palabras, palabras, palabras.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Algo podrido hay en el reino de Dinamarca.",
-    "w": "Hamlet",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Ah, Romeo, Romeo! ¿Por qué eres Romeo? Niega a tu padre y rechaza tu nombre, o, si no, júrame tu amor y ya nunca seré una Capuleto.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Ha sido el ruiseñor y no la alondra el que ha traspasado tu oído medroso.",
-    "w": "Romeo y Julieta",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "Mañana, y mañana, y mañana se arrastra con paso mezquino día tras día hasta la sílaba final del tiempo escrito",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "La vida es una sombra que camina, un pobre actor que en escena se arrebata y contonea y nunca más se le oye. Es un cuento que cuenta un idiota, lleno de ruido y de furia, que no significa nada",
-    "w": "Macbeth",
-    "a": "William Shakespeare"
-  },
-  {
-    "q": "¡Al ladrón! ¡Al ladrón! ¡Al ladrón! ¡Al asesino! ¡Al criminal! ¡Justicia, justo Cielo! ¡Estoy perdido! ¡Asesinado! ¡Me han cortado el cuello! ¡Me han robado mi dinero!",
-    "w": "El avaro",
-    "a": "Molière"
-  },
-  {
-    "q": "Es cierto; eso cierra la boca en absoluto. ¡Sin dote! ¡No hay modo de resistir a tal razón!",
-    "w": "El avaro",
-    "a": "Molière"
-  },
-  {
-    "q": "Para cubriros ese seno, cuya vista no puedo soportar. Cosas así lesionan las almas y hacen nacer culpables pensamientos.",
-    "w": "Tartufo",
-    "a": "Molière"
-  },
-  {
-    "q": "Hoy he cometido la villanía de matar esta gaviota. La pongo a sus pies.",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "lo importante no es la fama, no es el brillo, no es aquello con que yo soñaba, sino saber sufrir. Aprende a llevar tu cruz y a creer.",
-    "w": "La gaviota",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "¡Descansaremos!… ¡Oiremos a los ángeles, contemplaremos un cielo cuajado de diamantes y veremos cómo, bajo él, toda la maldad terrestre, todos nuestros sufrimientos, se ahogan en una misericordia que llenará el Universo!…",
-    "w": "El tío Vania",
-    "a": "Antón Chéjov"
-  },
-  {
-    "q": "Me llamaba su muñequita, y jugaba conmigo ni más ni menos que yo con mis muñecas.",
-    "w": "Casa de muñecas",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "El hombre más poderoso del mundo es el que está más solo.",
-    "w": "Un enemigo del pueblo",
-    "a": "Henrik Ibsen"
-  },
-  {
-    "q": "La verdad, es rara vez pura y nunca sencilla ¡La vida moderna sería aburridísima si la verdad fuera una u otra cosa, y la literatura moderna completamente imposible!",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "En cuestiones de gran importancia lo esencial es el estilo y no la sinceridad.",
-    "w": "La importancia de llamarse Ernesto",
-    "a": "Oscar Wilde"
-  },
-  {
-    "q": "Podría decirle a ese instante: «¡Detente, eres tan bello! La huella de mis días en la tierra no podrá disolverse en eones».",
-    "w": "Fausto",
-    "a": "Goethe"
-  },
-  {
-    "q": "No nací para compartir el odio sino el amor.",
-    "w": "Antígona",
-    "a": "Sófocles"
-  },
-  {
-    "q": "ningún mortal puede considerar a nadie feliz con la mira puesta en el último día, hasta que llegue al término de su vida sin haber sufrido nada doloroso.",
-    "w": "Edipo Rey",
-    "a": "Sófocles"
-  },
-  {
-    "q": "De todas las especies animadas y dotadas de pensamiento nosotras las mujeres somos los seres más miserables.",
-    "w": "Medea",
-    "a": "Eurípides"
-  },
-  {
-    "q": "Miradme: soy un dios y, sin embargo, ¡qué trato he recibido de los dioses!",
-    "w": "Prometeo encadenado",
-    "a": "Esquilo"
+    "q": "Yo sueño que estoy aquí\nDestas prisiones cargado,\nY soñé que en otro estado\nMas lisonjero me vi.\n¿Qué es la vida? — Un frenesí.\n¿Qué es la vida? — Una ilusión,\nUna sombra, una ficción,\nY el mayor bien es pequeño:\nQue toda la vida es sueño,\nY los sueños sueño son.",
+    "w": "La vida es sueño",
+    "a": "Calderón de la Barca"
   },
   {
     "q": "Aquí se hace lo que yo mando. Ya no puedes ir con el cuento a tu padre. Hilo y aguja para las hembras. Látigo y mula para el varón.",
@@ -178,91 +98,6 @@
     "q": "No os acerquéis, porque he matado a mi hijo, ¡yo misma he matado a mi hijo!",
     "w": "Yerma",
     "a": "Federico García Lorca"
-  },
-  {
-    "q": "Los héroes clásicos reflejados en los espejos cóncavos dan el Esperpento. El sentido trágico de la vida española sólo puede darse con una estética sistemáticamente deformada.",
-    "w": "Luces de bohemia",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "España es una deformación grotesca de la civilización europea.",
-    "w": "Luces de bohemia",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Quien sea libre de culpa, tire la primera piedra!",
-    "w": "Divinas palabras",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "Qui sine peccato est vestrum, primus in illam lapidem mittat.",
-    "w": "Divinas palabras",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Milagro del latín! Una emoción religiosa y litúrgica conmueve las conciencias, y cambia el sangriento resplandor de los rostros.",
-    "w": "Divinas palabras",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "La guerra es un negocio de los galones. El soldado sólo sabe morir.",
-    "w": "Las galas del difunto",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "Mi estética es una superación del dolor y de la risa, como deben ser las conversaciones de los muertos, al contarse historias de los vivos.",
-    "w": "Los cuernos de don Friolera",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "Todo nuestro arte nace de saber que un día pasaremos: Ese saber iguala a los hombres mucho más que la Revolución Francesa.",
-    "w": "Los cuernos de don Friolera",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Don Joselito de mi vida, le rezaré por el alma! ¡Carajeta, si usted no la diña, la hubiera diñado la Madre Patria! ¡De risa me escacho!",
-    "w": "La hija del capitán",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "es uno de esos hidalgos mujeriegos y despóticos, hospitalarios y violentos, que se conservan como retratos antiguos en las villas silenciosas y muertas, las villas que evocan con sus nombres feudales un herrumbroso son de armaduras",
-    "w": "Águila de blasón",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Yo soy león! ¡Yo soy tigre!",
-    "w": "Águila de blasón",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Los lobos en el monte tienen más hermandad que vosotros! ¡Nacidos sois de un mismo vientre, y peleáis como fieras que por acaso se hallan en un camino!",
-    "w": "Romance de lobos",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Yo he sido siempre el peor hombre del mundo! Ahora siento que voy a dejarlo, y quiero arrepentirme.",
-    "w": "Romance de lobos",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Tengo miedo de ser el Diablo!",
-    "w": "Cara de Plata",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Besa! ¡Muerde! ¡Ligazón te hago!",
-    "w": "Ligazón",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Flor de mozo! ¡Yo te maté cuando la vida me dabas!",
-    "w": "La cabeza del Bautista",
-    "a": "Ramón del Valle-Inclán"
-  },
-  {
-    "q": "¡Si no le sello la boca, nos gana la entraña ese tunante!",
-    "w": "Sacrilegio",
-    "a": "Ramón del Valle-Inclán"
   },
   {
     "q": "Primero me haré aparejador. ¡No es difícil! En unos años me haré un buen aparejador. Ganaré mucho dinero y me solicitarán todas las empresas constructoras. Para entonces ya estaremos casados… Tendremos nuestro hogar, alegre y limpio…, lejos de aquí.",
@@ -365,71 +200,6 @@
     "a": "Dario Fo"
   },
   {
-    "q": "¡Ah! ¿No es cierto, ángel de amor, que en esta apartada orilla más pura la luna brilla y se respira mejor?",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
-  },
-  {
-    "q": "Llamé al cielo, y no me oyó, y pues sus puertas me cierra, de mis pasos en la tierra responda el cielo, y no yo.",
-    "w": "Don Juan Tenorio",
-    "a": "José Zorrilla"
-  },
-  {
-    "q": "¡Sevilla!!! ¡Guadalquivir!!! ¡Cuál atormentáis mi mente!… ¡Noche en que vi de repente mis breves dichas huir!… ¡Oh qué carga es el vivir!…",
-    "w": "Don Álvaro o la fuerza del sino",
-    "a": "Ángel de Saavedra| Duque de Rivas"
-  },
-  {
-    "q": "Esto resulta del abuso de autoridad, de la opresión que la juventud padece; estas son las seguridades que dan los padres y los tutores, y esto lo que se debe fiar en el sí de las niñas…",
-    "w": "El sí de las niñas",
-    "a": "Leandro Fernández de Moratín"
-  },
-  {
-    "q": "Y un juego vil que no hay que jugarlo a ciegas, pues juegas cien veces, mil, y de las mil, ves febril que o te pasas o no llegas.",
-    "w": "La venganza de don Mendo",
-    "a": "Pedro Muñoz Seca"
-  },
-  {
-    "q": "MAGDALENA.— ¿Y por qué marcó esa hora tan rara? Pudo ser luego… MENDO.— Es que tu inocencia ignora que a más de una hora, señora, las siete media es un juego.",
-    "w": "La venganza de don Mendo",
-    "a": "Pedro Muñoz Seca"
-  },
-  {
-    "q": "He aquí el tinglado de la antigua farsa, la que alivió en posadas aldeanas el cansancio de los trajinanltes, la que embobó en las plazas de humildes lugares a los simples villanos",
-    "w": "Los intereses creados",
-    "a": "Jacinto Benavente"
-  },
-  {
-    "q": "CRISPÍN.-¿Y es poco interés ese amor? Yo di siempre su parte al ideal y conté con él siempre. Y ahora acabó la farsa.",
-    "w": "Los intereses creados",
-    "a": "Jacinto Benavente"
-  },
-  {
-    "q": "¡Ah!…, ¡de modo que una burla!…, ¡que todo ha sido una burla!… ¿Y por el placer de una grosera carcajada no han vacilado en amargar con el ridículo el fracaso de una vida?…",
-    "w": "La señorita de Trevélez",
-    "a": "Carlos Arniches"
-  },
-  {
-    "q": "Eso es muy corto, joven; yo os abono que podíais variar bastante el tono. Por ejemplo: Agresivo: «Si en mi cara tuviese tal nariz, me la amputara.»",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "ROXANA.—(Inclinándose sobre él y besándole en la frente.) ¡Di! CYRANO.—(Abre los ojos, reconoce a ROXANA y exclama sonriendo:) Mi… penacho.",
-    "w": "Cyrano de Bergerac",
-    "a": "Edmond Rostand"
-  },
-  {
-    "q": "la diferencia entre una dama y una mujer del arroyo no está tanto en cómo se porta…, sino en cómo es tratada. Para el señor HIGGINS, yo siempre seré una mujer de la calle; pero para usted podré ser una dama, porque siempre me ha tratado y me tratará como a una dama.",
-    "w": "Pigmalión",
-    "a": "Bernard Shaw"
-  },
-  {
-    "q": "ENONA.— ¿Amáis? FEDRA.— Siento todos los furores del amor. ENONA.— ¿Por quién? FEDRA.— Oirás el colmo del horror.",
-    "w": "Fedra",
-    "a": "Jean Racine"
-  },
-  {
     "q": "HELICÓN ¿Y cuál es esa verdad, Cayo? CALÍGULA (Mirando hacia otro lado, con tono neutro). Los hombres mueren y no son felices.",
     "w": "Calígula",
     "a": "Albert Camus"
@@ -470,11 +240,6 @@
     "a": "Wajdi Mouawad"
   },
   {
-    "q": "LA SEÑORITA (grita como en un ataque de histeria): ¡Y ahora me desprecias! ¡Me caigo! ¡Me siento caer, caer! JUAN: ¡Caiga usted hasta donde estoy yo y la levantaré!",
-    "w": "La señorita Julia",
-    "a": "August Strindberg"
-  },
-  {
     "q": "CLAIRE ZACHANASSIAN: Os diré mi condición. Os regalo mil millones, pero me compro a cambio la justicia.",
     "w": "La visita de la vieja dama",
     "a": "Friedrich Dürrenmatt"
@@ -490,59 +255,14 @@
     "a": "Harold Pinter"
   },
   {
-    "q": "¿Querríais, pues, si encuentro el modo, ayudarme a terminar con la guerra?",
-    "w": "Lisístrata",
-    "a": "Aristófanes"
-  },
-  {
-    "q": "Más luciente que los rayos del sol en un día de cielo límpido me habéis de dejar el escudo: que, cuando llegue el caso, su brillo ciegue en medio de la batalla la vista de las filas enemigas.",
-    "w": "Asinaria - Aulularia - Miles Gloriosus",
-    "a": "Plauto"
-  },
-  {
     "q": "LUIS: Hay que ver… Con lo contenta que estaba mamá porque había llegado la paz… DON LUIS: Pero no ha llegado la paz, Luisito: ha llegado la victoria.",
     "w": "Las bicicletas son para el verano",
     "a": "Fernando Fernán Gómez"
   },
   {
-    "q": "De la reina y Lanzarote fue Galeoto el medianero, y en amores, «el tercero» puede llamarse por mote y con verdad «el Galeoto»",
-    "w": "El gran galeoto",
-    "a": "José Echegaray"
-  },
-  {
-    "q": "¿Qué importa que verdad sea, si el que la dice sois vos? Que la boca mentirosa incurre en tan torpe mengua, que, solamente en su lengua es la verdad sospechosa.",
-    "w": "La verdad sospechosa",
-    "a": "Juan Ruiz de Alarcón"
-  },
-  {
-    "q": "que es lindo el don Diego y tiene, más que de Diego, de lindo. Él es tan rara persona que, como se anda vestido, puede en una mojiganga ser figura de capricho.",
-    "w": "El lindo don Diego",
-    "a": "Agustín Moreto"
-  },
-  {
-    "q": "ZULIMA: Tarde llegas. Tuya no puede ser; ya dio su mano. MARSILLA: ¡Iras del cielo! No: finges en vano.",
-    "w": "Los amantes de Teruel",
-    "a": "Juan Eugenio Hartzenbusch"
-  },
-  {
-    "q": "ninguno puede ver las cosas que en él se muestran, que tenga alguna raza de confeso, o no sea habido y procreado de sus padres de legítimo matrimonio",
-    "w": "Entremeses",
-    "a": "Miguel de Cervantes"
-  },
-  {
     "q": "Y me he pasado la vida así; haciendo cosas que… Ahora ya no sé quién soy yo. No me conozco.",
     "w": "La llamada de Lauren…",
     "a": "Paloma Pedrero"
-  },
-  {
-    "q": "Luengos años ha, vivía en Oriente un varón que poseía un anillo de valor incalculable, de mano amada recibido. Era la piedra un opal que reflejaba cien bellos colores y tenía la fuerza secreta de hacer acepto a los ojos de Dios y de los hombres a quien la llevara con esa confianza.",
-    "w": "Nathan el Sabio",
-    "a": "Gotthold Ephraim Lessing"
-  },
-  {
-    "q": "GESZLER.— Tú dispararás sobre una manzana colocada en la cabeza de tu hijo… lo quiero y lo mando. TELL.— ¡Yo apuntar con mi ballesta a la cabeza de mi propio hijo!… antes la muerte.",
-    "w": "Guillermo Tell",
-    "a": "Friedrich Schiller"
   },
   {
     "q": "Yo no quiero realismo. ¡Yo quiero magia!",
