@@ -653,25 +653,33 @@ export default function WeekGrid({
           </div>
         )}
       </div>
-      {/* overlay (never content below the grid): tap on a past cell / day */}
-      {deniedToast && (
-        <div
-          role="status"
-          className="pointer-events-none absolute top-14 left-1/2 z-20 -translate-x-1/2 rounded-full bg-gray-900/90 px-3 py-1.5 text-xs whitespace-nowrap text-white shadow-lg"
-        >
-          {t('availability.pastLocked')}
-        </div>
-      )}
-      {hint && hintVisible && !deniedToast && (
-        <button
-          type="button"
-          role="status"
-          onClick={() => setHintVisible(false)}
-          className="absolute top-14 left-1/2 z-20 -translate-x-1/2 w-max max-w-[calc(100%-2rem)] rounded-2xl bg-violet-600/95 px-3 py-1.5 text-center text-xs text-white shadow-lg"
-        >
-          {hint.text}
-        </button>
-      )}
+      {/* overlays (never content below the grid), centered over the slot
+          columns rather than the full width (the hour column is excluded) */}
+      <div
+        className="pointer-events-none absolute top-14 right-0 z-20 flex justify-center px-2"
+        style={{ left: HOUR_COL }}
+      >
+        {deniedToast ? (
+          <div
+            role="status"
+            className="rounded-full bg-gray-900/90 px-3 py-1.5 text-xs whitespace-nowrap text-white shadow-lg"
+          >
+            {t('availability.pastLocked')}
+          </div>
+        ) : (
+          hint &&
+          hintVisible && (
+            <button
+              type="button"
+              role="status"
+              onClick={() => setHintVisible(false)}
+              className="pointer-events-auto rounded-2xl bg-violet-600/95 px-3 py-1.5 text-center text-xs text-balance text-white shadow-lg"
+            >
+              {hint.text}
+            </button>
+          )
+        )}
+      </div>
     </div>
   )
 }
