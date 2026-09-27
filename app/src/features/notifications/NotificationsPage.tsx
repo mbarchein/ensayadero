@@ -45,9 +45,10 @@ export default function NotificationsPage() {
   const [showArchived, setShowArchived] = useState(false)
   const [archiveAllOpen, setArchiveAllOpen] = useState(false)
 
-  // one random famous theatre fragment per visit, in the app's language
+  // one random famous theatre fragment per visit; the Spanish app mixes in
+  // the English quotes too
   const [quote] = useState(() => {
-    const list = i18n.language?.startsWith('en') ? quotesEn : quotesEs
+    const list = i18n.language?.startsWith('en') ? quotesEn : [...quotesEs, ...quotesEn]
     return list[Math.floor(Math.random() * list.length)]
   })
 
