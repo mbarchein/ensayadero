@@ -148,6 +148,10 @@ export default function AvailabilityPage() {
   // null = agenda (week view); number = day being edited
   const [editDay, setEditDay] = useState<number | null>(null)
   const dayView = editDay != null
+  // entering a blank day (no availability in its open slots) → wave down its
+  // hours + a contextual tip, to show that painting is the thing to do
+  const [cellWave, setCellWave] = useState(0)
+  const [blankDay, setBlankDay] = useState(false)
   const [copyOpen, setCopyOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
   const [showOk, setShowOk] = useState(false) // brief "saved" tick after a save
@@ -260,6 +264,23 @@ export default function AvailabilityPage() {
   // differs from the server grid — drives the pending styling and save spinner
   const hasUnsaved =
     !!draft && !!serverGrid && draft.some((col, d) => col.some((v, s) => v !== serverGrid[d][s]))
+
+  // Blank-day check runs once per entry into a day (not on every edit), as
+  // soon as the grid is loaded: the tip stays until the day is left.
+  const gridReady = !!grid
+  useEffect(() => {
+    if (editDay == null || !grid) {
+      setBlankDay(false)
+      return
+    }
+    const now = new Date()
+    const blank = grid[editDay].every(
+      (v, slot) => v === 'NONE' || slotRange(monday, editDay, slot).end <= now,
+    )
+    setBlankDay(blank)
+    if (blank) setCellWave((n) => n + 1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editDay, monday, gridReady])
 
   // ── Autosave: debounce after each gesture; retry if there were in-flight edits ──
   const editSeq = useRef(0) // current edit number
@@ -549,7 +570,13 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      {dayView ? <Tip id="agendaEdit" type="OTHER" /> : <Tip id="agenda" type="OTHER" />}
+      {dayView && blankDay ? (
+        <Tip key={`${monday.getTime()}:${editDay}`} id="agendaEditEmpty" type="OTHER" once={false} />
+      ) : dayView ? (
+        <Tip id="agendaEdit" type="OTHER" />
+      ) : (
+        <Tip id="agenda" type="OTHER" />
+      )}
 
       <WeekGrid
         weekMonday={monday}
@@ -677,6 +704,7 @@ export default function AvailabilityPage() {
         day={editDay}
         onDayChange={setEditDay}
         hintPulse={hintPulse}
+        cellWave={blankDay ? cellWave : 0}
         fill
       />
 

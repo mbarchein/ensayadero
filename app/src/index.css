@@ -154,6 +154,15 @@ body,
     transform: translateX(3px);
   }
 }
+/* WeekGrid day view: staggered pulse down the open slots of a blank day */
+.cell-wave {
+  animation: day-wave 0.5s ease-in-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell-wave {
+    animation: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .past-denied {
     animation: none;

@@ -45,6 +45,9 @@ interface Props {
       days are the tappable thing (e.g. after repeated taps on the
       read-only week cells). */
   hintPulse?: number
+  /** Increment to run a violet wave down the open (non-past) slots of the
+      day view — e.g. on entering a blank day. */
+  cellWave?: number
 }
 
 const HOUR_COL = '2.25rem'
@@ -121,6 +124,7 @@ export default function WeekGrid({
   day,
   onDayChange,
   hintPulse = 0,
+  cellWave = 0,
 }: Props) {
   const { t } = useTranslation()
   // null = week view (all days, read-only); number = day view (editable).
@@ -582,6 +586,8 @@ export default function WeekGrid({
                 cellClass={cellClass}
                 isPast={isPast}
                 denied={denied}
+                wave={cellWave}
+                firstOpen={pastSlots((slot) => isPast({ day: selectedDay!, slot }))}
               />
             ))}
             <PastHatch
@@ -777,6 +783,8 @@ function Row({
   cellClass,
   isPast,
   denied,
+  wave,
+  firstOpen,
 }: {
   slot: number
   days: number[]
@@ -787,6 +795,9 @@ function Row({
   cellClass: Props['cellClass']
   isPast: (pos: CellPos) => boolean
   denied: (CellPos & { n: number }) | null
+  wave: number
+  /** First non-past slot: the wave's stagger starts there. */
+  firstOpen: number
 }) {
   const isHourStart = slot % 2 === 0
   return (
@@ -805,9 +816,18 @@ function Row({
             data-slot={slot}
             className={`h-5 overflow-hidden border-b border-r border-gray-100 ${
               isHourStart ? 'border-t border-t-gray-200' : ''
-            } ${cellClass({ day, slot }, weekMonday)} ${past ? 'past-locked' : ''} ${shake ? 'past-denied' : ''}`}
+            } ${cellClass({ day, slot }, weekMonday)} ${past ? 'past-locked' : 'relative'} ${shake ? 'past-denied' : ''}`}
           >
             {renderCell({ day, slot }, { dayView, weekMonday })}
+            {wave > 0 && !past && (
+              // wave in the key restarts the animation on each pulse
+              <span
+                key={wave}
+                aria-hidden
+                className="cell-wave pointer-events-none absolute inset-0"
+                style={{ animationDelay: `${(slot - firstOpen) * 35}ms` }}
+              />
+            )}
           </div>
         )
       })}

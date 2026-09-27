@@ -1,6 +1,7 @@
 // One-time coach tip: a dismissible callout shown the first time a user
-// visits a view (per user, persisted in localStorage). Texts live under the
-// i18n "tips" namespace keyed by the tip id. The profile page can reset all
+// visits a view (per user, persisted in localStorage). With once={false} it's
+// contextual instead: shown every time it's rendered, dismissed only locally.
+// Texts live under the i18n "tips" namespace keyed by the tip id. The profile page can reset all
 // seen flags via resetTips().
 
 import { useState } from 'react'
@@ -19,14 +20,22 @@ export function resetTips() {
   }
 }
 
-export default function Tip({ id, type }: { id: string; type?: GroupType }) {
+export default function Tip({
+  id,
+  type,
+  once = true,
+}: {
+  id: string
+  type?: GroupType
+  once?: boolean
+}) {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const key = `${PREFIX}${profile?.id ?? 'anon'}:${id}`
-  const [visible, setVisible] = useState(() => localStorage.getItem(key) !== '1')
+  const [visible, setVisible] = useState(() => !once || localStorage.getItem(key) !== '1')
   if (!visible) return null
   const dismiss = () => {
-    localStorage.setItem(key, '1')
+    if (once) localStorage.setItem(key, '1')
     setVisible(false)
   }
   return (
