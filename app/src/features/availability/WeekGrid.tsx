@@ -618,7 +618,7 @@ function WeekCellsPanel({
               data-slot={slot}
               className={`h-5 overflow-hidden border-b border-r border-gray-100 ${
                 slot % 2 === 0 ? 'border-t border-t-gray-200' : ''
-              } ${cellClass(pos, monday)} ${past ? 'opacity-35 grayscale' : ''}`}
+              } ${cellClass(pos, monday)} ${past ? 'past-locked' : ''}`}
             >
               {renderCell(pos, { dayView: false, weekMonday: monday })}
             </div>
@@ -738,9 +738,7 @@ function Row({
             data-slot={slot}
             className={`h-5 overflow-hidden border-b border-r border-gray-100 ${
               isHourStart ? 'border-t border-t-gray-200' : ''
-            } ${cellClass({ day, slot }, weekMonday)} ${
-              past ? (dayView ? 'past-locked opacity-60 grayscale' : 'opacity-35 grayscale') : ''
-            } ${shake ? 'past-denied' : ''}`}
+            } ${cellClass({ day, slot }, weekMonday)} ${past ? 'past-locked' : ''} ${shake ? 'past-denied' : ''}`}
           >
             {renderCell({ day, slot }, { dayView, weekMonday })}
           </div>
