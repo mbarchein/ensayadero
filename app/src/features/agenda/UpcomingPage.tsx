@@ -52,7 +52,13 @@ export default function UpcomingPage() {
         <BackButton to="/" />
         <h1 className="text-xl font-bold">{tg(t, 'upcoming.title', 'OTHER')}</h1>
         <div className="ml-auto">
-          <ViewToggle value={view} onChange={switchView} />
+          {/* month view only shows the current month: point to the list,
+              where pending rehearsals in later months are visible */}
+          <ViewToggle
+            value={view}
+            onChange={switchView}
+            listBadge={view === 'month' && pendingCount > 0}
+          />
         </div>
       </header>
 

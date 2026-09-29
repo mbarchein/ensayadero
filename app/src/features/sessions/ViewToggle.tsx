@@ -5,9 +5,12 @@ import { List, CalendarDays } from 'lucide-react'
 export default function ViewToggle({
   value,
   onChange,
+  listBadge = false,
 }: {
   value: 'list' | 'month'
   onChange: (v: 'list' | 'month') => void
+  // red dot on the list button: something needs attention there
+  listBadge?: boolean
 }) {
   const { t } = useTranslation()
   return (
@@ -17,9 +20,15 @@ export default function ViewToggle({
         onClick={() => onChange('list')}
         aria-label={t('sessions.viewList')}
         aria-pressed={value === 'list'}
-        className={`rounded-md p-1.5 ${value === 'list' ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+        className={`relative rounded-md p-1.5 ${value === 'list' ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
       >
         <List size={18} />
+        {listBadge && (
+          <span
+            className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-600 ring-2 ring-violet-50"
+            aria-hidden
+          />
+        )}
       </button>
       <button
         type="button"
