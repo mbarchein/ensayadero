@@ -49,7 +49,8 @@ export default function MonthCalendar<T>({
   dotOf: (item: T) => string
   renderAgenda: (dayItems: T[]) => ReactNode
   emptyDayLabel?: string
-  // items needing attention: a red dot on an arrow when one lies beyond it
+  // items needing attention: their day glows, and an arrow gets a red dot
+  // when one lies beyond it
   alertOf?: (item: T) => boolean
 }) {
   const { t } = useTranslation()
@@ -170,7 +171,7 @@ export default function MonthCalendar<T>({
     return (
       <div
         key={format(monthDate, 'yyyy-MM')}
-        className="shrink-0 space-y-1 px-0.5 pb-0.5"
+        className="shrink-0 space-y-1 px-1.5 pb-1.5"
         style={{ width: '33.3333%' }}
       >
         <p className="px-8 pb-1 text-center font-semibold">
@@ -186,12 +187,15 @@ export default function MonthCalendar<T>({
             const inMonth = isSameMonth(d, monthDate)
             const past = dayKey(d) < dayKey(today)
             const list = byDay.get(dayKey(d)) ?? []
+            const glow = inMonth && !!alertOf && list.some(alertOf)
             return (
               <button
                 key={dayKey(d)}
                 type="button"
                 data-date={dayKey(d)}
                 className={`flex h-12 flex-col items-center gap-1 rounded-lg py-1 text-sm transition ${
+                  glow ? 'day-glow' : ''
+                } ${
                   selected && isSameDay(d, selected)
                     ? 'bg-violet-100 ring-1 ring-violet-300'
                     : inMonth && past
