@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Trash2, Copy, Check, X, Loader2, AlertCircle } from 'lucide-react'
+import { Trash2, Copy, Check, X, Loader2, AlertCircle, User, Users } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -27,7 +27,8 @@ import { BackButton, Button, Modal, Spinner } from '../../components/ui'
 import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
 import GroupAvatar from '../groups/GroupAvatar'
-import type { Availability } from '../../lib/types'
+import GroupAvailability from './GroupAvailability'
+import type { Availability, MembershipWithGroup } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
   NONE: 'AVAILABLE',
@@ -158,6 +159,39 @@ export default function AvailabilityPage() {
   const okTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [copyN, setCopyN] = useState(1)
   const [clearPrompt, setClearPrompt] = useState<{ reverted: CellPos[]; sessionIds: string[] } | null>(null)
+
+  // "group" shows a group's availability heatmap (read-only) instead of mine.
+  // Always opens on mine; the last group viewed is remembered per device.
+  const [mode, setMode] = useState<'me' | 'group'>('me')
+  const [groupDay, setGroupDay] = useState<number | null>(null) // group day view
+  const [groupPick, setGroupPick] = useState<string | null>(() => localStorage.getItem('agenda-group'))
+  // same query as the home page, so the cache is shared
+  const { data: memberships } = useQuery({
+    queryKey: ['my-memberships'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('memberships')
+        .select('*, groups(*)')
+        .eq('user_id', profile!.id)
+      if (error) throw error
+      return (data as MembershipWithGroup[]).filter((m) => !m.groups.archived_at)
+    },
+    enabled: !!profile,
+  })
+  const myGroups = (memberships ?? [])
+    .map((m) => m.groups)
+    .sort((a, b) => a.name.localeCompare(b.name))
+  const activeGroup = myGroups.find((g) => g.id === groupPick) ?? myGroups[0]
+  const groupView = mode === 'group' && !!activeGroup
+  const switchMode = (m: 'me' | 'group') => {
+    setMode(m)
+    setGroupDay(null)
+  }
+  const pickGroup = (id: string) => {
+    localStorage.setItem('agenda-group', id)
+    setGroupPick(id)
+    setGroupDay(null)
+  }
 
   // rehearsals I'm summoned to, overlaid on the time slots
   // of the visible week. map "day:slot" → participation.
@@ -512,13 +546,21 @@ export default function AvailabilityPage() {
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <header className="-mx-4 flex min-h-9 items-center justify-between border-b border-violet-100 bg-violet-50 px-4 py-2">
         <div className="flex min-w-0 items-center gap-3">
-          {dayView ? <BackButton onBack={() => setEditDay(null)} /> : <BackButton to="/" />}
+          {dayView ? (
+            <BackButton onBack={() => setEditDay(null)} />
+          ) : groupView && groupDay != null ? (
+            <BackButton onBack={() => setGroupDay(null)} />
+          ) : (
+            <BackButton to="/" />
+          )}
           <h1 className="shrink-0 text-xl font-bold">
             {dayView ? t('availability.editTitle') : t('availability.agendaTitle')}
           </h1>
-          {editDay != null && (
+          {(groupView ? groupDay : editDay) != null && (
             <span className="truncate text-xs text-gray-600">
-              {format(addDays(monday, editDay), 'EEEE, d-MMMM-yyyy', { locale: dateLocale() })}
+              {format(addDays(monday, (groupView ? groupDay : editDay)!), 'EEEE, d-MMMM-yyyy', {
+                locale: dateLocale(),
+              })}
             </span>
           )}
         </div>
@@ -532,7 +574,7 @@ export default function AvailabilityPage() {
               <Check size={18} className="text-green-600" aria-label={t('availability.saved')} />
             ) : null}
           </span>
-          {!dayView && (
+          {!dayView && !groupView && (
             <>
               <Button
                 variant="ghost"
@@ -570,138 +612,196 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      {dayView ? <Tip id="agendaEdit" type="OTHER" /> : <Tip id="agenda" type="OTHER" />}
+      {/* view switch (mine / group) + group picker. Below the header: the
+          header has no room left for it on narrow phones */}
+      {!dayView && myGroups.length > 0 && (
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 rounded-lg border border-violet-200 p-0.5 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => switchMode('me')}
+              aria-pressed={!groupView}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 ${!groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+            >
+              <User size={16} aria-hidden /> {t('availability.viewMine')}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode('group')}
+              aria-pressed={groupView}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 ${groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+            >
+              <Users size={16} aria-hidden /> {t('availability.viewGroup')}
+            </button>
+          </div>
+          {groupView && myGroups.length > 1 && (
+            <select
+              value={activeGroup.id}
+              onChange={(e) => pickGroup(e.target.value)}
+              aria-label={t('availability.groupPicker')}
+              className="min-w-0 flex-1 truncate rounded-lg border border-violet-200 bg-white px-2 py-1.5 text-xs font-medium text-violet-900"
+            >
+              {myGroups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
-      <WeekGrid
-        weekMonday={monday}
-        cellClass={({ day, slot }, wm) => {
-          const current = wm.getTime() === monday.getTime()
-          const week = current ? null : adjacentWeeks.get(wm.getTime())
-          const cells = current ? sessionCells : (week?.cells ?? null)
-          // unsaved edits (additions and deletions): dashed outline until the
-          // save confirms, then it switches to the final style
-          const pending =
-            current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
-              ? 'cell-pending'
-              : ''
-          // rehearsals are drawn by renderCell (side-by-side sub-columns); here
-          // we only flash the slot when it holds the deep-linked session
-          const flash =
-            current && (cells?.get(`${day}:${slot}`) ?? []).some((p) => p.session_id === flashSession)
-              ? 'cell-flash'
-              : ''
-          const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-          return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
-        }}
-        renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
-          const current = wm.getTime() === monday.getTime()
-          const cells = current ? sessionCells : adjacentWeeks.get(wm.getTime())?.cells
-          const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
-          const list = cells?.get(`${day}:${slot}`)
-          if (!list || !cells || !lanes) return null
-          // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
-          // its box width is 1/laneCount on every slot, even where it doesn't
-          // overlap. laneCount is shared by the whole overlap cluster, so it's the
-          // same for every rehearsal present in this cell.
-          const laneCount = lanes.get(list[0].session_id)?.lanes ?? 1
-          const byLane = new Map(list.map((p) => [lanes.get(p.session_id)?.lane ?? 0, p]))
-          return (
-            <div className="flex h-full">
-              {Array.from({ length: laneCount }, (_, lane) => {
-                const p = byLane.get(lane)
-                // empty lane: a spacer that holds the column width
-                if (!p) return <span key={lane} className="min-w-0 flex-1" />
-                // full border set per response, so the rehearsal renders as an
-                // enclosed box (left stripe + right edge, top/bottom on the run
-                // boundaries). Literal class names so Tailwind keeps them.
-                const c =
-                  p.sessions.status !== 'CONFIRMED'
-                    ? { l: 'border-l-gray-400', r: 'border-r-gray-400', t: 'border-t-gray-400', b: 'border-b-gray-400' }
-                    : p.response === 'ACCEPTED'
-                      ? { l: 'border-l-violet-700', r: 'border-r-violet-700', t: 'border-t-violet-700', b: 'border-b-violet-700' }
-                      : p.response === 'DECLINED'
-                        ? { l: 'border-l-red-500', r: 'border-r-red-500', t: 'border-t-red-500', b: 'border-b-red-500' }
-                        : { l: 'border-l-orange-500', r: 'border-r-orange-500', t: 'border-t-orange-500', b: 'border-b-orange-500' }
-                const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
-                  (x) => x.session_id === p.session_id,
-                )
-                const lastOfRun = !(cells.get(`${day}:${slot + 1}`) ?? []).some(
-                  (x) => x.session_id === p.session_id,
-                )
-                const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
-                const initials = p.sessions.groups.name
-                  .split(/\s+/)
-                  .map((w) => w[0])
-                  .join('')
-                  .slice(0, 3)
-                  .toUpperCase()
-                return (
-                  <span
-                    key={p.session_id}
-                    title={title}
-                    data-session={p.session_id}
-                    className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
-                  >
-                    {firstOfRun && (
-                      <>
-                        <GroupAvatar
-                          seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
-                          image={p.sessions.groups.avatar_image}
-                          size={14}
-                        />
-                        {(dayView || laneCount === 1) && (
-                          <span
-                            className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
-                          >
-                            {dayView ? p.sessions.groups.name : initials}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </span>
-                )
-              })}
-            </div>
-          )
-        }}
-        onPaintStart={(pos) => {
-          const next = CYCLE[grid[pos.day][pos.slot]]
-          setPaintValue(next)
-          applyCell(pos, next)
-        }}
-        onPaintMove={(pos) => applyCell(pos, paintValue)}
-        onPaintEnd={onPaintEnd}
-        onWeekCellTap={(pos, sessionId) => {
-          // tap on a rehearsal in the week view opens its detail — the exact lane
-          // tapped when several overlap (fall back to the first in the slot)
-          const slotList = sessionCells.get(`${pos.day}:${pos.slot}`)
-          const ses = slotList?.find((p) => p.session_id === sessionId) ?? slotList?.[0]
-          if (ses) {
-            navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
-            return
-          }
-          // tap on a rehearsal-free cell does nothing here: after two quick
-          // taps, wave the day strip to point at the actual tap target
-          const now = Date.now()
-          emptyTaps.current =
-            now - emptyTaps.current.last < 2000
-              ? { count: emptyTaps.current.count + 1, last: now }
-              : { count: 1, last: now }
-          if (emptyTaps.current.count >= 2 && now >= waveBusyUntil.current) {
-            emptyTaps.current.count = 0
-            waveBusyUntil.current = now + WAVE_MS
-            setHintPulse((n) => n + 1)
-          }
-        }}
-        onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
-        onNextWeek={() => setWeekOffset((w) => w + 1)}
-        day={editDay}
-        onDayChange={setEditDay}
-        hintPulse={hintPulse}
-        cellWave={blankDay ? cellWave : 0}
-        hint={blankDay && cellWave > 0 ? { text: t('availability.blankDayHint'), n: cellWave } : null}
-        fill
-      />
+      {groupView ? (
+        <Tip key="agendaGroup" id="agendaGroup" type={activeGroup.group_type} />
+      ) : dayView ? (
+        <Tip id="agendaEdit" type="OTHER" />
+      ) : (
+        <Tip id="agenda" type="OTHER" />
+      )}
+
+      {groupView ? (
+        <GroupAvailability
+          key={activeGroup.id}
+          groupId={activeGroup.id}
+          groupType={activeGroup.group_type}
+          monday={monday}
+          onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
+          onNextWeek={() => setWeekOffset((w) => w + 1)}
+          day={groupDay}
+          onDayChange={setGroupDay}
+        />
+      ) : (
+        <WeekGrid
+          weekMonday={monday}
+          cellClass={({ day, slot }, wm) => {
+            const current = wm.getTime() === monday.getTime()
+            const week = current ? null : adjacentWeeks.get(wm.getTime())
+            const cells = current ? sessionCells : (week?.cells ?? null)
+            // unsaved edits (additions and deletions): dashed outline until the
+            // save confirms, then it switches to the final style
+            const pending =
+              current && hasUnsaved && serverGrid && grid[day][slot] !== serverGrid[day][slot]
+                ? 'cell-pending'
+                : ''
+            // rehearsals are drawn by renderCell (side-by-side sub-columns); here
+            // we only flash the slot when it holds the deep-linked session
+            const flash =
+              current && (cells?.get(`${day}:${slot}`) ?? []).some((p) => p.session_id === flashSession)
+                ? 'cell-flash'
+                : ''
+            const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
+            return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
+          }}
+          renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
+            const current = wm.getTime() === monday.getTime()
+            const cells = current ? sessionCells : adjacentWeeks.get(wm.getTime())?.cells
+            const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
+            const list = cells?.get(`${day}:${slot}`)
+            if (!list || !cells || !lanes) return null
+            // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
+            // its box width is 1/laneCount on every slot, even where it doesn't
+            // overlap. laneCount is shared by the whole overlap cluster, so it's the
+            // same for every rehearsal present in this cell.
+            const laneCount = lanes.get(list[0].session_id)?.lanes ?? 1
+            const byLane = new Map(list.map((p) => [lanes.get(p.session_id)?.lane ?? 0, p]))
+            return (
+              <div className="flex h-full">
+                {Array.from({ length: laneCount }, (_, lane) => {
+                  const p = byLane.get(lane)
+                  // empty lane: a spacer that holds the column width
+                  if (!p) return <span key={lane} className="min-w-0 flex-1" />
+                  // full border set per response, so the rehearsal renders as an
+                  // enclosed box (left stripe + right edge, top/bottom on the run
+                  // boundaries). Literal class names so Tailwind keeps them.
+                  const c =
+                    p.sessions.status !== 'CONFIRMED'
+                      ? { l: 'border-l-gray-400', r: 'border-r-gray-400', t: 'border-t-gray-400', b: 'border-b-gray-400' }
+                      : p.response === 'ACCEPTED'
+                        ? { l: 'border-l-violet-700', r: 'border-r-violet-700', t: 'border-t-violet-700', b: 'border-b-violet-700' }
+                        : p.response === 'DECLINED'
+                          ? { l: 'border-l-red-500', r: 'border-r-red-500', t: 'border-t-red-500', b: 'border-b-red-500' }
+                          : { l: 'border-l-orange-500', r: 'border-r-orange-500', t: 'border-t-orange-500', b: 'border-b-orange-500' }
+                  const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
+                    (x) => x.session_id === p.session_id,
+                  )
+                  const lastOfRun = !(cells.get(`${day}:${slot + 1}`) ?? []).some(
+                    (x) => x.session_id === p.session_id,
+                  )
+                  const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
+                  const initials = p.sessions.groups.name
+                    .split(/\s+/)
+                    .map((w) => w[0])
+                    .join('')
+                    .slice(0, 3)
+                    .toUpperCase()
+                  return (
+                    <span
+                      key={p.session_id}
+                      title={title}
+                      data-session={p.session_id}
+                      className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
+                    >
+                      {firstOfRun && (
+                        <>
+                          <GroupAvatar
+                            seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
+                            image={p.sessions.groups.avatar_image}
+                            size={14}
+                          />
+                          {(dayView || laneCount === 1) && (
+                            <span
+                              className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
+                            >
+                              {dayView ? p.sessions.groups.name : initials}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </span>
+                  )
+                })}
+              </div>
+            )
+          }}
+          onPaintStart={(pos) => {
+            const next = CYCLE[grid[pos.day][pos.slot]]
+            setPaintValue(next)
+            applyCell(pos, next)
+          }}
+          onPaintMove={(pos) => applyCell(pos, paintValue)}
+          onPaintEnd={onPaintEnd}
+          onWeekCellTap={(pos, sessionId) => {
+            // tap on a rehearsal in the week view opens its detail — the exact lane
+            // tapped when several overlap (fall back to the first in the slot)
+            const slotList = sessionCells.get(`${pos.day}:${pos.slot}`)
+            const ses = slotList?.find((p) => p.session_id === sessionId) ?? slotList?.[0]
+            if (ses) {
+              navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
+              return
+            }
+            // tap on a rehearsal-free cell does nothing here: after two quick
+            // taps, wave the day strip to point at the actual tap target
+            const now = Date.now()
+            emptyTaps.current =
+              now - emptyTaps.current.last < 2000
+                ? { count: emptyTaps.current.count + 1, last: now }
+                : { count: 1, last: now }
+            if (emptyTaps.current.count >= 2 && now >= waveBusyUntil.current) {
+              emptyTaps.current.count = 0
+              waveBusyUntil.current = now + WAVE_MS
+              setHintPulse((n) => n + 1)
+            }
+          }}
+          onPrevWeek={() => setWeekOffset((w) => Math.max(-6, w - 1))}
+          onNextWeek={() => setWeekOffset((w) => w + 1)}
+          day={editDay}
+          onDayChange={setEditDay}
+          hintPulse={hintPulse}
+          cellWave={blankDay ? cellWave : 0}
+          hint={blankDay && cellWave > 0 ? { text: t('availability.blankDayHint'), n: cellWave } : null}
+          fill
+        />
+      )}
 
       <Modal open={clearOpen} onClose={() => setClearOpen(false)} title={t('availability.clearWeekTitle')}>
         <div className="space-y-4">

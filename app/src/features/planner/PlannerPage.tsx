@@ -3,21 +3,20 @@
 // tap a cell → create a session with prefilled times.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { addDays, addWeeks, format } from 'date-fns'
+import { addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
-import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGroup } from '../groups/useGroup'
 import { tg } from '../../lib/glossary'
 import { useAuth } from '../../auth/AuthContext'
-import { supabase } from '../../lib/supabase'
-import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
-import { SLOTS_PER_DAY, heatmap, isoDay, slotRange, weekStart, type HeatCell } from '../../lib/slots'
+import { parseRange } from '../../lib/ranges'
+import { isoDay, slotRange, weekStart } from '../../lib/slots'
 import WeekGrid from '../availability/WeekGrid'
 import { Spinner, Button, Modal, BackButton } from '../../components/ui'
 import Tip from '../../components/Tip'
-import type { Availability, GroupType, SessionWithParticipants } from '../../lib/types'
+import { useGroupHeat } from './useGroupHeat'
+import { CellDetail, PeopleFilter, heatClass, mergeCells } from './heat'
 
 export default function PlannerPage() {
   const { t } = useTranslation()
@@ -34,7 +33,6 @@ export default function PlannerPage() {
   }, [])
   const [weekOffset, setWeekOffset] = useState(initialOffset)
   const monday = useMemo(() => addWeeks(weekStart(new Date()), weekOffset), [weekOffset])
-  const weekEnd = useMemo(() => addDays(monday, 7), [monday])
   const [selected, setSelected] = useState<Set<string> | null>(null) // null = all
   // slot selection: day + anchor slot + end slot (drag). a/b unordered.
   const [sel, setSel] = useState<{ day: number; a: number; b: number } | null>(null)
@@ -51,96 +49,8 @@ export default function PlannerPage() {
   const memberIds = members.map((m) => m.user_id)
   const activeIds = selected ? memberIds.filter((id) => selected.has(id)) : memberIds
 
-  const { data: availabilities } = useQuery({
-    queryKey: ['group-availabilities', groupId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('availabilities')
-        .select('*')
-        .in('user_id', memberIds)
-      if (error) throw error
-      return data as Availability[]
-    },
-    enabled: memberIds.length > 0,
-  })
-
-  const { data: busyRows } = useQuery({
-    queryKey: ['group-busy', groupId, monday.toISOString()],
-    queryFn: async () => {
-      // 3-week window: the carousel also shows the adjacent weeks' occupation
-      const { data, error } = await supabase.rpc('group_busy_ranges', {
-        gid: groupId,
-        search: `[${addDays(monday, -7).toISOString()},${addDays(weekEnd, 7).toISOString()})`,
-      })
-      if (error) throw error
-      return data as { user_id: string; busy: string }[]
-    },
-  })
-
-  // group sessions overlapping the visible week (drafts + confirmed)
-  const { data: weekSessions } = useQuery({
-    queryKey: ['week-sessions', groupId, monday.toISOString()],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('sessions')
-        .select('*, session_participants(*, profiles(*))')
-        .eq('group_id', groupId)
-        .neq('status', 'CANCELLED')
-        .filter(
-          'time_range',
-          'ov',
-          `[${addDays(monday, -7).toISOString()},${addDays(weekEnd, 7).toISOString()})`,
-        )
-        .order('time_range', { ascending: true })
-      if (error) throw error
-      return data as SessionWithParticipants[]
-    },
-  })
-
-  // map [day][slot] → session covering it, per carousel week (prev/current/next)
-  const sessionCellsByWeek = useMemo(() => {
-    const weeks = new Map<number, Map<string, SessionWithParticipants>>()
-    for (const off of [-7, 0, 7]) {
-      const m = addDays(monday, off)
-      const map = new Map<string, SessionWithParticipants>()
-      for (const s of weekSessions ?? []) {
-        const r = parseRange(s.time_range)
-        for (let d = 0; d < 7; d++) {
-          for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
-            if (overlaps(slotRange(m, d, slot), r)) map.set(`${d}:${slot}`, s)
-          }
-        }
-      }
-      weeks.set(m.getTime(), map)
-    }
-    return weeks
-  }, [weekSessions, monday])
+  const { sessionCellsByWeek, gridsByWeek } = useGroupHeat(groupId, memberIds, activeIds, monday)
   const sessionCells = sessionCellsByWeek.get(monday.getTime())!
-
-  const gridsByWeek = useMemo(() => {
-    if (!availabilities) return null
-    const busyByUser = new Map<string, TimeRange[]>()
-    for (const row of busyRows ?? []) {
-      const list = busyByUser.get(row.user_id) ?? []
-      list.push(parseRange(row.busy))
-      busyByUser.set(row.user_id, list)
-    }
-    const people = (m: Date) =>
-      heatmap(
-        activeIds.map((id) => ({
-          userId: id,
-          availabilities: availabilities.filter((a) => a.user_id === id),
-          busy: busyByUser.get(id) ?? [],
-        })),
-        m,
-      )
-    const weeks = new Map<number, ReturnType<typeof heatmap>>()
-    for (const off of [-7, 0, 7]) {
-      const m = addDays(monday, off)
-      weeks.set(m.getTime(), people(m))
-    }
-    return weeks
-  }, [availabilities, busyRows, activeIds, monday])
   const grid = gridsByWeek?.get(monday.getTime()) ?? null
 
   // tapping/selecting a slot that holds a session opens its editor page
@@ -187,39 +97,7 @@ export default function PlannerPage() {
 
       <Tip id="planner" type={group?.group_type} />
 
-      {/* people selector */}
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          onClick={() => setSelected(null)}
-          className={chip(selected === null)}
-        >
-          {t('planner.all', { count: memberIds.length })}
-        </button>
-        {members.map((m) => {
-          const active = selected === null || selected.has(m.user_id)
-          return (
-            <button
-              key={m.user_id}
-              onClick={() => {
-                setSelected((prev) => {
-                  const next = new Set(prev ?? memberIds)
-                  if (prev === null) {
-                    next.delete(m.user_id) // from "all": first click excludes
-                  } else if (next.has(m.user_id)) {
-                    next.delete(m.user_id)
-                  } else {
-                    next.add(m.user_id)
-                  }
-                  return next
-                })
-              }}
-              className={chip(active)}
-            >
-              {(m.profiles.name || m.profiles.email).split(' ')[0]}
-            </button>
-          )
-        })}
-      </div>
+      <PeopleFilter members={members} selected={selected} onChange={setSelected} />
 
       {!grid ? (
         <Spinner />
@@ -332,136 +210,6 @@ export default function PlannerPage() {
         )}
       </Modal>
 
-    </div>
-  )
-}
-
-const chip = (active: boolean) =>
-  `rounded-full px-3 py-1 text-xs font-medium transition ${
-    active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-600 line-through'
-  }`
-
-type MergedCell = HeatCell & { partial: string[] }
-
-/** Aggregates slots lo..hi of a day: available = whoever is available in ALL
- *  slots (can attend the whole session); partial = available in some but not
- *  all; busy = union of busy. */
-function mergeCells(day: HeatCell[], lo: number, hi: number): MergedCell {
-  let available = day[lo].available
-  const everAvailable = new Set<string>()
-  const busy = new Set<string>()
-  const preferred = new Set(day[lo].preferred)
-  for (let s = lo; s <= hi; s++) {
-    available = available.filter((id) => day[s].available.includes(id))
-    day[s].available.forEach((id) => everAvailable.add(id))
-    day[s].busy.forEach((id) => busy.add(id))
-    for (const id of [...preferred]) if (!day[s].preferred.includes(id)) preferred.delete(id)
-  }
-  const partial = [...everAvailable].filter((id) => !available.includes(id) && !busy.has(id))
-  return {
-    available,
-    preferred: [...preferred],
-    busy: [...busy].filter((id) => !available.includes(id)),
-    partial,
-  }
-}
-
-function heatClass(cell: HeatCell, total: number): string {
-  if (total === 0) return 'bg-white'
-  const ratio = cell.available.length / total
-  if (ratio === 0) return 'bg-white'
-  if (ratio < 0.34) return 'bg-emerald-100'
-  if (ratio < 0.67) return 'bg-emerald-200'
-  if (ratio < 1) return 'bg-emerald-300'
-  return 'bg-emerald-500 ring-1 ring-inset ring-emerald-700'
-}
-
-function NameChip({
-  name,
-  me,
-  variant,
-}: {
-  name: string
-  me: boolean
-  variant: 'available' | 'partial' | 'busy' | 'unavailable'
-}) {
-  const base = {
-    available: 'bg-green-100 text-green-800',
-    partial: 'bg-orange-100 text-orange-800',
-    busy: 'bg-amber-100 text-amber-800',
-    unavailable: 'bg-gray-100 text-gray-600',
-  }[variant]
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-        me ? 'bg-violet-600 text-white ring-2 ring-violet-300' : base
-      }`}
-    >
-      {name}
-      {me && ' (tú)'}
-    </span>
-  )
-}
-
-function CellDetail({
-  cell,
-  activeIds,
-  nameOf,
-  meId,
-  groupType,
-}: {
-  cell: MergedCell
-  activeIds: string[]
-  nameOf: (id: string) => string
-  meId?: string
-  groupType?: GroupType
-}) {
-  const { t } = useTranslation()
-  const unavailable = activeIds.filter(
-    (id) => !cell.available.includes(id) && !cell.partial.includes(id) && !cell.busy.includes(id),
-  )
-  return (
-    <div className="space-y-2 text-xs">
-      {cell.available.length > 0 && (
-        <div>
-          <span className="font-medium text-green-700">{t('planner.availableLabel')}</span>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {cell.available.map((id) => (
-              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="available" />
-            ))}
-          </div>
-        </div>
-      )}
-      {cell.partial.length > 0 && (
-        <div>
-          <span className="font-medium text-orange-700">{t('planner.partialLabel')}</span>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {cell.partial.map((id) => (
-              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="partial" />
-            ))}
-          </div>
-        </div>
-      )}
-      {cell.busy.length > 0 && (
-        <div>
-          <span className="font-medium text-amber-700">{tg(t, 'planner.busyLabel', groupType)}</span>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {cell.busy.map((id) => (
-              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="busy" />
-            ))}
-          </div>
-        </div>
-      )}
-      {unavailable.length > 0 && (
-        <div>
-          <span className="font-medium text-gray-600">{t('planner.unavailableLabel')}</span>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {unavailable.map((id) => (
-              <NameChip key={id} name={nameOf(id)} me={id === meId} variant="unavailable" />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
