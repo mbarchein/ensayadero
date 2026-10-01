@@ -10,7 +10,7 @@ import { isoDay, weekStart } from '../../lib/slots'
 import { tg } from '../../lib/glossary'
 import { BackButton, EmptyState, Spinner } from '../../components/ui'
 import Tip from '../../components/Tip'
-import { useMyAgenda } from './useMyAgenda'
+import { useMyAgenda, type MyParticipation } from './useMyAgenda'
 import ParticipationCard from './ParticipationCard'
 import MonthCalendar from '../sessions/MonthCalendar'
 import ViewToggle from '../sessions/ViewToggle'
@@ -31,10 +31,12 @@ export default function UpcomingPage() {
   if (isLoading) return <Spinner />
 
   const now = new Date()
-  const upcoming = (data ?? []).filter((p) => parseRange(p.sessions.time_range).end >= now)
-  const pendingCount = upcoming.filter(
-    (p) => p.sessions.status === 'CONFIRMED' && p.response === 'PENDING',
-  ).length
+  const isUpcoming = (p: MyParticipation) => parseRange(p.sessions.time_range).end >= now
+  // same rule as the nav badge: confirmed, not over, and I haven't answered
+  const needsAnswer = (p: MyParticipation) =>
+    isUpcoming(p) && p.sessions.status === 'CONFIRMED' && p.response === 'PENDING'
+  const upcoming = (data ?? []).filter(isUpcoming)
+  const pendingCount = upcoming.filter(needsAnswer).length
 
   // group by this week / next week / later (Monday-based weeks)
   const nextWeek = addDays(weekStart(now), 7)
@@ -76,6 +78,7 @@ export default function UpcomingPage() {
           emptyDayLabel={tg(t, 'sessions.noneThisDay', 'OTHER')}
           dateOf={(p) => parseRange(p.sessions.time_range).start}
           dotOf={(p) => responseDotColor(p.sessions.status, p.response)}
+          alertOf={needsAnswer}
           renderAgenda={(items) => (
             <ul className="space-y-3">
               {items.map((p) => (

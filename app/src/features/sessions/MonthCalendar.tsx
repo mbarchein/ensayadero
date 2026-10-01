@@ -29,18 +29,28 @@ const dayKey = (d: Date) => format(d, 'yyyy-MM-dd')
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const CENTER = 'translateX(-33.3333%)'
 
+const AlertDot = () => (
+  <span
+    className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-red-600 ring-2 ring-white"
+    aria-hidden
+  />
+)
+
 export default function MonthCalendar<T>({
   items,
   dateOf,
   dotOf,
   renderAgenda,
   emptyDayLabel,
+  alertOf,
 }: {
   items: T[]
   dateOf: (item: T) => Date
   dotOf: (item: T) => string
   renderAgenda: (dayItems: T[]) => ReactNode
   emptyDayLabel?: string
+  // items needing attention: a red dot on an arrow when one lies beyond it
+  alertOf?: (item: T) => boolean
 }) {
   const { t } = useTranslation()
   const today = new Date()
@@ -68,6 +78,10 @@ export default function MonthCalendar<T>({
     : ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
   const selectedItems = selected ? (byDay.get(dayKey(selected)) ?? []) : []
+
+  const alertDates = alertOf ? items.filter(alertOf).map(dateOf) : []
+  const alertPrev = alertDates.some((d) => d < month)
+  const alertNext = alertDates.some((d) => d >= addMonths(month, 1))
 
   // ── carousel: 3 month panels, current centered; swipe slides to a neighbour ──
   const stripRef = useRef<HTMLDivElement>(null)
@@ -220,6 +234,7 @@ export default function MonthCalendar<T>({
           className="absolute left-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
           <ChevronLeft size={20} />
+          {alertPrev && <AlertDot />}
         </button>
         <button
           type="button"
@@ -228,6 +243,7 @@ export default function MonthCalendar<T>({
           className="absolute right-0 top-0 z-10 rounded p-1.5 text-violet-700 hover:bg-violet-50"
         >
           <ChevronRight size={20} />
+          {alertNext && <AlertDot />}
         </button>
         <div
           className="overflow-hidden"
