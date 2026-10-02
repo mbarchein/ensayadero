@@ -111,10 +111,9 @@ function NameChip({
     busy: 'bg-amber-100 text-amber-800',
     unavailable: 'bg-gray-100 text-gray-600',
   }[variant]
-  // me: violet fill only when I can make it; otherwise keep the section's
-  // color, a shade stronger and outlined, so it doesn't read as "available"
+  // me: the section's color, a shade stronger and outlined
   const mine = {
-    available: 'bg-violet-600 text-white ring-2 ring-violet-300',
+    available: 'bg-green-200 text-green-900 ring-1 ring-green-400',
     partial: 'bg-orange-200 text-orange-900 ring-1 ring-orange-400',
     busy: 'bg-amber-200 text-amber-900 ring-1 ring-amber-400',
     unavailable: 'bg-gray-200 text-gray-800 ring-1 ring-gray-400',
