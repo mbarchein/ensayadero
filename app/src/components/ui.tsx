@@ -166,6 +166,11 @@ export function Modal({
   children: ReactNode
 }) {
   useBackClose(open, onClose)
+  // The backdrop closes only on a press that STARTED on it. A modal opened by
+  // a tap (e.g. on a calendar slot) is followed by the touch's click, which
+  // lands on whatever is now under the finger; on the backdrop it would
+  // close the modal instantly. That press began on the slot, so it's ignored.
+  const pressOnBackdrop = useRef(false)
 
   if (!open) return null
   // Portal to <body>: an ancestor with transform/filter/sticky positioning
@@ -174,7 +179,13 @@ export function Modal({
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
-      onClick={onClose}
+      onPointerDown={(e) => {
+        pressOnBackdrop.current = e.target === e.currentTarget
+      }}
+      onClick={() => {
+        if (pressOnBackdrop.current) onClose()
+        pressOnBackdrop.current = false
+      }}
       role="dialog"
       aria-modal="true"
       aria-label={title}
