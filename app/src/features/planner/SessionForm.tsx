@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { formatRange } from '../../lib/ranges'
+import { formatRange, parseRange } from '../../lib/ranges'
 import { isoDay, DAY_START_HOUR, DAY_END_HOUR, SLOT_MINUTES, SLOTS_PER_DAY, type HeatCell } from '../../lib/slots'
 import { BackButton, Badge, Button, InitialsAvatar } from '../../components/ui'
 import { tg } from '../../lib/glossary'
@@ -262,8 +262,11 @@ export default function SessionForm({
     // The convener is assumed to attend: when the creator adds themselves to
     // the list, default their response to ACCEPTED. Only on first inclusion,
     // so a later "can't go" from the creator is preserved across edits.
+    // Not on a rehearsal that is already over (as stored now: the time is
+    // saved after this): its answers are locked in the database.
     const creatorNewlyIncluded = includedIds.includes(profile!.id) && !prevIds.includes(profile!.id)
-    if (creatorNewlyIncluded) {
+    const storedEnd = session ? parseRange(session.time_range).end : end
+    if (creatorNewlyIncluded && storedEnd > new Date()) {
       const { error } = await supabase
         .from('session_participants')
         .update({ response: 'ACCEPTED' })
