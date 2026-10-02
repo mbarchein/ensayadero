@@ -111,10 +111,18 @@ function NameChip({
     busy: 'bg-amber-100 text-amber-800',
     unavailable: 'bg-gray-100 text-gray-600',
   }[variant]
+  // me: violet fill only when I can make it; otherwise keep the section's
+  // color, a shade stronger and outlined, so it doesn't read as "available"
+  const mine = {
+    available: 'bg-violet-600 text-white ring-2 ring-violet-300',
+    partial: 'bg-orange-200 text-orange-900 ring-1 ring-orange-400',
+    busy: 'bg-amber-200 text-amber-900 ring-1 ring-amber-400',
+    unavailable: 'bg-gray-200 text-gray-800 ring-1 ring-gray-400',
+  }[variant]
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-        me ? 'bg-violet-600 text-white ring-2 ring-violet-300' : base
+        me ? mine : base
       }`}
     >
       {name}
