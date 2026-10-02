@@ -85,8 +85,9 @@ export default function ParticipationCard({
           </div>
         </div>
 
-        {/* inline confirmation only while pending; changes happen in the detail */}
-        {confirmed && p.response === 'PENDING' && (
+        {/* inline confirmation only while pending and not over; changes
+            happen in the detail */}
+        {confirmed && p.response === 'PENDING' && r.end >= new Date() && (
           <div className="mt-2 flex items-center gap-2">
             <Button
               variant="secondary"

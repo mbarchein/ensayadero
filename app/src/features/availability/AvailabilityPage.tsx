@@ -236,11 +236,14 @@ export default function AvailabilityPage() {
 
   // confirmed rehearsals in the visible week — clearing the week wipes the
   // availability that overlaps them, so we list them in the confirm modal.
+  // Ones already over are left out: their answer can no longer change.
   const weekScheduled = useMemo(() => {
+    const now = new Date()
     const seen = new Map<string, MyParticipation>()
     for (const arr of sessionCells.values())
       for (const p of arr) {
-        if (p.sessions.status === 'CONFIRMED') seen.set(p.session_id, p)
+        if (p.sessions.status === 'CONFIRMED' && parseRange(p.sessions.time_range).end >= now)
+          seen.set(p.session_id, p)
       }
     return [...seen.values()].sort(
       (a, b) =>

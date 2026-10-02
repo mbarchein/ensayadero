@@ -507,6 +507,8 @@
     "backToSessions": "‹ Ensayos",
     "areYouGoing": "¿Vas a ir?",
     "canChangeLater": "Puedes cambiar tu respuesta cuando quieras.",
+    "yourAnswer": "Tu respuesta",
+    "answerClosed": "Este {{act}} ya ha terminado: tu respuesta no se puede cambiar.",
     "optionalTag": "Opcional",
     "goingBtn": "Voy",
     "cantGoBtn": "No puedo",

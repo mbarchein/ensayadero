@@ -11,6 +11,7 @@ import {
   Phone,
   Share2,
   Check,
+  Clock,
   X,
   Pencil,
 } from 'lucide-react'
@@ -351,42 +352,71 @@ export default function SessionDetailPage() {
           }`}
         >
           <p className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-900">
-            {t('sessions.areYouGoing')}
+            {isPast ? t('sessions.yourAnswer') : t('sessions.areYouGoing')}
             {!mine.required && <Badge color="gray">{t('sessions.optionalTag')}</Badge>}
           </p>
-          <p className="mb-3 text-xs text-gray-600">{t('sessions.canChangeLater')}</p>
-          <div className="flex gap-2">
-            <Button
-              variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
-              className="inline-flex flex-1 items-center justify-center gap-1.5"
-              disabled={respond.isPending}
-              onClick={() => {
-                if (mine.response === 'ACCEPTED') return
-                celebrate()
-                respond.mutate('ACCEPTED')
-              }}
+          <p className="mb-3 text-xs text-gray-600">
+            {isPast ? tg(t, 'sessions.answerClosed', group?.group_type) : t('sessions.canChangeLater')}
+          </p>
+          {isPast ? (
+            // over: read-only, the answer can no longer change
+            <p
+              className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
+                mine.response === 'ACCEPTED'
+                  ? 'text-violet-800'
+                  : mine.response === 'DECLINED'
+                    ? 'text-red-700'
+                    : 'text-amber-800'
+              }`}
             >
-              <Check size={16} /> {t('sessions.goingBtn')}
-            </Button>
-            <Button
-              variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
-              className="inline-flex flex-1 items-center justify-center gap-1.5"
-              disabled={respond.isPending}
-              onClick={() => {
-                if (mine.response === 'DECLINED') return
-                commiserate()
-                respond.mutate('DECLINED')
-              }}
-            >
-              <X size={16} /> {t('sessions.cantGoBtn')}
-            </Button>
-          </div>
-          {availInfo.get(profile?.id ?? '')?.coverage === 'partial' && (
+              {mine.response === 'ACCEPTED' ? (
+                <>
+                  <Check size={16} /> {t('sessions.response.going')}
+                </>
+              ) : mine.response === 'DECLINED' ? (
+                <>
+                  <X size={16} /> {t('sessions.response.notGoing')}
+                </>
+              ) : (
+                <>
+                  <Clock size={16} /> {t('sessions.response.pending')}
+                </>
+              )}
+            </p>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant={mine.response === 'ACCEPTED' ? 'primary' : 'secondary'}
+                className="inline-flex flex-1 items-center justify-center gap-1.5"
+                disabled={respond.isPending}
+                onClick={() => {
+                  if (mine.response === 'ACCEPTED') return
+                  celebrate()
+                  respond.mutate('ACCEPTED')
+                }}
+              >
+                <Check size={16} /> {t('sessions.goingBtn')}
+              </Button>
+              <Button
+                variant={mine.response === 'DECLINED' ? 'danger' : 'secondary'}
+                className="inline-flex flex-1 items-center justify-center gap-1.5"
+                disabled={respond.isPending}
+                onClick={() => {
+                  if (mine.response === 'DECLINED') return
+                  commiserate()
+                  respond.mutate('DECLINED')
+                }}
+              >
+                <X size={16} /> {t('sessions.cantGoBtn')}
+              </Button>
+            </div>
+          )}
+          {!isPast && availInfo.get(profile?.id ?? '')?.coverage === 'partial' && (
             <p className="mt-2 text-xs text-amber-800">
               ⚠ {t('sessions.yourPartialAvailability', { hours: availInfo.get(profile!.id)!.label })}
             </p>
           )}
-          {availInfo.get(profile?.id ?? '')?.coverage === 'none' && (
+          {!isPast && availInfo.get(profile?.id ?? '')?.coverage === 'none' && (
             <p className="mt-2 text-xs text-amber-800">⚠ {t('sessions.yourNoAvailability')}</p>
           )}
         </section>

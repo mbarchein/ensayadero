@@ -507,6 +507,8 @@
     "backToSessions": "‹ Rehearsals",
     "areYouGoing": "Are you going?",
     "canChangeLater": "You can change your answer anytime.",
+    "yourAnswer": "Your answer",
+    "answerClosed": "This {{act}} is over: your answer can no longer change.",
     "optionalTag": "Optional",
     "goingBtn": "Going",
     "cantGoBtn": "Can't make it",
