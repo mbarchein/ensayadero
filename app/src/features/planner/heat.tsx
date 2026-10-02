@@ -18,9 +18,16 @@ export function PeopleFilter({
 }) {
   const { t } = useTranslation()
   const memberIds = members.map((m) => m.user_id)
+  // everyone in, either as "all" or picked back one by one
+  const allOn = selected === null || memberIds.every((id) => selected.has(id))
   return (
     <div className="flex flex-wrap gap-1.5">
-      <button onClick={() => onChange(null)} className={chip(selected === null)}>
+      {/* toggle: selects everyone, or clears everyone when all are in */}
+      <button
+        onClick={() => onChange(allOn ? new Set() : null)}
+        aria-pressed={allOn}
+        className={chip(allOn)}
+      >
         {t('planner.all', { count: memberIds.length })}
       </button>
       {members.map((m) => {
