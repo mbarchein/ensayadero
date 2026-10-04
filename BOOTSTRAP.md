@@ -400,12 +400,14 @@ from cron.job_run_details order by start_time desc limit 5;         -- recent ru
   again).
 
 **Calendar import job.** `infra/cron.tf` creates a second job, `sync-calendars`
-(every hour at minute 7), that calls the `sync-calendars` Edge Function to
-refresh the users' imported calendars. Without it, calendars only refresh when
-their owner opens the agenda or taps "Sync now". Manual setup: the same SQL as
-above with job name `sync-calendars`, schedule `'7 * * * *'`, the
-`/functions/v1/sync-calendars` URL and `timeout_milliseconds := 120000` in the
-`net.http_post` call.
+(every 10 minutes), that calls the `sync-calendars` Edge Function to refresh
+the users' imported calendars not attempted in the last 50 minutes. A run has
+no fixed size: it goes on until done or until the Edge runtime's time limit
+stops it, and the next run continues where it stopped. Without the job,
+calendars only refresh when their owner opens the agenda or taps "Sync now".
+Manual setup: the same SQL as above with job name `sync-calendars`, schedule
+`'*/10 * * * *'`, the `/functions/v1/sync-calendars` URL and
+`timeout_milliseconds := 120000` in the `net.http_post` call.
 
 ## 12. Keep the free tier alive (optional)
 

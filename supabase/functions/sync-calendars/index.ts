@@ -1,8 +1,12 @@
 // Edge Function: refreshes the users' imported calendars (calendar_sources)
 // into busy blocks (external_busy), see _shared/calendarFeed.ts.
 // Invoked by:
-//  - pg_cron every hour with the service-role key (BOOTSTRAP §11): every
-//    calendar not synced in the last 50 minutes, oldest first.
+//  - pg_cron every 10 minutes with the service-role key (BOOTSTRAP §11):
+//    every calendar not attempted in the last 50 minutes, least recently
+//    attempted first, until done or the runtime's time limit kills the run.
+//    Each finished attempt, ok or failed, is stamped (last_attempt_at), so
+//    the next run picks up where this one stopped, however many fit in a run;
+//    one cut off mid-download keeps its old stamp and goes first next time.
 //  - the app with the user's JWT: that user's calendars, or one of them with
 //    { source_id } — right after adding it, or from "Sync now".
 
@@ -19,7 +23,7 @@ const WINDOW_BACK = 1 * DAY // keep today's earlier events
 const WINDOW_AHEAD = 12 * 7 * DAY
 const STALE_MS = 50 * 60_000 // cron: re-sync after this long
 const USER_COOLDOWN_MS = 30_000 // app: ignore repeated taps on "Sync now"
-const CRON_BATCH = 25
+const CONCURRENCY = 5 // feeds downloading at once
 const FETCH_TIMEOUT_MS = 15_000
 const MAX_BYTES = 5 * 1024 * 1024
 const MAX_REDIRECTS = 3
@@ -95,6 +99,7 @@ async function syncOne(src: Source): Promise<{ id: string; ok: boolean; events?:
     })
     const { error } = await admin.rpc('replace_external_busy', { sid: src.id, events })
     if (error) throw error
+    await admin.from('calendar_sources').update({ last_attempt_at: new Date().toISOString() }).eq('id', src.id)
     return { id: src.id, ok: true, events: events.length }
   } catch (e) {
     // keep the last good blocks: a feed that is briefly down shouldn't free
@@ -106,17 +111,23 @@ async function syncOne(src: Source): Promise<{ id: string; ok: boolean; events?:
           ? 'TIMEOUT'
           : 'FETCH_FAILED'
     if (!(e instanceof FeedError)) console.error('sync-calendars', src.id, e)
-    await admin.from('calendar_sources').update({ last_error: code }).eq('id', src.id)
+    await admin
+      .from('calendar_sources')
+      .update({ last_error: code, last_attempt_at: new Date().toISOString() })
+      .eq('id', src.id)
     return { id: src.id, ok: false, error: code }
   }
 }
 
-/** Runs the syncs a few at a time. */
+/** Runs the syncs in order, a few at a time: each worker takes the next
+ *  calendar as soon as it's free, so a slow feed doesn't hold the others. */
 async function syncAll(sources: Source[]) {
   const results: Awaited<ReturnType<typeof syncOne>>[] = []
-  for (let i = 0; i < sources.length; i += 5) {
-    results.push(...(await Promise.all(sources.slice(i, i + 5).map(syncOne))))
+  let next = 0
+  const worker = async () => {
+    while (next < sources.length) results.push(await syncOne(sources[next++]))
   }
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker))
   return results
 }
 
@@ -132,11 +143,11 @@ Deno.serve(async (req) => {
     .select('id, url, include_all_day, include_free, last_synced_at')
 
   if (token && token === SERVICE_KEY) {
-    // cron: the stale ones, oldest first
+    // cron: all the stale ones, least recently attempted first (no cap: the
+    // run goes on until done or killed, and the next one continues)
     query = query
-      .or(`last_synced_at.is.null,last_synced_at.lt.${new Date(Date.now() - STALE_MS).toISOString()}`)
-      .order('last_synced_at', { ascending: true, nullsFirst: true })
-      .limit(CRON_BATCH)
+      .or(`last_attempt_at.is.null,last_attempt_at.lt.${new Date(Date.now() - STALE_MS).toISOString()}`)
+      .order('last_attempt_at', { ascending: true, nullsFirst: true })
   } else {
     const { data } = await admin.auth.getUser(token)
     if (!data.user) return json({ error: 'UNAUTHORIZED' }, 401)

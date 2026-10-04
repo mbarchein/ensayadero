@@ -94,11 +94,14 @@ resource "terraform_data" "notifications_cron" {
 }
 
 # ── Calendar import ──────────────────────────────────────────
-# Second job, same mechanics: every hour (off the top of the hour) it asks
-# sync-calendars to refresh the calendars not synced in the last 50 minutes.
-# pg_net's default 5 s timeout would drop the request while feeds download.
+# Second job, same mechanics: every 10 minutes it asks sync-calendars to
+# refresh the calendars not attempted in the last 50 minutes. Each run goes on
+# until done or the Edge runtime's time limit kills it; the function records
+# every attempt, so the next run continues where it stopped. pg_net only waits
+# 120 s (its default 5 s would drop the request at once); the function keeps
+# going after that.
 locals {
-  calendars_cron_schedule = "7 * * * *"
+  calendars_cron_schedule = "*/10 * * * *"
 
   calendars_cron_command = trimspace(<<-SQL
     select net.http_post(
