@@ -848,11 +848,13 @@ export default function AvailabilityPage() {
               const first = here.find((b) => !((ext!.get(prev) ?? []).includes(b) && !cells?.has(prev)))
               return first ? (
                 // translucent, blurred pill behind the text so the dots don't
-                // fight with it; sized to the text, the rest stays dotted
+                // fight with it; sized to the text, the rest stays dotted. The
+                // icon (as on the external calendars button) marks it imported.
                 <span
-                  className={`pointer-events-none m-0.5 inline-block max-w-[calc(100%-4px)] truncate rounded bg-white/70 font-medium leading-4 text-slate-700 backdrop-blur-[2px] ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
+                  className={`pointer-events-none m-0.5 inline-flex max-w-[calc(100%-4px)] items-center gap-0.5 rounded align-top bg-white/70 font-medium leading-4 text-slate-700 backdrop-blur-[2px] ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
                 >
-                  {first.summary || t('calendars.untitled')}
+                  <CalendarSync size={dayView ? 11 : 9} className="shrink-0" aria-hidden />
+                  <span className="truncate">{first.summary || t('calendars.untitled')}</span>
                 </span>
               ) : null
             }
