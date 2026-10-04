@@ -806,7 +806,7 @@ export default function AvailabilityPage() {
                 ? 'cell-flash'
                 : ''
             const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-            // taken by an event of my imported calendars: hatched
+            // taken by an event of my imported calendars: dotted
             const ext = (current ? extCells : week?.ext)?.has(`${day}:${slot}`) ? 'ext-busy' : ''
             return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash} ${ext}`
           }}

@@ -141,14 +141,11 @@ body,
   }
 }
 
-/* My agenda: time taken by an event of the user's imported calendars. A
-   hatch over the cell's own color, so painted availability still shows. */
+/* My agenda: time taken by an event of the user's imported calendars. A dot
+   grid over the cell's own color, so painted availability still shows. */
 .ext-busy {
-  background-image: repeating-linear-gradient(
-    135deg,
-    rgb(71 85 105 / 0.32) 0 1.5px,
-    transparent 1.5px 6px
-  );
+  background-image: radial-gradient(rgb(71 85 105 / 0.45) 1px, transparent 1.2px);
+  background-size: 6px 6px;
 }
 
 /* Hint wave over the day-strip header: each day pulses violet in sequence
