@@ -159,21 +159,21 @@ function SourceCard({
           <Button
             variant="ghost"
             className="!p-2"
-            aria-label={t('calendars.edit.open')}
-            title={t('calendars.edit.open')}
-            onClick={() => setEditing(true)}
-          >
-            <Pencil size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            className="!p-2"
             aria-label={t('calendars.syncNow')}
             title={t('calendars.syncNow')}
             disabled={syncing}
             onClick={() => cal.sync.mutate(s.id)}
           >
             <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="!p-2"
+            aria-label={t('calendars.edit.open')}
+            title={t('calendars.edit.open')}
+            onClick={() => setEditing(true)}
+          >
+            <Pencil size={16} />
           </Button>
           <Button
             variant="ghost"
