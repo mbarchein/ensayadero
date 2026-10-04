@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ButtonHTMLAttributes,
@@ -171,6 +172,13 @@ export function Modal({
   // lands on whatever is now under the finger; on the backdrop it would
   // close the modal instantly. That press began on the slot, so it's ignored.
   const pressOnBackdrop = useRef(false)
+  // Same for the controls inside: when the sheet opens under the finger, that
+  // click would hit whatever button now sits there. Until a press starts
+  // within the modal, clicks are dropped (keyboard clicks, detail 0, pass).
+  const pressedInside = useRef(false)
+  useLayoutEffect(() => {
+    if (open) pressedInside.current = false
+  }, [open])
 
   if (!open) return null
   // Portal to <body>: an ancestor with transform/filter/sticky positioning
@@ -179,6 +187,15 @@ export function Modal({
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
+      onPointerDownCapture={() => {
+        pressedInside.current = true
+      }}
+      onClickCapture={(e) => {
+        if (!pressedInside.current && e.detail !== 0) {
+          e.stopPropagation()
+          e.preventDefault()
+        }
+      }}
       onPointerDown={(e) => {
         pressOnBackdrop.current = e.target === e.currentTarget
       }}
