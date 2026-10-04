@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "ical.js": "npm:ical.js@2.2.1"
+  },
+  "lock": false
+}

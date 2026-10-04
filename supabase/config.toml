@@ -66,3 +66,9 @@ enabled = false
 # server-side Turnstile check instead.
 [functions.legal-info]
 verify_jwt = false
+
+# Calendar import: called by the app (user JWT) and by the hourly cron
+# (service-role key). Its deno.json maps the shared parser's ical.js import.
+[functions.sync-calendars]
+verify_jwt = true
+import_map = "./functions/sync-calendars/deno.json"

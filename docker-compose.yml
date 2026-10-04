@@ -194,6 +194,23 @@ services:
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:dev@localhost}
 
+  # Calendar import (Edge Function sync-calendars). No cron locally: the app
+  # syncs when a calendar is added, on "Sync now" and when it's stale.
+  calendar-sync:
+    image: denoland/deno:alpine
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    working_dir: /functions/sync-calendars
+    command: ["run", "--allow-net", "--allow-env", "index.ts"]
+    volumes:
+      - ./supabase/functions:/functions:ro
+    environment:
+      SUPABASE_URL: http://gateway:8000
+      SUPABASE_SERVICE_ROLE_KEY: *service-key
+      # lets you test with a feed served over plain http on your network
+      CALENDAR_ALLOW_HTTP: "1"
+
   gateway:
     image: nginx:alpine
     depends_on:

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Drift check for the process-notifications pg_cron job, run by the
-# data.external source in cron.tf on every terraform plan/refresh.
+# Drift check for a pg_cron job (process-notifications unless job_name says
+# otherwise), run by the data.external sources in cron.tf on every terraform
+# plan/refresh.
 #
-#   stdin:  {"db_url": "...", "db_password": "...", "expected_sha": "..."}
+#   stdin:  {"db_url": "...", "db_password": "...", "expected_sha": "...", "job_name": "..."}
 #   stdout: {"in_sync": "true"} | {"in_sync": "false"}
 #
 # It reads the live cron.job row through a dockerized psql and compares
@@ -18,11 +19,12 @@ field() { python3 -c 'import json,sys; print(json.load(sys.stdin)[sys.argv[1]])'
 DB_URL=$(field db_url)
 PGPASSWORD=$(field db_password)
 EXPECTED=$(field expected_sha)
+JOB=$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("job_name", "process-notifications"))' <<<"$input")
 export DB_URL PGPASSWORD
 
 # -tAX: tuples only, unaligned, no psqlrc → the raw value, newlines included.
 current=$(docker run --rm -e DB_URL -e PGPASSWORD postgres:16-alpine \
-  sh -c "psql \"\$DB_URL\" -tAX -c \"select schedule || E'\\n' || command from cron.job where jobname = 'process-notifications'\"" \
+  sh -c "psql \"\$DB_URL\" -tAX -c \"select schedule || E'\\n' || command from cron.job where jobname = '$JOB'\"" \
   2>/dev/null) || current=""
 
 if [ -z "$current" ]; then

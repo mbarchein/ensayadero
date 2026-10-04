@@ -92,3 +92,67 @@ resource "terraform_data" "notifications_cron" {
     }
   }
 }
+
+# ── Calendar import ──────────────────────────────────────────
+# Second job, same mechanics: every hour (off the top of the hour) it asks
+# sync-calendars to refresh the calendars not synced in the last 50 minutes.
+# pg_net's default 5 s timeout would drop the request while feeds download.
+locals {
+  calendars_cron_schedule = "7 * * * *"
+
+  calendars_cron_command = trimspace(<<-SQL
+    select net.http_post(
+      url := 'https://${supabase_project.main.id}.supabase.co/functions/v1/sync-calendars',
+      headers := jsonb_build_object(
+        'Authorization', 'Bearer ' || '${data.supabase_apikeys.main.service_role_key}',
+        'Content-Type', 'application/json'
+      ),
+      body := '{}'::jsonb,
+      timeout_milliseconds := 120000
+    );
+  SQL
+  )
+
+  calendars_cron_sql = join("", [
+    "create extension if not exists pg_cron;\n",
+    "create extension if not exists pg_net;\n",
+    "select cron.schedule('sync-calendars', '",
+    local.calendars_cron_schedule,
+    "', $cron$",
+    local.calendars_cron_command,
+    "$cron$);\n",
+  ])
+
+  calendars_cron_sha = sha256("${local.calendars_cron_schedule}\n${local.calendars_cron_command}")
+}
+
+data "external" "calendars_cron" {
+  program = ["bash", "${path.module}/scripts/notifications-cron-status.sh"]
+  query = {
+    db_url       = local.pooler_url
+    db_password  = local.db_password
+    expected_sha = local.calendars_cron_sha
+    job_name     = "sync-calendars"
+  }
+}
+
+resource "terraform_data" "calendars_cron" {
+  triggers_replace = [
+    supabase_project.main.id,
+    local.calendars_cron_sha,
+    data.external.calendars_cron.result.in_sync == "true" ? "in-sync" : timestamp(),
+  ]
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      docker run --rm -i -e DATABASE_URL -e PGPASSWORD postgres:16-alpine \
+        sh -c 'psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f -' <<<"$CRON_SQL"
+    EOT
+    environment = {
+      DATABASE_URL = local.pooler_url
+      PGPASSWORD   = local.db_password
+      CRON_SQL     = local.calendars_cron_sql
+    }
+  }
+}

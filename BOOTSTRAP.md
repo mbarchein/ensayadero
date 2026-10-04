@@ -399,6 +399,14 @@ from cron.job_run_details order by start_time desc limit 5;         -- recent ru
   key and re-creates the job (manual setups: `cron.unschedule` + `cron.schedule`
   again).
 
+**Calendar import job.** `infra/cron.tf` creates a second job, `sync-calendars`
+(every hour at minute 7), that calls the `sync-calendars` Edge Function to
+refresh the users' imported calendars. Without it, calendars only refresh when
+their owner opens the agenda or taps "Sync now". Manual setup: the same SQL as
+above with job name `sync-calendars`, schedule `'7 * * * *'`, the
+`/functions/v1/sync-calendars` URL and `timeout_milliseconds := 120000` in the
+`net.http_post` call.
+
 ## 12. Keep the free tier alive (optional)
 
 Supabase free pauses projects after ~1 week without traffic. The cron from step 11
