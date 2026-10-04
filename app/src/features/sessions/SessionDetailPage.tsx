@@ -5,6 +5,7 @@ import { useState } from 'react'
 import {
   CalendarDays,
   CalendarPlus,
+  CalendarSync,
   MapPin,
   Megaphone,
   NotebookPen,
@@ -26,6 +27,7 @@ import { overlaps, parseRange, type TimeRange } from '../../lib/ranges'
 import { expandAvailability, isoDay } from '../../lib/slots'
 import { downloadIcs } from '../../lib/ics'
 import { visibleParticipants } from '../../lib/participants'
+import { useCalendars } from '../calendars/useCalendars'
 import { roleLabel } from '../../lib/roleLabel'
 import { celebrate, commiserate } from '../../lib/confetti'
 import { Badge, BackButton, Button, InitialsAvatar, Modal, Spinner } from '../../components/ui'
@@ -64,6 +66,7 @@ export default function SessionDetailPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
+  const myCalendars = useCalendars()
   // set by the short-link landing: explain what a shared rehearsal is
   const viaShare = !!(useLocation().state as { shared?: boolean } | null)?.shared
   const [shareCopied, setShareCopied] = useState(false)
@@ -221,6 +224,8 @@ export default function SessionDetailPage() {
   }
 
   const isPast = r.end < new Date()
+  // my own imported calendar events at that time (only I see their titles)
+  const calendarHits = myCalendars.busy.filter((b) => overlaps(b, r))
   // "dentro de 19 horas" / "hace 2 días" — date-fns' suffix would say
   // "en alrededor de 19 horas", so we strip the approximation words and
   // add our own prefix
@@ -410,6 +415,14 @@ export default function SessionDetailPage() {
                 <X size={16} /> {t('sessions.cantGoBtn')}
               </Button>
             </div>
+          )}
+          {!isPast && calendarHits.length > 0 && (
+            <p className="mt-2 flex items-start gap-1 text-xs text-amber-800">
+              <CalendarSync size={13} className="mt-0.5 shrink-0" aria-hidden />
+              {t('calendars.agenda.inYourCalendar', {
+                list: calendarHits.map((b) => b.summary || t('calendars.untitled')).join(', '),
+              })}
+            </p>
           )}
           {!isPast && availInfo.get(profile?.id ?? '')?.coverage === 'partial' && (
             <p className="mt-2 text-xs text-amber-800">

@@ -141,6 +141,16 @@ body,
   }
 }
 
+/* My agenda: time taken by an event of the user's imported calendars. A
+   hatch over the cell's own color, so painted availability still shows. */
+.ext-busy {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgb(71 85 105 / 0.32) 0 1.5px,
+    transparent 1.5px 6px
+  );
+}
+
 /* Hint wave over the day-strip header: each day pulses violet in sequence
    (staggered animation-delay per column), nudging the user to tap a day to
    edit instead of the read-only week cells. */

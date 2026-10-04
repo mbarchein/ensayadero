@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Trash2, Copy, Check, X, Loader2, AlertCircle, User, Users } from 'lucide-react'
+import { Trash2, Copy, Check, X, Loader2, AlertCircle, User, Users, CalendarSync, WandSparkles } from 'lucide-react'
 import { addDays, addWeeks, format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -28,6 +28,13 @@ import { overlaps, parseRange } from '../../lib/ranges'
 import { useMyAgenda, type MyParticipation } from '../agenda/useMyAgenda'
 import GroupAvatar from '../groups/GroupAvatar'
 import GroupAvailability from './GroupAvailability'
+import { STALE_MS, useCalendars, type ExternalBusy } from '../calendars/useCalendars'
+import {
+  AutofillModal,
+  CalendarEventModal,
+  ConflictsBanner,
+  type AutofillOptions,
+} from '../calendars/AgendaCalendarBits'
 import type { Availability, MembershipWithGroup } from '../../lib/types'
 
 const CYCLE: Record<SlotState, SlotState> = {
@@ -234,6 +241,60 @@ export default function AvailabilityPage() {
   // not just on the overlapping cells. Computed per week from the cells map.
   const sessionLanes = useMemo(() => computeLanes(sessionCells), [sessionCells])
 
+  // events from my imported calendars (not ignored), per "day:slot": they
+  // hatch the slots they take, on top of whatever availability is painted
+  const cal = useCalendars()
+  const buildExtCells = useCallback(
+    (m: Date) => {
+      const map = new Map<string, ExternalBusy[]>()
+      const windowEnd = addDays(m, 7)
+      for (const b of cal.busy) {
+        if (b.start >= windowEnd || b.end <= m) continue
+        for (let d = 0; d < 7; d++) {
+          for (let slot = 0; slot < SLOTS_PER_DAY; slot++) {
+            if (overlaps(slotRange(m, d, slot), b)) {
+              const k = `${d}:${slot}`
+              const arr = map.get(k)
+              if (arr) arr.push(b)
+              else map.set(k, [b])
+            }
+          }
+        }
+      }
+      return map
+    },
+    [cal.busy],
+  )
+  const extCells = useMemo(() => buildExtCells(monday), [buildExtCells, monday])
+  const [extOpen, setExtOpen] = useState<ExternalBusy[] | null>(null)
+  const [autofillOpen, setAutofillOpen] = useState(false)
+
+  // a calendar not refreshed in the last hour syncs when the agenda opens
+  const autoSynced = useRef(false)
+  useEffect(() => {
+    const list = cal.sources.data
+    if (!list || autoSynced.current) return
+    if (list.some((s) => !s.last_synced_at || Date.now() - Date.parse(s.last_synced_at) > STALE_MS)) {
+      autoSynced.current = true
+      cal.sync.mutate(undefined)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cal.sources.data])
+
+  // rehearsals I'm going to that clash with something in my calendars
+  const conflicts = useMemo(() => {
+    const now = new Date()
+    const out: { p: MyParticipation; events: ExternalBusy[] }[] = []
+    for (const p of agenda.data ?? []) {
+      if (p.sessions.status !== 'CONFIRMED' || p.response !== 'ACCEPTED') continue
+      const r = parseRange(p.sessions.time_range)
+      if (r.end < now) continue
+      const events = cal.busy.filter((b) => overlaps(b, r))
+      if (events.length > 0) out.push({ p, events })
+    }
+    return out
+  }, [agenda.data, cal.busy])
+
   // confirmed rehearsals in the visible week — clearing the week wipes the
   // availability that overlaps them, so we list them in the confirm modal.
   // Ones already over are left out: their answer can no longer change.
@@ -281,6 +342,7 @@ export default function AvailabilityPage() {
         grid: SlotState[][] | null
         cells: Map<string, MyParticipation[]>
         lanes: Map<string, { lane: number; lanes: number }>
+        ext: Map<string, ExternalBusy[]>
       }
     >()
     for (const off of [-7, 7]) {
@@ -290,10 +352,11 @@ export default function AvailabilityPage() {
         grid: availabilities ? weekGrid(availabilities, m) : null,
         cells,
         lanes: computeLanes(cells),
+        ext: buildExtCells(m),
       })
     }
     return map
-  }, [availabilities, buildSessionCells, monday])
+  }, [availabilities, buildSessionCells, buildExtCells, monday])
   const [draft, setDraft] = useState<SlotState[][] | null>(null)
   const [paintValue, setPaintValue] = useState<SlotState>('AVAILABLE')
   const grid = draft ?? serverGrid
@@ -355,29 +418,7 @@ export default function AvailabilityPage() {
   }, [monday])
 
   const save = useMutation({
-    mutationFn: async (newGrid: SlotState[][]) => {
-      // Simple and robust strategy: replace the NON-recurring availabilities
-      // overlapping this week with the painted blocks. Recurring ones are
-      // converted with "Repeat every week".
-      const weekEnd = addDays(monday, 7)
-      const { error: delError } = await supabase
-        .from('availabilities')
-        .delete()
-        .eq('user_id', profile!.id)
-        .is('rrule', null)
-        .filter('time_range', 'ov', `[${monday.toISOString()},${weekEnd.toISOString()})`)
-      if (delError) throw delError
-
-      const rows = gridToRanges(newGrid, monday).map((r) => ({
-        user_id: profile!.id,
-        time_range: formatRange(r.start, r.end),
-        kind: r.kind,
-      }))
-      if (rows.length > 0) {
-        const { error } = await supabase.from('availabilities').insert(rows)
-        if (error) throw error
-      }
-    },
+    mutationFn: (newGrid: SlotState[][]) => replaceWeek(profile!.id, newGrid, monday),
     onSuccess: () => {
       // the refetch is awaited in scheduleSave's onSuccess before clearing the
       // draft; here we only flash the saved indicator
@@ -453,6 +494,36 @@ export default function AvailabilityPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['availabilities'] })
       setCopyOpen(false)
+    },
+  })
+
+  // "Fill in availability": my usual hours on the chosen days, minus what's
+  // past and (optionally) what my calendars mark busy. Only adds slots.
+  const autofill = useMutation({
+    mutationFn: async (o: AutofillOptions) => {
+      const now = new Date()
+      for (let w = 0; w < o.weeks; w++) {
+        const m = addDays(monday, 7 * w)
+        // this week starts from what's on screen (it may hold unsaved strokes)
+        const g = (w === 0 && grid ? grid : weekGrid(availabilities ?? [], m)).map((col) => [...col])
+        let added = 0
+        for (const d of o.days) {
+          for (let slot = o.fromSlot; slot < o.toSlot; slot++) {
+            if (g[d][slot] !== 'NONE') continue
+            const r = slotRange(m, d, slot)
+            if (r.end <= now) continue
+            if (o.skipBusy && cal.busy.some((b) => overlaps(b, r))) continue
+            g[d][slot] = 'AVAILABLE'
+            added++
+          }
+        }
+        if (added > 0) await replaceWeek(profile!.id, g, m)
+      }
+    },
+    onSuccess: async () => {
+      await qc.refetchQueries({ queryKey: ['availabilities', profile?.id] })
+      setDraft(null)
+      setAutofillOpen(false)
     },
   })
 
@@ -615,28 +686,63 @@ export default function AvailabilityPage() {
         </div>
       </header>
 
-      {/* view switch (mine / group) + group picker. Below the header: the
-          header has no room left for it on narrow phones */}
-      {!dayView && myGroups.length > 0 && (
+      {/* view switch (mine / group) + group picker, and on mine the calendar
+          and fill-in actions. Below the header: the header has no room left
+          for them on narrow phones */}
+      {!dayView && (
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex shrink-0 rounded-lg border border-violet-200 p-0.5 text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => switchMode('me')}
-              aria-pressed={!groupView}
-              className={`flex items-center gap-1 rounded-md px-2 py-1 ${!groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-            >
-              <User size={16} aria-hidden /> {t('availability.viewMine')}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode('group')}
-              aria-pressed={groupView}
-              className={`flex items-center gap-1 rounded-md px-2 py-1 ${groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-            >
-              <Users size={16} aria-hidden /> {t('availability.viewGroup')}
-            </button>
-          </div>
+          {myGroups.length > 0 && (
+            <div className="flex shrink-0 rounded-lg border border-violet-200 p-0.5 text-xs font-medium">
+              <button
+                type="button"
+                onClick={() => switchMode('me')}
+                aria-pressed={!groupView}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 ${!groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+              >
+                <User size={16} aria-hidden /> {t('availability.viewMine')}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode('group')}
+                aria-pressed={groupView}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 ${groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+              >
+                <Users size={16} aria-hidden /> {t('availability.viewGroup')}
+              </button>
+            </div>
+          )}
+          {!groupView && (
+            <div className="ml-auto flex items-center">
+              <Button
+                variant="ghost"
+                className="relative !p-2"
+                aria-label={
+                  cal.sources.data?.some((s) => s.last_error)
+                    ? t('calendars.agenda.openWithError')
+                    : t('calendars.agenda.open')
+                }
+                title={t('calendars.agenda.open')}
+                onClick={() => navigate('/calendars')}
+              >
+                <CalendarSync size={18} className={cal.sync.isPending ? 'animate-pulse' : ''} />
+                {cal.sources.data?.some((s) => s.last_error) && (
+                  <span
+                    className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-600 ring-2 ring-white"
+                    aria-hidden
+                  />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                className="!p-2"
+                aria-label={t('calendars.autofill.open')}
+                title={t('calendars.autofill.open')}
+                onClick={() => setAutofillOpen(true)}
+              >
+                <WandSparkles size={18} />
+              </Button>
+            </div>
+          )}
           {groupView && myGroups.length > 1 && (
             <select
               value={activeGroup.id}
@@ -660,6 +766,13 @@ export default function AvailabilityPage() {
         <Tip id="agendaEdit" type="OTHER" />
       ) : (
         <Tip id="agenda" type="OTHER" />
+      )}
+
+      {!groupView && !dayView && (
+        <ConflictsBanner
+          conflicts={conflicts}
+          onOpen={(p) => navigate(`/g/${p.sessions.group_id}/sessions/${p.session_id}`)}
+        />
       )}
 
       {groupView ? (
@@ -693,14 +806,29 @@ export default function AvailabilityPage() {
                 ? 'cell-flash'
                 : ''
             const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-            return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
+            // taken by an event of my imported calendars: hatched
+            const ext = (current ? extCells : week?.ext)?.has(`${day}:${slot}`) ? 'ext-busy' : ''
+            return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash} ${ext}`
           }}
           renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
             const current = wm.getTime() === monday.getTime()
             const cells = current ? sessionCells : adjacentWeeks.get(wm.getTime())?.cells
             const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
             const list = cells?.get(`${day}:${slot}`)
-            if (!list || !cells || !lanes) return null
+            if (!list || !cells || !lanes) {
+              // day view: an imported event shows its title on its first slot
+              // not covered by a rehearsal box
+              const ext = (current ? extCells : adjacentWeeks.get(wm.getTime())?.ext) ?? null
+              const here = ext?.get(`${day}:${slot}`)
+              if (!dayView || !here) return null
+              const prev = `${day}:${slot - 1}`
+              const first = here.find((b) => !((ext!.get(prev) ?? []).includes(b) && !cells?.has(prev)))
+              return first ? (
+                <span className="pointer-events-none block truncate px-1 text-[10px] font-medium leading-5 text-slate-700">
+                  {first.summary || t('calendars.untitled')}
+                </span>
+              ) : null
+            }
             // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
             // its box width is 1/laneCount on every slot, even where it doesn't
             // overlap. laneCount is shared by the whole overlap cluster, so it's the
@@ -782,6 +910,12 @@ export default function AvailabilityPage() {
               navigate(`/g/${ses.sessions.group_id}/sessions/${ses.session_id}`)
               return
             }
+            // an imported calendar event: what it is, and ignore it
+            const ext = extCells.get(`${pos.day}:${pos.slot}`)
+            if (ext) {
+              setExtOpen(ext)
+              return
+            }
             // tap on a rehearsal-free cell does nothing here: after two quick
             // taps, wave the day strip to point at the actual tap target
             const now = Date.now()
@@ -805,6 +939,27 @@ export default function AvailabilityPage() {
           fill
         />
       )}
+
+      <CalendarEventModal
+        events={extOpen}
+        sources={cal.sources.data ?? []}
+        onClose={() => setExtOpen(null)}
+        pending={cal.ignore.isPending}
+        onIgnore={(ev, series) =>
+          cal.ignore.mutate(
+            { source_id: ev.source_id, uid: ev.uid, occurrence: series ? null : ev.start, summary: ev.summary },
+            { onSuccess: () => setExtOpen(null) },
+          )
+        }
+      />
+
+      <AutofillModal
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        onApply={(o) => autofill.mutate(o)}
+        pending={autofill.isPending}
+        hasCalendars={(cal.sources.data?.length ?? 0) > 0}
+      />
 
       <Modal open={clearOpen} onClose={() => setClearOpen(false)} title={t('availability.clearWeekTitle')}>
         <div className="space-y-4">
@@ -950,6 +1105,30 @@ export default function AvailabilityPage() {
       </Modal>
     </div>
   )
+}
+
+/** Saves a week's grid. Simple and robust strategy: replace the NON-recurring
+ *  availabilities overlapping that week with the painted blocks. Recurring
+ *  ones are converted with "Repeat every week". */
+async function replaceWeek(userId: string, grid: SlotState[][], weekMonday: Date) {
+  const weekEnd = addDays(weekMonday, 7)
+  const { error: delError } = await supabase
+    .from('availabilities')
+    .delete()
+    .eq('user_id', userId)
+    .is('rrule', null)
+    .filter('time_range', 'ov', `[${weekMonday.toISOString()},${weekEnd.toISOString()})`)
+  if (delError) throw delError
+
+  const rows = gridToRanges(grid, weekMonday).map((r) => ({
+    user_id: userId,
+    time_range: formatRange(r.start, r.end),
+    kind: r.kind,
+  }))
+  if (rows.length > 0) {
+    const { error } = await supabase.from('availabilities').insert(rows)
+    if (error) throw error
+  }
 }
 
 /** Converts the slot matrix into contiguous ranges by day and type. */
