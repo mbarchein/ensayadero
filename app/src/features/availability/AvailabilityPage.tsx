@@ -50,15 +50,6 @@ const CELL_STYLE: Record<SlotState, string> = {
   PREFERRED: 'bg-violet-400',
 }
 
-// taken by an imported calendar event: the group counts it as busy, so the
-// violet is dimmed one step (still distinct from each other); unpainted, a
-// grey fill so the dots don't vanish on white
-const CELL_STYLE_EXT: Record<SlotState, string> = {
-  NONE: 'bg-slate-200',
-  AVAILABLE: 'bg-violet-100',
-  PREFERRED: 'bg-violet-300',
-}
-
 // Assign every rehearsal a fixed sub-column (lane) and the lane count of its
 // overlap cluster, so its box keeps the SAME width along its whole run — even on
 // slots where it happens not to overlap. Built from the "day:slot" → list cells
@@ -824,10 +815,7 @@ export default function AvailabilityPage() {
                 ? 'cell-flash'
                 : ''
             const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-            // taken by an event of my imported calendars: dotted, violet dimmed
-            const ext = !!(current ? extCells : week?.ext)?.has(`${day}:${slot}`)
-            const style = ext ? `${CELL_STYLE_EXT[state]} ext-busy` : CELL_STYLE[state]
-            return `${style} cursor-pointer ${pending} ${flash}`
+            return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash}`
           }}
           renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
             const current = wm.getTime() === monday.getTime()
@@ -835,24 +823,33 @@ export default function AvailabilityPage() {
             const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
             const list = cells?.get(`${day}:${slot}`)
             if (!list || !cells || !lanes) {
-              // an imported event shows its title (only I see my agenda) on its
-              // first slot not covered by a rehearsal box
+              // my imported calendar events: one translucent sky block over
+              // their slots (a rehearsal box takes precedence), the cell's
+              // color showing through it and a sliver on the right
               const ext = (current ? extCells : adjacentWeeks.get(wm.getTime())?.ext) ?? null
               const here = ext?.get(`${day}:${slot}`)
               if (!here) return null
               const prev = `${day}:${slot - 1}`
-              const first = here.find((b) => !((ext!.get(prev) ?? []).includes(b) && !cells?.has(prev)))
-              return first ? (
-                // translucent, blurred pill behind the text so the dots don't
-                // fight with it; sized to the text, the rest stays dotted. The
-                // icon (as on the external calendars button) marks it imported.
-                <span
-                  className={`pointer-events-none m-0.5 inline-flex max-w-[calc(100%-4px)] items-center gap-0.5 rounded align-top bg-white/70 font-medium leading-4 text-slate-700 backdrop-blur-[2px] ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
+              const next = `${day}:${slot + 1}`
+              const blockAbove = ext!.has(prev) && !cells?.has(prev)
+              const blockBelow = ext!.has(next) && !cells?.has(next)
+              // the title (only I see my agenda) on the slot each event starts in
+              const first = here.find((b) => !(blockAbove && (ext!.get(prev) ?? []).includes(b)))
+              return (
+                <div
+                  className={`pointer-events-none mr-0.5 flex h-full items-start border-l-[3px] border-sky-600 bg-sky-400/25 ${blockAbove ? '' : 'rounded-tr-md'} ${blockBelow ? '' : 'rounded-br-md'}`}
                 >
-                  <CalendarSync size={dayView ? 11 : 9} className="shrink-0" aria-hidden />
-                  <span className="truncate">{first.summary || t('calendars.untitled')}</span>
-                </span>
-              ) : null
+                  {first && (
+                    <span
+                      className={`flex min-w-0 items-center gap-0.5 font-medium leading-[18px] text-sky-900 ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
+                    >
+                      {/* the icon (as on the external calendars button) marks it imported */}
+                      <CalendarSync size={dayView ? 11 : 9} className="shrink-0" aria-hidden />
+                      <span className="truncate">{first.summary || t('calendars.untitled')}</span>
+                    </span>
+                  )}
+                </div>
+              )
             }
             // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
             // its box width is 1/laneCount on every slot, even where it doesn't
