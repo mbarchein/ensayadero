@@ -637,9 +637,9 @@
     "urlHelp": "El enlace es secreto: solo lo usa el servidor para leer tu calendario y no se vuelve a mostrar.",
     "howTo": {
       "title": "¿Dónde encuentro el enlace?",
-      "google": "Google Calendar (en el ordenador): Configuración → tu calendario → Integrar el calendario → «Dirección secreta en formato iCal».",
-      "outlook": "Outlook: Configuración → Calendario → Calendarios compartidos → Publicar un calendario → «Puede ver cuándo estoy ocupado» → copia el enlace ICS.",
-      "icloud": "iCloud (iPhone o Mac): Calendario → compartir el calendario → activa «Calendario público» → copia el enlace (webcal://)."
+      "google": "<app>Google Calendar</app> (en el ordenador): Configuración → tu calendario → Integrar el calendario → «Dirección secreta en formato iCal».",
+      "outlook": "<live>Outlook.com</live> o <office>Microsoft 365</office>: Configuración → Calendario → Calendarios compartidos → Publicar un calendario → «Puede ver cuándo estoy ocupado» → copia el enlace ICS.",
+      "icloud": "<app>iCloud</app> (web, iPhone o Mac): Calendario → compartir el calendario → activa «Calendario público» → copia el enlace (webcal://)."
     },
     "includeAllDay": "Contar eventos de día completo",
     "includeAllDayHint": "Vacaciones, festivos, viajes…",

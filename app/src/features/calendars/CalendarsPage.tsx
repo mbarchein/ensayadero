@@ -3,8 +3,8 @@
 // connected calendars with their sync state and rules, the add form with
 // per-provider help, and the events the user chose to ignore.
 
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState, type ReactNode } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { format, formatDistanceToNow } from 'date-fns'
 import { AlertCircle, CalendarSync, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
@@ -280,9 +280,21 @@ function AddForm({ cal, onDone }: { cal: ReturnType<typeof useCalendars>; onDone
       <details className="rounded-lg bg-violet-50 px-3 py-2 text-xs text-violet-900">
         <summary className="cursor-pointer font-medium">{t('calendars.howTo.title')}</summary>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
-          <li>{t('calendars.howTo.google')}</li>
-          <li>{t('calendars.howTo.outlook')}</li>
-          <li>{t('calendars.howTo.icloud')}</li>
+          <li>
+            <Trans i18nKey="calendars.howTo.google" components={{ app: <ProviderLink href="https://calendar.google.com/calendar/" /> }} />
+          </li>
+          <li>
+            <Trans
+              i18nKey="calendars.howTo.outlook"
+              components={{
+                live: <ProviderLink href="https://outlook.live.com/calendar/" />,
+                office: <ProviderLink href="https://outlook.office.com/calendar/" />,
+              }}
+            />
+          </li>
+          <li>
+            <Trans i18nKey="calendars.howTo.icloud" components={{ app: <ProviderLink href="https://www.icloud.com/calendar/" /> }} />
+          </li>
         </ul>
       </details>
 
@@ -309,5 +321,14 @@ function AddForm({ cal, onDone }: { cal: ReturnType<typeof useCalendars>; onDone
         </Button>
       </div>
     </form>
+  )
+}
+
+/** A provider's web calendar, opened in a new tab (Trans fills in the text). */
+function ProviderLink({ href, children }: { href: string; children?: ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2">
+      {children}
+    </a>
   )
 }

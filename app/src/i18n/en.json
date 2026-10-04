@@ -637,9 +637,9 @@
     "urlHelp": "The link is secret: only the server uses it to read your calendar, and it's never shown again.",
     "howTo": {
       "title": "Where do I find the link?",
-      "google": "Google Calendar (on a computer): Settings → your calendar → Integrate calendar → \"Secret address in iCal format\".",
-      "outlook": "Outlook: Settings → Calendar → Shared calendars → Publish a calendar → \"Can view when I'm busy\" → copy the ICS link.",
-      "icloud": "iCloud (iPhone or Mac): Calendar → share the calendar → turn on \"Public Calendar\" → copy the link (webcal://)."
+      "google": "<app>Google Calendar</app> (on a computer): Settings → your calendar → Integrate calendar → \"Secret address in iCal format\".",
+      "outlook": "<live>Outlook.com</live> or <office>Microsoft 365</office>: Settings → Calendar → Shared calendars → Publish a calendar → \"Can view when I'm busy\" → copy the ICS link.",
+      "icloud": "<app>iCloud</app> (web, iPhone or Mac): Calendar → share the calendar → turn on \"Public Calendar\" → copy the link (webcal://)."
     },
     "includeAllDay": "Count all-day events",
     "includeAllDayHint": "Holidays, days off, trips…",
