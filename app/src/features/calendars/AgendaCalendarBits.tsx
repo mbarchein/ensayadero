@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { AlertTriangle, CalendarSync, EyeOff } from 'lucide-react'
+import { AlertTriangle, CircleCheck, RefreshCw } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { parseRange } from '../../lib/ranges'
 import { DAY_START_HOUR, SLOT_MINUTES, SLOTS_PER_DAY } from '../../lib/slots'
@@ -19,33 +19,38 @@ const when = (b: ExternalBusy) =>
     ? format(b.start, 'EEE d MMM', { locale: dateLocale() })
     : `${format(b.start, 'EEE d MMM · HH:mm', { locale: dateLocale() })}–${format(b.end, 'HH:mm')}`
 
-/** Tapped an imported event in the agenda: what it is, and ignore it. */
+/** Tapped an imported event in the agenda: what it is, mark it as free, or
+ *  re-download its calendar. */
 export function CalendarEventModal({
   events,
   sources,
   onClose,
   onIgnore,
   pending,
+  onResync,
+  resyncing,
 }: {
   events: ExternalBusy[] | null
   sources: CalendarSource[]
   onClose: () => void
   onIgnore: (ev: ExternalBusy, series: boolean) => void
   pending: boolean
+  onResync: () => void
+  resyncing: boolean
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const names = [...new Set((events ?? []).map((ev) => ev.source_id))]
+    .map((id) => sources.find((s) => s.id === id)?.name)
+    .filter(Boolean)
+    .join(', ')
   return (
-    <Modal open={!!events} onClose={onClose} title={t('calendars.agenda.eventTitle')}>
+    <Modal open={!!events} onClose={onClose} title={t('calendars.agenda.eventTitle', { name: names })}>
       <div className="space-y-4">
         {(events ?? []).map((ev) => (
           <div key={ev.id} className="space-y-2 rounded-lg border p-3">
             <p className="font-semibold">{ev.summary || t('calendars.untitled')}</p>
             <p className="text-sm text-gray-600">{when(ev)}</p>
-            <p className="flex items-center gap-1 text-xs text-gray-500">
-              <CalendarSync size={13} aria-hidden />
-              {sources.find((s) => s.id === ev.source_id)?.name}
-            </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <Button
                 variant="secondary"
@@ -53,7 +58,7 @@ export function CalendarEventModal({
                 disabled={pending}
                 onClick={() => onIgnore(ev, false)}
               >
-                <EyeOff size={15} /> {t('calendars.agenda.ignoreOne')}
+                <CircleCheck size={15} /> {t('calendars.agenda.ignoreOne')}
               </Button>
               {ev.recurring && (
                 <Button
@@ -62,16 +67,26 @@ export function CalendarEventModal({
                   disabled={pending}
                   onClick={() => onIgnore(ev, true)}
                 >
-                  <EyeOff size={15} /> {t('calendars.agenda.ignoreSeries')}
+                  <CircleCheck size={15} /> {t('calendars.agenda.ignoreSeries')}
                 </Button>
               )}
             </div>
           </div>
         ))}
         <p className="text-xs text-gray-600">{t('calendars.agenda.ignoreBody')}</p>
-        <Button variant="ghost" className="w-full text-violet-700" onClick={() => navigate('/calendars')}>
-          {t('calendars.agenda.manage')}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            className="inline-flex flex-1 items-center justify-center gap-1.5"
+            disabled={resyncing}
+            onClick={onResync}
+          >
+            <RefreshCw size={15} className={resyncing ? 'animate-spin' : ''} /> {t('calendars.agenda.resync')}
+          </Button>
+          <Button variant="ghost" className="flex-1 text-violet-700" onClick={() => navigate('/calendars')}>
+            {t('calendars.agenda.manage')}
+          </Button>
+        </div>
       </div>
     </Modal>
   )

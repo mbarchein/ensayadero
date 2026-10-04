@@ -960,6 +960,15 @@ export default function AvailabilityPage() {
             { onSuccess: () => setExtOpen(null) },
           )
         }
+        resyncing={cal.sync.isPending}
+        onResync={() => {
+          // a source_id always syncs (no server cooldown); the shown events
+          // may change or vanish, so the sheet closes once it's done
+          const ids = [...new Set((extOpen ?? []).map((ev) => ev.source_id))]
+          Promise.all(ids.map((id) => cal.sync.mutateAsync(id)))
+            .then(() => setExtOpen(null))
+            .catch(() => {})
+        }}
       />
 
       <AutofillModal
