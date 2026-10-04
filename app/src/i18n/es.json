@@ -661,6 +661,17 @@
     "wholeSeries": "toda la serie",
     "restore": "Volver a contar",
     "untitled": "(sin título)",
+    "edit": {
+      "open": "Editar",
+      "title": "Editar «{{name}}»",
+      "urlLabel": "Nuevo enlace iCal (opcional)",
+      "urlHelp": "Déjalo vacío para mantener el actual ({{hint}}).",
+      "changeBody_zero": "Al cambiar el enlace, el calendario se sincronizará de nuevo desde el nuevo enlace. Los eventos que marcaste como libres se mantienen.",
+      "changeBody_one": "Al cambiar el enlace se borrará el evento sincronizado de este calendario y se descargarán de nuevo los eventos desde el nuevo enlace. Los eventos que marcaste como libres se mantienen.",
+      "changeBody_other": "Al cambiar el enlace se borrarán los {{count}} eventos sincronizados de este calendario y se descargarán de nuevo desde el nuevo enlace. Los eventos que marcaste como libres se mantienen.",
+      "confirm": "Cambiar enlace",
+      "saving": "Guardando…"
+    },
     "errors": {
       "NOT_ICAL": "El enlace no devuelve un calendario iCal. Revisa que sea el enlace iCal, no el de la web.",
       "BAD_URL": "El enlace no es válido: debe empezar por https:// o webcal://.",

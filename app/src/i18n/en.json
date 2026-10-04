@@ -661,6 +661,17 @@
     "wholeSeries": "whole series",
     "restore": "Count again",
     "untitled": "(untitled)",
+    "edit": {
+      "open": "Edit",
+      "title": "Edit \"{{name}}\"",
+      "urlLabel": "New iCal link (optional)",
+      "urlHelp": "Leave it empty to keep the current one ({{hint}}).",
+      "changeBody_zero": "Changing the link syncs the calendar again from the new link. The events you marked as free stay that way.",
+      "changeBody_one": "Changing the link deletes this calendar's synced event and downloads its events again from the new link. The events you marked as free stay that way.",
+      "changeBody_other": "Changing the link deletes this calendar's {{count}} synced events and downloads them again from the new link. The events you marked as free stay that way.",
+      "confirm": "Change link",
+      "saving": "Saving…"
+    },
     "errors": {
       "NOT_ICAL": "The link doesn't return an iCal calendar. Check it's the iCal link, not the web one.",
       "BAD_URL": "The link isn't valid: it must start with https:// or webcal://.",

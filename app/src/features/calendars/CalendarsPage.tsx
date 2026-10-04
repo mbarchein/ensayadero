@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useLocation } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { format, formatDistanceToNow } from 'date-fns'
-import { AlertCircle, CalendarSync, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { AlertCircle, CalendarSync, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Modal, Spinner, Toggle } from '../../components/ui'
@@ -144,6 +144,7 @@ function SourceCard({
     enabled: cal.capped,
   })
   const count = cal.capped ? (exact.data ?? 0) : cal.busyRows.filter((b) => b.source_id === s.id).length
+  const [editing, setEditing] = useState(false)
   return (
     <li className="space-y-3 rounded-xl border bg-white p-4">
       <div className="flex items-start justify-between gap-2">
@@ -155,6 +156,15 @@ function SourceCard({
           <p className="truncate text-xs text-gray-500">{s.url_hint}</p>
         </div>
         <div className="flex shrink-0 items-center">
+          <Button
+            variant="ghost"
+            className="!p-2"
+            aria-label={t('calendars.edit.open')}
+            title={t('calendars.edit.open')}
+            onClick={() => setEditing(true)}
+          >
+            <Pencil size={16} />
+          </Button>
           <Button
             variant="ghost"
             className="!p-2"
@@ -207,7 +217,119 @@ function SourceCard({
           onChange={(v) => cal.update.mutate({ id: s.id, include_free: v })}
         />
       </div>
+
+      <Modal open={editing} onClose={() => setEditing(false)} title={t('calendars.edit.title', { name: s.name })}>
+        {editing && <EditForm source={s} count={count} cal={cal} onDone={() => setEditing(false)} />}
+      </Modal>
     </li>
+  )
+}
+
+/** Rename a calendar or give it a new link. The current link can't be read
+ *  back, so the field starts empty (empty = keep it). A new link drops the
+ *  calendar's synced events (server-side) and re-syncs: confirmed first. */
+function EditForm({
+  source: s,
+  count,
+  cal,
+  onDone,
+}: {
+  source: CalendarSource
+  count: number
+  cal: ReturnType<typeof useCalendars>
+  onDone: () => void
+}) {
+  const { t } = useTranslation()
+  const [name, setName] = useState(s.name)
+  const [url, setUrl] = useState('')
+  const [confirming, setConfirming] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const newUrl = url.trim()
+  const urlOk = newUrl === '' || /^(https?|webcal):\/\/[^/\s]+/i.test(newUrl)
+
+  const save = () => {
+    setError(null)
+    cal.update.mutate(
+      { id: s.id, name: name.trim(), ...(newUrl ? { url: newUrl } : {}) },
+      {
+        onSuccess: onDone,
+        onError: (err) => {
+          setConfirming(false)
+          const msg = (err as { message?: string }).message ?? ''
+          setError(
+            msg.includes('url_check') || msg.includes('check constraint')
+              ? t('calendars.errors.BAD_URL')
+              : t('calendars.errors.generic'),
+          )
+        },
+      },
+    )
+  }
+
+  if (confirming) {
+    return (
+      <div className="space-y-4">
+        <p className="flex items-start gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden />
+          {t('calendars.edit.changeBody', { count })}
+        </p>
+        <div className="flex gap-2">
+          <Button variant="secondary" className="flex-1" onClick={() => setConfirming(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="warning" className="flex-1" disabled={cal.update.isPending} onClick={save}>
+            {cal.update.isPending ? t('calendars.edit.saving') : t('calendars.edit.confirm')}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault()
+        // a new link is confirmed first: it drops the synced events
+        if (newUrl) setConfirming(true)
+        else save()
+      }}
+    >
+      <label className="block text-sm">
+        {t('calendars.nameLabel')}
+        <input
+          required
+          maxLength={60}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="mt-1 w-full rounded-lg border px-3 py-2"
+        />
+      </label>
+      <label className="block text-sm">
+        {t('calendars.edit.urlLabel')}
+        <input
+          type="url"
+          inputMode="url"
+          autoComplete="off"
+          spellCheck={false}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://…  ·  webcal://…"
+          className="mt-1 w-full rounded-lg border px-3 py-2 font-mono text-xs"
+        />
+        <span className="mt-1 block text-xs text-gray-500">{t('calendars.edit.urlHelp', { hint: s.url_hint })}</span>
+      </label>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="flex gap-2">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onDone}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" className="flex-1" disabled={!name.trim() || !urlOk || cal.update.isPending}>
+          {cal.update.isPending ? t('calendars.edit.saving') : t('common.save')}
+        </Button>
+      </div>
+    </form>
   )
 }
 

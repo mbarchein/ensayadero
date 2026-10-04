@@ -197,13 +197,23 @@ export function useCalendars(range?: TimeRange | null) {
   })
 
   const update = useMutation({
-    mutationFn: async ({ id, ...patch }: { id: string; name?: string; include_all_day?: boolean; include_free?: boolean }) => {
+    mutationFn: async ({
+      id,
+      ...patch
+    }: {
+      id: string
+      name?: string
+      url?: string
+      include_all_day?: boolean
+      include_free?: boolean
+    }) => {
       const { error } = await supabase.from('calendar_sources').update(patch).eq('id', id)
       if (error) throw error
-      return id
+      return { id, resync: Object.keys(patch).some((k) => k !== 'name') }
     },
-    // new rules → expand the feed again
-    onSuccess: (id) => sync.mutate(id),
+    // new rules or a new link (the server already dropped the old link's
+    // events) → expand the feed again; a new name only needs a reload
+    onSuccess: ({ id, resync }) => (resync ? sync.mutate(id) : refresh()),
   })
 
   const remove = useMutation({
