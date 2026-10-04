@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Trash2, Copy, Check, X, Loader2, AlertCircle, User, Users, CalendarSync, WandSparkles } from 'lucide-react'
-import { addDays, addWeeks, format } from 'date-fns'
+import { addDays, addWeeks, format, parseISO } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -120,14 +120,16 @@ export default function AvailabilityPage() {
   const { t } = useTranslation()
   const { profile } = useAuth()
   const qc = useQueryClient()
-  // initial week: ?d=YYYY-MM-DD (from "view in my agenda"), otherwise the current one
+  // initial week: ?d=YYYY-MM-DD (from "view in my agenda", or kept by a
+  // reload), otherwise the current one
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const initialOffset = useMemo(() => {
     const d = params.get('d')
     if (!d) return 0
-    const diff = weekStart(new Date(d)).getTime() - weekStart(new Date()).getTime()
-    return Math.max(-6, Math.round(diff / (7 * 86_400_000)))
+    // parseISO: a bare date is local midnight (new Date() would read it as UTC)
+    const diff = weekStart(parseISO(d)).getTime() - weekStart(new Date()).getTime()
+    return Number.isNaN(diff) ? 0 : Math.max(-6, Math.round(diff / (7 * 86_400_000)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [weekOffset, setWeekOffset] = useState(initialOffset)
@@ -153,6 +155,18 @@ export default function AvailabilityPage() {
       clearTimeout(clear)
     }
   }, [flashSession])
+  // keep the visible week in the URL (?d=its Monday; none for the current
+  // week) so a reload stays on it. Replace, not push: weeks aren't history
+  // steps. Read from location, not params: the ?s= cleanup above may have
+  // replaced the URL in this same commit.
+  useEffect(() => {
+    const cur = new URLSearchParams(window.location.search)
+    const next = new URLSearchParams(cur)
+    if (weekOffset === 0) next.delete('d')
+    else next.set('d', isoDay(monday))
+    if (next.toString() !== cur.toString()) setParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monday])
   // repeated taps on week-view cells without a rehearsal (the read-only area)
   // → pulse a color wave across the day strip to hint where to tap
   const [hintPulse, setHintPulse] = useState(0)
