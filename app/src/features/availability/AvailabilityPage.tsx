@@ -50,10 +50,11 @@ const CELL_STYLE: Record<SlotState, string> = {
   PREFERRED: 'bg-violet-400',
 }
 
-// painted but taken by an imported calendar event: the group counts it as
-// busy, so the violet is dimmed one step (still distinct from each other)
+// taken by an imported calendar event: the group counts it as busy, so the
+// violet is dimmed one step (still distinct from each other); unpainted, a
+// grey fill so the dots don't vanish on white
 const CELL_STYLE_EXT: Record<SlotState, string> = {
-  NONE: 'bg-white',
+  NONE: 'bg-slate-200',
   AVAILABLE: 'bg-violet-100',
   PREFERRED: 'bg-violet-300',
 }
