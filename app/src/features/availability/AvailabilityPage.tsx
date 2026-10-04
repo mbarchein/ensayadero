@@ -847,8 +847,10 @@ export default function AvailabilityPage() {
               const prev = `${day}:${slot - 1}`
               const first = here.find((b) => !((ext!.get(prev) ?? []).includes(b) && !cells?.has(prev)))
               return first ? (
+                // translucent, blurred pill behind the text so the dots don't
+                // fight with it; sized to the text, the rest stays dotted
                 <span
-                  className={`pointer-events-none block truncate font-medium leading-5 text-slate-700 ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
+                  className={`pointer-events-none m-0.5 inline-block max-w-[calc(100%-4px)] truncate rounded bg-white/70 font-medium leading-4 text-slate-700 backdrop-blur-[2px] ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
                 >
                   {first.summary || t('calendars.untitled')}
                 </span>
