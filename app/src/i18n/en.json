@@ -315,6 +315,7 @@
         "install": "Install the app on your phone and open it like any other app.",
         "deviceAlerts": "Turn on alerts on this device to hear about changes and cancellations right away.",
         "availability": "Mark your availability and the group will know when you're free without having to ask.",
+        "importCalendars": "You can connect your Google, Outlook or iCloud calendars: their events count as busy for your groups, without anyone seeing what they are.",
         "resetTips": "You can show all the tips again from your profile.",
         "slotAvailability": "As a director, you can see how many people are free in each slot before summoning.",
         "convokeSome": "As a director, you can summon {{actPl}} only for the people you choose from the group.",
@@ -332,7 +333,8 @@
         "join": "Join a group",
         "availability": "View availability",
         "planner": "View planner",
-        "editGroup": "Edit group"
+        "editGroup": "Edit group",
+        "importCalendar": "Import a calendar"
       }
     }
   },

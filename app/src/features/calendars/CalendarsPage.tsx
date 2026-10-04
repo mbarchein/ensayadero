@@ -5,6 +5,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useLocation } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { format, formatDistanceToNow } from 'date-fns'
 import { AlertCircle, CalendarSync, Plus, RefreshCw, Trash2 } from 'lucide-react'
@@ -18,7 +19,9 @@ const MAX_CALENDARS = 5 // keep in sync with calendar_source_prepare()
 export default function CalendarsPage() {
   const { t } = useTranslation()
   const cal = useCalendars()
-  const [adding, setAdding] = useState(false)
+  // { add: true } (the home tip's link): open with the add form showing
+  const openAdd = !!(useLocation().state as { add?: boolean } | null)?.add
+  const [adding, setAdding] = useState(openAdd)
   const [removing, setRemoving] = useState<CalendarSource | null>(null)
 
   if (cal.sources.isLoading) return <Spinner />
@@ -47,7 +50,7 @@ export default function CalendarsPage() {
         ))}
       </ul>
 
-      {adding ? (
+      {adding && sources.length < MAX_CALENDARS ? (
         <AddForm cal={cal} onDone={() => setAdding(false)} />
       ) : sources.length < MAX_CALENDARS ? (
         <Button variant="secondary" className="inline-flex w-full items-center justify-center gap-1.5" onClick={() => setAdding(true)}>

@@ -315,6 +315,7 @@
         "install": "Instala la app en tu móvil y ábrela como cualquier otra aplicación.",
         "deviceAlerts": "Activa los avisos en este dispositivo para enterarte al momento de cambios y cancelaciones.",
         "availability": "Marca tu disponibilidad y el grupo sabrá cuándo puedes sin tener que preguntarte.",
+        "importCalendars": "Puedes conectar tus calendarios de Google, Outlook o iCloud: sus eventos cuentan como ocupado para tus grupos, sin que nadie vea de qué se trata.",
         "resetTips": "Puedes volver a ver todos los consejos desde tu perfil.",
         "slotAvailability": "Como director, puedes ver cuánta gente está disponible en cada franja antes de convocar.",
         "convokeSome": "Como director, puedes convocar {{actPl}} solo para las personas que quieras del grupo.",
@@ -332,7 +333,8 @@
         "join": "Unirme a un grupo",
         "availability": "Ver disponibilidad",
         "planner": "Ver planificador",
-        "editGroup": "Editar grupo"
+        "editGroup": "Editar grupo",
+        "importCalendar": "Importar un calendario"
       }
     }
   },

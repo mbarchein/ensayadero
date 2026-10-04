@@ -55,6 +55,7 @@ const FACTS: Fact[] = [
   { id: 'install', cta: 'profile', to: '/profile' },
   { id: 'deviceAlerts', cta: 'emailPrefs', to: '/profile' },
   { id: 'availability', cta: 'availability', to: '/availability' },
+  { id: 'importCalendars', cta: 'importCalendar', to: '/calendars', state: { add: true } },
   { id: 'resetTips', cta: 'profile', to: '/profile' },
   { id: 'slotAvailability', director: true, groupPath: (g) => `/g/${g}/planner` },
   { id: 'convokeSome', director: true, groupPath: (g) => `/g/${g}/planner` },
