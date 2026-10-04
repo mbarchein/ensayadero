@@ -67,7 +67,6 @@ export default function SessionDetailPage() {
   const { profile } = useAuth()
   const qc = useQueryClient()
   const navigate = useNavigate()
-  const myCalendars = useCalendars()
   // set by the short-link landing: explain what a shared rehearsal is
   const viaShare = !!(useLocation().state as { shared?: boolean } | null)?.shared
   const [shareCopied, setShareCopied] = useState(false)
@@ -88,6 +87,9 @@ export default function SessionDetailPage() {
       return data as SessionWithParticipants
     },
   })
+
+  // my imported calendar events at the rehearsal's time
+  const myCalendars = useCalendars(session ? parseRange(session.time_range) : null)
 
   // participants' availability (to detect partial availability)
   const participantIds = session?.session_participants.map((p) => p.user_id) ?? []

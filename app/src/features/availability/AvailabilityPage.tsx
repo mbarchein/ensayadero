@@ -265,7 +265,8 @@ export default function AvailabilityPage() {
 
   // events from my imported calendars (not ignored), per "day:slot": they
   // hatch the slots they take, on top of whatever availability is painted
-  const cal = useCalendars()
+  // the carousel shows the weeks either side too
+  const cal = useCalendars({ start: addDays(monday, -7), end: addDays(monday, 14) })
   const buildExtCells = useCallback(
     (m: Date) => {
       const map = new Map<string, ExternalBusy[]>()
@@ -524,6 +525,7 @@ export default function AvailabilityPage() {
   const autofill = useMutation({
     mutationFn: async (o: AutofillOptions) => {
       const now = new Date()
+      const busy = o.skipBusy ? await cal.busyBetween(monday, addDays(monday, 7 * o.weeks)) : []
       for (let w = 0; w < o.weeks; w++) {
         const m = addDays(monday, 7 * w)
         // this week starts from what's on screen (it may hold unsaved strokes)
@@ -534,7 +536,7 @@ export default function AvailabilityPage() {
             if (g[d][slot] !== 'NONE') continue
             const r = slotRange(m, d, slot)
             if (r.end <= now) continue
-            if (o.skipBusy && cal.busy.some((b) => overlaps(b, r))) continue
+            if (busy.some((b) => overlaps(b, r))) continue
             g[d][slot] = 'AVAILABLE'
             added++
           }

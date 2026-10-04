@@ -4,10 +4,12 @@
 // per-provider help, and the events the user chose to ignore.
 
 import { useState, type ReactNode } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import { format, formatDistanceToNow } from 'date-fns'
 import { AlertCircle, CalendarSync, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
+import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Modal, Spinner, Toggle } from '../../components/ui'
 import { useCalendars, type CalendarSource } from './useCalendars'
 
@@ -125,7 +127,20 @@ function SourceCard({
 }) {
   const { t } = useTranslation()
   const syncing = cal.sync.isPending && (cal.sync.variables === s.id || cal.sync.variables === undefined)
-  const count = (cal.busyRows.data ?? []).filter((b) => b.source_id === s.id).length
+  // the loaded blocks, unless the server capped them: then ask for the count
+  const exact = useQuery({
+    queryKey: ['external-busy', 'count', s.id, s.last_synced_at],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('external_busy')
+        .select('id', { count: 'exact', head: true })
+        .eq('source_id', s.id)
+      if (error) throw error
+      return count ?? 0
+    },
+    enabled: cal.capped,
+  })
+  const count = cal.capped ? (exact.data ?? 0) : cal.busyRows.filter((b) => b.source_id === s.id).length
   return (
     <li className="space-y-3 rounded-xl border bg-white p-4">
       <div className="flex items-start justify-between gap-2">
