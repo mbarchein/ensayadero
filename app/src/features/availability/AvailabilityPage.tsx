@@ -839,15 +839,17 @@ export default function AvailabilityPage() {
             const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
             const list = cells?.get(`${day}:${slot}`)
             if (!list || !cells || !lanes) {
-              // day view: an imported event shows its title on its first slot
-              // not covered by a rehearsal box
+              // an imported event shows its title (only I see my agenda) on its
+              // first slot not covered by a rehearsal box
               const ext = (current ? extCells : adjacentWeeks.get(wm.getTime())?.ext) ?? null
               const here = ext?.get(`${day}:${slot}`)
-              if (!dayView || !here) return null
+              if (!here) return null
               const prev = `${day}:${slot - 1}`
               const first = here.find((b) => !((ext!.get(prev) ?? []).includes(b) && !cells?.has(prev)))
               return first ? (
-                <span className="pointer-events-none block truncate px-1 text-[10px] font-medium leading-5 text-slate-700">
+                <span
+                  className={`pointer-events-none block truncate font-medium leading-5 text-slate-700 ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
+                >
                   {first.summary || t('calendars.untitled')}
                 </span>
               ) : null
