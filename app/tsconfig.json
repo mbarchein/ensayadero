@@ -13,7 +13,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": {
+      "@/*": ["src/*"],
+      // supabase/functions/_shared/calendarFeed.ts (tested from src/lib) imports ical.js bare
+      "ical.js": ["node_modules/ical.js"]
+    }
   },
   "include": ["src"]
 }

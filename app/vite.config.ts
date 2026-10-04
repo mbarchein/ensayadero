@@ -1,8 +1,14 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // the Edge Functions' calendar parser (supabase/functions/_shared, tested
+  // from src/lib) imports ical.js bare: resolve it from the app's node_modules
+  resolve: {
+    alias: { 'ical.js': fileURLToPath(new URL('./node_modules/ical.js/dist/ical.js', import.meta.url)) },
+  },
   plugins: [
     react(),
     VitePWA({
