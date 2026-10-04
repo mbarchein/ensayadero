@@ -50,6 +50,14 @@ const CELL_STYLE: Record<SlotState, string> = {
   PREFERRED: 'bg-violet-400',
 }
 
+// painted but taken by an imported calendar event: the group counts it as
+// busy, so the violet is dimmed one step (still distinct from each other)
+const CELL_STYLE_EXT: Record<SlotState, string> = {
+  NONE: 'bg-white',
+  AVAILABLE: 'bg-violet-100',
+  PREFERRED: 'bg-violet-300',
+}
+
 // Assign every rehearsal a fixed sub-column (lane) and the lane count of its
 // overlap cluster, so its box keeps the SAME width along its whole run — even on
 // slots where it happens not to overlap. Built from the "day:slot" → list cells
@@ -806,9 +814,10 @@ export default function AvailabilityPage() {
                 ? 'cell-flash'
                 : ''
             const state = current ? grid[day][slot] : (week?.grid?.[day][slot] ?? 'NONE')
-            // taken by an event of my imported calendars: dotted
-            const ext = (current ? extCells : week?.ext)?.has(`${day}:${slot}`) ? 'ext-busy' : ''
-            return `${CELL_STYLE[state]} cursor-pointer ${pending} ${flash} ${ext}`
+            // taken by an event of my imported calendars: dotted, violet dimmed
+            const ext = !!(current ? extCells : week?.ext)?.has(`${day}:${slot}`)
+            const style = ext ? `${CELL_STYLE_EXT[state]} ext-busy` : CELL_STYLE[state]
+            return `${style} cursor-pointer ${pending} ${flash}`
           }}
           renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
             const current = wm.getTime() === monday.getTime()
