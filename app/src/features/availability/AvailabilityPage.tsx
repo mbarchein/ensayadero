@@ -2,7 +2,7 @@
 // Paint by dragging; tap cycles NONE → AVAILABLE → PREFERRED → NONE.
 // "Repeat every week" turns the week's blocks into recurring ones.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Trash2, Copy, Check, X, Loader2, AlertCircle, User, Users, CalendarSync, WandSparkles } from 'lucide-react'
 import { addDays, addWeeks, format, parseISO } from 'date-fns'
@@ -50,21 +50,21 @@ const CELL_STYLE: Record<SlotState, string> = {
   PREFERRED: 'bg-violet-400',
 }
 
-// Assign every rehearsal a fixed sub-column (lane) and the lane count of its
-// overlap cluster, so its box keeps the SAME width along its whole run — even on
-// slots where it happens not to overlap. Built from the "day:slot" → list cells
-// map: per day, derive each session's slot run, cluster the runs that overlap
-// (transitively), then greedy-assign lanes within each cluster.
-function computeLanes(
-  cells: Map<string, MyParticipation[]>,
-): Map<string, { lane: number; lanes: number }> {
-  // session_id → { day, min slot, max slot } (rehearsals sit within one day)
+// Assign every item (rehearsal or imported event) a fixed sub-column (lane) and
+// the lane count of its overlap cluster, so its box keeps the SAME width along
+// its whole run — even on slots where it happens not to overlap. Built from the
+// "day:slot" → item ids map (see laneIds): per day, derive each item's slot run,
+// cluster the runs that overlap (transitively), then greedy-assign lanes within
+// each cluster. Keyed "day|id": an imported event may span several days.
+function computeLanes(cells: Map<string, string[]>): Map<string, { lane: number; lanes: number }> {
+  // "day|id" → { day, min slot, max slot }
   const spans = new Map<string, { day: number; a: number; b: number }>()
   for (const [key, arr] of cells) {
     const [day, slot] = key.split(':').map(Number)
-    for (const p of arr) {
-      const e = spans.get(p.session_id)
-      if (!e) spans.set(p.session_id, { day, a: slot, b: slot })
+    for (const id of arr) {
+      const k = `${day}|${id}`
+      const e = spans.get(k)
+      if (!e) spans.set(k, { day, a: slot, b: slot })
       else {
         e.a = Math.min(e.a, slot)
         e.b = Math.max(e.b, slot)
@@ -105,6 +105,15 @@ function computeLanes(
       i = j
     }
   }
+  return out
+}
+
+/** Lane items per "day:slot": rehearsals by session id, my imported calendar
+ *  events as "ext:<id>" — they share the day column side by side. */
+function laneIds(sessions: Map<string, MyParticipation[]>, ext: Map<string, ExternalBusy[]>) {
+  const out = new Map<string, string[]>()
+  for (const [k, arr] of sessions) out.set(k, arr.map((p) => p.session_id))
+  for (const [k, arr] of ext) out.set(k, [...(out.get(k) ?? []), ...arr.map((b) => `ext:${b.id}`)])
   return out
 }
 
@@ -250,14 +259,10 @@ export default function AvailabilityPage() {
     [agenda.data],
   )
   const sessionCells = useMemo(() => buildSessionCells(monday), [buildSessionCells, monday])
-  // Fixed sub-column layout per rehearsal: if a rehearsal overlaps another at
-  // ANY slot, its box is narrowed for its WHOLE extent (constant lane/width),
-  // not just on the overlapping cells. Computed per week from the cells map.
-  const sessionLanes = useMemo(() => computeLanes(sessionCells), [sessionCells])
 
-  // events from my imported calendars (not ignored), per "day:slot": they
-  // hatch the slots they take, on top of whatever availability is painted
-  // the carousel shows the weeks either side too
+  // events from my imported calendars (not ignored), per "day:slot": drawn as
+  // blocks over whatever availability is painted. The carousel shows the
+  // weeks either side too.
   const cal = useCalendars({ start: addDays(monday, -7), end: addDays(monday, 14) })
   const buildExtCells = useCallback(
     (m: Date) => {
@@ -281,6 +286,10 @@ export default function AvailabilityPage() {
     [cal.busy],
   )
   const extCells = useMemo(() => buildExtCells(monday), [buildExtCells, monday])
+  // Fixed sub-column layout per rehearsal / imported event: if one overlaps
+  // another at ANY slot, its box is narrowed for its WHOLE extent (constant
+  // lane/width), not just on the overlapping cells. Computed per week.
+  const sessionLanes = useMemo(() => computeLanes(laneIds(sessionCells, extCells)), [sessionCells, extCells])
   const [extOpen, setExtOpen] = useState<ExternalBusy[] | null>(null)
   const [autofillOpen, setAutofillOpen] = useState(false)
 
@@ -363,11 +372,12 @@ export default function AvailabilityPage() {
     for (const off of [-7, 7]) {
       const m = addDays(monday, off)
       const cells = buildSessionCells(m)
+      const ext = buildExtCells(m)
       map.set(m.getTime(), {
         grid: availabilities ? weekGrid(availabilities, m) : null,
         cells,
-        lanes: computeLanes(cells),
-        ext: buildExtCells(m),
+        lanes: computeLanes(laneIds(cells, ext)),
+        ext,
       })
     }
     return map
@@ -819,100 +829,107 @@ export default function AvailabilityPage() {
           }}
           renderCell={({ day, slot }, { dayView, weekMonday: wm }) => {
             const current = wm.getTime() === monday.getTime()
-            const cells = current ? sessionCells : adjacentWeeks.get(wm.getTime())?.cells
-            const lanes = current ? sessionLanes : adjacentWeeks.get(wm.getTime())?.lanes
-            const list = cells?.get(`${day}:${slot}`)
-            if (!list || !cells || !lanes) {
-              // my imported calendar events: one translucent sky block over
-              // their slots (a rehearsal box takes precedence), the cell's
-              // color showing through it and a sliver on the right
-              const ext = (current ? extCells : adjacentWeeks.get(wm.getTime())?.ext) ?? null
-              const here = ext?.get(`${day}:${slot}`)
-              if (!here) return null
-              const prev = `${day}:${slot - 1}`
-              const next = `${day}:${slot + 1}`
-              const blockAbove = ext!.has(prev) && !cells?.has(prev)
-              const blockBelow = ext!.has(next) && !cells?.has(next)
-              // the title (only I see my agenda) on the slot each event starts in
-              const first = here.find((b) => !(blockAbove && (ext!.get(prev) ?? []).includes(b)))
-              return (
-                <div
-                  className={`pointer-events-none mr-0.5 flex h-full items-start border-l-[3px] border-sky-600 bg-sky-400/25 ${blockAbove ? '' : 'rounded-tr-md'} ${blockBelow ? '' : 'rounded-br-md'}`}
+            const adj = current ? null : adjacentWeeks.get(wm.getTime())
+            const cells = current ? sessionCells : adj?.cells
+            const ext = current ? extCells : adj?.ext
+            const lanes = current ? sessionLanes : adj?.lanes
+            const list = cells?.get(`${day}:${slot}`) ?? []
+            const exts = ext?.get(`${day}:${slot}`) ?? []
+            if (!cells || !ext || !lanes || (list.length === 0 && exts.length === 0)) return null
+            // rehearsals and my imported events share the day column: each keeps
+            // a FIXED lane (sub-column) across its whole run, its box width
+            // 1/laneCount on every slot, even where it doesn't overlap. laneCount
+            // is shared by the whole overlap cluster, so it's the same for every
+            // item present in this cell.
+            const laneOf = (id: string) => lanes.get(`${day}|${id}`)
+            const laneCount = laneOf(list[0]?.session_id ?? `ext:${exts[0].id}`)?.lanes ?? 1
+            const byLane = new Map<number, ReactNode>()
+            for (const p of list) {
+              // full border set per response, so the rehearsal renders as an
+              // enclosed box (left stripe + right edge, top/bottom on the run
+              // boundaries). Literal class names so Tailwind keeps them.
+              const c =
+                p.sessions.status !== 'CONFIRMED'
+                  ? { l: 'border-l-gray-400', r: 'border-r-gray-400', t: 'border-t-gray-400', b: 'border-b-gray-400' }
+                  : p.response === 'ACCEPTED'
+                    ? { l: 'border-l-violet-700', r: 'border-r-violet-700', t: 'border-t-violet-700', b: 'border-b-violet-700' }
+                    : p.response === 'DECLINED'
+                      ? { l: 'border-l-red-500', r: 'border-r-red-500', t: 'border-t-red-500', b: 'border-b-red-500' }
+                      : { l: 'border-l-orange-500', r: 'border-r-orange-500', t: 'border-t-orange-500', b: 'border-b-orange-500' }
+              const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
+                (x) => x.session_id === p.session_id,
+              )
+              const lastOfRun = !(cells.get(`${day}:${slot + 1}`) ?? []).some(
+                (x) => x.session_id === p.session_id,
+              )
+              const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
+              const initials = p.sessions.groups.name
+                .split(/\s+/)
+                .map((w) => w[0])
+                .join('')
+                .slice(0, 3)
+                .toUpperCase()
+              byLane.set(
+                laneOf(p.session_id)?.lane ?? 0,
+                <span
+                  key={p.session_id}
+                  title={title}
+                  data-session={p.session_id}
+                  className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
                 >
-                  {first && (
+                  {firstOfRun && (
+                    <>
+                      <GroupAvatar
+                        seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
+                        image={p.sessions.groups.avatar_image}
+                        size={14}
+                      />
+                      {(dayView || laneCount === 1) && (
+                        <span
+                          className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
+                        >
+                          {dayView ? p.sessions.groups.name : initials}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </span>
+              )
+            }
+            for (const b of exts) {
+              // my imported event: a translucent sky block, the cell's color
+              // showing through; the title (only I see my agenda) on its first
+              // slot. data-session "ext:<id>" tells the tap handler which one.
+              const above = (ext.get(`${day}:${slot - 1}`) ?? []).some((x) => x.id === b.id)
+              const below = (ext.get(`${day}:${slot + 1}`) ?? []).some((x) => x.id === b.id)
+              const name = b.summary || t('calendars.untitled')
+              byLane.set(
+                laneOf(`ext:${b.id}`)?.lane ?? 0,
+                <span
+                  key={`ext:${b.id}`}
+                  title={name}
+                  data-session={`ext:${b.id}`}
+                  className={`mr-0.5 flex h-full min-w-0 flex-1 items-start overflow-hidden border-l-[3px] border-sky-600 bg-sky-400/25 ${above ? '' : 'rounded-tr-md'} ${below ? '' : 'rounded-br-md'}`}
+                >
+                  {!above && (
                     <span
                       className={`flex min-w-0 items-center gap-0.5 font-medium leading-[18px] text-sky-900 ${dayView ? 'px-1 text-[10px]' : 'px-0.5 text-[9px]'}`}
                     >
                       {/* the icon (as on the external calendars button) marks it imported */}
                       <CalendarSync size={dayView ? 11 : 9} className="shrink-0" aria-hidden />
-                      <span className="truncate">{first.summary || t('calendars.untitled')}</span>
+                      {(dayView || laneCount === 1) && <span className="truncate">{name}</span>}
                     </span>
                   )}
-                </div>
+                </span>,
               )
             }
-            // each rehearsal keeps a FIXED lane (sub-column) across its whole run:
-            // its box width is 1/laneCount on every slot, even where it doesn't
-            // overlap. laneCount is shared by the whole overlap cluster, so it's the
-            // same for every rehearsal present in this cell.
-            const laneCount = lanes.get(list[0].session_id)?.lanes ?? 1
-            const byLane = new Map(list.map((p) => [lanes.get(p.session_id)?.lane ?? 0, p]))
             return (
               <div className="flex h-full">
-                {Array.from({ length: laneCount }, (_, lane) => {
-                  const p = byLane.get(lane)
+                {Array.from(
+                  { length: laneCount },
                   // empty lane: a spacer that holds the column width
-                  if (!p) return <span key={lane} className="min-w-0 flex-1" />
-                  // full border set per response, so the rehearsal renders as an
-                  // enclosed box (left stripe + right edge, top/bottom on the run
-                  // boundaries). Literal class names so Tailwind keeps them.
-                  const c =
-                    p.sessions.status !== 'CONFIRMED'
-                      ? { l: 'border-l-gray-400', r: 'border-r-gray-400', t: 'border-t-gray-400', b: 'border-b-gray-400' }
-                      : p.response === 'ACCEPTED'
-                        ? { l: 'border-l-violet-700', r: 'border-r-violet-700', t: 'border-t-violet-700', b: 'border-b-violet-700' }
-                        : p.response === 'DECLINED'
-                          ? { l: 'border-l-red-500', r: 'border-r-red-500', t: 'border-t-red-500', b: 'border-b-red-500' }
-                          : { l: 'border-l-orange-500', r: 'border-r-orange-500', t: 'border-t-orange-500', b: 'border-b-orange-500' }
-                  const firstOfRun = !(cells.get(`${day}:${slot - 1}`) ?? []).some(
-                    (x) => x.session_id === p.session_id,
-                  )
-                  const lastOfRun = !(cells.get(`${day}:${slot + 1}`) ?? []).some(
-                    (x) => x.session_id === p.session_id,
-                  )
-                  const title = `${p.sessions.groups.name} — ${format(parseRange(p.sessions.time_range).start, 'EEE d · HH:mm', { locale: dateLocale() })}`
-                  const initials = p.sessions.groups.name
-                    .split(/\s+/)
-                    .map((w) => w[0])
-                    .join('')
-                    .slice(0, 3)
-                    .toUpperCase()
-                  return (
-                    <span
-                      key={p.session_id}
-                      title={title}
-                      data-session={p.session_id}
-                      className={`flex h-full min-w-0 flex-1 items-center gap-0.5 overflow-hidden border-l-4 border-r-2 pl-0.5 ${c.l} ${c.r} ${firstOfRun ? `border-t-2 ${c.t}` : ''} ${lastOfRun ? `border-b-2 ${c.b}` : ''}`}
-                    >
-                      {firstOfRun && (
-                        <>
-                          <GroupAvatar
-                            seed={p.sessions.groups.avatar_seed || p.sessions.group_id}
-                            image={p.sessions.groups.avatar_image}
-                            size={14}
-                          />
-                          {(dayView || laneCount === 1) && (
-                            <span
-                              className={`truncate font-bold leading-none text-gray-900 ${dayView ? 'text-xs' : 'text-[11px]'}`}
-                            >
-                              {dayView ? p.sessions.groups.name : initials}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </span>
-                  )
-                })}
+                  (_, lane) => byLane.get(lane) ?? <span key={lane} className="min-w-0 flex-1" />,
+                )}
               </div>
             )
           }}
@@ -924,6 +941,14 @@ export default function AvailabilityPage() {
           onPaintMove={(pos) => applyCell(pos, paintValue)}
           onPaintEnd={onPaintEnd}
           onWeekCellTap={(pos, sessionId) => {
+            // tapped an imported event's lane ("ext:<id>"): what it is, ignore it
+            if (sessionId?.startsWith('ext:')) {
+              const ev = extCells.get(`${pos.day}:${pos.slot}`)?.find((b) => `ext:${b.id}` === sessionId)
+              if (ev) {
+                setExtOpen([ev])
+                return
+              }
+            }
             // tap on a rehearsal in the week view opens its detail — the exact lane
             // tapped when several overlap (fall back to the first in the slot)
             const slotList = sessionCells.get(`${pos.day}:${pos.slot}`)
