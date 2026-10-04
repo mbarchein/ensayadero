@@ -45,7 +45,23 @@ export function CalendarEventModal({
     .filter(Boolean)
     .join(', ')
   return (
-    <Modal open={!!events} onClose={onClose} title={t('calendars.agenda.eventTitle', { name: names })}>
+    <Modal
+      open={!!events}
+      onClose={onClose}
+      title={t('calendars.agenda.eventTitle', { name: names })}
+      actions={
+        <button
+          type="button"
+          onClick={onResync}
+          disabled={resyncing}
+          aria-label={t('calendars.agenda.resync')}
+          title={t('calendars.agenda.resync')}
+          className="rounded p-1 text-gray-600 hover:bg-gray-100 disabled:opacity-60"
+        >
+          <RefreshCw size={18} className={resyncing ? 'animate-spin' : ''} />
+        </button>
+      }
+    >
       <div className="space-y-4">
         {(events ?? []).map((ev) => (
           <div key={ev.id} className="space-y-2 rounded-lg border p-3">
@@ -74,19 +90,9 @@ export function CalendarEventModal({
           </div>
         ))}
         <p className="text-xs text-gray-600">{t('calendars.agenda.ignoreBody')}</p>
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            className="inline-flex flex-1 items-center justify-center gap-1.5"
-            disabled={resyncing}
-            onClick={onResync}
-          >
-            <RefreshCw size={15} className={resyncing ? 'animate-spin' : ''} /> {t('calendars.agenda.resync')}
-          </Button>
-          <Button variant="ghost" className="flex-1 text-violet-700" onClick={() => navigate('/calendars')}>
-            {t('calendars.agenda.manage')}
-          </Button>
-        </div>
+        <Button variant="ghost" className="w-full text-violet-700" onClick={() => navigate('/calendars')}>
+          {t('calendars.agenda.manage')}
+        </Button>
       </div>
     </Modal>
   )

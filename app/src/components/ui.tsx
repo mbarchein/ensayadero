@@ -159,11 +159,14 @@ export function Modal({
   open,
   onClose,
   title,
+  actions,
   children,
 }: {
   open: boolean
   onClose: () => void
   title: string
+  /** extra header buttons, next to the close one */
+  actions?: ReactNode
   children: ReactNode
 }) {
   useBackClose(open, onClose)
@@ -214,9 +217,12 @@ export function Modal({
         {/* fixed header; only the body below scrolls */}
         <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 text-gray-600 hover:bg-gray-100">
-            <X size={18} />
-          </button>
+          <div className="flex shrink-0 items-center gap-1">
+            {actions}
+            <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 text-gray-600 hover:bg-gray-100">
+              <X size={18} />
+            </button>
+          </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
       </div>
