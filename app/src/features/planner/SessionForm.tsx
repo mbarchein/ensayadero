@@ -10,7 +10,7 @@
 
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check } from 'lucide-react'
+import { AlertTriangle, Check } from 'lucide-react'
 import { format } from 'date-fns'
 import { dateLocale } from '../../lib/dateLocale'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -506,11 +506,14 @@ export default function SessionForm({
         {/* coverage summary */}
         {grid &&
           (requiredOutside.length > 0 ? (
-            <p className="mb-2 text-sm font-medium text-red-700">
+            <p className="mb-2 flex items-start gap-1 text-sm font-medium text-red-700">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden />
               {t('planner.requiredOutside', { count: requiredOutside.length })}
             </p>
           ) : (
-            <p className="mb-2 text-sm font-medium text-green-700">✓ {t('planner.coverageOk')}</p>
+            <p className="mb-2 flex items-center gap-1 text-sm font-medium text-green-700">
+              <Check size={16} aria-hidden /> {t('planner.coverageOk')}
+            </p>
           ))}
         {grid && optionalOutside.length > 0 && requiredOutside.length === 0 && (
           <p className="mb-2 text-sm text-amber-700">

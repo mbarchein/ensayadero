@@ -6,6 +6,7 @@ import { Navigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { AlertTriangle } from 'lucide-react'
 import { dateLocale } from '../../lib/dateLocale'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -155,7 +156,9 @@ export default function AdminPage() {
                     <p className="text-xs text-gray-600">
                       {t('admin.members', { count: ms.length })} ·{' '}
                       {instructors.length === 0 ? (
-                        <span className="font-medium text-red-600">{t('admin.noDirector')}</span>
+                        <span className="inline-flex items-center gap-0.5 font-medium text-red-600">
+                          <AlertTriangle size={12} aria-hidden /> {t('admin.noDirector')}
+                        </span>
                       ) : (
                         t('admin.directorLabel', {
                           names: instructors.map((i) => i.profiles.name || i.profiles.email).join(', '),

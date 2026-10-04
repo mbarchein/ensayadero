@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, formatDistanceToNow } from 'date-fns'
 import { useState } from 'react'
 import {
+  AlertTriangle,
   CalendarDays,
   CalendarPlus,
   CalendarSync,
@@ -425,12 +426,16 @@ export default function SessionDetailPage() {
             </p>
           )}
           {!isPast && availInfo.get(profile?.id ?? '')?.coverage === 'partial' && (
-            <p className="mt-2 text-xs text-amber-800">
-              ⚠ {t('sessions.yourPartialAvailability', { hours: availInfo.get(profile!.id)!.label })}
+            <p className="mt-2 flex items-start gap-1 text-xs text-amber-800">
+              <AlertTriangle size={13} className="mt-0.5 shrink-0" aria-hidden />
+              {t('sessions.yourPartialAvailability', { hours: availInfo.get(profile!.id)!.label })}
             </p>
           )}
           {!isPast && availInfo.get(profile?.id ?? '')?.coverage === 'none' && (
-            <p className="mt-2 text-xs text-amber-800">⚠ {t('sessions.yourNoAvailability')}</p>
+            <p className="mt-2 flex items-start gap-1 text-xs text-amber-800">
+              <AlertTriangle size={13} className="mt-0.5 shrink-0" aria-hidden />
+              {t('sessions.yourNoAvailability')}
+            </p>
           )}
         </section>
       )}

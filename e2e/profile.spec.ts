@@ -18,11 +18,11 @@ test.describe('profile', () => {
     const field = page.locator('label:has-text("Nombre")').first()
     await field.locator('input').fill('Admin Local Edit')
     await field.getByRole('button', { name: 'Guardar' }).click()
-    await expect(field.getByText('✓ Guardado')).toBeVisible()
+    await expect(field.getByText('Guardado')).toBeVisible()
     // restore so other specs see the seeded name
     await field.locator('input').fill('Admin Local')
     await field.getByRole('button', { name: 'Guardar' }).click()
-    await expect(field.getByText('✓ Guardado')).toBeVisible()
+    await expect(field.getByText('Guardado')).toBeVisible()
   })
 
   test('pronoun auto-saves on selection', async ({ page }) => {

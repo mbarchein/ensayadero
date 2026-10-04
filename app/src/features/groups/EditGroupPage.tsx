@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ChevronRight } from 'lucide-react'
+import { Check, ChevronRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { BackButton, Button, Spinner } from '../../components/ui'
 import AvatarPicker from './AvatarPicker'
@@ -113,8 +113,14 @@ function EditGroupForm({ group }: { group: Group }) {
       <div className="space-y-4">
         <div className="space-y-1">
           <AvatarPicker seed={seed} image={image} onRollSeed={regenerate} onImageChange={changeImage} />
-          <p aria-live="polite" className="h-4 text-right text-sm text-green-600">
-            {saveAvatar.isPending ? t('availability.saving') : avatarSaved ? t('availability.saved') : ''}
+          <p aria-live="polite" className="flex h-4 items-center justify-end gap-1 text-sm text-green-600">
+            {saveAvatar.isPending ? (
+              t('availability.saving')
+            ) : avatarSaved ? (
+              <>
+                <Check size={14} aria-hidden /> {t('availability.saved')}
+              </>
+            ) : null}
           </p>
           {saveAvatar.isError && (
             <p className="text-sm text-red-600">{(saveAvatar.error as Error).message}</p>

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { tg } from '../../lib/glossary'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarSync, Download, LogOut, Trash2 } from 'lucide-react'
+import { CalendarSync, Check, Download, LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush, disablePush, isPushSubscribed } from '../../lib/push'
@@ -232,7 +232,9 @@ export default function ProfilePage() {
             </Button>
           </div>
           {savedField === 'name' && (
-            <span className="mt-1 block text-xs text-green-600">{t('profile.detailsSaved')}</span>
+            <span className="mt-1 flex items-center gap-1 text-xs text-green-600">
+              <Check size={12} aria-hidden /> {t('profile.detailsSaved')}
+            </span>
           )}
         </label>
         <label className="block text-sm">
@@ -256,7 +258,9 @@ export default function ProfilePage() {
             </Button>
           </div>
           {savedField === 'phone' && (
-            <span className="mt-1 block text-xs text-green-600">{t('profile.detailsSaved')}</span>
+            <span className="mt-1 flex items-center gap-1 text-xs text-green-600">
+              <Check size={12} aria-hidden /> {t('profile.detailsSaved')}
+            </span>
           )}
         </label>
         <div className="text-sm">
@@ -346,7 +350,11 @@ export default function ProfilePage() {
           </Button>
         </div>
         {pwError && <p className="text-sm text-red-600">{pwError}</p>}
-        {pwSaved && <span className="text-xs text-green-600">{t('profile.detailsSaved')}</span>}
+        {pwSaved && (
+          <span className="inline-flex items-center gap-1 text-xs text-green-600">
+            <Check size={12} aria-hidden /> {t('profile.detailsSaved')}
+          </span>
+        )}
       </fieldset>
 
       <fieldset className="rounded-xl border bg-white px-4 pb-4 pt-1">
@@ -375,8 +383,12 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
-        <p aria-live="polite" className="mt-2 h-4 text-right text-sm text-green-600">
-          {prefsSaved ? t('profile.detailsSaved') : ''}
+        <p aria-live="polite" className="mt-2 flex h-4 items-center justify-end gap-1 text-sm text-green-600">
+          {prefsSaved && (
+            <>
+              <Check size={14} aria-hidden /> {t('profile.detailsSaved')}
+            </>
+          )}
         </p>
       </fieldset>
 
@@ -415,7 +427,11 @@ export default function ProfilePage() {
           <Button variant="secondary" onClick={() => { resetTips(); setTipsReset(true); setTimeout(() => setTipsReset(false), 2000) }}>
             {t('profile.resetTips')}
           </Button>
-          {tipsReset && <span className="text-sm text-green-600">{t('profile.tipsResetDone')}</span>}
+          {tipsReset && (
+            <span className="inline-flex items-center gap-1 text-sm text-green-600">
+              <Check size={14} aria-hidden /> {t('profile.tipsResetDone')}
+            </span>
+          )}
         </div>
       </fieldset>
 
