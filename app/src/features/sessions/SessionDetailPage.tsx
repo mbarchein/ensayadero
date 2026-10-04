@@ -423,7 +423,14 @@ export default function SessionDetailPage() {
             <p className="mt-2 flex items-start gap-1 text-xs text-amber-800">
               <CalendarSync size={13} className="mt-0.5 shrink-0" aria-hidden />
               {t('calendars.agenda.inYourCalendar', {
-                list: calendarHits.map((b) => b.summary || t('calendars.untitled')).join(', '),
+                // each event with the part of the rehearsal it takes up
+                list: calendarHits
+                  .map((b) => {
+                    const from = b.start > r.start ? b.start : r.start
+                    const to = b.end < r.end ? b.end : r.end
+                    return `${b.summary || t('calendars.untitled')} (${format(from, 'HH:mm')}–${format(to, 'HH:mm')})`
+                  })
+                  .join(', '),
               })}
             </p>
           )}
