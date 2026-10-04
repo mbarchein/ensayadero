@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { tg } from '../../lib/glossary'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Download, LogOut, Trash2 } from 'lucide-react'
+import { CalendarSync, Download, LogOut, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { enablePush, disablePush, isPushSubscribed } from '../../lib/push'
@@ -12,6 +12,7 @@ import { BackButton, Button, Modal, PasswordInput, Toggle } from '../../componen
 import Tip, { resetTips } from '../../components/Tip'
 import { PASSWORD_MIN } from '../../auth/SignupPage'
 import AvatarEditor from './AvatarEditor'
+import { useCalendars } from '../calendars/useCalendars'
 
 // Email opt-out groups → notification event types (notification_preferences).
 // A switch ON means the email is sent: channel BOTH; OFF → PUSH (in-app/device
@@ -28,6 +29,7 @@ export default function ProfilePage() {
   const { t } = useTranslation()
   const { session, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
+  const calendarCount = useCalendars().sources.data?.length ?? 0
   const openAvatar = !!(useLocation().state as { openAvatar?: boolean } | null)?.openAvatar
   const { canInstall } = useInstallPrompt()
 
@@ -295,6 +297,20 @@ export default function ProfilePage() {
         {saveField.isError && (
           <p className="text-sm text-red-600">{(saveField.error as Error).message}</p>
         )}
+      </fieldset>
+
+      <fieldset className="space-y-3 rounded-xl border bg-white px-4 pb-4 pt-1">
+        <legend className="ml-2 px-1 text-sm font-semibold text-gray-700">{t('calendars.title')}</legend>
+        <p className="text-sm text-gray-600">{t('calendars.profileHint')}</p>
+        <Button
+          type="button"
+          variant="secondary"
+          className="inline-flex items-center gap-1.5"
+          onClick={() => navigate('/calendars')}
+        >
+          <CalendarSync size={16} />
+          {calendarCount > 0 ? t('calendars.manage', { count: calendarCount }) : t('calendars.connect')}
+        </Button>
       </fieldset>
 
       <fieldset className="space-y-2 rounded-xl border bg-white px-4 pb-4 pt-1">

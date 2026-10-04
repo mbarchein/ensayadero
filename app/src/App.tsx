@@ -28,6 +28,7 @@ import NewSessionPage from './features/planner/NewSessionPage'
 import NotificationsPage from './features/notifications/NotificationsPage'
 import ProfilePage from './features/profile/ProfilePage'
 import AdminPage from './features/admin/AdminPage'
+import CalendarsPage from './features/calendars/CalendarsPage'
 
 export default function App() {
   return (
@@ -81,6 +82,7 @@ export default function App() {
           <Route path="/upcoming" element={<UpcomingPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/calendars" element={<CalendarsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/g/:groupId" element={<SessionsPage />} />
           <Route path="/g/:groupId/edit" element={<EditGroupPage />} />
