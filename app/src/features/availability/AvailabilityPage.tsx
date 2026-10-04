@@ -674,69 +674,6 @@ export default function AvailabilityPage() {
             <>
               <Button
                 variant="ghost"
-                className="p-2"
-                aria-label={t('availability.copyWeeks')}
-                title={t('availability.copyWeeks')}
-                onClick={() => setCopyOpen(true)}
-                disabled={copyWeeks.isPending}
-              >
-                <Copy size={18} />
-              </Button>
-              <Button
-                variant="ghost"
-                className="p-2 text-red-600"
-                aria-label={t('availability.clearWeek')}
-                title={t('availability.clearWeek')}
-                onClick={() => setClearOpen(true)}
-                disabled={clearWeek.isPending}
-              >
-                <Trash2 size={18} />
-              </Button>
-            </>
-          )}
-          {dayView && (
-            <Button
-              variant="ghost"
-              className="p-2"
-              aria-label={t('common.close')}
-              title={t('common.close')}
-              onClick={() => setEditDay(null)}
-            >
-              <X size={20} />
-            </Button>
-          )}
-        </div>
-      </header>
-
-      {/* view switch (mine / group) + group picker, and on mine the calendar
-          and fill-in actions. Below the header: the header has no room left
-          for them on narrow phones */}
-      {!dayView && (
-        <div className="flex shrink-0 items-center gap-2">
-          {myGroups.length > 0 && (
-            <div className="flex shrink-0 rounded-lg border border-violet-200 p-0.5 text-xs font-medium">
-              <button
-                type="button"
-                onClick={() => switchMode('me')}
-                aria-pressed={!groupView}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 ${!groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-              >
-                <User size={16} aria-hidden /> {t('availability.viewMine')}
-              </button>
-              <button
-                type="button"
-                onClick={() => switchMode('group')}
-                aria-pressed={groupView}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 ${groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
-              >
-                <Users size={16} aria-hidden /> {t('availability.viewGroup')}
-              </button>
-            </div>
-          )}
-          {!groupView && (
-            <div className="ml-auto flex items-center">
-              <Button
-                variant="ghost"
                 className="relative !p-2"
                 aria-label={
                   cal.sources.data?.some((s) => s.last_error)
@@ -763,8 +700,64 @@ export default function AvailabilityPage() {
               >
                 <WandSparkles size={18} />
               </Button>
-            </div>
+              <Button
+                variant="ghost"
+                className="!p-2"
+                aria-label={t('availability.copyWeeks')}
+                title={t('availability.copyWeeks')}
+                onClick={() => setCopyOpen(true)}
+                disabled={copyWeeks.isPending}
+              >
+                <Copy size={18} />
+              </Button>
+              <Button
+                variant="ghost"
+                className="!p-2 text-red-600"
+                aria-label={t('availability.clearWeek')}
+                title={t('availability.clearWeek')}
+                onClick={() => setClearOpen(true)}
+                disabled={clearWeek.isPending}
+              >
+                <Trash2 size={18} />
+              </Button>
+            </>
           )}
+          {dayView && (
+            <Button
+              variant="ghost"
+              className="p-2"
+              aria-label={t('common.close')}
+              title={t('common.close')}
+              onClick={() => setEditDay(null)}
+            >
+              <X size={20} />
+            </Button>
+          )}
+        </div>
+      </header>
+
+      {/* view switch (mine / group) + group picker. Below the header: the
+          header has no room left for it on narrow phones */}
+      {!dayView && myGroups.length > 0 && (
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 rounded-lg border border-violet-200 p-0.5 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => switchMode('me')}
+              aria-pressed={!groupView}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 ${!groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+            >
+              <User size={16} aria-hidden /> {t('availability.viewMine')}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode('group')}
+              aria-pressed={groupView}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 ${groupView ? 'bg-violet-600 text-white' : 'text-violet-700'}`}
+            >
+              <Users size={16} aria-hidden /> {t('availability.viewGroup')}
+            </button>
+          </div>
           {groupView && myGroups.length > 1 && (
             <select
               value={activeGroup.id}
